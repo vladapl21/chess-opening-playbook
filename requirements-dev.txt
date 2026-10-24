@@ -1,0 +1,4 @@
+-r requirements.txt
+# End-to-end tests and the README screenshots
+playwright>=1.45
+pillow>=10

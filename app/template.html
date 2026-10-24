@@ -1,0 +1,1428 @@
+<title>Opening Playbook</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500..800;1,6..96,500..800&family=Instrument+Sans:wght@400..700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: app shell. Header with tabs; Learn = hero + lesson map; Study/Drill = sticky board column beside a coach column; stacks at phone width. */
+:root{
+  --bg:#EDF1EC; --surface:#FFFFFF; --surface-2:#E3E9E2; --ink:#12201A; --muted:#566960; --line:#D0D9D2;
+  --accent:#0D6A4E; --accent-ink:#FFFFFF; --accent-soft:#D3EBE0;
+  --rosso:#B93628; --rosso-soft:#F6DDD8; --oro:#9C6F0E; --oro-soft:#F4E8C9; --blu:#2D5DAA; --blu-soft:#DCE5F5; --viola:#674C9E; --viola-soft:#E8E1F4;
+  --sq-light:#E6ECE2; --sq-dark:#84A390; --hl:rgba(240,201,64,.55); --sel:rgba(13,106,78,.38);
+  --arr-g:#11843F; --arr-r:#D2302A; --arr-b:#2F63C9; --arr-y:#E3A90E;
+  --shadow:0 1px 2px rgba(18,32,26,.06),0 8px 24px rgba(18,32,26,.08);
+  --f-display:"Bodoni Moda","Bodoni 72","Didot",Georgia,serif;
+  --f-body:"Instrument Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --r:14px; --pico-b:none;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1411; --surface:#151F1A; --surface-2:#1C2822; --ink:#E4EDE8; --muted:#97ACA2; --line:#2A3832;
+  --accent:#43C08F; --accent-ink:#06231A; --accent-soft:#173A2D;
+  --rosso:#F2685B; --rosso-soft:#3D1C18; --oro:#E2B54C; --oro-soft:#3A2F14; --blu:#86AEF2; --blu-soft:#1B2A45; --viola:#B9A2EC; --viola-soft:#2C2342;
+  --sq-light:#CFD8CC; --sq-dark:#6F8D7B; --hl:rgba(240,201,64,.5); --sel:rgba(67,192,143,.42);
+  --arr-g:#1FA155; --arr-r:#E8463D; --arr-b:#4F82E6; --arr-y:#F0B92A;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35); --pico-b:drop-shadow(0 0 1px rgba(214,226,219,.95)) drop-shadow(0 0 .6px rgba(214,226,219,.95)); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1411; --surface:#151F1A; --surface-2:#1C2822; --ink:#E4EDE8; --muted:#97ACA2; --line:#2A3832;
+  --accent:#43C08F; --accent-ink:#06231A; --accent-soft:#173A2D;
+  --rosso:#F2685B; --rosso-soft:#3D1C18; --oro:#E2B54C; --oro-soft:#3A2F14; --blu:#86AEF2; --blu-soft:#1B2A45; --viola:#B9A2EC; --viola-soft:#2C2342;
+  --sq-light:#CFD8CC; --sq-dark:#6F8D7B; --hl:rgba(240,201,64,.5); --sel:rgba(67,192,143,.42);
+  --arr-g:#1FA155; --arr-r:#E8463D; --arr-b:#4F82E6; --arr-y:#F0B92A;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35); --pico-b:drop-shadow(0 0 1px rgba(214,226,219,.95)) drop-shadow(0 0 .6px rgba(214,226,219,.95)); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px;border-radius:6px}
+.app{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 48px}
+h1,h2,h3,h4{text-wrap:balance;margin:0}
+p{margin:0}
+.kicker{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.tnum{font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.pico.b{filter:var(--pico-b)}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:22px}
+.brand{display:flex;align-items:center;gap:12px;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.brand .mark{width:40px;height:40px;border-radius:11px;background:var(--accent);display:grid;place-items:center;flex:none}
+.brand .mark svg{width:30px;height:30px}
+.wordmark{font-family:var(--f-display);font-weight:700;font-size:24px;line-height:1.05;letter-spacing:-.01em}
+.wordmark em{font-style:italic;font-weight:600;color:var(--accent)}
+.tabs{display:flex;gap:4px;background:var(--surface-2);padding:4px;border-radius:12px;overflow-x:auto;max-width:100%}
+.tabs button{border:0;background:none;padding:8px 14px;border-radius:9px;font-weight:600;font-size:14px;color:var(--muted);cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.tabs button .sm{display:none}
+.tabs button .badge,.sidesw .badge{display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:9px;background:var(--rosso);color:#fff;font-size:11px;margin-left:6px;padding:0 5px;font-family:var(--f-mono)}
+.brandrow{display:flex;align-items:center;gap:10px 18px;flex-wrap:wrap;min-width:0}
+.sidesw{display:inline-flex;gap:2px;background:var(--surface-2);padding:3px;border-radius:11px}
+.sidesw button{display:inline-flex;align-items:center;gap:7px;border:0;background:none;padding:6px 12px;border-radius:8px;font-weight:650;font-size:13.5px;color:var(--muted);cursor:pointer;white-space:nowrap}
+.sidesw button:hover{color:var(--ink)}
+.sidesw button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);box-shadow:var(--shadow)}
+.sidesw .sw{width:11px;height:11px;border-radius:50%;border:1.5px solid currentColor;display:block;flex:none}
+.sidesw .sw.w{background:#FFFFFF} .sidesw .sw.b{background:#1B1F1D}
+
+/* buttons, chips */
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);padding:9px 15px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;transition:transform .12s,background .12s}
+.btn:hover{background:var(--surface-2)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.07);background:var(--accent)}
+.btn.ghost{background:none;border-color:transparent}
+.btn.small{padding:6px 10px;font-size:13px;border-radius:8px}
+.btn[disabled]{opacity:.45;cursor:default}
+.btn svg{width:16px;height:16px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;padding:3px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted);white-space:nowrap;line-height:1.35}
+.chip.core{background:var(--accent-soft);color:var(--accent)}
+.chip.common{background:var(--blu-soft);color:var(--blu)}
+.chip.rare{background:var(--surface-2);color:var(--muted)}
+.chip.key,.chip.good{background:var(--accent-soft);color:var(--accent)}
+.chip.best{background:var(--blu-soft);color:var(--blu)}
+.chip.mistake{background:var(--oro-soft);color:var(--oro)}
+.chip.blunder,.chip.warn,.chip.missed,.chip.trap{background:var(--rosso-soft);color:var(--rosso)}
+.chip.mate{background:var(--ink);color:var(--bg)}
+.chip.draw{background:var(--surface-2);color:var(--muted)}
+.chip.fix,.chip.swap{background:var(--viola-soft);color:var(--viola)}
+.chip.new{background:var(--viola-soft);color:var(--viola)}
+.chip.game{background:var(--oro-soft);color:var(--oro)}
+.chip.win{background:var(--accent-soft);color:var(--accent)}
+.chip.loss{background:var(--rosso-soft);color:var(--rosso)}
+
+/* board */
+.board{position:relative;width:100%;aspect-ratio:1/1;max-width:100%;border-radius:10px;overflow:hidden;box-shadow:var(--shadow);user-select:none;-webkit-user-select:none}
+.board svg,.thumb svg{display:block;width:100%;height:100%}
+.sq-l{fill:var(--sq-light)} .sq-d{fill:var(--sq-dark)}
+.coord{font-family:var(--f-body);font-weight:700;font-size:15px}
+.coord.on-l{fill:var(--sq-dark)} .coord.on-d{fill:var(--sq-light)}
+.hl{fill:var(--hl)} .selsq{fill:var(--sel)}
+.flash-ok{fill:rgba(17,132,63,.45)} .flash-bad{fill:rgba(210,48,42,.45)}
+.arr path{fill:none;stroke-linecap:round} .arr{opacity:.82}
+.arr.g path{stroke:var(--arr-g)} .arr.g polygon{fill:var(--arr-g)}
+.arr.r path{stroke:var(--arr-r)} .arr.r polygon{fill:var(--arr-r)}
+.arr.b path{stroke:var(--arr-b)} .arr.b polygon{fill:var(--arr-b)}
+.arr.y path{stroke:var(--arr-y)} .arr.y polygon{fill:var(--arr-y)}
+.arr.hint{opacity:.55}
+.ring{fill:none;stroke-width:7}
+.ring.g{stroke:var(--arr-g)} .ring.r{stroke:var(--arr-r)} .ring.b{stroke:var(--arr-b)} .ring.y{stroke:var(--arr-y)}
+.dot{fill:rgba(18,32,26,.28)} .capring{fill:none;stroke:rgba(18,32,26,.3);stroke-width:8}
+.board.input{touch-action:none;cursor:pointer}
+.ghost{pointer-events:none}
+.board-wrap{display:grid;grid-template-columns:12px minmax(0,1fr);gap:8px;align-items:stretch}
+.evalbar{position:relative;border-radius:6px;overflow:hidden;background:#2B312E;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.evalbar .fill{position:absolute;left:0;right:0;bottom:0;background:#F4F1E8;transition:height .35s ease}
+.evalbar .mid{position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(128,128,128,.6)}
+.evalbar.flip{background:#F4F1E8} .evalbar.flip .fill{background:#2B312E}
+.thumb{aspect-ratio:1/1;border-radius:8px;overflow:hidden;background:var(--surface-2)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,430px) minmax(0,1fr);gap:40px;align-items:center;margin-bottom:44px}
+.hero-board{position:relative}
+.hero-cap{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px;font-size:13px;color:var(--muted)}
+.hero h2{font-family:var(--f-display);font-weight:700;font-size:clamp(34px,5vw,58px);line-height:1.02;letter-spacing:-.02em;margin:10px 0 14px}
+.hero h2 em{font-style:italic;color:var(--rosso);font-weight:600}
+.lede{font-size:17px;color:var(--muted);max-width:56ch}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:24px 0}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.stat b{display:block;font-family:var(--f-display);font-size:30px;line-height:1.05;font-weight:700}
+.stat span{display:block;font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.35}
+.stat.alert b{color:var(--rosso)}
+.cta{display:flex;flex-wrap:wrap;gap:10px}
+
+/* map */
+.part{margin-bottom:40px}
+.part-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 20px;align-items:end;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.part-head h3{font-family:var(--f-display);font-size:30px;font-weight:700;letter-spacing:-.01em;line-height:1.1}
+.part-head p{color:var(--muted);max-width:62ch;grid-column:1}
+.part-head .count{grid-row:1/3;grid-column:2;font-size:13px;color:var(--muted);text-align:right}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.lcard{display:grid;grid-template-columns:92px minmax(0,1fr);gap:12px;align-items:start;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;cursor:pointer;transition:border-color .15s,transform .15s}
+.lcard:hover{border-color:var(--accent);transform:translateY(-1px)}
+.lcard h4{font-size:15.5px;line-height:1.25;margin:6px 0 4px}
+.lcard p{font-size:13px;color:var(--muted);line-height:1.4}
+.lcard .meta{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--muted)}
+.lcard .lwhy{margin-top:8px;color:var(--ink);font-size:13.5px}
+.lcard.feat{grid-column:span 2;grid-row:span 2;grid-template-columns:minmax(0,236px) minmax(0,1fr);gap:16px;padding:14px}
+.lcard.feat h4,.lcard.wide h4{font-family:var(--f-display);font-size:24px;font-weight:700;line-height:1.1;margin:8px 0 6px}
+.lcard.wide{grid-column:1/-1;grid-template-columns:150px minmax(0,1fr);gap:18px;padding:14px;max-width:760px}
+.pips{display:inline-flex;gap:3px}
+.pips i{width:7px;height:7px;border-radius:50%;background:var(--line);display:block}
+.pips i.on{background:var(--accent)}
+.changes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:8px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.panel h3{font-family:var(--f-display);font-size:22px;font-weight:700;margin-bottom:10px}
+.panel ul{margin:0;padding-left:18px}
+.panel li{margin:6px 0;color:var(--muted)}
+.panel li b{color:var(--ink);font-weight:600}
+.linkish{background:none;border:0;padding:0;color:var(--accent);font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+
+/* study + drill */
+.crumbs{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.crumbs .where{color:var(--muted);font-size:13.5px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crumbs .btn{flex:none}
+.crumbs .spacer{display:none}
+.sgrid{display:grid;grid-template-columns:minmax(0,540px) minmax(0,1fr);gap:32px;align-items:start}
+.sgrid.study{grid-template-areas:"board head" "board coach";grid-template-rows:auto 1fr;row-gap:16px}
+.sgrid.study .lhead{grid-area:head;min-width:0}
+.sgrid.study .bcol{grid-area:board}
+.sgrid.study .ccol{grid-area:coach}
+.bcol{position:sticky;top:max(12px,env(safe-area-inset-top,0px));align-self:start}
+.controls{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:12px;flex-wrap:wrap}
+.ctl{width:44px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer}
+.ctl:hover{background:var(--surface-2)}
+.ctl svg{width:18px;height:18px}
+.ctl[disabled]{opacity:.35;cursor:default}
+.ctl.play[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.evaltext{text-align:center;font-size:12.5px;color:var(--muted);margin-top:8px}
+.evaltext b{color:var(--ink);font-weight:600}
+.ccol{min-width:0;display:flex;flex-direction:column;gap:16px}
+.lhead h2{font-family:var(--f-display);font-weight:700;font-size:clamp(26px,3vw,36px);line-height:1.08;letter-spacing:-.01em;margin:8px 0 6px}
+.lhead .sub{color:var(--muted)}
+.lhead .why{font-size:13.5px;margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--surface-2);color:var(--ink)}
+.mcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 16px 14px;box-shadow:var(--shadow)}
+.mcard .who{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.side{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:6px}
+.side.you{background:var(--ink);color:var(--bg)}
+.side.blk{background:var(--surface-2);color:var(--muted);box-shadow:inset 0 0 0 1px var(--line)}
+.mcard .stepno{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.mcard h3{font-size:21px;line-height:1.25;font-weight:650;display:flex;align-items:center;gap:10px}
+.mcard h3 .pico{width:30px;height:30px;flex:none}
+.mcard .note{margin-top:8px;font-size:15px;max-width:62ch}
+.mcard .chips{margin-top:10px}
+.mcard.empty h3{font-weight:600;color:var(--muted)}
+.opts h4,.linesin h4{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.optlist{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:9px 11px;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt.cur{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+.opt .pico{width:26px;height:26px}
+.opt b{display:block;font-size:14px;font-weight:600}
+.opt span{display:block;font-size:12.5px;color:var(--muted)}
+.opt.warn{border-style:dashed}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.timeline{position:relative;list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.timeline li{border-top:1px solid var(--line)}
+.timeline li:first-child{border-top:0}
+.trow{display:grid;grid-template-columns:44px 24px minmax(0,1fr) auto;gap:8px;align-items:center;width:100%;text-align:left;background:none;border:0;padding:8px 12px;cursor:pointer;font-size:14px}
+.trow:hover{background:var(--surface-2)}
+.trow.cur{background:var(--accent-soft)}
+.trow .n{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.trow .pico{width:22px;height:22px}
+.trow.blk .lbl{color:var(--muted)}
+.trow .tg{display:flex;gap:4px}
+.trow .tg i{width:8px;height:8px;border-radius:50%;display:block}
+.tg .key,.tg .good{background:var(--accent)} .tg .best{background:var(--blu)} .tg .mistake{background:var(--oro)} .tg .blunder,.tg .trap,.tg .warn,.tg .missed{background:var(--rosso)} .tg .mate{background:var(--ink)} .tg .fix,.tg .new,.tg .swap{background:var(--viola)} .tg .game{background:var(--oro)} .tg .draw{background:var(--muted)}
+.collapsed{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;font-size:13px;color:var(--muted);background:var(--surface-2);width:100%;border:0;text-align:left;cursor:pointer}
+.outcome{display:flex;align-items:center;gap:10px;font-size:14px;padding:10px 12px;border-radius:10px;background:var(--surface-2)}
+.outcome b{font-weight:650}
+.lesson-actions{display:flex;flex-wrap:wrap;gap:8px}
+
+/* drill */
+.dpanel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:12px}
+.dpanel h3{font-family:var(--f-display);font-size:24px;font-weight:700;line-height:1.15}
+.status{display:flex;align-items:center;gap:10px;font-weight:650;font-size:16px}
+.status .bub{width:10px;height:10px;border-radius:50%;background:var(--accent);flex:none}
+.status.wait .bub{background:var(--muted)}
+.status.bad .bub{background:var(--rosso)}
+.feedback{font-size:14.5px;color:var(--muted);min-height:3em}
+.sbpend{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--accent-soft);font-size:13.5px}
+.sbpend span{flex:1 1 220px;min-width:0}
+.feedback b{color:var(--ink)}
+.progressbar{height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden}
+.progressbar i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.queue{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.queue div{background:var(--surface-2);border-radius:10px;padding:10px;text-align:center}
+.queue b{display:block;font-family:var(--f-display);font-size:24px;line-height:1.1}
+.queue span{font-size:12px;color:var(--muted)}
+.mtable{display:grid;gap:4px}
+.mrow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:6px 8px;border-radius:8px;font-size:13.5px;background:none;border:0;text-align:left;cursor:pointer;width:100%}
+.mrow:hover{background:var(--surface-2)}
+.mgroup{display:grid;gap:1px;padding:8px 0;border-top:1px solid var(--line)}
+.mgroup:first-child{border-top:0;padding-top:0}
+.mhead{font-weight:650;font-size:14px;padding:2px 8px 4px}
+.mgroup .mrow{padding-left:16px;color:var(--muted)}
+.mrow .due{font-size:12px;color:var(--muted);font-family:var(--f-mono)}
+.mrow .due.now{color:var(--rosso)}
+.donebox{display:grid;gap:10px;padding:14px;border-radius:12px;background:var(--accent-soft)}
+.donebox.bad{background:var(--oro-soft)}
+.donebox h4{font-size:17px}
+
+/* games */
+.insights{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:28px}
+.insight{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.insight .big{font-family:var(--f-display);font-size:44px;line-height:1;font-weight:700;color:var(--rosso)}
+.insight .big small{font-family:var(--f-body);font-size:14px;font-weight:600;letter-spacing:.02em;color:var(--muted);margin-left:8px}
+.insight h3{font-size:18px;margin:4px 0 6px;line-height:1.25}
+.insight p{color:var(--muted);font-size:14px}
+.gcards{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+.gcard{display:grid;grid-template-columns:180px minmax(0,1fr);gap:20px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;align-items:start}
+.gcard p{max-width:72ch}
+.gcard h4{font-family:var(--f-display);font-size:24px;font-weight:700;line-height:1.15;margin:8px 0 6px}
+.gcard p{font-size:13.5px;color:var(--muted)}
+.gcard .acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.nw{white-space:nowrap}
+.sechead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:6px 0 14px}
+.sechead h2{font-family:var(--f-display);font-size:32px;font-weight:700;letter-spacing:-.01em}
+.sechead p{color:var(--muted);max-width:60ch}
+
+/* by-opening table */
+.otable{display:grid;gap:2px}
+.orow2{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,2fr) 44px 56px 48px;gap:10px;align-items:center;padding:7px 8px;border-radius:8px;background:none;border:0;text-align:left;cursor:pointer;font-size:14px;width:100%}
+.orow2:hover{background:var(--surface-2)}
+.orow2.head{cursor:default;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.orow2.head:hover{background:none}
+.orow2 .ob{height:8px;border-radius:4px;background:var(--surface-2);overflow:hidden}
+.orow2 .ob i{display:block;height:100%;background:var(--accent);border-radius:4px}
+.orow2 .on{font-weight:600}
+.orow2 .op2{text-align:right;font-family:var(--f-mono);font-size:12.5px}
+.orow2 .op2.good{color:var(--accent)} .orow2 .op2.bad{color:var(--rosso)}
+
+/* cheat sheet */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+.ccard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px;text-align:left;cursor:pointer;display:grid;gap:8px}
+.ccard:hover{border-color:var(--accent)}
+.ccard .if{font-size:12px;color:var(--muted);line-height:1.35}
+.ccard .then{font-size:14.5px;font-weight:650;line-height:1.3}
+.ccard .then::before{content:"→ ";color:var(--accent)}
+
+/* opening picker */
+.reps{margin-bottom:30px}
+.reps .sechead{margin-bottom:12px}
+.rgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.rgrid.n9{grid-template-columns:repeat(3,minmax(0,1fr))}
+.rtile{display:grid;grid-template-columns:64px minmax(0,1fr);gap:10px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:9px;cursor:pointer;transition:border-color .15s,transform .15s;min-width:0}
+.rtile:hover{border-color:var(--accent);transform:translateY(-1px)}
+.rtile[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent);background:var(--accent-soft)}
+.rtile .thumb{border-radius:6px}
+.rtx{display:grid;gap:4px;min-width:0}
+.rtx b{font-size:14.5px;font-weight:650;line-height:1.2}
+.rtx .rmove{font-size:12px;color:var(--muted);line-height:1.3}
+.rbar{height:5px;border-radius:3px;background:var(--surface-2);overflow:hidden}
+.rtile[aria-pressed="true"] .rbar{background:var(--surface)}
+.rbar i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.rnum{display:flex;justify-content:space-between;gap:6px;font-size:11.5px;color:var(--muted)}
+.chapter{scroll-margin-top:16px}
+.facts{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.facts li{display:grid;grid-template-columns:minmax(0,1fr);gap:2px;padding:12px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--line)}
+.facts li b{font-weight:650}
+.facts li span{color:var(--muted);font-size:14px}
+
+/* odds + sandbox */
+.odds{display:grid;gap:6px}
+.orow{display:grid;grid-template-columns:24px minmax(0,1fr) 92px 38px;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+.orow .pico{width:22px;height:22px}
+.orow .ol{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.orow .ob{height:8px;border-radius:4px;background:var(--surface-2);overflow:hidden}
+.orow .ob i{display:block;height:100%;background:var(--line)}
+.orow.pick{color:var(--ink);font-weight:650}
+.orow.pick .ob i{background:var(--accent)}
+.orow .op{font-family:var(--f-mono);font-size:12px;text-align:right}
+.feed{list-style:none;margin:0;padding:0;display:grid;gap:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;max-height:300px;overflow-y:auto}
+.feed li{display:grid;grid-template-columns:40px 24px minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 12px;border-top:1px solid var(--line);font-size:14px}
+.feed li:first-child{border-top:0}
+.feed .n{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.feed .pico{width:22px;height:22px}
+.feed li.blk .fl{color:var(--muted)}
+.feed .fq{font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+.feed li.slip{background:var(--rosso-soft)}
+.feed li.last{background:var(--accent-soft)}
+.slips{display:grid;gap:10px}
+.slipc{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;align-items:center;background:var(--surface);border-radius:10px;padding:8px}
+.slipc b{display:block;font-size:14.5px}
+.slipc p{font-size:13px;color:var(--muted)}
+.chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chain .chip .pico{width:16px;height:16px}
+.bigstat{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.bigstat b{font-family:var(--f-display);font-size:40px;line-height:1;font-weight:700}
+.bigstat span{color:var(--muted);font-size:14px}
+.sbintro{display:grid;gap:12px}
+.sbintro ol{margin:0;padding-left:20px;color:var(--muted);display:grid;gap:4px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12.5px;color:var(--muted)}
+.legend i{display:inline-block;width:18px;height:4px;border-radius:2px;vertical-align:middle;margin-right:5px}
+
+footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
+
+@media (max-width: 760px){
+  .lcard.feat{grid-column:auto;grid-row:auto;grid-template-columns:96px minmax(0,1fr);gap:12px;padding:12px}
+  .lcard.feat h4{font-size:19px}
+}
+@media (min-width: 981px){
+  .timeline{max-height:min(56vh,560px);overflow-y:auto;overscroll-behavior:contain}
+}
+@media (max-width: 980px){
+  .hero{grid-template-columns:minmax(0,1fr);gap:24px}
+  .hero-board{max-width:440px}
+  .sgrid{grid-template-columns:minmax(0,1fr);gap:20px}
+  .sgrid.study{grid-template-areas:"head" "board" "coach";grid-template-rows:auto}
+  .bcol{position:static;max-width:560px;width:100%;margin:0 auto}
+  .changes,.insights{grid-template-columns:minmax(0,1fr)}
+  .rgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width: 560px){
+  .stats{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .stats .stat:last-child{grid-column:1/-1}
+  .lcard{grid-template-columns:76px minmax(0,1fr)}
+  .insight{grid-template-columns:96px minmax(0,1fr)}
+  .navtxt{display:none}
+  .lcard.wide{grid-template-columns:96px minmax(0,1fr)}
+  .gcard h4{font-size:19px}
+  .insight .big{font-size:34px}
+  .gcard{grid-template-columns:96px minmax(0,1fr)}
+  .wordmark{font-size:21px}
+  .tabs{width:100%}
+  .tabs button{flex:1;padding:8px 6px}
+  .part-head{grid-template-columns:minmax(0,1fr)}
+  .part-head .count{grid-row:auto;grid-column:1;text-align:left}
+  .trow{grid-template-columns:38px 22px minmax(0,1fr) auto}
+  .feed li{grid-template-columns:34px 22px minmax(0,1fr) auto;padding:7px 10px}
+  .orow{grid-template-columns:22px minmax(0,1fr) 56px 34px}
+  .rgrid,.rgrid.n9{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+  .rgrid.n9 .rtile:last-child{grid-column:1/-1}
+  .brandrow{width:100%;justify-content:space-between}
+  .rtile{grid-template-columns:44px minmax(0,1fr);gap:8px;padding:8px}
+  .rtx b{font-size:13.5px}
+  .rtx .rmove{display:none}
+  .rnum{font-size:11px}
+  .orow2{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 48px 44px;gap:8px;font-size:13px}
+  .orow2 > :nth-child(3){display:none}
+  .orow2.head{font-size:10.5px;letter-spacing:.06em}
+  .tabs button .lg{display:none}
+  .tabs button .sm{display:inline}
+  .rpct{display:none}
+  .rnum span{white-space:nowrap}
+  .queue b{font-size:20px}
+  .lhead .why{display:none}
+  .lhead h2{font-size:26px}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><!--__PIECES__--></defs></svg>
+
+<div class="app" id="app">
+  <header class="top">
+    <div class="brandrow">
+      <button class="brand" data-go="learn" aria-label="Opening Playbook home">
+        <span class="mark" aria-hidden="true"><svg viewBox="0 0 45 45"><use id="brandPiece" href="#p-wb"/></svg></span>
+        <span><span class="kicker" id="brandKick">White repertoire</span><h1 class="wordmark">The Opening <em>Playbook</em></h1></span>
+      </button>
+      <div class="sidesw" role="group" aria-label="Repertoire color">
+        <button data-side="w" aria-pressed="true"><i class="sw w" aria-hidden="true"></i>White<span class="badge" id="dueW" hidden>0</span></button>
+        <button data-side="b" aria-pressed="false"><i class="sw b" aria-hidden="true"></i>Black<span class="badge" id="dueB" hidden>0</span></button>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button role="tab" data-view="learn" aria-selected="true">Learn</button>
+      <button role="tab" data-view="sandbox" aria-selected="false">Sandbox</button>
+      <button role="tab" data-view="drill" aria-selected="false">Drill<span class="badge" id="dueBadge" hidden>0</span></button>
+      <button role="tab" data-view="games" aria-selected="false"><span class="lg">Your games</span><span class="sm">Games</span></button>
+      <button role="tab" data-view="cheat" aria-selected="false">Cheat sheet</button>
+    </nav>
+  </header>
+  <main id="view" aria-live="polite"></main>
+  <footer class="foot" id="foot"></footer>
+</div>
+
+<script>
+const DATA_W = /*__DATA_W__*/;
+const DATA_B = /*__DATA_B__*/;
+</script>
+<script>
+"use strict";
+/* ------------------------------------------------------------------ books + data indexes */
+// Two books share one engine: the White book (you move the white pieces) and the Black book.
+// loadBook() swaps every index below; nothing else holds on to a book's nodes.
+const BOOKS = {w: DATA_W, b: DATA_B};
+const SIDE_KEY = 'playbook-side';
+let SIDE = 'w', DATA, N, LINES, LESSONS, PARTS, GAMES, CHAPTERS, E4, REPN, ODDS_ROOT, ME, MYC, OPP, FLIP, LESSON_ORDER, linesByNode, DRILLABLE, DRILLSET;
+const _reach = new Map(), _sbl = new Map(); let _anc = {};
+function drillableOf(D){ const les = new Set(D.lessons.map(l => l.id)), me = D.side === 'b' ? 0 : 1;
+  return D.lines.filter(l => les.has(l.lesson) && !l.n.some(i => (D.nodes[i].g || []).includes('warn') && D.nodes[i].w === me)).map(l => l.id); }
+for (const s of ['w', 'b']){ BOOKS[s].side = s; BOOKS[s].drillable = drillableOf(BOOKS[s]); }
+function loadBook(side){
+  SIDE = BOOKS[side] ? side : 'w'; DATA = BOOKS[SIDE];
+  N = DATA.nodes; LINES = {}; LESSONS = {}; PARTS = {}; GAMES = {}; CHAPTERS = {};
+  DATA.lines.forEach(l => LINES[l.id] = l);
+  DATA.lessons.forEach(l => LESSONS[l.id] = l);
+  DATA.parts.forEach(p => PARTS[p.id] = p);
+  DATA.games.forEach(g => GAMES[g.id] = g);
+  DATA.chapters.forEach(c => CHAPTERS[c.id] = c);
+  E4 = DATA.e4; REPN = DATA.repCount; ODDS_ROOT = DATA.oddsRoot ?? DATA.e4;
+  ME = SIDE === 'w' ? 1 : 0; MYC = SIDE === 'w' ? 'White' : 'Black'; OPP = SIDE === 'w' ? 'Black' : 'White'; FLIP = SIDE === 'b';
+  LESSON_ORDER = DATA.lessons.map(l => l.id);
+  linesByNode = new Map();
+  for (const l of DATA.lines) for (const i of l.n) { if (!linesByNode.has(i)) linesByNode.set(i, []); linesByNode.get(i).push(l.id); }
+  DRILLABLE = DATA.drillable; DRILLSET = new Set(DRILLABLE);
+  _reach.clear(); _sbl.clear(); _anc = {};
+  TAGNAMES.best = OPP + "'s best";
+  SBS = SB_STATE[SIDE];
+}
+const isMine = nd => nd.w === ME;
+const isMyPiece = p => !!p && (ME === 1 ? p === p.toUpperCase() : p === p.toLowerCase());
+const chapterOf = L => CHAPTERS[PARTS[L.part].ch];
+const pctTxt = q => q >= 0.995 ? '100%' : q >= 0.095 ? Math.round(q * 100) + '%' : q >= 0.01 ? (q * 100).toFixed(q >= 0.05 ? 0 : 1).replace(/\.0$/, '') + '%' : '<1%';
+function lessonOf(lineId){ const l = LINES[lineId]; return LESSONS[l.lesson] || null; }
+function isGameLine(lineId){ return !LESSONS[LINES[lineId].lesson]; }
+function lineStart(lineId){
+  const l = LINES[lineId];
+  if (l.at) return l.at - 1;
+  const les = LESSONS[l.lesson];
+  if (!les) return 0;
+  if (l.main) return Math.min(les.start || 0, l.n.length - 1);
+  const main = LINES[les.lines[0]].n;
+  let k = 0; while (k < l.n.length && k < main.length && l.n[k] === main[k]) k++;
+  return Math.max(0, k - 1);
+}
+const hasWarn = lineId => LINES[lineId].n.some(i => (N[i].g || []).includes('warn') && isMine(N[i]));
+// how often a line comes up: product of the opponent's odds along it (first move from your own games)
+function lineReach(id){
+  if (_reach.has(id)) return _reach.get(id);
+  let p = 1; for (const i of LINES[id].n) if (!isMine(N[i]) && N[i].q) p *= N[i].q;
+  _reach.set(id, p); return p;
+}
+function oneIn(p){ if (!p) return ''; const n = 1 / p; if (n < 1.5) return 'almost every game'; if (n < 20) return `about 1 in ${Math.round(n)} games`; if (n < 200) return `about 1 in ${Math.round(n / 5) * 5} games`; if (n < 2000) return `about 1 in ${Math.round(n / 50) * 50} games`; return 'rare: under 1 in 2,000 games'; }
+
+/* ------------------------------------------------------------------ chess helpers */
+const FILES = 'abcdefgh';
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function fenArr(f){ const a = new Array(64).fill(null); let r = 7, c = 0; for (const ch of f){ if (ch === '/'){ r--; c = 0; continue; } if (ch >= '1' && ch <= '8'){ c += +ch; continue; } a[r*8+c] = ch; c++; } return a; }
+const sqi = s => (s.charCodeAt(1) - 49) * 8 + (s.charCodeAt(0) - 97);
+const sqn = i => FILES[i % 8] + (Math.floor(i / 8) + 1);
+// square index -> top-left corner in an 800x800 board; the Black book shows Black at the bottom
+const sqxy = i => FLIP ? [(7 - i % 8) * 100, Math.floor(i / 8) * 100] : [(i % 8) * 100, (7 - Math.floor(i / 8)) * 100];
+const ply = idx => { let k = 0, i = idx; while (N[i].p !== null && N[i].p !== undefined){ i = N[i].p; k++; } return k; };
+const moveNo = p => Math.ceil(p / 2);
+const PIECE_NAME = {p:'pawn', n:'knight', b:'bishop', r:'rook', q:'queen', k:'king'};
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ------------------------------------------------------------------ board rendering */
+function arrowSVG(a, b, col, w = 17, extra = ''){
+  const [x1, y1] = sqxy(sqi(a)).map(v => v + 50), [x2, y2] = sqxy(sqi(b)).map(v => v + 50);
+  const dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy) || 1, ux = dx / L, uy = dy / L;
+  const head = w * 2.3, hw = w * 1.55, ex = x2 - ux * 18, ey = y2 - uy * 18, bx = ex - ux * head, by = ey - uy * head, px = -uy, py = ux;
+  const sx = x1 + ux * 26, sy = y1 + uy * 26;
+  return `<g class="arr ${col} ${extra}"><path d="M${sx.toFixed(1)},${sy.toFixed(1)} L${bx.toFixed(1)},${by.toFixed(1)}" stroke-width="${w}"/><polygon points="${ex.toFixed(1)},${ey.toFixed(1)} ${(bx+px*hw).toFixed(1)},${(by+py*hw).toFixed(1)} ${(bx-px*hw).toFixed(1)},${(by-py*hw).toFixed(1)}"/></g>`;
+}
+function boardSVG(fen, o = {}){
+  const a = fenArr(fen);
+  let s = `<svg viewBox="0 0 800 800" role="img" aria-label="${esc(o.aria || 'Chess position')}"><rect width="800" height="800" class="sq-l"/>`;
+  for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) if ((r + c) % 2 === 0){ const [x, y] = sqxy(r * 8 + c); s += `<rect x="${x}" y="${y}" width="100" height="100" class="sq-d"/>`; }
+  if (o.last){ for (const q of o.last){ const [x, y] = sqxy(sqi(q)); s += `<rect x="${x}" y="${y}" width="100" height="100" class="hl"/>`; } }
+  if (o.sel){ const [x, y] = sqxy(sqi(o.sel)); s += `<rect x="${x}" y="${y}" width="100" height="100" class="selsq"/>`; }
+  if (o.flash){ const [x, y] = sqxy(sqi(o.flash.sq)); s += `<rect x="${x}" y="${y}" width="100" height="100" class="${o.flash.ok ? 'flash-ok' : 'flash-bad'}"/>`; }
+  if (o.coords){
+    const lc = FLIP ? 7 : 0, br = FLIP ? 7 : 0; // left-edge file and bottom-edge rank
+    for (let r = 0; r < 8; r++){ const dark = ((r + lc) % 2 === 0); s += `<text x="5" y="${sqxy(r * 8 + lc)[1] + 19}" class="coord ${dark ? 'on-d' : 'on-l'}">${r+1}</text>`; }
+    for (let c = 0; c < 8; c++){ const dark = ((br + c) % 2 === 0); s += `<text x="${sqxy(br * 8 + c)[0] + 87}" y="793" class="coord ${dark ? 'on-d' : 'on-l'}">${FILES[c]}</text>`; }
+  }
+  for (const c of (o.circles || [])){ const [x, y] = sqxy(sqi(c.slice(0, 2))); s += `<circle cx="${x+50}" cy="${y+50}" r="43" class="ring ${c[2]}"/>`; }
+  for (let i = 0; i < 64; i++){ const p = a[i]; if (!p) continue; const w = p === p.toUpperCase(); const [x, y] = sqxy(i);
+    s += `<use href="#p-${w ? 'w' : 'b'}${p.toLowerCase()}" x="${x}" y="${y}" width="100" height="100" data-sq="${sqn(i)}"/>`; }
+  for (const d of (o.dots || [])){ const [x, y] = sqxy(sqi(d)); s += a[sqi(d)] ? `<circle cx="${x+50}" cy="${y+50}" r="44" class="capring"/>` : `<circle cx="${x+50}" cy="${y+50}" r="15" class="dot"/>`; }
+  for (const ar of (o.arrows || [])){ s += arrowSVG(ar.slice(0, 2), ar.slice(2, 4), ar[4], o.mini ? 22 : 17, ''); }
+  if (o.hint){ s += arrowSVG(o.hint.slice(0, 2), o.hint.slice(2, 4), 'g', o.mini ? 22 : 17, 'hint'); }
+  return s + '</svg>';
+}
+function nodeBoardOpts(idx, extra = {}){
+  const nd = N[idx], o = {coords: true};
+  if (nd.u) o.last = [nd.u.slice(0, 2), nd.u.slice(2, 4)];
+  if (nd.a) o.arrows = nd.a.slice();
+  if (nd.c) o.circles = nd.c.slice();
+  return Object.assign(o, extra);
+}
+function animateMove(svg, uci, meta, back){
+  if (reduced || !svg) return;
+  const from = uci.slice(0, 2), to = uci.slice(2, 4);
+  const go = (land, origin) => { const el = svg.querySelector(`use[data-sq="${land}"]`); if (!el) return;
+    const [x1, y1] = sqxy(sqi(origin)), [x2, y2] = sqxy(sqi(land));
+    el.animate([{transform: `translate(${x1-x2}px,${y1-y2}px)`}, {transform: 'translate(0px,0px)'}], {duration: 210, easing: 'cubic-bezier(.22,.8,.3,1)'}); };
+  if (back){ go(from, to); if (meta && meta.x) go(meta.x.slice(0, 2), meta.x.slice(2, 4)); }
+  else { go(to, from); if (meta && meta.x) go(meta.x.slice(2, 4), meta.x.slice(0, 2)); }
+}
+function pieceIcon(pc, white){ return `<svg class="pico ${white ? 'w' : 'b'}" viewBox="0 0 45 45" aria-hidden="true"><use href="#p-${white ? 'w' : 'b'}${pc}"/></svg>`; }
+function thumb(idx, o = {}){ return `<div class="thumb">${boardSVG(N[idx].f, Object.assign({mini: true}, o))}</div>`; }
+
+/* ------------------------------------------------------------------ evals */
+function evalInfo(e){
+  if (e === undefined || e === null) return null;
+  // engine values are from White's side; words and numbers are turned to your side
+  const meW = ME === 1;
+  if (typeof e === 'string'){
+    if (e === '#W') return {pct: 100, txt: meW ? 'Checkmate' : 'White checkmates', num: ''};
+    if (e === '#B') return {pct: 0, txt: meW ? 'Black checkmates' : 'Checkmate', num: ''};
+    if (e === 'M0') return {pct: 50, txt: 'Game over', num: ''};
+    const m = parseInt(e.slice(1), 10), mine = (m > 0) === meW;
+    return {pct: m > 0 ? 98 : 2, txt: mine ? `Forced mate for you in ${Math.abs(m)}` : `${OPP} has a forced mate in ${Math.abs(m)}`, num: ''};
+  }
+  const cp = e, pct = 50 + 50 * (2 / (1 + Math.exp(-cp / 260)) - 1), a = Math.abs(cp), my = meW ? cp : -cp;
+  let txt = a < 45 ? 'Equal' : a < 120 ? 'Slightly better for ' : a < 300 ? 'Clearly better for ' : 'Winning for ';
+  if (a >= 45) txt += my > 0 ? 'you' : OPP;
+  return {pct, txt, num: (my > 0 ? '+' : my < 0 ? '−' : '') + (a / 100).toFixed(1)};
+}
+function evalBarHTML(idx){ const ei = evalInfo(N[idx].e) || {pct: 50}, h = FLIP ? 100 - ei.pct : ei.pct; return `<div class="evalbar ${FLIP ? 'flip' : ''}" aria-hidden="true"><div class="fill" style="height:${h.toFixed(1)}%"></div><div class="mid"></div></div>`; }
+
+/* ------------------------------------------------------------------ progress store */
+const PKEY = 'italian-playbook-progress-v1';
+const DAY = 864e5, INTERVALS = [0, 1, 2, 4, 8, 16];
+const Prog = {
+  d: {lines: {}, puz: {}, updated: 0}, ref: null, saving: false, again: false,
+  load(){ try { const raw = localStorage.getItem(PKEY); if (raw){ const v = JSON.parse(raw); if (v && v.lines) this.d = v; } } catch(e){} },
+  async connect(){
+    try {
+      if (!window.claude || typeof window.claude.use !== 'function') return;
+      const [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+      if (!db || !user) return;
+      const uid = await user.id(); if (!uid) return;
+      this.ref = db.doc('data/users/' + uid + '/italian-progress');
+      const snap = await this.ref.get();
+      if (snap.exists){ const r = snap.data(); if (r && r.lines && (r.updated || 0) > (this.d.updated || 0)){ this.d = JSON.parse(JSON.stringify(r)); this.saveLocal(); refresh(); } }
+      else if (this.d.updated) this.push();
+    } catch(e){ this.ref = null; }
+  },
+  saveLocal(){ try { localStorage.setItem(PKEY, JSON.stringify(this.d)); } catch(e){} },
+  save(){ this.d.updated = Date.now(); this.saveLocal(); this.push(); },
+  async push(){
+    if (!this.ref) return;
+    if (this.saving){ this.again = true; return; }
+    this.saving = true;
+    try { await this.ref.set(JSON.parse(JSON.stringify(this.d))); } catch(e){ if (e && e.code !== 'unavailable') this.ref = null; }
+    this.saving = false;
+    if (this.again){ this.again = false; this.push(); }
+  },
+  rec(id){ return this.d.lines[id] || null; },
+  record(id, clean){
+    const r = this.d.lines[id] || {box: 0, seen: 0, clean: 0};
+    r.seen++; r.last = Date.now();
+    if (clean){ r.clean++; r.box = Math.min(5, (r.box || 0) + 1); } else r.box = 0;
+    r.due = Date.now() + INTERVALS[r.box] * DAY - 60e3;
+    this.d.lines[id] = r; this.save();
+  },
+  puz(id, ok){ const r = this.d.puz[id] || {tries: 0, ok: 0}; r.tries++; if (ok) r.ok++; r.last = Date.now(); this.d.puz[id] = r; this.save(); },
+  lessonLevel(lid){ const ls = LESSONS[lid].lines.filter(x => DRILLABLE.includes(x)); if (!ls.length) return 0;
+    return Math.round(ls.reduce((a, x) => a + Math.min(5, (this.rec(x) || {}).box || 0), 0) / ls.length); },
+  dueCount(side){ const now = Date.now(), ids = side ? BOOKS[side].drillable : DRILLABLE; return ids.filter(id => { const r = this.rec(id); return r && r.due <= now; }).length; }
+};
+
+/* ------------------------------------------------------------------ app state + routing */
+const S = {view: 'learn', chapter: 'italian', line: null, i: 0, playing: null, drill: null, drillState: null, sbState: null, dfilter: {ch: 'all', pri: 'all', from: 'branch'}, dmode: 'smart', showPre: false};
+const CH_KEY = s => s === 'w' ? 'e4-playbook-chapter' : 'playbook-b-chapter';
+function savedChapter(s){ try { const c = localStorage.getItem(CH_KEY(s)); if (c && BOOKS[s].chapters.some(x => x.id === c)) return c; } catch(e){} return BOOKS[s].chapters[0].id; }
+const TXT = {
+  w: {kick: 'White repertoire', piece: 'p-wb',
+      learnKick: st => `Your ${st.total} games with White · every one started with the e-pawn`, learnH: 'What Black plays against your e-pawn',
+      gamesP: st => `Your last ${st.total} games with White across both accounts, July to October: ${st.wins} wins, ${st.losses} losses. Every one started with the e-pawn.`,
+      byHead: 'Black\'s reply', miss: 'Not the move from your study. Try again.', miss2: 'Not that one. The arrow shows the move from your study; play it to continue.',
+      foot: ['Italian lines from your coach\'s study (Aleks_Ra, 2022); everything else built for you. All lines checked with Stockfish 17.1.',
+             'Black\'s odds: your first move from your own games; after that from Maia, a model trained on real club games at your level.',
+             'Games: your last 76 with White across both chess.com accounts, Jul–Oct 2026.']},
+  b: {kick: 'Black repertoire', piece: 'p-bb',
+      learnKick: st => `Your ${st.total} games with Black · both accounts`, learnH: 'What White plays against you',
+      gamesP: st => `Your ${st.total} games with Black across both accounts, July to October: ${st.wins} wins, ${st.losses} losses${st.draws ? `, ${st.draws} draw${st.draws === 1 ? '' : 's'}` : ''}.`,
+      byHead: 'White\'s opening', miss: 'Not the move in the guide. Try again.', miss2: 'Not that one. The arrow shows the guide\'s move; play it to continue.',
+      foot: ['Black lines built for you from your own games and checked with Stockfish 17.1.',
+             'White\'s odds: the first move from your own games; after that from Maia, a model trained on real club games at your level.',
+             'Games: your 73 with Black across both chess.com accounts, Jul–Oct 2026.']}};
+function renderChrome(){
+  const T = TXT[SIDE];
+  document.getElementById('brandKick').textContent = T.kick;
+  document.getElementById('brandPiece').setAttribute('href', '#' + T.piece);
+  document.querySelectorAll('.sidesw [data-side]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.side === SIDE)));
+  for (const s of ['w', 'b']){ const el = document.getElementById(s === 'w' ? 'dueW' : 'dueB'), d = s === SIDE ? 0 : Prog.dueCount(s); el.hidden = !d; el.textContent = d; el.title = `${d} lines due`; }
+  document.getElementById('foot').innerHTML = T.foot.map(t => `<span>${esc(t)}</span>`).join('');
+}
+const STASH = {};
+function switchSide(side){
+  if (side === SIDE || !BOOKS[side]) return;
+  stopPlay(); clearTimeout(heroTimer);
+  STASH[SIDE] = {view: S.view, chapter: S.chapter, line: S.line, i: S.i, studyFrom: S.studyFrom, drillState: S.drillState, sbState: S.sbState, dfilter: S.dfilter, sbSession: S.sbSession};
+  loadBook(side);
+  Object.assign(S, STASH[side] || {view: S.view === 'study' ? 'learn' : S.view, chapter: savedChapter(side), line: null, i: 0, studyFrom: 'learn', drillState: null, sbState: null, dfilter: {ch: 'all', pri: 'all', from: 'branch'}, sbSession: null});
+  S.drill = null; S.renderedLine = null; S.showPre = false;
+  try { localStorage.setItem(SIDE_KEY, side); } catch(e){}
+  render(); setHash(); window.scrollTo({top: 0, behavior: 'auto'});
+}
+const view = document.getElementById('view');
+const VIEWS = ['learn', 'sandbox', 'drill', 'games', 'cheat'];
+function setTab(v){ document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.view === v || (v === 'study' && b.dataset.view === (S.studyFrom || 'learn'))))); }
+function setHash(){
+  const h = (SIDE === 'b' ? 'b.' : '') + (S.view === 'study' && S.line ? 'line.' + S.line : S.view === 'learn' && S.chapter !== DATA.chapters[0].id ? 'learn.' + S.chapter : S.view);
+  try { history.replaceState(null, '', '#' + h); } catch(e){}
+}
+function go(v, opts = {}){
+  stopPlay();
+  const prevView = S.view;
+  if (v === 'study'){ S.view = 'study'; if (opts.from) S.studyFrom = opts.from; }
+  else { S.view = v; S.studyFrom = v === 'games' ? 'games' : v === 'cheat' ? 'cheat' : v === 'sandbox' ? 'sandbox' : 'learn'; }
+  render(); if (prevView !== S.view || opts.top) window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
+  setHash();
+}
+function setChapter(id, scroll){
+  if (!CHAPTERS[id]) return;
+  S.chapter = id; try { localStorage.setItem(CH_KEY(SIDE), id); } catch(e){}
+  if (S.view !== 'learn') { go('learn'); } else { render(); setHash(); }
+  if (scroll){ const el = document.getElementById('chapter'); if (el && el.getBoundingClientRect().top > window.innerHeight * 0.55) el.scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block: 'start'}); }
+}
+function openLine(lineId, i, from){ S.line = lineId; S.i = (i === undefined ? lineStart(lineId) : i); S.showPre = false; go('study', {from}); }
+function refresh(){ render(); }
+function render(){
+  setTab(S.view); renderChrome();
+  const b = document.getElementById('dueBadge'), d = Prog.dueCount(); b.hidden = !d; b.textContent = d;
+  if (S.view === 'drill') S.drill = S.drillState; else if (S.view === 'sandbox') S.drill = S.sbState; else S.drill = null;
+  if (S.view === 'learn') renderLearn();
+  else if (S.view === 'study') renderStudy();
+  else if (S.view === 'drill') renderDrill();
+  else if (S.view === 'sandbox') renderSandbox();
+  else if (S.view === 'games') renderGames();
+  else if (S.view === 'cheat') renderCheat();
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-go],[data-view],[data-lesson],[data-line],[data-ch],[data-sbch],[data-drillch],[data-side]');
+  if (!t || !document.getElementById('app').contains(t)) return;
+  if (t.dataset.side){ switchSide(t.dataset.side); return; }
+  if (t.dataset.view){ go(t.dataset.view); return; }
+  if (t.dataset.ch){ setChapter(t.dataset.ch, true); return; }
+  if (t.dataset.sbch){ SBS.scope = t.dataset.sbch; sbSave(); S.sbState = null; go('sandbox'); sbStart(); return; }
+  if (t.dataset.drillch){ S.dfilter.ch = t.dataset.drillch; go('drill'); return; }
+  if (t.dataset.lesson){ const L = LESSONS[t.dataset.lesson]; openLine(L.lines[0], undefined, S.view === 'study' ? S.studyFrom : S.view); return; }
+  if (t.dataset.line){ openLine(t.dataset.line, t.dataset.i !== undefined ? +t.dataset.i : undefined, S.view === 'study' ? S.studyFrom : S.view); return; }
+  const g = t.dataset.go;
+  if (VIEWS.includes(g)) go(g);
+});
+
+/* ------------------------------------------------------------------ LEARN */
+function lessonThumbOpts(L){
+  const n = LINES[L.lines[0]].n, s = Math.min((L.start || 0) + 1, n.length - 1);
+  const idx = L.start === 0 ? n[n.length - 1] : n[s];
+  const o = nodeBoardOpts(idx, {coords: false});
+  const next = n[n.indexOf(idx) + 1];
+  if (next !== undefined && isMine(N[next])) o.arrows = [N[next].u.slice(0, 4) + 'g'];
+  return {idx, o};
+}
+function lessonCard(L, variant){
+  const {idx, o} = lessonThumbOpts(L);
+  const lvl = Prog.lessonLevel(L.id);
+  const chips = [`<span class="chip ${L.pri}">${{core: 'Core', common: 'Common', rare: 'Rare'}[L.pri]}</span>`];
+  if (L.tags.includes('new')) chips.push('<span class="chip new">Not in study</span>');
+  if (L.tags.includes('game')) chips.push('<span class="chip game">In your games</span>');
+  const nl = L.lines.length;
+  const often = L.id === 'setup' ? '' : oneIn(L.lines.filter(x => DRILLSET.has(x)).reduce((a, x) => a + lineReach(x), 0) || lineReach(L.lines[0]));
+  return `<button class="lcard ${variant || ''}" data-lesson="${L.id}">${thumb(idx, o)}<div><div class="chips">${chips.join('')}</div><h4>${esc(L.title)}</h4><p>${esc(L.sub)}</p>${variant ? `<p class="lwhy">${esc(L.why)}</p>` : ''}
+    <div class="meta"><span class="pips" title="Drill progress" aria-label="Drill progress ${lvl} of 5">${[1,2,3,4,5].map(k => `<i class="${k <= lvl ? 'on' : ''}"></i>`).join('')}</span><span>${nl} ${nl === 1 ? 'line' : 'lines'}${often ? ' · ' + often : ''}</span></div></div></button>`;
+}
+function replyTiles(){
+  const tot = DATA.stats.total, maxn = Math.max(...DATA.chapters.map(c => c.stats.n));
+  return DATA.chapters.map(C => {
+    const st = C.stats, o = nodeBoardOpts(C.tile, {coords: false});
+    return `<button class="rtile" data-ch="${C.id}" aria-pressed="${S.chapter === C.id}" aria-label="${esc(C.name)}: ${st.n} of your games">${thumb(C.tile, o)}<span class="rtx"><b>${esc(C.name)}</b><span class="rmove">${esc(C.move)}</span><span class="rbar" aria-hidden="true"><i style="width:${Math.max(4, Math.round(st.n / maxn * 100))}%"></i></span><span class="rnum tnum"><span><span class="rpct">${Math.round(st.n / tot * 100)}% · </span>${st.n} ${st.n === 1 ? 'game' : 'games'}</span><span>${st.w}–${st.l}</span></span></span></button>`;
+  }).join('');
+}
+function partsHTML(C){
+  let html = '';
+  for (const pid of C.parts){
+    const P = PARTS[pid]; if (!P) continue;
+    const ls = DATA.lessons.filter(l => l.part === P.id);
+    const nl = ls.reduce((a, l) => a + l.lines.length, 0);
+    const feat = ls.length > 1 && ls.length % 4 === 1;
+    html += `<section class="part"><div class="part-head"><div><p class="kicker">${esc(P.kicker)}</p><h3>${esc(P.title)}</h3></div><p>${esc(P.blurb)}</p><span class="count tnum">${ls.length} ${ls.length === 1 ? 'lesson' : 'lessons'} · ${nl} ${nl === 1 ? 'line' : 'lines'}</span></div>
+      <div class="cards">${ls.map((L, k) => lessonCard(L, ls.length === 1 ? 'wide' : (feat && k === 0 ? 'feat' : ''))).join('')}</div></section>`;
+  }
+  return html;
+}
+function chapterHero(C){
+  const st = C.stats, dueN = Prog.dueCount();
+  return `<section class="hero">
+    <div class="hero-board"><div class="board">${boardSVG(N[C.hero].f, {coords: true, last: N[C.hero].u ? [N[C.hero].u.slice(0,2), N[C.hero].u.slice(2,4)] : null, arrows: C.arrows, circles: C.circles, aria: C.cap})}</div>
+      <div class="hero-cap"><span>${esc(C.cap)}</span></div></div>
+    <div><p class="kicker">${esc(C.kicker)}</p>
+      <h2>${C.headline}</h2>
+      <p class="lede">${esc(C.lede)}</p>
+      <div class="stats">${C.facts.map(f => `<div class="stat ${f.alert ? 'alert' : ''}"><b class="tnum">${esc(f.big)}</b><span>${esc(f.text)}</span></div>`).join('')}</div>
+      <div class="cta"><button class="btn primary" data-lesson="${C.first}">Start with the main line</button><button class="btn" data-sbch="${C.id}">Spar in the Sandbox</button><button class="btn ghost" data-drillch="${C.id}">Drill this opening${dueN ? '' : ''}</button></div>
+    </div></section>`;
+}
+function chapterNotes(C){
+  if (!C.notes || !C.notes.length) return '';
+  return `<section class="changes"><div class="panel" style="grid-column:1/-1"><h3>${esc(C.notesTitle || 'From your games')}</h3><ul>${C.notes.map(n => `<li><b>${esc(n.b)}</b> ${esc(n.t)}${n.lesson ? ` <button class="linkish" data-lesson="${n.lesson}">Open</button>` : n.line ? ` <button class="linkish" data-line="${n.line}">Open</button>` : ''}</li>`).join('')}</ul></div></section>`;
+}
+// keep words like 'e-pawn' on one line instead of breaking at the hyphen
+const keepHyph = h => h.replace(/\b([a-h])-pawn\b/g, '<span class="nw">$1-pawn</span>');
+function renderLearn(){
+  const st = DATA.stats, C = CHAPTERS[S.chapter] || DATA.chapters[0];
+  let html = `<section class="reps"><div class="sechead"><div><p class="kicker">${keepHyph(esc(TXT[SIDE].learnKick(st)))}</p><h2>${keepHyph(esc(TXT[SIDE].learnH))}</h2></div><p>Pick an opening. The bar shows how often it came up in your games; the numbers are your wins and losses.</p></div>
+    <div class="rgrid ${DATA.chapters.length === 9 ? 'n9' : ''}">${replyTiles()}</div></section><div id="chapter" class="chapter">`;
+  if (SIDE !== 'w' || C.id !== 'italian'){
+    html += chapterHero(C) + partsHTML(C) + chapterNotes(C) + '</div>';
+    view.innerHTML = html; return;
+  }
+  const heroIdx = LINES['setup'].n[LINES['setup'].n.length - 1];
+  html += `<section class="hero">
+    <div class="hero-board"><div class="board" id="heroBoard">${boardSVG(N[heroIdx].f, {coords: true, last: ['f1','c4'], arrows: ['c4f7r', 'f3g5g'], circles: ['f7r'], aria: 'The Italian setup: your bishop aims at f7'})}</div>
+      <div class="hero-cap"><span>Bishop and knight both aim at f7.</span><button class="btn small" id="heroReplay" aria-label="Replay the first moves"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Replay</button></div></div>
+    <div><p class="kicker">Your coach's study · rebuilt · engine-checked</p>
+      <h2>Aim everything at <em>f7</em>.</h2>
+      <p class="lede">The pawn beside Black's king has only one defender. Your bishop, your knight and often your queen all point at it. Every line below is a board you can step through, with plain-English notes and no notation.</p>
+      <div class="stats">
+        <div class="stat"><b class="tnum">${C.stats.n}</b><span>Italian games in your ${st.total} with White</span></div>
+        <div class="stat"><b class="tnum">${C.stats.w}–${C.stats.l}</b><span>your record in them, across both accounts</span></div>
+        <div class="stat alert"><b class="tnum">5×</b><span>you missed the bishop shot on f7 in two of those losses</span></div>
+      </div>
+      <div class="cta"><button class="btn primary" data-lesson="setup">Start with the setup</button><button class="btn" data-sbch="italian">Spar in the Sandbox</button><button class="btn ghost" data-drillch="italian">Drill this opening</button></div>
+    </div></section>`;
+  html += partsHTML(C);
+  html += `<section class="changes">
+    <div class="panel"><h3>Where I changed your study</h3><ul>
+      <li><b>Trap II, after the queen pin:</b> the bishop goes to the center, not the pawn push (which fails to a pawn kick). Your study's own d-pawn chapter already does this. <button class="linkish" data-lesson="trap-d6">Open</button></li>
+      <li><b>Trap III, the center branch:</b> take the knight before pushing your pawn. <button class="linkish" data-line="trap-ne7-d5">Open</button></li>
+      <li><b>Solid d-pawn line:</b> when Black defends the pinned knight with the pawn, take it with your bishop instead of retreating. <button class="linkish" data-line="four-d6-d5">Open</button></li>
+      <li><b>Waiting-move line:</b> when Black kicks your bishop, take the knight with check instead of retreating. <button class="linkish" data-line="h6-a6">Open</button></li>
+      <li><b>Møller, Black castles:</b> after winning the knight back, the queen goes toward the kingside, not back to the center. <button class="linkish" data-line="moller-ne5-castle">Open</button></li>
+    </ul></div>
+    <div class="panel"><h3>What I added</h3><ul>
+      <li><b>Black declines the pawn</b> (you met it on Oct 14). <button class="linkish" data-lesson="quiet-d6">Open</button></li>
+      <li><b>Black ignores f7</b> in the Two Knights: the counter-attack and the knight-to-the-rim move from your Oct 14 game. <button class="linkish" data-lesson="traxler">Open</button></li>
+      <li><b>Bishop steps back before taking:</b> a club-level slip with a bishop sacrifice on f7. <button class="linkish" data-lesson="bb6-early">Open</button></li>
+      <li><b>Other fourth moves</b> and <b>the Hungarian</b>: same plan, quick answers. <button class="linkish" data-lesson="other-4th">Open</button></li>
+      <li><b>Fried Liver king moves</b> you'll actually see: the king running home or to the corner. <button class="linkish" data-line="fl-ke8">Open</button></li>
+    </ul></div></section></div>`;
+  view.innerHTML = html;
+  document.getElementById('heroReplay').onclick = heroReplay;
+}
+let heroTimer = null;
+function heroReplay(){
+  clearTimeout(heroTimer);
+  const seq = LINES['setup'].n, el = document.getElementById('heroBoard'); if (!el) return;
+  let k = 0;
+  const step = () => {
+    const idx = seq[k], nd = N[idx], last = k === seq.length - 1;
+    el.innerHTML = boardSVG(nd.f, last ? {coords: true, last: ['f1','c4'], arrows: ['c4f7r', 'f3g5g'], circles: ['f7r']} : {coords: true, last: nd.u ? [nd.u.slice(0,2), nd.u.slice(2,4)] : null});
+    if (nd.u) animateMove(el.querySelector('svg'), nd.u, nd, false);
+    if (!last){ k++; heroTimer = setTimeout(step, 750); }
+  };
+  step();
+}
+
+/* ------------------------------------------------------------------ STUDY */
+function sideBadge(nd){ return isMine(nd) ? '<span class="side you">You</span>' : `<span class="side blk">${OPP}</span>`; }
+const TAGNAMES = {key: 'Key move', best: "Black's best", mistake: 'Inaccuracy', blunder: 'Blunder', trap: 'Trap', mate: 'Checkmate', draw: 'Equal', fix: 'Changed from study', swap: 'Fixes a habit', new: 'Not in your study', game: 'From your games', warn: 'Avoid', missed: 'You missed this', good: 'Good move'};
+function tagChips(tags){ return (tags || []).map(t => `<span class="chip ${t}">${esc(TAGNAMES[t] || t)}</span>`).join(''); }
+function optionsFor(idx, curLine){
+  const kids = N[idx].k || [];
+  if (kids.length < 2) return null;
+  const les = lessonOf(curLine);
+  return kids.map(c => {
+    const ls = linesByNode.get(c) || [];
+    let pick = ls.find(id => id === curLine) || ls.find(id => les && LINES[id].lesson === les.id) || ls.find(id => LINES[id].main) || ls[0];
+    let title = pick ? (LINES[pick].main ? (LESSONS[LINES[pick].lesson] || {title: LINES[pick].title}).title : LINES[pick].title) : '';
+    const via = [...new Set(ls.filter(id => LESSONS[LINES[id].lesson]).map(id => LINES[id].lesson))];
+    if (via.length > 1 && !LINES[curLine].n.includes(c)) title = `${via.length} lessons follow this move`;
+    return {c, line: pick, title, cur: LINES[curLine].n.includes(c)};
+  });
+}
+function renderStudy(){
+  const line = LINES[S.line]; if (!line){ go('learn'); return; }
+  const les = lessonOf(S.line), game = GAMES[line.lesson];
+  S.i = Math.max(0, Math.min(S.i, line.n.length - 1));
+  const idx = line.n[S.i], nd = N[idx], start = lineStart(S.line);
+  const part = les ? PARTS[les.part] : null;
+  const allLines = les ? les.lines : game.lines;
+  // neighbors for prev/next lesson
+  let navPrev = '', navNext = '';
+  if (les){ const k = LESSON_ORDER.indexOf(les.id);
+    if (k > 0) navPrev = `<button class="btn small" data-lesson="${LESSON_ORDER[k-1]}" aria-label="Previous lesson: ${esc(LESSONS[LESSON_ORDER[k-1]].title)}">‹<span class="navtxt"> ${esc(LESSONS[LESSON_ORDER[k-1]].title)}</span></button>`;
+    if (k < LESSON_ORDER.length - 1) navNext = `<button class="btn small" data-lesson="${LESSON_ORDER[k+1]}" aria-label="Next lesson: ${esc(LESSONS[LESSON_ORDER[k+1]].title)}"><span class="navtxt">${esc(LESSONS[LESSON_ORDER[k+1]].title)} </span>›</button>`; }
+  const back = S.studyFrom === 'games' ? '<button class="btn small" data-go="games">← Your games</button>' : S.studyFrom === 'cheat' ? '<button class="btn small" data-go="cheat">← Cheat sheet</button>' : S.studyFrom === 'sandbox' ? '<button class="btn small" data-go="sandbox">← Sandbox</button>' : '<button class="btn small" data-go="learn">← All lessons</button>';
+  const where = les ? `${esc(chapterOf(les).name)} · ${esc(part.title)}` : `Game vs ${esc(game.opp)} · ${esc(game.date)}`;
+  // header
+  const chips = les ? [`<span class="chip ${les.pri}">${{core:'Core',common:'Common',rare:'Rare'}[les.pri]}</span>`].concat(les.tags.map(t => `<span class="chip ${t}">${esc(TAGNAMES[t])}</span>`)).join('')
+                    : `<span class="chip ${game.result === 'W' ? 'win' : 'loss'}">${game.result === 'W' ? 'Win' : 'Loss'}</span><span class="chip">${esc(game.tc)}</span><span class="chip">${esc(game.opp)} ${game.oppElo}</span>`;
+  const title = les ? les.title : game.title;
+  const sub = les ? les.sub : game.summary;
+  const why = les ? les.why : '';
+  // lines in lesson
+  const linesHTML = allLines.length > 1 ? `<div class="linesin"><h4>${les ? 'Lines in this lesson' : 'Lines'}</h4><div class="seg">${allLines.map(id => `<button data-line="${id}" aria-pressed="${id === S.line}">${esc(LINES[id].main ? (les ? 'Main line' : 'The game') : LINES[id].title)}</button>`).join('')}</div></div>` : '';
+  // move card
+  const p = ply(idx);
+  let mcard;
+  if (S.i === 0){ mcard = `<div class="mcard empty"><h3>Starting position</h3><p class="note">Press the forward arrow (or the → key) to step through the moves.</p></div>`; }
+  else {
+    mcard = `<div class="mcard"><div class="who">${sideBadge(nd)}<span class="stepno">Move ${moveNo(p)}</span></div>
+      <h3>${pieceIcon(nd.pc, nd.w === 1)}<span>${esc(nd.l)}</span></h3>
+      ${nd.t ? `<p class="note">${esc(nd.t)}</p>` : ''}${nd.g ? `<div class="chips">${tagChips(nd.g)}</div>` : ''}</div>`;
+  }
+  // options at this node
+  const opts = optionsFor(idx, S.line);
+  let optHTML = '';
+  if (opts){
+    const blackToMove = ((p % 2) === 1) === (ME === 1); // the opponent is to move
+    const sorted = blackToMove ? opts.slice().sort((a, b) => (N[b.c].q || 0) - (N[a.c].q || 0)) : opts;
+    optHTML = `<div class="opts"><h4>${blackToMove ? `${OPP} can play here · ${idx === ODDS_ROOT ? 'share of your games' : 'how often at your level'}` : 'Your choices here'}</h4><div class="optlist">${sorted.map(o => { const c = N[o.c]; const warn = (c.g || []).includes('warn');
+      const q = blackToMove && c.q ? `<span class="chip">${pctTxt(c.q)}</span>` : '';
+      const norm = s => String(s || '').toLowerCase().replace(/^the\s+/, '').trim();
+      const subT = norm(o.title) === norm(c.l) ? (warn ? 'Avoid' : '') : esc(o.title) + (warn ? ' · avoid' : '');
+      const tail = o.cur ? `<span class="chip key">This line${blackToMove && c.q ? ' · ' + pctTxt(c.q) : ''}</span>` : (q || '<span aria-hidden="true">›</span>');
+      return `<button class="opt ${o.cur ? 'cur' : ''} ${warn ? 'warn' : ''}" data-line="${o.line}" data-i="${LINES[o.line].n.indexOf(o.c)}">${pieceIcon(c.pc, c.w === 1)}<span><b>${esc(c.l)}</b>${subT ? `<span>${subT}</span>` : ''}</span>${tail}</button>`; }).join('')}</div></div>`;
+  }
+  // timeline
+  const rows = [];
+  const preEnd = start; // plies 1..start are "how we got here"
+  if (preEnd > 0 && !S.showPre){
+    rows.push(`<li><button class="collapsed" id="showPre"><span>${preEnd} earlier ${preEnd === 1 ? 'move leads' : 'moves lead'} here</span><span>Show</span></button></li>`);
+  }
+  for (let k = 1; k < line.n.length; k++){
+    if (k <= preEnd && !S.showPre) continue;
+    const m = N[line.n[k]], pk = k;
+    rows.push(`<li><button class="trow ${isMine(m) ? 'you' : 'blk'} ${k === S.i ? 'cur' : ''}" data-step="${k}"><span class="n">${moveNo(pk)}${m.w === 1 ? '' : '…'}</span>${pieceIcon(m.pc, m.w === 1)}<span class="lbl">${esc(m.l)}</span><span class="tg">${(m.g || []).filter(t => t !== 'game').slice(0, 2).map(t => `<i class="${t}" title="${esc(TAGNAMES[t])}"></i>`).join('')}</span></button></li>`);
+  }
+  const endIdx = line.n[line.n.length - 1], ei = evalInfo(N[endIdx].e);
+  const outcome = les ? `<div class="outcome"><span class="kicker">Where it ends</span><b>${esc(LINES[S.line].main ? (les.outcome || (ei && ei.txt)) : (ei ? ei.txt : ''))}</b></div>` : '';
+  const curEval = evalInfo(nd.e);
+  const drillBtn = (les && DRILLABLE.includes(S.line)) ? `<button class="btn primary" id="drillThis">Drill this line</button>` : '';
+  const lessonBtn = (!les && game.lesson) ? `<button class="btn" data-lesson="${game.lesson}">Open the related lesson</button>` : '';
+  const oldTl = view.querySelector('.timeline'), oldScroll = oldTl ? oldTl.scrollTop : 0, sameLine = S.renderedLine === S.line;
+  S.renderedLine = S.line;
+  view.innerHTML = `<div class="crumbs">${back}<span class="where">${where}</span><span class="spacer"></span>${navPrev}${navNext}</div>
+  <div class="sgrid study">
+    <header class="lhead"><div class="chips">${chips}</div><h2>${esc(title)}</h2><p class="sub">${esc(sub)}</p>${why ? `<p class="why">${esc(why)}</p>` : ''}</header>
+    <div class="bcol">
+      <div class="board-wrap">${evalBarHTML(idx)}<div class="board" id="sb">${boardSVG(nd.f, nodeBoardOpts(idx, {aria: nd.l}))}</div></div>
+      <div class="controls">
+        <button class="ctl" id="cFirst" aria-label="To the start" ${S.i === 0 ? 'disabled' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5v14M18 6l-8 6 8 6V6z"/></svg></button>
+        <button class="ctl" id="cPrev" aria-label="Back one move" ${S.i === 0 ? 'disabled' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <button class="ctl play" id="cPlay" aria-label="Play through" aria-pressed="${!!S.playing}"><svg viewBox="0 0 24 24" fill="currentColor"><path d="${S.playing ? 'M7 5h4v14H7zM13 5h4v14h-4z' : 'M8 5v14l11-7z'}"/></svg></button>
+        <button class="ctl" id="cNext" aria-label="Forward one move" ${S.i >= line.n.length - 1 ? 'disabled' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+        <button class="ctl" id="cLast" aria-label="To the end" ${S.i >= line.n.length - 1 ? 'disabled' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 5v14M6 6l8 6-8 6V6z"/></svg></button>
+      </div>
+      <p class="evaltext">${curEval ? `Engine: <b>${esc(curEval.txt)}</b>${curEval.num ? ` <span class="tnum">(${curEval.num})</span>` : ''}` : ''}</p>
+    </div>
+    <div class="ccol">
+      ${mcard}${optHTML}${linesHTML}
+      <ol class="timeline" aria-label="Moves in this line">${rows.join('')}</ol>
+      ${outcome}
+      <div class="lesson-actions">${drillBtn}${lessonBtn}</div>
+    </div></div>`;
+  const svg = document.querySelector('#sb svg');
+  if (S.anim){ const a = S.anim; S.anim = null; animateMove(svg, a.u, a.meta, a.back); }
+  document.getElementById('cFirst').onclick = () => step(-999);
+  document.getElementById('cPrev').onclick = () => step(-1);
+  document.getElementById('cNext').onclick = () => step(1);
+  document.getElementById('cLast').onclick = () => step(999);
+  document.getElementById('cPlay').onclick = togglePlay;
+  const sp = document.getElementById('showPre'); if (sp) sp.onclick = () => { S.showPre = true; renderStudy(); };
+  view.querySelectorAll('[data-step]').forEach(b => b.onclick = () => jump(+b.dataset.step));
+  const dt = document.getElementById('drillThis'); if (dt) dt.onclick = () => startDrillLine(S.line);
+  const tl = view.querySelector('.timeline'), cur = view.querySelector('.trow.cur');
+  if (tl && tl.scrollHeight > tl.clientHeight + 4){
+    tl.scrollTop = sameLine ? oldScroll : 0;
+    if (cur){ const li = cur.parentElement, top = li.offsetTop, h = li.offsetHeight;
+      if (top < tl.scrollTop || top + h > tl.scrollTop + tl.clientHeight) tl.scrollTop = Math.max(0, top - tl.clientHeight / 2 + h / 2); }
+  }
+  S.scrollTimeline = false;
+}
+function step(d){
+  const line = LINES[S.line], ni = Math.max(0, Math.min(line.n.length - 1, S.i + d));
+  if (ni === S.i) return;
+  if (Math.abs(d) === 1){ const nd = N[line.n[d > 0 ? ni : S.i]]; S.anim = {u: nd.u, meta: nd, back: d < 0}; }
+  S.i = ni; S.scrollTimeline = true; renderStudy();
+}
+function jump(k){ const line = LINES[S.line]; if (k === S.i + 1){ step(1); return; } if (k === S.i - 1){ step(-1); return; } S.i = k; renderStudy(); }
+function stopPlay(){ if (S.playing){ clearInterval(S.playing); S.playing = null; } }
+function togglePlay(){
+  if (S.playing){ stopPlay(); renderStudy(); return; }
+  const line = LINES[S.line]; if (S.i >= line.n.length - 1) S.i = lineStart(S.line);
+  S.playing = setInterval(() => { const l = LINES[S.line]; if (!l || S.view !== 'study' || S.i >= l.n.length - 1){ stopPlay(); if (S.view === 'study') renderStudy(); return; } step(1); }, 1150);
+  step(1);
+}
+document.addEventListener('keydown', e => {
+  if (e.target.closest && e.target.closest('input,textarea,select')) return;
+  if (S.view === 'study'){
+    if (e.key === 'ArrowRight'){ e.preventDefault(); stopPlay(); step(1); }
+    else if (e.key === 'ArrowLeft'){ e.preventDefault(); stopPlay(); step(-1); }
+    else if (e.key === 'Home'){ e.preventDefault(); step(-999); }
+    else if (e.key === 'End'){ e.preventDefault(); step(999); }
+  }
+});
+
+/* ------------------------------------------------------------------ DRILL */
+function eligibleLines(){
+  const f = S.dfilter;
+  return DRILLABLE.filter(id => { const L = lessonOf(id); return (f.ch === 'all' || chapterOf(L).id === f.ch) && (f.pri === 'all' || L.pri === f.pri); });
+}
+function nextSmart(exclude){
+  const now = Date.now(), el = eligibleLines().filter(id => id !== exclude);
+  const due = el.filter(id => { const r = Prog.rec(id); return r && r.due <= now; }).sort((a, b) => (Prog.rec(a).box - Prog.rec(b).box) || (Prog.rec(a).due - Prog.rec(b).due));
+  if (due.length) return {id: due[0], why: 'Due for review'};
+  const pr = {core: 0, common: 1, rare: 2};
+  const fresh = el.filter(id => !Prog.rec(id)).sort((a, b) => (pr[lessonOf(a).pri] - pr[lessonOf(b).pri]) || (lineReach(b) - lineReach(a)) || (DRILLABLE.indexOf(a) - DRILLABLE.indexOf(b)));
+  if (fresh.length) return {id: fresh[0], why: 'New line'};
+  const soon = el.slice().sort((a, b) => Prog.rec(a).due - Prog.rec(b).due);
+  return soon.length ? {id: soon[0], why: 'Extra practice (nothing due)'} : null;
+}
+function startDrillLine(id, why){
+  const line = LINES[id];
+  const s0 = S.dfilter.from === 'start' ? 0 : lineStart(id);
+  S.drill = S.drillState = {kind: 'line', id, i: s0, s0, mistakes: 0, tries: 0, sel: null, busy: false, msg: why || '', state: 'play', hint: null, flash: null};
+  S.view = 'drill'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
+  setTimeout(drillAdvance, 450);
+}
+function startPuzzle(k){
+  const P = DATA.puzzles[k];
+  S.drill = S.drillState = {kind: 'puz', k, i: 0, mistakes: 0, tries: 0, sel: null, busy: false, state: 'play', hint: null, flash: null, msg: ''};
+  S.view = 'drill'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
+}
+function dNode(){ const D = S.drill; return D.kind === 'sb' ? D.node : D.kind === 'line' ? LINES[D.id].n[D.i] : DATA.puzzles[D.k].node; }
+function drillAdvance(){
+  const D = S.drill; if (!D || D.kind !== 'line' || S.view !== 'drill') return;
+  const n = LINES[D.id].n;
+  if (D.i >= n.length - 1){ finishLine(); return; }
+  const nx = N[n[D.i + 1]];
+  if (!isMine(nx)){
+    D.busy = true; D.msg = '';
+    setTimeout(() => { if (S.drill !== D) return; D.i++; D.busy = false; D.flash = null; renderDrillBoard({u: nx.u, meta: nx}); renderDrillPanel(); drillAdvance(); }, 520);
+  } else { D.busy = false; D.tries = 0; renderDrillPanel(); }
+}
+function expectedMove(){ const D = S.drill; if (D.kind === 'puz') return DATA.puzzles[D.k].ok; if (D.kind === 'sb') return sbMyKids(D.node).map(c => N[c].u); return [N[LINES[D.id].n[D.i + 1]].u]; }
+function legalFor(){ const D = S.drill; if (D.kind === 'puz') return DATA.puzzles[D.k].legal; return DATA.legal[String(dNode())] || []; }
+function tryMove(from, to){
+  const D = S.drill; if (!D || D.busy || D.state !== 'play') return;
+  let u = from + to;
+  const legal = legalFor();
+  if (!legal.includes(u)){ // king onto own rook = castle
+    const k = ME === 1 ? '1' : '8';
+    if (from === 'e' + k && to === 'h' + k && legal.includes('e' + k + 'g' + k)) u = 'e' + k + 'g' + k;
+    else if (from === 'e' + k && to === 'a' + k && legal.includes('e' + k + 'c' + k)) u = 'e' + k + 'c' + k;
+    else if (legal.includes(u + 'q')) u = u + 'q';
+    else { D.sel = null; renderDrillBoard(); return; }
+  }
+  if (D.kind === 'sb'){ sbTry(u, to); return; }
+  const exp = expectedMove();
+  D.sel = null;
+  if (exp.includes(u)){
+    if (D.kind === 'puz'){
+      D.state = 'done'; const P = DATA.puzzles[D.k]; if (D.tries === 0) Prog.puz(P.id, true);
+      const fen = fenAfter(dNode(), u);
+      D.after = {fen, u}; D.flash = {sq: to, ok: true}; D.msg = '';
+      renderDrillBoard({u, meta: {}}); renderDrillPanel(); return;
+    }
+    D.i++; D.flash = {sq: u.slice(2, 4), ok: true}; D.hint = null;
+    const nd = N[LINES[D.id].n[D.i]];
+    D.msg = `<b>${esc(nd.l)}.</b> ${esc(nd.t || '')}`;
+    renderDrillBoard({u, meta: nd}); renderDrillPanel();
+    D.busy = true; setTimeout(() => { if (S.drill === D){ D.flash = null; drillAdvance(); } }, 700);
+  } else {
+    if (D.tries === 0){ D.mistakes++; if (D.kind === 'puz') Prog.puz(DATA.puzzles[D.k].id, false); }
+    D.tries++; D.flash = {sq: to, ok: false};
+    D.msg = D.kind === 'puz' ? (D.tries >= 2 ? 'Not that one. The arrow shows the move; play it to continue.' : 'Not that one. Try again.') : (D.tries >= 2 ? TXT[SIDE].miss2 : TXT[SIDE].miss);
+    if (D.tries >= 2) D.hint = exp[0];
+    renderDrillBoard(); renderDrillPanel();
+    setTimeout(() => { if (S.drill === D && D.flash && !D.flash.ok){ D.flash = null; renderDrillBoard(); } }, 650);
+  }
+}
+function fenAfter(idx, u){ // only for puzzle reveal: move piece on a copy
+  const a = fenArr(N[idx].f); const f = sqi(u.slice(0, 2)), t = sqi(u.slice(2, 4)); const castle = a[f] && a[f].toLowerCase() === 'k' && Math.abs(t - f) === 2;
+  a[t] = a[f]; a[f] = null;
+  if (castle){ const rf = t > f ? f + 3 : f - 4, rt = t > f ? f + 1 : f - 1; a[rt] = a[rf]; a[rf] = null; }
+  let out = ''; for (let r = 7; r >= 0; r--){ let e = 0; for (let c = 0; c < 8; c++){ const p = a[r*8+c]; if (!p) e++; else { if (e){ out += e; e = 0; } out += p; } } if (e) out += e; if (r) out += '/'; } return out;
+}
+function finishLine(){
+  const D = S.drill; D.state = 'done';
+  Prog.record(D.id, D.mistakes === 0);
+  render();
+}
+function renderDrillBoard(anim){
+  const D = S.drill, el = document.getElementById('db'); if (!el || !D) return;
+  let idx = dNode(), fen = N[idx].f, o;
+  if (D.kind === 'puz' && D.after){ fen = D.after.fen; o = {coords: true, last: [D.after.u.slice(0,2), D.after.u.slice(2,4)]}; }
+  else { o = {coords: true}; if (N[idx].u) o.last = [N[idx].u.slice(0, 2), N[idx].u.slice(2, 4)]; }
+  if (D.flash) o.flash = D.flash;
+  if (D.sel){ o.sel = D.sel; o.dots = legalFor().filter(m => m.startsWith(D.sel)).map(m => m.slice(2, 4)); }
+  if (D.hint) o.hint = D.hint;
+  o.aria = 'Drill board';
+  el.innerHTML = boardSVG(fen, o);
+  if (anim) animateMove(el.querySelector('svg'), anim.u, anim.meta, false);
+}
+function drillPanelHTML(){
+  const D = S.drill;
+  if (!D) return '';
+  if (D.kind === 'puz'){
+    const P = DATA.puzzles[D.k], G = GAMES[P.game];
+    const doneBox = D.state === 'done' ? `<div class="donebox"><h4>${D.tries === 0 ? 'Found it.' : 'That\'s the one.'}</h4><p>${esc(P.t)}</p><div class="lesson-actions">${D.k < DATA.puzzles.length - 1 ? `<button class="btn primary" id="nextPuz">Next shot</button>` : ''}<button class="btn" data-line="${P.game}" data-i="${LINES[P.game].n.indexOf(P.node)}">See it in the game</button></div></div>` : '';
+    return `<div class="dpanel"><p class="kicker">Missed shot ${D.k + 1} of ${DATA.puzzles.length} · vs ${esc(G.opp)}, ${esc(G.date)}</p><h3>${esc(P.title)}</h3>
+      <div class="status ${D.state === 'done' ? '' : 'wait'}"><span class="bub"></span>${D.state === 'done' ? 'Solved' : esc(P.q || `${MYC} to move: find the best move`)}</div>
+      ${D.state === 'done' ? '' : `<p class="feedback">${D.msg || 'Drag a piece or tap it, then tap where it goes.'}</p>`}${doneBox}</div>`;
+  }
+  const line = LINES[D.id], L = lessonOf(D.id), n = line.n;
+  const whiteTotal = n.slice(D.s0 + 1).filter(i => isMine(N[i])).length;
+  const whiteDone = n.slice(D.s0 + 1, D.i + 1).filter(i => isMine(N[i])).length;
+  const pct = whiteTotal ? Math.round(whiteDone / whiteTotal * 100) : 100;
+  let status = D.state === 'done' ? '' : (D.busy ? `${OPP} is thinking…` : 'Your move');
+  let doneBox = '';
+  if (D.state === 'done'){
+    const r = Prog.rec(D.id), clean = D.mistakes === 0, days = INTERVALS[r.box];
+    doneBox = `<div class="donebox ${clean ? '' : 'bad'}"><h4>${clean ? 'Clean run.' : `Done, with ${D.mistakes} ${D.mistakes === 1 ? 'slip' : 'slips'}.`}</h4>
+      <p>${clean ? `This line comes back in ${days} ${days === 1 ? 'day' : 'days'}.` : 'This line stays in today\'s review until you get it clean.'} Ends: ${esc(line.main ? (L.outcome || '') : ((evalInfo(N[n[n.length-1]].e) || {}).txt || ''))}.</p>
+      <div class="lesson-actions"><button class="btn primary" id="dNext">Next line</button><button class="btn" id="dAgain">Again</button><button class="btn ghost" data-line="${D.id}">Study it</button></div></div>`;
+  }
+  return `<div class="dpanel"><p class="kicker">${esc(L.title)}${line.main ? '' : ' · ' + esc(line.title)}${D.msgWhy ? ' · ' + esc(D.msgWhy) : ''}</p><h3>Play ${MYC}'s moves from memory</h3>
+    <div class="progressbar" aria-hidden="true"><i style="width:${pct}%"></i></div>
+    ${status ? `<div class="status ${D.busy ? 'wait' : ''} ${D.tries ? 'bad' : ''}"><span class="bub"></span>${status}</div>` : ''}
+    <p class="feedback">${D.msg || (D.i === D.s0 ? `${OPP}'s moves play automatically. Drag a piece or tap it, then tap where it goes.` : '&nbsp;')}</p>${doneBox}</div>`;
+}
+function renderDrillPanel(){ const el = document.getElementById('dpanel'); if (el){ el.innerHTML = drillPanelHTML(); wireDrillPanel(); } }
+function wireDrillPanel(){
+  const D = S.drill;
+  const nx = document.getElementById('dNext'); if (nx) nx.onclick = () => { const s = nextSmart(D.id); if (s){ startDrillLine(s.id); S.drill.msgWhy = s.why; renderDrillPanel(); } };
+  const ag = document.getElementById('dAgain'); if (ag) ag.onclick = () => startDrillLine(D.id);
+  const np = document.getElementById('nextPuz'); if (np) np.onclick = () => startPuzzle(D.k + 1);
+}
+function fmtDue(r){ if (!r) return 'new'; const d = r.due - Date.now(); if (d <= 0) return 'due'; const days = Math.ceil(d / DAY); return `in ${days}d`; }
+function renderDrill(){
+  const f = S.dfilter, now = Date.now();
+  const el = eligibleLines();
+  const due = el.filter(id => { const r = Prog.rec(id); return r && r.due <= now; }).length;
+  const fresh = el.filter(id => !Prog.rec(id)).length;
+  const mastered = el.filter(id => (Prog.rec(id) || {}).box >= 4).length;
+  const segBtn = (key, val, label) => `<button data-f="${key}:${val}" aria-pressed="${f[key] === val}">${label}</button>`;
+  const rows = DATA.lessons.filter(L => (f.ch === 'all' || chapterOf(L).id === f.ch) && (f.pri === 'all' || L.pri === f.pri)).map(L => {
+    const ls = L.lines.filter(x => DRILLABLE.includes(x)); if (!ls.length) return '';
+    return `<div class="mgroup"><p class="mhead">${esc(L.title)}</p>${ls.map(id => { const r = Prog.rec(id), dd = fmtDue(r);
+      return `<button class="mrow" data-drill="${id}"><span>${LINES[id].main ? 'Main line' : esc(LINES[id].title)}</span><span class="pips">${[1,2,3,4,5].map(k => `<i class="${k <= ((r || {}).box || 0) ? 'on' : ''}"></i>`).join('')}</span><span class="due ${dd === 'due' ? 'now' : ''}">${dd}</span></button>`; }).join('')}</div>`;
+  }).join('');
+  const D = S.drill;
+  const boardHTML = D ? '' : boardSVG(N[0].f, {coords: true});
+  view.innerHTML = `<div class="sechead"><h2>Drill</h2><p>Play ${MYC}'s moves from memory. Clean runs come back later; slips come back today. Progress saves automatically.</p></div>
+  <div class="sgrid">
+    <div class="bcol"><div class="board ${D && D.state === 'play' ? 'input' : ''}" id="db">${boardHTML}</div>
+      ${D ? '' : '<p class="evaltext">Pick what to drill and the board comes alive.</p>'}</div>
+    <div class="ccol">
+      <div id="dpanel">${D ? drillPanelHTML() : ''}</div>
+      <div class="dpanel">
+        <div class="queue"><div><b class="tnum">${due}</b><span>due now</span></div><div><b class="tnum">${fresh}</b><span>not started</span></div><div><b class="tnum">${mastered}</b><span>solid (4+ clean)</span></div></div>
+        <div class="lesson-actions"><button class="btn primary" id="smart">${due ? 'Review what\'s due' : 'Start next line'}</button><button class="btn" id="shots">Missed shots from your games (${DATA.puzzles.length})</button></div>
+        <div><p class="kicker" style="margin-bottom:6px">Which opening</p><div class="seg">${segBtn('ch','all','All')}${DATA.chapters.map(C => segBtn('ch', C.id, esc(C.name))).join('')}</div></div>
+        <div><div class="seg">${segBtn('pri','all','Any priority')}${segBtn('pri','core','Core')}${segBtn('pri','common','Common')}${segBtn('pri','rare','Rare')}</div></div>
+        <div><p class="kicker" style="margin-bottom:6px">Start each line</p><div class="seg">${segBtn('from','branch','Where it branches')}${segBtn('from','start','From move 1')}</div></div>
+      </div>
+      <div class="dpanel"><p class="kicker">Every line · tap one to drill it</p><div class="mtable">${rows}</div></div>
+    </div></div>`;
+  if (D) renderDrillBoard();
+  wireDrillPanel();
+  if (D && D.kind === 'line' && D.state === 'play' && D.busy){ D.busy = false; setTimeout(drillAdvance, 300); }
+  document.getElementById('smart').onclick = () => { const s = nextSmart(); if (s){ startDrillLine(s.id); S.drill.msgWhy = s.why; renderDrillPanel(); } };
+  document.getElementById('shots').onclick = () => startPuzzle(0);
+  view.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { const [k, v] = b.dataset.f.split(':'); S.dfilter[k] = v; renderDrill(); });
+  view.querySelectorAll('[data-drill]').forEach(b => b.onclick = () => startDrillLine(b.dataset.drill));
+  wireBoardInput();
+}
+function squareAt(svg, e){ const r = svg.getBoundingClientRect(); let c = Math.floor((e.clientX - r.left) / r.width * 8), rr = 7 - Math.floor((e.clientY - r.top) / r.height * 8); if (c < 0 || c > 7 || rr < 0 || rr > 7) return null; if (FLIP){ c = 7 - c; rr = 7 - rr; } return FILES[c] + (rr + 1); }
+function wireBoardInput(){
+  const el = document.getElementById('db'); if (!el || el.dataset.wired) return; el.dataset.wired = '1';
+  let drag = null;
+  el.addEventListener('pointerdown', e => {
+    const D = S.drill; if (!D || D.busy || D.state !== 'play') return;
+    const svg = el.querySelector('svg'); if (!svg) return;
+    const sq = squareAt(svg, e); if (!sq) return;
+    const a = fenArr(N[dNode()].f), p = a[sqi(sq)];
+    if (D.sel && D.sel !== sq && !isMyPiece(p)){ e.preventDefault(); tryMove(D.sel, sq); return; }
+    if (isMyPiece(p)){
+      e.preventDefault();
+      D.sel = sq; renderDrillBoard();
+      const svg2 = el.querySelector('svg'), use = svg2.querySelector(`use[data-sq="${sq}"]`);
+      if (use){ const ghost = use.cloneNode(); ghost.classList.add('ghost'); ghost.removeAttribute('data-sq'); svg2.appendChild(ghost); use.style.opacity = '.35';
+        drag = {sq, ghost, use, svg: svg2, moved: false, x0: e.clientX, y0: e.clientY}; try { el.setPointerCapture(e.pointerId); } catch(_){} }
+    } else if (D.sel){ D.sel = null; renderDrillBoard(); }
+  });
+  el.addEventListener('pointermove', e => {
+    if (!drag) return; const r = drag.svg.getBoundingClientRect();
+    if (!drag.svg.isConnected || !r.width) return; // the board was redrawn under the drag
+    if (Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) > 4) drag.moved = true;
+    const x = (e.clientX - r.left) / r.width * 800 - 50, y = (e.clientY - r.top) / r.height * 800 - 50;
+    drag.ghost.setAttribute('x', x.toFixed(1)); drag.ghost.setAttribute('y', y.toFixed(1));
+  });
+  const end = e => {
+    if (!drag) return; const d = drag; drag = null;
+    const to = squareAt(d.svg.isConnected ? d.svg : el.querySelector('svg'), e);
+    if (d.moved && to && to !== d.sq){ tryMove(d.sq, to); }
+    else { d.ghost.remove(); d.use.style.opacity = ''; }
+  };
+  el.addEventListener('pointerup', end);
+  el.addEventListener('pointercancel', () => { if (drag){ drag.ghost.remove(); drag.use.style.opacity = ''; drag = null; } });
+}
+
+/* ------------------------------------------------------------------ SANDBOX */
+const SBK = s => s === 'w' ? 'e4-playbook-sandbox-v1' : 'playbook-b-sandbox-v1';
+const SB_STATE = {};
+for (const s of ['w', 'b']){ const st = SB_STATE[s] = {scope: 'all', odds: 'real'};
+  try { const v = JSON.parse(localStorage.getItem(SBK(s)) || '{}'); if (v.scope && (v.scope === 'all' || BOOKS[s].chapters.some(c => c.id === v.scope))) st.scope = v.scope; if (['real', 'even', 'weak'].includes(v.odds)) st.odds = v.odds; } catch(e){} }
+let SBS = SB_STATE.w;
+function sbSave(){ try { localStorage.setItem(SBK(SIDE), JSON.stringify({scope: SBS.scope, odds: SBS.odds})); } catch(e){} }
+const isWarnNode = c => (N[c].g || []).includes('warn');
+function sbLinesThrough(c){ if (!_sbl.has(c)) _sbl.set(c, (linesByNode.get(c) || []).filter(id => DRILLSET.has(id))); return _sbl.get(c); }
+function scopeAncestors(chId){ // nodes on the way to a chapter's roots
+  if (_anc[chId]) return _anc[chId];
+  const s = new Set(); for (const r of CHAPTERS[chId].roots){ let i = r; while (i !== null && i !== undefined){ s.add(i); i = N[i].p; } }
+  return (_anc[chId] = s);
+}
+// a running game keeps the opening and odds it started with; the chips only set up the next game
+function gameScope(){ const D = S.drill; return D && D.kind === 'sb' ? D.scope : SBS.scope; }
+function gameOdds(){ const D = S.drill; return D && D.kind === 'sb' ? D.odds : SBS.odds; }
+function inScope(c, scope){
+  scope = scope || gameScope();
+  if (scope === 'all') return true;
+  const C = CHAPTERS[scope]; if (!C) return true;
+  if (scopeAncestors(C.id).has(c)) return true;
+  let i = c; while (i !== null && i !== undefined){ if (C.roots.includes(i)) return true; i = N[i].p; }
+  return false;
+}
+function sbMyKids(idx){ return (N[idx].k || []).filter(c => c < REPN && isMine(N[c]) && !isWarnNode(c) && sbLinesThrough(c).length && inScope(c)); }
+function sbOppKids(idx){ return (N[idx].k || []).filter(c => c < REPN && !isMine(N[c]) && sbLinesThrough(c).length && inScope(c)); }
+function lineNeed(id){ const r = Prog.rec(id); if (!r) return 3; if (r.due <= Date.now()) return 2.5; return r.box >= 4 ? 0.35 : 1; }
+function sbWeights(kids){
+  const odds = gameOdds();
+  if (odds === 'even') return kids.map(c => sbLinesThrough(c).filter(id => inScopeLine(id)).length || 0.0001);
+  if (odds === 'weak') return kids.map(c => (sbLinesThrough(c).filter(id => inScopeLine(id)).reduce((a, id) => a + lineNeed(id), 0) || 0.0001) * Math.sqrt(Math.max(N[c].q || 0.02, 0.02)));
+  return kids.map(c => Math.max(N[c].q || 0, 0.003));
+}
+function inScopeLine(id, scope){ const n = LINES[id].n; return inScope(n[n.length - 1], scope); }
+function pickWeighted(kids, ws){ const tot = ws.reduce((a, b) => a + b, 0); let r = Math.random() * tot; for (let i = 0; i < kids.length; i++){ r -= ws[i]; if (r <= 0) return kids[i]; } return kids[kids.length - 1]; }
+function myTurnAt(idx){ return (ply(idx) % 2 === 0) === (ME === 1); }
+function sbStart(){
+  const D = {kind: 'sb', node: 0, hist: [0], slips: [], slipAt: new Set(), tries: 0, busy: false, tick: 0, state: 'play', hint: null, flash: null, sel: null, choices: [], msg: '', scope: SBS.scope, odds: SBS.odds};
+  S.sbState = S.drill = D;
+  if (S.view !== 'sandbox'){ S.view = 'sandbox'; setHash(); }
+  render();
+  D.busy = true; const t = ++D.tick;
+  // the White book always opens with your e-pawn; the Black book waits for White's first move
+  setTimeout(() => { if (S.drill === D && D.tick === t){ if (ME === 1) sbGo(E4); else sbContinue(); } }, 420);
+}
+function sbGo(next, anim = true){
+  const D = S.drill; D.node = next; D.hist.push(next);
+  renderDrillBoard(anim ? {u: N[next].u, meta: N[next]} : null);
+  sbContinue();
+}
+function sbContinue(){
+  const D = S.drill, idx = D.node;
+  if (myTurnAt(idx)){
+    if (!sbMyKids(idx).length) return sbFinish();
+    D.busy = false; D.tries = 0; renderSbPanel();
+  } else {
+    const bk = sbOppKids(idx);
+    if (!bk.length) return sbFinish();
+    D.busy = true; renderSbPanel();
+    const t = ++D.tick; // a newer timer (after leaving and coming back) cancels this one
+    setTimeout(() => {
+      if (S.drill !== D || D.tick !== t) return;
+      const ws = sbWeights(bk), c = pickWeighted(bk, ws), tot = ws.reduce((a, b) => a + b, 0);
+      D.choices.push({at: idx, pick: c, kids: bk, share: ws.map(w => w / tot)});
+      D.flash = null; D.msg = '';
+      sbGo(c);
+    }, 560 + Math.random() * 260);
+  }
+}
+function sbTry(u, to){
+  const D = S.drill; D.sel = null;
+  const ok = sbMyKids(D.node).find(c => N[c].u === u);
+  if (ok !== undefined){
+    D.flash = {sq: u.slice(2, 4), ok: true}; D.hint = null;
+    const nd = N[ok]; D.msg = `<b>${esc(nd.l)}.</b> ${esc(nd.t || '')}`;
+    D.busy = true;
+    D.node = ok; D.hist.push(ok);
+    renderDrillBoard({u, meta: nd});
+    const t = ++D.tick; setTimeout(() => { if (S.drill === D && D.tick === t){ D.flash = null; sbContinue(); } }, 380);
+    renderSbPanel();
+    return;
+  }
+  const warnKid = (N[D.node].k || []).find(c => N[c].u === u && isWarnNode(c));
+  if (!D.slipAt.has(D.node)){ D.slipAt.add(D.node); D.slips.push({at: D.node, tried: u, warn: warnKid}); }
+  D.tries++; D.flash = {sq: to, ok: false};
+  if (warnKid !== undefined) D.msg = `<b>That's the move to avoid here.</b> ${esc(N[warnKid].t || '')}`;
+  else D.msg = D.tries >= 2 ? 'Not your prep move. The arrow shows it; play it to continue.' : 'Not your prep move here. Try again.';
+  if (D.tries >= 2) D.hint = N[sbMyKids(D.node)[0]].u;
+  renderDrillBoard(); renderSbPanel();
+  setTimeout(() => { if (S.drill === D && D.flash && !D.flash.ok){ D.flash = null; renderDrillBoard(); } }, 650);
+}
+function sbLineFor(idx){
+  const ls = (linesByNode.get(idx) || []).filter(id => DRILLSET.has(id));
+  return ls.find(id => LINES[id].n[LINES[id].n.length - 1] === idx) || ls[0] || null;
+}
+function sbFinish(){
+  const D = S.drill; D.state = 'done'; D.busy = false; D.hint = null;
+  D.line = sbLineFor(D.node);
+  const clean = D.slips.length === 0;
+  if (D.line) Prog.record(D.line, clean);
+  const sb = Prog.d.sb || (Prog.d.sb = {games: 0, clean: 0, slips: 0, seen: {}});
+  sb.games++; if (clean) sb.clean++; sb.slips += D.slips.length; if (D.line) sb.seen[D.line] = (sb.seen[D.line] || 0) + 1;
+  Prog.save();
+  S.sbSession = S.sbSession || {games: 0, clean: 0, slips: 0};
+  S.sbSession.games++; if (clean) S.sbSession.clean++; S.sbSession.slips += D.slips.length;
+  renderDrillBoard(); renderSbPanel(); renderSbSide();
+}
+function oddsRows(ch){
+  const rows = ch.kids.map((c, k) => ({c, s: ch.share[k]})).sort((a, b) => b.s - a.s).slice(0, 6);
+  return `<div class="odds">${rows.map(r => `<div class="orow ${r.c === ch.pick ? 'pick' : ''}">${pieceIcon(N[r.c].pc, N[r.c].w === 1)}<span class="ol">${esc(N[r.c].l)}</span><span class="ob"><i style="width:${Math.max(2, Math.round(r.s * 100))}%"></i></span><span class="op">${pctTxt(r.s)}</span></div>`).join('')}</div>`;
+}
+function sbFeed(){
+  const D = S.drill, rows = [];
+  for (let k = 1; k < D.hist.length; k++){
+    const i = D.hist[k], m = N[i], p = k;
+    const slip = D.slipAt.has(D.hist[k - 1]) && isMine(m);
+    rows.push(`<li class="${isMine(m) ? 'you' : 'blk'} ${slip ? 'slip' : ''} ${k === D.hist.length - 1 ? 'last' : ''}"><span class="n">${moveNo(p)}${m.w === 1 ? '' : '…'}</span>${pieceIcon(m.pc, m.w === 1)}<span class="fl">${esc(m.l)}</span><span class="fq">${!isMine(m) && m.q ? pctTxt(m.q) : slip ? 'slip' : ''}</span></li>`);
+  }
+  return rows.length ? `<ol class="feed" id="sbfeed" aria-label="Moves this game">${rows.join('')}</ol>` : '';
+}
+function sbReport(){
+  const D = S.drill, lid = D.line, L = lid ? lessonOf(lid) : null, C = L ? chapterOf(L) : null;
+  const n = D.slips.length, prob = D.choices.reduce((a, ch) => a * (N[ch.pick].q || 1), 1);
+  const chain = D.choices.map(ch => `<span class="chip">${pieceIcon(N[ch.pick].pc, N[ch.pick].w === 1)}${esc(N[ch.pick].l)} · ${pctTxt(N[ch.pick].q || 0)}</span>`).join('<span aria-hidden="true">›</span>');
+  const slipCards = D.slips.map(s => {
+    const good = sbMyKids(s.at)[0], o = {coords: false, arrows: [s.tried.slice(0, 4) + 'r', N[good].u.slice(0, 4) + 'g']};
+    if (N[s.at].u) o.last = [N[s.at].u.slice(0, 2), N[s.at].u.slice(2, 4)];
+    const after = N[s.at];
+    return `<div class="slipc">${thumb(s.at, o)}<div><b>${esc(N[good].l)}</b><p>${after.u ? `${OPP} had just played: ${esc(after.l)}. ` : ''}${s.warn !== undefined ? 'You played the move to avoid.' : 'Red: what you tried. Green: your prep.'}</p></div></div>`;
+  }).join('');
+  const r = lid ? Prog.rec(lid) : null, days = r ? INTERVALS[r.box] : 0;
+  return `<div class="donebox ${n ? 'bad' : ''}">
+      <p class="kicker">${C ? esc(C.name) + ' · ' : ''}${L ? esc(L.title) : 'Line complete'}${lid && !LINES[lid].main ? ' · ' + esc(LINES[lid].title) : ''}</p>
+      <div class="bigstat"><b class="tnum">${n}</b><span>${n === 1 ? 'slip' : 'slips'} in this game · ${n ? 'this line is back in today\'s review' : `clean; it comes back in ${days} ${days === 1 ? 'day' : 'days'}`}</span></div>
+      ${n ? `<div class="slips">${slipCards}</div>` : ''}
+      ${D.choices.length ? `<div><p class="kicker" style="margin-bottom:6px">${OPP}'s choices</p><div class="chain">${chain}</div><p class="evaltext" style="text-align:left">This exact line: ${oneIn(prob)}.</p></div>` : ''}
+      <div class="lesson-actions"><button class="btn primary" id="sbAgain">Next game</button>${lid ? `<button class="btn" data-line="${lid}">Study this line</button><button class="btn ghost" id="sbDrill">Drill it</button>` : ''}</div></div>`;
+}
+function sbPanelHTML(){
+  const D = S.drill;
+  const scopeName = SBS.scope === 'all' ? 'Every opening' : CHAPTERS[SBS.scope].name;
+  if (!D){
+    return `<div class="dpanel sbintro"><p class="kicker">Sandbox · ${esc(scopeName)}</p><h3>Play a game against your prep</h3>
+      <ol>${ME === 1 ? '<li>You play White. Black answers instantly, picking from the moves in your prep.</li><li>Black\'s choices follow real odds: your own games for the first reply, then how players around your rating actually move.</li>' : '<li>You play Black. White moves first and answers instantly, picking from the moves in your prep.</li><li>White\'s choices follow real odds: your own games for the first move, then how players around your rating actually move.</li>'}<li>The game runs down one branch until the prep runs out. Then you get a report: slips, Black's choices and how rare the line is.</li></ol>
+      <div class="lesson-actions"><button class="btn primary" id="sbGo">Start a game</button></div></div>`;
+  }
+  const last = D.choices[D.choices.length - 1];
+  const lastBlack = last && D.hist[D.hist.length - 1] === last.pick ? last : (last && D.hist[D.hist.length - 2] === last.pick ? last : null);
+  let status = D.state === 'done' ? '' : D.busy ? (myTurnAt(D.node) ? '' : `${OPP} is choosing…`) : 'Your move';
+  const bnode = lastBlack ? N[lastBlack.pick] : null;
+  const black = bnode ? `<div class="mcard"><div class="who"><span class="side blk">${OPP}</span><span class="stepno">${pctTxt(bnode.q || 0)} of ${lastBlack.at === ODDS_ROOT ? 'your games' : 'players at your level'} go this way</span></div>
+      <h3>${pieceIcon(bnode.pc, bnode.w === 1)}<span>${esc(bnode.l)}</span></h3>${bnode.t ? `<p class="note">${esc(bnode.t)}</p>` : ''}${bnode.g ? `<div class="chips">${tagChips(bnode.g)}</div>` : ''}
+      ${lastBlack.kids.length > 1 ? `<details style="margin-top:10px"><summary class="kicker" style="cursor:pointer">What else ${OPP} could play here</summary><div style="margin-top:8px">${oddsRows(lastBlack)}</div></details>` : ''}</div>` : '';
+  const head = `<div class="dpanel"><p class="kicker">Sandbox · ${esc(D.scope === 'all' ? 'Every opening' : CHAPTERS[D.scope].name)} · ${D.slips.length} ${D.slips.length === 1 ? 'slip' : 'slips'} so far</p>
+      ${status ? `<div class="status ${D.busy ? 'wait' : ''} ${D.tries ? 'bad' : ''}"><span class="bub"></span>${status}</div>` : ''}
+      ${D.state === 'done' ? sbReport() : `<p class="feedback">${D.msg || (D.hist.length <= 2 ? 'Drag a piece or tap it, then tap where it goes.' : '&nbsp;')}</p>`}</div>`;
+  return head + (D.state === 'done' ? '' : black) + sbFeed();
+}
+function renderSbPanel(){
+  const el = document.getElementById('sbpanel'); if (!el) return;
+  el.innerHTML = sbPanelHTML(); wireSbPanel();
+  const f = document.getElementById('sbfeed'); if (f) f.scrollTop = f.scrollHeight;
+}
+function wireSbPanel(){
+  const g = document.getElementById('sbGo'); if (g) g.onclick = sbStart;
+  const a = document.getElementById('sbAgain'); if (a) a.onclick = sbStart;
+  const dr = document.getElementById('sbDrill'); if (dr && S.drill && S.drill.line) dr.onclick = () => startDrillLine(S.drill.line);
+}
+function sbSideHTML(){
+  const segBtn = (key, val, label) => `<button data-sbf="${key}:${val}" aria-pressed="${SBS[key] === val}">${label}</button>`;
+  const ses = S.sbSession, all = Prog.d.sb;
+  const pool = DRILLABLE.filter(id => inScopeLine(id, SBS.scope)), seen = all ? pool.filter(id => all.seen[id]).length : 0;
+  return `<div class="dpanel">
+      <div><p class="kicker" style="margin-bottom:6px">Openings</p><div class="seg">${segBtn('scope', 'all', 'Every opening')}${DATA.chapters.map(C => segBtn('scope', C.id, esc(C.name))).join('')}</div></div>
+      <div><p class="kicker" style="margin-bottom:6px">${OPP}'s odds</p><div class="seg">${segBtn('odds', 'real', 'Like real games')}${segBtn('odds', 'even', 'Even spread')}${segBtn('odds', 'weak', 'My weak spots')}</div>
+      <p class="evaltext" style="text-align:left;margin-top:8px">${SBS.odds === 'real' ? 'Common replies come up often, rare ones rarely, just like your games.' : SBS.odds === 'even' ? 'Every line in your prep is equally likely, so rare branches get their turn.' : 'Lines you haven\'t played, are due, or slipped on come up more.'}</p>${sbPendingHTML()}</div>
+      <div class="queue"><div><b class="tnum">${ses ? ses.games : 0}</b><span>games this session</span></div><div><b class="tnum">${ses ? ses.slips : 0}</b><span>slips this session</span></div><div><b class="tnum">${seen}<small style="font-size:.5em;color:var(--muted)">/${pool.length}</small></b><span>lines met in the sandbox</span></div></div>
+    </div>`;
+}
+function sbPendingHTML(){
+  const D = S.drill;
+  if (!D || D.kind !== 'sb' || D.state !== 'play' || (D.scope === SBS.scope && D.odds === SBS.odds)) return '';
+  const nm = sc => sc === 'all' ? 'every opening' : CHAPTERS[sc].name;
+  const what = D.scope !== SBS.scope ? `This game stays in ${nm(D.scope)}; ${nm(SBS.scope)} starts with the next one.` : 'The new odds start with the next game.';
+  return `<div class="sbpend" role="status"><span>${esc(what)}</span><button class="btn small" id="sbNow">Start it now</button></div>`;
+}
+function renderSbSide(){ const el = document.getElementById('sbside'); if (el){ el.innerHTML = sbSideHTML(); wireSbSide(); } }
+function wireSbSide(){
+  view.querySelectorAll('[data-sbf]').forEach(b => b.onclick = () => { const [k, v] = b.dataset.sbf.split(':'); SBS[k] = v; sbSave(); renderSbSide(); if (!S.drill) renderSbPanel(); });
+  const now = document.getElementById('sbNow'); if (now) now.onclick = () => { sbStart(); renderSbSide(); };
+}
+function renderSandbox(){
+  const D = S.drill;
+  view.innerHTML = `<div class="sechead"><h2>Sandbox</h2><p>Play ${MYC} against an opponent who only plays moves from your prep, picked at the odds you'd meet them in real games. One branch, start to finish, then a slip report.</p></div>
+  <div class="sgrid">
+    <div class="bcol"><div class="board ${D && D.state === 'play' ? 'input' : ''}" id="db">${D ? '' : boardSVG(N[0].f, {coords: true})}</div>
+      <div class="legend" style="margin-top:10px"><span><i style="background:var(--arr-g)"></i>your prep move</span><span><i style="background:var(--arr-r)"></i>what you tried</span></div></div>
+    <div class="ccol"><div id="sbpanel">${sbPanelHTML()}</div><div id="sbside">${sbSideHTML()}</div></div>
+  </div>`;
+  if (D) renderDrillBoard();
+  wireSbPanel(); wireSbSide(); wireBoardInput();
+  const f = document.getElementById('sbfeed'); if (f) f.scrollTop = f.scrollHeight;
+  if (D && D.state === 'play' && D.busy){ D.busy = false; const t = ++D.tick; setTimeout(() => { if (S.drill === D && D.tick === t) sbContinue(); }, 250); }
+}
+
+/* ------------------------------------------------------------------ GAMES */
+function renderGames(){
+  const pz = id => DATA.puzzles.findIndex(p => p.game === id);
+  const insight = I => {
+    let idx, o = {coords: false}, btn;
+    if (I.puz !== undefined){ const P = DATA.puzzles[I.puz]; if (!P) return ''; idx = P.node; o.arrows = [P.ok[0] + 'g']; btn = `<button class="btn small primary" data-puz="${I.puz}">Practice the shots</button>`; }
+    else { const L = LINES[I.game]; if (!L) return ''; idx = L.n[I.at]; btn = `<button class="btn small primary" data-line="${I.game}" data-i="${I.at}">Replay the game</button>`; }
+    const nd = N[idx]; if (nd.u) o.last = [nd.u.slice(0,2), nd.u.slice(2,4)];
+    return `<div class="insight">${thumb(idx, o)}<div><div class="big tnum">${esc(I.big)}${I.unit ? `<small>${esc(I.unit)}</small>` : ''}</div><h3>${esc(I.h)}</h3><p>${esc(I.p)}</p><div class="lesson-actions" style="margin-top:10px">${btn}</div></div></div>`; };
+  const cards = DATA.games.map(G => {
+    const main = LINES[G.lines[0]];
+    const tagged = t => G.moments.find(m => (N[main.n[m]].g || []).some(x => t.includes(x)));
+    const firstMiss = tagged(['missed']) || tagged(['blunder']) || tagged(['good', 'key']) || G.moments[0];
+    const at = Math.max(0, firstMiss - 1), idx = main.n[at];
+    const o = nodeBoardOpts(idx, {coords: false}); const better = DATA.lines.find(l => l.lesson === G.id && !l.main && l.at === firstMiss);
+    o.arrows = [(better ? N[better.n[at + 1]].u : N[main.n[firstMiss]].u).slice(0, 4) + 'g'];
+    const L = LESSONS[G.lesson], C = L ? chapterOf(L) : null;
+    return `<article class="gcard">${thumb(idx, o)}<div><div class="chips"><span class="chip ${G.result === 'W' ? 'win' : G.result === 'L' ? 'loss' : ''}">${G.result === 'W' ? 'Win' : G.result === 'L' ? 'Loss' : 'Draw'}</span>${C ? `<span class="chip">${esc(C.name)}</span>` : ''}<span class="chip">${esc(G.date)} · ${esc(G.acct)}</span><span class="chip">vs ${esc(G.opp)} (${G.oppElo})</span></div>
+      <h4>${esc(G.title)}</h4><p>${esc(G.summary)}</p><div class="acts"><button class="btn small primary" data-line="${G.id}" data-i="${at}">Replay from the key moment</button><button class="btn small" data-lesson="${G.lesson}">Related lesson</button></div></div></article>`;
+  }).join('');
+  const st = DATA.stats, maxn = Math.max(...DATA.chapters.map(c => c.stats.n));
+  const byOpening = DATA.chapters.map(C => { const s = C.stats, pct = Math.round(s.w / Math.max(1, s.n) * 100);
+    return `<button class="orow2" data-ch="${C.id}"><span class="on">${esc(C.name)}</span><span class="ob"><i style="width:${Math.round(s.n / maxn * 100)}%"></i></span><span class="tnum">${s.n}</span><span class="tnum">${s.w}–${s.l}</span><span class="tnum op2 ${pct >= 60 ? 'good' : pct < 50 ? 'bad' : ''}">${pct}%</span></button>`; }).join('');
+  view.innerHTML = `<div class="sechead"><h2>Your games</h2><p>${esc(TXT[SIDE].gamesP(st))}</p></div>
+    <div class="panel" style="margin-bottom:24px"><h3>By opening</h3><div class="otable"><div class="orow2 head" aria-hidden="true"><span>${esc(TXT[SIDE].byHead)}</span><span>How often</span><span>Games</span><span>Record</span><span style="text-align:right">Won</span></div>${byOpening}</div></div>
+    <div class="insights">${(DATA.insights || []).map(insight).join('')}</div>
+    <div class="gcards">${cards}</div>`;
+  view.querySelectorAll('[data-puz]').forEach(b => b.onclick = () => startPuzzle(+b.dataset.puz));
+}
+
+/* ------------------------------------------------------------------ CHEAT SHEET */
+function renderCheat(){
+  const groups = {};
+  for (const c of DATA.cheat){ const L = LESSONS[c.lesson]; (groups[L.part] = groups[L.part] || []).push(c); }
+  let html = `<div class="sechead"><h2>Cheat sheet</h2><p>${OPP}'s move is highlighted; the green arrow is your answer. Tap a card to open that position in its lesson.</p></div>
+    <div class="seg" style="margin-bottom:22px">${DATA.chapters.map(C => `<button data-jump="${C.id}">${esc(C.name)}</button>`).join('')}</div>`;
+  for (const C of DATA.chapters){
+    const cs = C.parts.flatMap(p => groups[p] || []); if (!cs.length) continue;
+    html += `<section class="part" id="cs-${C.id}" style="scroll-margin-top:16px"><div class="part-head"><div><p class="kicker">${esc(C.move)}</p><h3>${esc(C.name)}</h3></div></div><div class="cgrid">${cs.map(c => {
+      const nd = N[c.node], o = {coords: false, arrows: [c.mv.slice(0, 4) + 'g']};
+      if (nd.u) o.last = [nd.u.slice(0, 2), nd.u.slice(2, 4)];
+      const lid = LESSONS[c.lesson].lines.find(id => LINES[id].n.includes(c.child)) || LESSONS[c.lesson].lines[0];
+      const iAt = Math.max(0, LINES[lid].n.indexOf(c.node));
+      return `<button class="ccard" data-line="${lid}" data-i="${iAt}">${thumb(c.node, o)}<span class="if">${nd.u ? ((nd.l.startsWith(OPP) ? '' : (isMine(nd) ? 'You: ' : OPP + ': ')) + esc(nd.l)) : 'Start'}</span><span class="then">${esc(c.rule)}</span></button>`; }).join('')}</div></section>`;
+  }
+  view.innerHTML = html;
+  view.querySelectorAll('[data-jump]').forEach(b => b.onclick = () => { const el = document.getElementById('cs-' + b.dataset.jump); if (el) el.scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block: 'start'}); });
+}
+
+/* ------------------------------------------------------------------ boot */
+function start(saved){
+  Prog.load();
+  let h = (location.hash || '').slice(1), side = 'w';
+  try { const v = localStorage.getItem(SIDE_KEY); if (v && BOOKS[v]) side = v; } catch(e){}
+  if (saved && saved.side && BOOKS[saved.side]) side = saved.side;
+  else if (h.startsWith('b.')){ side = 'b'; h = h.slice(2); }
+  else if (h) side = 'w';
+  loadBook(side); S.chapter = savedChapter(SIDE);
+  if (saved && saved.view){ Object.assign(S, {view: saved.view, line: saved.line && LINES[saved.line] ? saved.line : null, i: saved.i || 0, studyFrom: saved.studyFrom || 'learn'}); if (saved.chapter && CHAPTERS[saved.chapter]) S.chapter = saved.chapter; if (S.view === 'study' && !S.line) S.view = 'learn'; }
+  else if (h.startsWith('line.') && LINES[h.slice(5)]){ S.line = h.slice(5); S.i = lineStart(S.line); S.view = 'study'; }
+  else if (h.startsWith('learn.') && CHAPTERS[h.slice(6)]){ S.chapter = h.slice(6); S.view = 'learn'; }
+  else if (VIEWS.includes(h)) S.view = h;
+  render();
+  Prog.connect();
+  try { window.claude && window.claude.hot && window.claude.hot.snapshot && window.claude.hot.snapshot(() => ({side: SIDE, view: S.view, line: S.line, i: S.i, studyFrom: S.studyFrom, chapter: S.chapter})); } catch(e){}
+}
+try { if (window.claude && window.claude.hot && window.claude.hot.ready) window.claude.hot.ready(start); else start((window.claude && window.claude.hot && window.claude.hot.data) || {}); }
+catch(e){ start({}); }
+</script>

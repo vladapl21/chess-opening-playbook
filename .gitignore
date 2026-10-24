@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.DS_Store
+
+# test screenshots
+tests/out/
+
+# engines and weights (see README: STOCKFISH, MAIA_WEIGHTS, LCZERO_TRAINING)
+vendor/
+
+# cache write leftovers
+data/cache/*.lock
+data/cache/*.tmp

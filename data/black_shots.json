@@ -1,0 +1,882 @@
+[
+{
+"opp": "MrGaurav547",
+"date": "2026.10.13",
+"ply": 21,
+"played": "Nd5",
+"best": [
+[
+"Qxe3+",
+-117
+],
+[
+"Nd5",
+69
+],
+[
+"Qe6",
+148
+]
+],
+"res": "L",
+"before": "Nc3 e3 dxe3 Qxe3"
+},
+{
+"opp": "MrGaurav547",
+"date": "2026.10.13",
+"ply": 35,
+"played": "Be6",
+"best": [
+[
+"Bxa1",
+-343
+],
+[
+"Nc6",
+-80
+],
+[
+"O-O",
+-24
+]
+],
+"res": "L",
+"before": "Be6 Bxd5 Bxd5 Bxd6"
+},
+{
+"opp": "Dziubster",
+"date": "2026.10.13",
+"ply": 31,
+"played": "Bxf2+",
+"best": [
+[
+"Qxg3+",
+-904
+],
+[
+"Qxh3",
+-107
+],
+[
+"Nxh3+",
+-68
+]
+],
+"res": "W",
+"before": "Qh4 Qf3 Ng5 Qg3"
+},
+{
+"opp": "bed1rh4n31",
+"date": "2026.10.14",
+"ply": 49,
+"played": "c5",
+"best": [
+[
+"Rc1+",
+-261
+],
+[
+"Re8",
+-19
+],
+[
+"Rc2",
+-19
+]
+],
+"res": "L",
+"before": "Ra8 Rd1 g6 Rd7"
+},
+{
+"opp": "Eschoir",
+"date": "2026.10.14",
+"ply": 67,
+"played": "Ke5",
+"best": [
+[
+"c4",
+0
+],
+[
+"Ke5",
+633
+],
+[
+"Ke6",
+642
+]
+],
+"res": "L",
+"before": "f5 Kd3 c6 Kc3"
+},
+{
+"opp": "yonatha32",
+"date": "2026.10.14",
+"ply": 27,
+"played": "O-O",
+"best": [
+[
+"Qxf4",
+-313
+],
+[
+"b5",
+106
+],
+[
+"O-O",
+176
+]
+],
+"res": "L",
+"before": "Bb6 Nxb6 axb6 Bb2"
+},
+{
+"opp": "junior607",
+"date": "2026.10.14",
+"ply": 57,
+"played": "Rd2",
+"best": [
+[
+"Rxb2",
+-254
+],
+[
+"Rd2",
+-73
+],
+[
+"Rc4",
+-26
+]
+],
+"res": "W",
+"before": "Kc6 g4 Rxc2 g5"
+},
+{
+"opp": "Pong_02",
+"date": "2026.10.14",
+"ply": 39,
+"played": "Bf5",
+"best": [
+[
+"Bxf2+",
+-934
+],
+[
+"Bd7",
+-755
+],
+[
+"Bg4",
+-730
+]
+],
+"res": "W",
+"before": "Nc6 Nxc6 bxc6 Re1"
+},
+{
+"opp": "ramjo08",
+"date": "2026.10.14",
+"ply": 15,
+"played": "Bxe3",
+"best": [
+[
+"Ng4",
+-622
+],
+[
+"Bxe3",
+-469
+],
+[
+"Bb6",
+-438
+]
+],
+"res": "W",
+"before": "Qd4 Be3 Qxe5 O-O"
+},
+{
+"opp": "ramjo08",
+"date": "2026.10.14",
+"ply": 37,
+"played": "Nf4",
+"best": [
+[
+"Qf2#",
+-10000
+],
+[
+"Qh6",
+-438
+],
+[
+"Ng5",
+-430
+]
+],
+"res": "W",
+"before": "Nh3 Rg2 b6 Rg3"
+},
+{
+"opp": "ramjo08",
+"date": "2026.10.14",
+"ply": 41,
+"played": "Qe2+",
+"best": [
+[
+"Nd5",
+-391
+],
+[
+"Nd3",
+-127
+],
+[
+"Ng2",
+-123
+]
+],
+"res": "W",
+"before": "Nf4 Rb3 Rae8 d4"
+},
+{
+"opp": "Aashishtak92",
+"date": "2026.10.14",
+"ply": 17,
+"played": "Nxe5",
+"best": [
+[
+"dxe5",
+-185
+],
+[
+"Nxe5",
+8
+],
+[
+"Nxe4",
+18
+]
+],
+"res": "W",
+"before": "e5 d4 Nf6 dxe5"
+},
+{
+"opp": "Mahm00dsaad",
+"date": "2026.10.14",
+"ply": 23,
+"played": "Re7",
+"best": [
+[
+"Rxe2",
+-10
+],
+[
+"Qg4",
+190
+],
+[
+"Re7",
+205
+]
+],
+"res": "W",
+"before": "Re8 d3 Qd7 O-O"
+},
+{
+"opp": "Mahm00dsaad",
+"date": "2026.10.14",
+"ply": 31,
+"played": "Re7",
+"best": [
+[
+"d4",
+-448
+],
+[
+"Re8",
+-32
+],
+[
+"Re7",
+-17
+]
+],
+"res": "W",
+"before": "Rxe2 Rxe2 Rxe2 Bf3"
+},
+{
+"opp": "Mahm00dsaad",
+"date": "2026.10.14",
+"ply": 69,
+"played": "Be2",
+"best": [
+[
+"Bd3",
+-361
+],
+[
+"Kf6",
+0
+],
+[
+"Bf1+",
+0
+]
+],
+"res": "W",
+"before": "Kf8 f3 Ke7 Kh3"
+},
+{
+"opp": "megautama77",
+"date": "2026.07.12",
+"ply": 35,
+"played": "exd4",
+"best": [
+[
+"f5",
+-317
+],
+[
+"Rae8",
+-116
+],
+[
+"d5",
+-92
+]
+],
+"res": "W",
+"before": "Ng4 Be3 Qh2+ Kf1"
+},
+{
+"opp": "Danichondo",
+"date": "2026.07.12",
+"ply": 21,
+"played": "Bxf3",
+"best": [
+[
+"fxe4",
+-49
+],
+[
+"f4",
+221
+],
+[
+"O-O-O",
+250
+]
+],
+"res": "L",
+"before": "Qe7 Bd3 f5 O-O"
+},
+{
+"opp": "johnmcqueenjjjjjdhdh",
+"date": "2026.07.12",
+"ply": 49,
+"played": "bxc4",
+"best": [
+[
+"Qg3+",
+-361
+],
+[
+"bxc4",
+89
+],
+[
+"Be6",
+181
+]
+],
+"res": "L",
+"before": "a4 Bc2 Nc4 Nxc4"
+},
+{
+"opp": "Datmo",
+"date": "2026.07.13",
+"ply": 9,
+"played": "cxd4",
+"best": [
+[
+"Qxb2",
+-212
+],
+[
+"cxd4",
+0
+],
+[
+"Nf6",
+20
+]
+],
+"res": "L",
+"before": "Nd5 Bg3 Qb6 c3"
+},
+{
+"opp": "ctdawizard",
+"date": "2026.07.13",
+"ply": 53,
+"played": "cxd5",
+"best": [
+[
+"Rxf3+",
+-26
+],
+[
+"Kg7",
+328
+],
+[
+"Rxb2",
+354
+]
+],
+"res": "W",
+"before": "Kxf6 fxg6 Rxf2+ Kd3"
+},
+{
+"opp": "Mathzombie10",
+"date": "2026.07.13",
+"ply": 27,
+"played": "Nxc2+",
+"best": [
+[
+"Nxc2+",
+-36
+],
+[
+"Ne7",
+314
+],
+[
+"Nf6",
+388
+]
+],
+"res": "W",
+"before": "Kd8 Qxd4 Nxd4 Nxa8"
+},
+{
+"opp": "Mathzombie10",
+"date": "2026.07.13",
+"ply": 55,
+"played": "Rd8",
+"best": [
+[
+"Be5+",
+-713
+],
+[
+"Rd8",
+-266
+],
+[
+"Bxb2",
+5
+]
+],
+"res": "W",
+"before": "Kd8 Rxa7 Ke7 Bc6"
+},
+{
+"opp": "Mathzombie10",
+"date": "2026.07.13",
+"ply": 57,
+"played": "Bxb2",
+"best": [
+[
+"Be5+",
+-689
+],
+[
+"Bxb2",
+-340
+],
+[
+"Bd4",
+-268
+]
+],
+"res": "W",
+"before": "Ke7 Bc6 Rd8 a4"
+},
+{
+"opp": "DEOSVULT",
+"date": "2026.07.16",
+"ply": 19,
+"played": "Be7",
+"best": [
+[
+"Qxg5",
+-476
+],
+[
+"Nd5",
+-4
+],
+[
+"Bb4",
+2
+]
+],
+"res": "L",
+"before": "c6 Bd3 Bxd3 Qxd3"
+},
+{
+"opp": "Alla79_Albag",
+"date": "2026.07.18",
+"ply": 55,
+"played": "Bxc5",
+"best": [
+[
+"Rxd4",
+-500
+],
+[
+"b4",
+15
+],
+[
+"g6",
+20
+]
+],
+"res": "W",
+"before": "Rxc8 f3 Rc4 Nc5"
+},
+{
+"opp": "Shiv515355",
+"date": "2026.10.08",
+"ply": 37,
+"played": "Qc2",
+"best": [
+[
+"Qxg3",
+-10000
+],
+[
+"Bxf2+",
+-693
+],
+[
+"Qg6",
+-595
+]
+],
+"res": "W",
+"before": "Nf4 Ng3 Qxd3 Rad1"
+},
+{
+"opp": "cipucci",
+"date": "2026.07.09",
+"ply": 29,
+"played": "Ne7",
+"best": [
+[
+"Kd8",
+-207
+],
+[
+"Kf8",
+-37
+],
+[
+"Ne7",
+149
+]
+],
+"res": "L",
+"before": "Nc6 Rxe6+ fxe6 Qxe6+"
+},
+{
+"opp": "cipucci",
+"date": "2026.07.09",
+"ply": 39,
+"played": "Rad8",
+"best": [
+[
+"Rac8",
+-244
+],
+[
+"Rad8",
+-27
+],
+[
+"Rab8",
+0
+]
+],
+"res": "L",
+"before": "O-O Nxc6 bxc6 Bxc6"
+},
+{
+"opp": "charizard2038",
+"date": "2026.07.09",
+"ply": 19,
+"played": "Nd7",
+"best": [
+[
+"Ng4",
+-408
+],
+[
+"Nxf3+",
+-77
+],
+[
+"Qe8",
+-71
+]
+],
+"res": "L",
+"before": "Nd4 Rb1 O-O Bb2"
+},
+{
+"opp": "charizard2038",
+"date": "2026.07.09",
+"ply": 47,
+"played": "Nxd3",
+"best": [
+[
+"Qxg3",
+-10000
+],
+[
+"Rh6",
+-433
+],
+[
+"Qh4",
+-423
+]
+],
+"res": "L",
+"before": "cxb5 c3 dxc3 Bxc3"
+},
+{
+"opp": "Saud1980",
+"date": "2026.07.09",
+"ply": 39,
+"played": "Ne5",
+"best": [
+[
+"a5",
+-10000
+],
+[
+"Qxe3+",
+-1264
+],
+[
+"Re8",
+-1148
+]
+],
+"res": "W",
+"before": "Bf5 Nb4 Qd2+ Kb3"
+},
+{
+"opp": "Saud1980",
+"date": "2026.07.09",
+"ply": 53,
+"played": "Ne3+",
+"best": [
+[
+"Qf2+",
+-10000
+],
+[
+"Nxd6",
+-1192
+],
+[
+"Bf5+",
+-1169
+]
+],
+"res": "W",
+"before": "Qb6+ Nb4 Nxc4 Kc2"
+},
+{
+"opp": "Jaydenh625",
+"date": "2026.07.09",
+"ply": 51,
+"played": "Rbe6",
+"best": [
+[
+"Qxf1+",
+-538
+],
+[
+"h6",
+117
+],
+[
+"Rbe6",
+127
+]
+],
+"res": "W",
+"before": "Qxc4 Qxf5 Nxd2 Rxd2"
+},
+{
+"opp": "logruswalker",
+"date": "2026.07.10",
+"ply": 13,
+"played": "Bg7",
+"best": [
+[
+"Bh6",
+-45
+],
+[
+"d6",
+152
+],
+[
+"Ke8",
+171
+]
+],
+"res": "L",
+"before": "g5 Nxg5 hxg5 Bxg5"
+},
+{
+"opp": "1756yourmum",
+"date": "2026.07.10",
+"ply": 51,
+"played": "bxc4",
+"best": [
+[
+"Qg5",
+-519
+],
+[
+"Ra7",
+-210
+],
+[
+"bxc4",
+-207
+]
+],
+"res": "L",
+"before": "Rbxc8 Bb7 Rc7 Bxa6"
+},
+{
+"opp": "1756yourmum",
+"date": "2026.07.10",
+"ply": 55,
+"played": "d5",
+"best": [
+[
+"Qg5",
+-528
+],
+[
+"Rxc4",
+-310
+],
+[
+"Qf5",
+134
+]
+],
+"res": "L",
+"before": "bxc4 Bxc4 Rfc8 Rac1"
+},
+{
+"opp": "1756yourmum",
+"date": "2026.07.10",
+"ply": 57,
+"played": "Rxc1",
+"best": [
+[
+"Qg5",
+-552
+],
+[
+"e5",
+129
+],
+[
+"Rxc1",
+160
+]
+],
+"res": "L",
+"before": "Rfc8 Rac1 d5 Ba6"
+},
+{
+"opp": "fullmetalparka",
+"date": "2026.07.10",
+"ply": 59,
+"played": "Ka6",
+"best": [
+[
+"Qxf3",
+-45
+],
+[
+"Ra4",
+365
+],
+[
+"Rd8",
+374
+]
+],
+"res": "L",
+"before": "Kc6 Qf3+ Kb5 Ra1"
+},
+{
+"opp": "mtreb",
+"date": "2026.07.10",
+"ply": 13,
+"played": "Qxh4",
+"best": [
+[
+"Nxd5",
+-348
+],
+[
+"Nxa2",
+-174
+],
+[
+"Ne4",
+-139
+]
+],
+"res": "W",
+"before": "Qb4+ c3 Nxc3 Qd2"
+},
+{
+"opp": "quzibek",
+"date": "2026.07.11",
+"ply": 63,
+"played": "Kd7",
+"best": [
+[
+"Bxf7",
+-720
+],
+[
+"Kd7",
+-452
+],
+[
+"Kb7",
+687
+]
+],
+"res": "L",
+"before": "Bxd1 Kf2 Bb3 e7"
+}
+]

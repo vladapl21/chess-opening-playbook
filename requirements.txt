@@ -1,0 +1,4 @@
+# Rebuild the app from the committed content and caches
+chess==1.11.2
+# Maia inference, only needed for positions that are not in data/cache yet
+numpy>=1.26
