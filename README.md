@@ -313,7 +313,6 @@ The tests drive the real page in Chromium. They visit every chapter in both book
 - **The Italian chapter** of the White book is rebuilt from a Lichess study by my coach, Aleks_Ra (2022).
 - **Fonts:** Bodoni Moda, Instrument Sans and JetBrains Mono (SIL Open Font License), served by Google Fonts.
 - **Games:** my own games on chess.com. Opponents appear under their public usernames.
-- Designed and built together with [Claude](https://claude.ai).
 
 ## License
 
