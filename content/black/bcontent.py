@@ -125,25 +125,24 @@ L('bi-cheap', 'bi-gambits', 'Cheap shots at f7', 'Count the attackers: your quee
 
 # ============================================================== RUY LOPEZ (3.Bb5 Nf6)
 RL = J(KN, "Bb5 Nf6")
-P('br-castle', 'ruy', 'White castles', 'Berlin',
-  'White leaves the e-pawn hanging to castle fast. Take it, then step the knight back and trade.')
+P('br-castle', 'ruy', 'White castles', 'Main line',
+  'White castles and leaves the e-pawn to its fate. Ignore it: your bishop goes to the same diagonal as in the Italian and you castle too.')
 P('br-quiet', 'ruy', 'Quiet fourth moves', 'Slow Spanish',
   'White guards the e-pawn and develops. Your bishop goes to the same diagonal as in the Italian.')
 P('br-swap', 'ruy', 'Bishop takes your knight', 'Exchange',
   'White trades the bishop for your knight. Take back toward the center, then win your pawn back.')
 
-L('br-oo', 'br-castle', 'Take the e-pawn, then step back', 'Knight takes, retreats, and trades', 'core',
-  J(RL, "O-O Nxe4 Re1 Nd6 Bxc6 dxc6 Nxe5 Be7"),
-  alts=[('br-oo-nxe5', 'Knight takes first', J(RL, "O-O Nxe4 Re1 Nd6 Nxe5 Be7 Nxc6 dxc6")),
-        ('br-oo-rxe5', 'Rook takes with check', J(RL, "O-O Nxe4 Re1 Nd6 Bxc6 dxc6 Rxe5+ Be7")),
-        ('br-oo-bxc6', 'Bishop takes at once', J(RL, "O-O Nxe4 Bxc6 dxc6 Nxe5 Nd6")),
-        ('br-oo-bxc6d3', 'Bishop takes, then the pawn hits your knight', J(RL, "O-O Nxe4 Bxc6 dxc6 d3 Nd6 Nxe5 Be7")),
-        ('br-oo-d3', 'Pawn hits your knight', J(RL, "O-O Nxe4 d3 Nd6 Bxc6 dxc6 Nxe5 Be7")),
-        ('br-oo-d4', 'Center push: the queen trade', J(RL, "O-O Nxe4 d4 Nd6 Bxc6 dxc6 dxe5 Nf5 Qxd8+ Kxd8")),
-        ('br-oo-dxe5', 'Center push, then pawn takes: grab the bishop', J(RL, "O-O Nxe4 d4 Nd6 dxe5 Nxb5")),
-        ('br-oo-qe2', 'Queen pins your knight, then the knight grabs', J(RL, "O-O Nxe4 Qe2 Nd6 Nxe5 Nd4")),
-        ('br-oo-qe2b', 'Queen pins, bishop takes', J(RL, "O-O Nxe4 Qe2 Nd6 Bxc6 dxc6 Qxe5+ Qe7"))],
-  why='The Berlin is your move against the Spanish. About a quarter of White players castle here and leave the e-pawn hanging.', outcome='Equal; you have the bishop pair')
+L('br-oo', 'br-castle', 'White castles: bishop out, castle', 'Same setup as the Italian: bishop to its diagonal, castle, small d-pawn', 'core',
+  J(RL, "O-O Bc5 c3 O-O d4 Bb6"),
+  alts=[('br-oo-re1', 'Small c-pawn, then the rook', J(RL, "O-O Bc5 c3 O-O Re1 d6")),
+        ('br-oo-re1first', 'Rook to the e-file first', J(RL, "O-O Bc5 Re1 O-O c3 d6")),
+        ('br-oo-bxc6', 'Bishop takes, knight grabs your pawn: grab White\'s', J(RL, "O-O Bc5 Bxc6 dxc6 Nxe5 Nxe4")),
+        ('br-oo-bxc6d3', 'Bishop takes, then the small d-pawn', J(RL, "O-O Bc5 Bxc6 dxc6 d3 Qe7")),
+        ('br-oo-c3bxc6', 'Small c-pawn, then bishop takes', J(RL, "O-O Bc5 c3 O-O Bxc6 dxc6")),
+        ('br-oo-d3', 'Small d-pawn move', J(RL, "O-O Bc5 d3 d6 Bg5 h6")),
+        ('br-oo-d3c3', 'Small d-pawn, then the c-pawn', J(RL, "O-O Bc5 d3 d6 c3 O-O")),
+        ('br-oo-nc3', 'Knight out', J(RL, "O-O Bc5 Nc3 O-O d3 d6"))],
+  why='About a quarter of White players castle here. You already play the bishop out against the Spanish by instinct; this makes it the rule.', outcome='About equal; the same position type as your Italian')
 L('br-d3', 'br-quiet', 'Pawn guards the e-pawn', 'Bishop out to the same diagonal as in the Italian', 'core',
   J(RL, "d3 Bc5 O-O d6 h3 O-O"),
   alts=[('br-d3-trap', 'Bishop takes, knight grabs: the queen fork', J(RL, "d3 Bc5 Bxc6 dxc6 Nxe5 Qd4")),
@@ -154,17 +153,17 @@ L('br-d3', 'br-quiet', 'Pawn guards the e-pawn', 'Bishop out to the same diagona
         ('br-d3-oonc3', 'Castle, then the knight', J(RL, "d3 Bc5 O-O d6 Nc3 h6")),
         ('br-d3-c3', 'Small c-pawn move', J(RL, "d3 Bc5 c3 O-O O-O d6"))],
   why='You played the bishop out against this in both of your games and won both.', outcome='Equal', tags=['game'])
-L('br-nc3', 'br-quiet', 'Knight out: copy the pin', 'Your bishop pins back; castle and keep it simple', 'common',
-  J(RL, "Nc3 Bb4 O-O O-O d3 d6"),
-  alts=[('br-nc3-d3', 'Pawn guards first', J(RL, "Nc3 Bb4 d3 d6 Bd2 O-O")),
-        ('br-nc3-d3bg5', 'Pawn guards, then the pin', J(RL, "Nc3 Bb4 d3 d6 Bg5 h6")),
-        ('br-nc3-bxc6', 'Bishop takes your knight', J(RL, "Nc3 Bb4 Bxc6 dxc6 d3 Nd7")),
-        ('br-nc3-bxc6e5', 'Bishop takes, knight grabs the pawn', J(RL, "Nc3 Bb4 Bxc6 dxc6 Nxe5 Qe7")),
-        ('br-nc3-a3', 'Pawn hits your bishop', J(RL, "Nc3 Bb4 a3 Bxc3 dxc3 d6")),
-        ('br-nc3-a3b', 'Pawn hits your bishop, b-pawn takes back', J(RL, "Nc3 Bb4 a3 Bxc3 bxc3 O-O")),
-        ('br-nc3-ooa3', 'Castle, then the pawn hits your bishop', J(RL, "Nc3 Bb4 O-O O-O a3 Bxc3 dxc3 Nxe4")),
-        ('br-nc3-nd5', 'Knight jumps to the center', J(RL, "Nc3 Bb4 Nd5 Nxd5 exd5 e4"))],
-  why='The Four Knights version of the Spanish. Symmetry is fine for you.', outcome='Equal')
+L('br-nc3', 'br-quiet', 'Knight out: bishop out, castle', 'Same setup; one trick if White grabs your e-pawn', 'common',
+  J(RL, "Nc3 Bc5 O-O O-O d3 d6"),
+  alts=[('br-nc3-bxc6', 'Bishop takes your knight', J(RL, "Nc3 Bc5 Bxc6 dxc6 O-O Bg4")),
+        ('br-nc3-bxc6e5', 'Bishop takes, knight grabs the pawn: bishop check, queen fork', J(RL, "Nc3 Bc5 Bxc6 dxc6 Nxe5 Bxf2+ Kxf2 Qd4+ Ke1 Qxe5")),
+        ('br-nc3-d3', 'Small d-pawn, then the pin', J(RL, "Nc3 Bc5 d3 O-O Bg5 h6")),
+        ('br-nc3-d3oo', 'Small d-pawn, then castle', J(RL, "Nc3 Bc5 d3 O-O O-O d6")),
+        ('br-nc3-ooxc6', 'Castle, then bishop takes', J(RL, "Nc3 Bc5 O-O O-O Bxc6 dxc6")),
+        ('br-nc3-re1', 'Castle, then the rook', J(RL, "Nc3 Bc5 O-O O-O Re1 d6")),
+        ('br-nc3-h3', 'Edge pawn', J(RL, "Nc3 Bc5 h3 O-O")),
+        ('br-nc3-nxe5', 'Knight grabs your e-pawn at once', J(RL, "Nc3 Bc5 Nxe5 Nxe5 d4 Bd6 dxe5 Bxe5"))],
+  why='The Four Knights version of the Spanish. You won with this exact setup on Oct 31.', outcome='Equal')
 L('br-bxc6', 'br-swap', 'Take back with the d-pawn', 'Open lines for your queen and bishop, then win the pawn back', 'core',
   J(RL, "Bxc6 dxc6 Nxe5 Qd4 Nf3 Qxe4+ Qe2 Qxe2+ Kxe2 Bd6"),
   alts=[('br-bxc6-nd3', 'Knight steps back to guard', J(RL, "Bxc6 dxc6 Nxe5 Qd4 Nd3 Qxe4+")),
@@ -412,177 +411,6 @@ L('ba-bc4', 'ba-bishop', 'Bishop out on move two', 'Knight out; back to your Ita
         ('ba-bc4-nf3nc3', 'Knight out, then the other knight', J(E, "Bc4 Nc6 Nf3 Bc5 Nc3 Nf6"))],
   why='Three of your games started this way. Most move orders lead back to the Italian or the Vienna.', outcome='Equal', tags=['game'])
 
-# ============================================================== QUEEN'S GAMBIT (1.d4 Nf6 2.c4 e6)
-D = "d4 Nf6"
-QG = J(D, "c4 e6")
-QC = J(QG, "Nc3 d5")
-P('bq-classic', 'qgd', 'The classical setup', 'Queen\'s Gambit Declined',
-  'Knight, e-pawn, d-pawn, bishop, castle. Then the h-pawn asks the bishop and your knight jumps forward to trade.')
-P('bq-exchange', 'qgd', 'White trades in the center', 'Exchange',
-  'White takes on your d-pawn early. Take back with the e-pawn, castle, and put a pawn beside your d-pawn.')
-P('bq-other', 'qgd', 'Other third moves', 'Catalan & sidelines',
-  'White develops the king\'s knight or fianchettoes. Same setup, and take the c-pawn when White can\'t win it back fast.')
-
-L('bq-ortho', 'bq-classic', 'Bishop pins: the trade trick', 'Castle, ask the bishop, then the knight jump trades two pairs', 'core',
-  J(QC, "Bg5 Be7 e3 O-O Nf3 h6 Bh4 Ne4 Bxe7 Qxe7 cxd5 Nxc3 bxc3 exd5"),
-  alts=[('bq-ortho-bxf6', 'Bishop takes your knight', J(QC, "Bg5 Be7 e3 O-O Nf3 h6 Bxf6 Bxf6")),
-        ('bq-ortho-nxe4', 'Knight takes knight', J(QC, "Bg5 Be7 e3 O-O Nf3 h6 Bh4 Ne4 Nxe4 Bxh4")),
-        ('bq-ortho-bd3', 'Bishop out before the knight', J(QC, "Bg5 Be7 e3 O-O Bd3 h6 Bxf6 Bxf6")),
-        ('bq-ortho-bd3h4', 'Bishop out, then back on the pin: take the c-pawn', J(QC, "Bg5 Be7 e3 O-O Bd3 h6 Bh4 dxc4")),
-        ('bq-ortho-nxe4b', 'Bishops trade, then knight takes knight', J(QC, "Bg5 Be7 e3 O-O Nf3 h6 Bh4 Ne4 Bxe7 Qxe7 Nxe4 dxe4")),
-        ('bq-ortho-nf3', 'Knight first', J(QC, "Bg5 Be7 Nf3 O-O e3 h6 Bh4 Ne4")),
-        ('bq-ortho-early', 'Bishop takes at once', J(QC, "Bg5 Be7 Bxf6 Bxf6")),
-        ('bq-ortho-cxd5', 'Pawn trade after the pin', J(QC, "Bg5 Be7 cxd5 exd5 e3 O-O"))],
-  why='The classical Queen\'s Gambit. You played the same first moves in your July games.', outcome='Equal and solid')
-L('bq-nf3', 'bq-classic', 'Knight out first', 'Same setup; strike with the c-pawn if the bishop goes to the side', 'common',
-  J(QC, "Nf3 Be7 Bg5 O-O e3 h6 Bh4 Ne4"),
-  alts=[('bq-nf3-e3', 'Small e-pawn move', J(QC, "Nf3 Be7 e3 O-O Bd3 dxc4 Bxc4 c5")),
-        ('bq-nf3-bf4', 'Bishop to the long diagonal', J(QC, "Nf3 Be7 Bf4 O-O e3 c5")),
-        ('bq-nf3-cxd5', 'Pawn trade', J(QC, "Nf3 Be7 cxd5 exd5"))],
-  why='The knight comes out first in about a quarter of games.', outcome='Equal')
-L('bq-quiet', 'bq-classic', 'Small e-pawn or bishop out', 'Strike with the c-pawn', 'common',
-  J(QC, "e3 Be7 Nf3 O-O Bd3 dxc4 Bxc4 c5"),
-  alts=[('bq-quiet-bf4', 'Bishop to the long diagonal', J(QC, "Bf4 c5 e3 cxd4 exd4 Be7")),
-        ('bq-quiet-a3', 'Edge pawn', J(QC, "a3 c5 e3 cxd4 exd4 Be7"))],
-  why='When White\'s dark bishop stays home or goes to the side, the c-pawn strike frees your game.', outcome='Equal')
-L('bq-exch', 'bq-exchange', 'Pawn trade: take back with the e-pawn', 'Bishop, castle, then the c-pawn beside your d-pawn', 'core',
-  J(QC, "cxd5 exd5 Bg5 Be7 e3 O-O Bd3 c6"),
-  alts=[('bq-exch-nf3', 'Knight out after the trade', J(QC, "cxd5 exd5 Nf3 Be7 Bg5 O-O")),
-        ('bq-exch-nf3bf4', 'Knight out, then the bishop', J(QC, "cxd5 exd5 Nf3 Be7 Bf4 c6")),
-        ('bq-exch-nf3e3', 'Knight out, then the e-pawn', J(QC, "cxd5 exd5 Nf3 Be7 e3 O-O")),
-        ('bq-exch-bg5nf3', 'Bishop pins, then the knight', J(QC, "cxd5 exd5 Bg5 Be7 Nf3 O-O")),
-        ('bq-exch-e3nf3', 'Bishop pins, e-pawn, then the knight', J(QC, "cxd5 exd5 Bg5 Be7 e3 O-O Nf3 c6")),
-        ('bq-exch-bxf6', 'Bishop takes your knight', J(QC, "cxd5 exd5 Bg5 Be7 Bxf6 Bxf6")),
-        ('bq-exch-bf4', 'Bishop to the long diagonal', J(QC, "cxd5 exd5 Bf4 c6 e3 Bd6")),
-        ('bq-exch-e3', 'Small e-pawn move', J(QC, "cxd5 exd5 e3 Bd6"))],
-  why='The pawn trade gives you an open file for your rook and easy development.', outcome='Equal')
-L('bq-3nf3', 'bq-other', 'Knight out on move three', 'Same setup; take the c-pawn if White fianchettoes', 'common',
-  J(QG, "Nf3 d5 Nc3 Be7 Bg5 O-O e3 h6"),
-  alts=[('bq-3nf3-e3', 'Small e-pawn move', J(QG, "Nf3 d5 e3 Be7 Bd3 O-O")),
-        ('bq-3nf3-e3nc3', 'Small e-pawn, then the knight', J(QG, "Nf3 d5 e3 Be7 Nc3 O-O")),
-        ('bq-3nf3-nc3e3', 'Knight, then the small e-pawn', J(QG, "Nf3 d5 Nc3 Be7 e3 O-O")),
-        ('bq-3nf3-g3', 'Fianchetto: the Catalan', J(QG, "Nf3 d5 g3 Be7 Bg2 O-O O-O dxc4")),
-        ('bq-3nf3-bg5', 'Bishop pins your knight', J(QG, "Nf3 d5 Bg5 Be7 e3 O-O")),
-        ('bq-3nf3-bf4', 'Bishop to the long diagonal', J(QG, "Nf3 d5 Bf4 dxc4")),
-        ('bq-3nf3-cxd5', 'Pawn trade', J(QG, "Nf3 d5 cxd5 exd5 Nc3 c6"))],
-  why='About one game in seven goes this way.', outcome='Equal')
-L('bq-3other', 'bq-other', 'Odd third moves', 'Same setup against everything', 'common',
-  J(QG, "e3 d5 Nc3 Be7 Nf3 O-O"),
-  alts=[('bq-3other-g3', 'Fianchetto', J(QG, "g3 d5 Bg2 Be7 Nf3 O-O")),
-        ('bq-3other-g3nc3', 'Fianchetto, then the knight', J(QG, "g3 d5 Bg2 Be7 Nc3 O-O")),
-        ('bq-3other-bg5', 'Bishop pins at once', J(QG, "Bg5 h6 Bxf6 Qxf6")),
-        ('bq-3other-bh4', 'Bishop pins, then stays', J(QG, "Bg5 h6 Bh4 Be7")),
-        ('bq-3other-a3', 'Edge pawn', J(QG, "a3 d5 Nc3 c5")),
-        ('bq-3other-bf4', 'Bishop to the long diagonal', J(QG, "Bf4 d5 Nc3 c5"))],
-  why='Rarer third moves. You keep the same pieces on the same squares.', outcome='Equal')
-
-# ============================================================== LONDON SYSTEM
-LD = J(D, "Bf4 d5")
-LC = J(LD, "e3 c5 c3 Nc6")
-P('bl-main', 'london', 'Bishop out before the e-pawn', 'London System',
-  'White plays the same setup every game. Put your d-pawn in the middle first, then hit with the c-pawn and trade off the London bishop.')
-P('bl-other', 'london', 'Other London move orders', 'Knight first & Jobava',
-  'The knight comes out first, or the queen\'s knight joins the bishop. Same plan.')
-
-L('bl-main', 'bl-main', 'Center pawn first, then the c-pawn', 'Knight out, e-pawn, then the bishop that trades White\'s', 'core',
-  J(LC, "Nd2 e6 Ngf3 Bd6 Bg3 O-O"),
-  alts=[('bl-main-bxd6', 'Bishop takes your bishop', J(LC, "Nd2 e6 Ngf3 Bd6 Bxd6 Qxd6")),
-        ('bl-main-ne5', 'Knight jumps forward', J(LC, "Nd2 e6 Ngf3 Bd6 Ne5 O-O")),
-        ('bl-main-nf3', 'Knight out before the queen\'s knight', J(LC, "Nf3 e6 Nbd2 Bd6 Bg3 O-O")),
-        ('bl-main-nf3bd3', 'Knight, then the bishop', J(LC, "Nf3 e6 Bd3 Bd6")),
-        ('bl-main-nf3bxd6', 'Knight, then the bishop trade', J(LC, "Nf3 e6 Nbd2 Bd6 Bxd6 Qxd6")),
-        ('bl-main-bd3', 'Bishop out', J(LC, "Bd3 e6 Nf3 Bd6")),
-        ('bl-main-bb5', 'Bishop pins your knight', J(LC, "Bb5 Qb6")),
-        ('bl-main-nd2bd3', 'Knight, then the bishop', J(LC, "Nd2 e6 Bd3 Bd6"))],
-  why='Three of your London games went wrong after an early knight jump to the center and a queen check. This keeps it simple.', outcome='Equal; you are never worse', tags=['game', 'swap'])
-L('bl-early', 'bl-main', 'White skips the small c-pawn move', 'Trade in the center or develop, then the same bishop trade', 'common',
-  J(LD, "e3 c5 Nf3 e6 c3 Nc6"),
-  alts=[('bl-early-dxc5', 'Pawn takes your c-pawn', J(LD, "e3 c5 dxc5 e6")),
-        ('bl-early-c4', 'Pawn hits your d-pawn', J(LD, "e3 c5 c4 cxd4 exd4 Nc6")),
-        ('bl-early-c4q', 'Pawn hits your d-pawn, queen takes back', J(LD, "e3 c5 c4 cxd4 Qxd4 Nc6")),
-        ('bl-early-bb5', 'Bishop check', J(LD, "e3 c5 Bb5+ Bd7")),
-        ('bl-early-bd3', 'Bishop out', J(LD, "e3 c5 Bd3 Nc6")),
-        ('bl-early-nd2', 'Knight out', J(LD, "e3 c5 Nd2 Nc6")),
-        ('bl-early-nc3', 'Knight in front of the c-pawn', J(LD, "e3 c5 Nc3 cxd4 exd4 a6")),
-        ('bl-early-nc3q', 'Knight in front of the c-pawn, queen takes back', J(LD, "e3 c5 Nc3 cxd4 Qxd4 Nc6"))],
-  why='White doesn\'t always play the small c-pawn move. Your pieces go to the same squares.', outcome='Equal')
-L('bl-nf3', 'bl-other', 'Knight out first', 'Same plan: d-pawn, c-pawn, knight, e-pawn', 'core',
-  J(D, "Nf3 d5 Bf4 c5 e3 Nc6 c3 e6"),
-  alts=[('bl-nf3-c3', 'Small c-pawn first', J(D, "Nf3 d5 Bf4 c5 c3 Nc6 e3 e6")),
-        ('bl-nf3-bb5', 'Bishop pins your knight', J(D, "Nf3 d5 Bf4 c5 e3 Nc6 Bb5 e6")),
-        ('bl-nf3-dxc5', 'Pawn takes your c-pawn', J(D, "Nf3 d5 Bf4 c5 dxc5 e6")),
-        ('bl-nf3-bf4nf3', 'Bishop first, then the knight', J(LD, "Nf3 c5 e3 e6")),
-        ('bl-nf3-nf3c3', 'Bishop, knight, then the small c-pawn', J(LD, "Nf3 c5 c3 Nc6"))],
-  why='A fifth of London players bring the knight out before the bishop.', outcome='Equal')
-L('bl-jobava', 'bl-other', 'Both knights and bishops: the Jobava', 'E-pawn one square, then pin the knight', 'common',
-  J(LD, "Nc3 e6 e3 Bb4"),
-  alts=[('bl-jobava-nb5', 'Knight jumps at your c-pawn', J(LD, "Nc3 e6 Nb5 Na6")),
-        ('bl-jobava-nf3', 'Knight out', J(LD, "Nc3 e6 Nf3 Bb4")),
-        ('bl-jobava-a3', 'Edge pawn', J(LD, "Nc3 e6 a3 c5"))],
-  why='The queen\'s knight comes out next to the London bishop. Watch for the jump at your c-pawn.', outcome='Equal')
-
-# ============================================================== OTHER D-PAWN SYSTEMS
-P('bd-colle', 'd4x', 'Small e-pawn systems', 'Colle',
-  'White builds a quiet triangle of pawns and aims the bishop at your king. Copy the setup and hit with the c-pawn.')
-P('bd-bg5', 'd4x', 'Early bishop pin', 'Trompowsky & Torre',
-  'White pins or takes your knight on move two or three. Take back toward the center and use your two bishops.')
-P('bd-nc3', 'd4x', 'The queen\'s knight comes out early', 'Jobava & Veresov',
-  'White puts the queen\'s knight in front of the c-pawn. Keep your d-pawn in the middle and develop.')
-
-L('bd-colle', 'bd-colle', 'The Colle setup', 'Copy it, then strike with the c-pawn; never close the center', 'core',
-  J(D, "Nf3 d5 e3 e6 Bd3 c5 c3 Nc6 Nbd2 Bd6 O-O O-O"),
-  alts=[('bd-colle-dxc5', 'Pawn takes your c-pawn', J(D, "Nf3 d5 e3 e6 Bd3 c5 c3 Nc6 Nbd2 Bd6 O-O O-O dxc5 Bxc5")),
-        ('bd-colle-e4', 'The e-pawn push', J(D, "Nf3 d5 e3 e6 Bd3 c5 c3 Nc6 Nbd2 Bd6 e4 dxe4")),
-        ('bd-colle-re1', 'Rook to the e-file', J(D, "Nf3 d5 e3 e6 Bd3 c5 c3 Nc6 Nbd2 Bd6 O-O O-O Re1 Qc7")),
-        ('bd-colle-oo', 'Castle before the knight', J(D, "Nf3 d5 e3 e6 Bd3 c5 c3 Nc6 O-O Bd6")),
-        ('bd-colle-dx', 'Early pawn trade', J(D, "Nf3 d5 e3 e6 Bd3 c5 dxc5 Bxc5")),
-        ('bd-colle-c4', 'Pawn hits your d-pawn', J(D, "Nf3 d5 e3 e6 c4 Be7")),
-        ('bd-colle-be2', 'Bishop to the quiet square', J(D, "Nf3 d5 e3 e6 Be2 c5")),
-        ('bd-colle-e3', 'Small e-pawn on move two', J(D, "e3 d5 Nf3 e6")),
-        ('bd-colle-e3bd3', 'Small e-pawn, then the bishop', J(D, "e3 d5 Bd3 c5"))],
-  why='Against CamiloS8 in July you pushed the c-pawn past and shut your own pieces in. Keep the tension.', outcome='Equal', tags=['game'])
-L('bd-nf3', 'bd-colle', 'Knight out, then something else', 'D-pawn in the middle, then e-pawn and c-pawn', 'common',
-  J(D, "Nf3 d5 Nc3 e6 Bg5 Nbd7"),
-  alts=[('bd-nf3-g3', 'Fianchetto', J(D, "Nf3 d5 g3 e6 Bg2 Be7")),
-        ('bd-nf3-c3', 'Small c-pawn move', J(D, "Nf3 d5 c3 e6 Bf4 c5")),
-        ('bd-nf3-c3bg5', 'Small c-pawn, then the pin', J(D, "Nf3 d5 c3 e6 Bg5 Be7")),
-        ('bd-nf3-b3', 'Queen\'s fianchetto', J(D, "Nf3 d5 b3 c5")),
-        ('bd-nf3-c4', 'Pawn hits your d-pawn: back to the Queen\'s Gambit', J(D, "Nf3 d5 c4 e6 Nc3 Be7"))],
-  why='Every second-move knight leads to a setup you know from the London or the Queen\'s Gambit.', outcome='Equal')
-L('bd-tromp', 'bd-bg5', 'Bishop takes your knight', 'Take back with the e-pawn; your bishops get open lines', 'core',
-  J(D, "Bg5 d5 Bxf6 exf6 e3 Bd6 Nf3 O-O"),
-  alts=[('bd-tromp-c4b', 'Small e-pawn, then the c-pawn', J(D, "Bg5 d5 Bxf6 exf6 e3 Bd6 c4 dxc4 Bxc4 O-O")),
-        ('bd-tromp-bd3', 'Small e-pawn, then the bishop', J(D, "Bg5 d5 Bxf6 exf6 e3 Bd6 Bd3 O-O")),
-        ('bd-tromp-nf3', 'Knight out', J(D, "Bg5 d5 Bxf6 exf6 Nf3 Nd7")),
-        ('bd-tromp-nc3', 'Knight in front of the c-pawn', J(D, "Bg5 d5 Bxf6 exf6 Nc3 c6")),
-        ('bd-tromp-c4', 'Pawn hits your d-pawn', J(D, "Bg5 d5 Bxf6 exf6 c4 dxc4")),
-        ('bd-tromp-e3', 'Bishop stays: c-pawn strike', J(D, "Bg5 d5 e3 c5 c3 Qb6")),
-        ('bd-tromp-nd2', 'The other knight comes out', J(D, "Bg5 d5 Nd2 c5")),
-        ('bd-tromp-nf3x', 'Knight out: knight jump', J(D, "Bg5 d5 Nf3 Ne4 Bf4 c5")),
-        ('bd-tromp-nc3x', 'Knight in front of the c-pawn first', J(D, "Bg5 d5 Nc3 Nbd7"))],
-  why='Against youssefdabbech in July you took back with the g-pawn, castled behind the broken pawns, and White\'s h-pawn broke through. Take with the e-pawn.', outcome='Equal; you have two bishops', tags=['game', 'swap'])
-L('bd-torre', 'bd-bg5', 'Knight out, then the pin', 'Knight jumps forward and hits the bishop', 'common',
-  J(D, "Nf3 d5 Bg5 Ne4 Bf4 c5"),
-  alts=[('bd-torre-bh4', 'Bishop steps back on the pin line', J(D, "Nf3 d5 Bg5 Ne4 Bh4 c5"))],
-  why='The Torre. The knight jump makes White decide about the bishop.', outcome='Equal')
-L('bd-jobava', 'bd-nc3', 'Queen\'s knight out on move two', 'D-pawn in the middle, then develop', 'common',
-  J(D, "Nc3 d5 Bf4 e6 e3 Bb4"),
-  alts=[('bd-jobava-bg5', 'Bishop pins your knight', J(D, "Nc3 d5 Bg5 Nbd7 Nf3 h6")),
-        ('bd-jobava-bxf6', 'Pin, then take', J(D, "Nc3 d5 Bg5 Nbd7 Bxf6 Nxf6")),
-        ('bd-jobava-bg5e3', 'Pin, then the e-pawn', J(D, "Nc3 d5 Bg5 Nbd7 e3 e6")),
-        ('bd-jobava-nf3', 'Knight out', J(D, "Nc3 d5 Nf3 e6")),
-        ('bd-jobava-f3', 'Small f-pawn: the gambit idea', J(D, "Nc3 d5 f3 c5")),
-        ('bd-jobava-e4', 'The e-pawn gambit', J(D, "Nc3 d5 e4 Nxe4"))],
-  why='You beat Vitavolo and drew with Void_max in these lines. The setup is the same as always.', outcome='Equal', tags=['game'])
-L('bd-misc', 'bd-nc3', 'Odd second moves', 'Center pawn and develop', 'rare',
-  J(D, "d5 e6 c4 exd5 cxd5 Bb4+"),
-  alts=[('bd-misc-d5nc3', 'Pawn pushes, then the knight', J(D, "d5 e6 Nc3 Bb4")),
-        ('bd-misc-dxe6', 'Pawn takes your e-pawn', J(D, "d5 e6 dxe6 fxe6")),
-        ('bd-misc-f3', 'Small f-pawn move', J(D, "f3 d5")),
-        ('bd-misc-g3', 'Fianchetto', J(D, "g3 d5")),
-        ('bd-misc-f4', 'The f-pawn', J(D, "f4 d5"))],
-  why='Rare second moves. Take the center.', outcome='Equal')
-
 # ============================================================== OTHER FIRST MOVES
 P('bo-english', 'other', 'The c-pawn first', 'English',
   'White starts with the c-pawn. Play the e-pawn two squares, as you would against the e-pawn, and develop the knights.')
@@ -610,17 +438,16 @@ L('bo-english2', 'bo-english', 'Other second moves', 'Same e-pawn, then the d-pa
         ('bo-english2-d4', 'Center push', J("c4 e5 d4 exd4 Qxd4 Nc6")),
         ('bo-english2-nf3', 'Knight hits your pawn: push past', J("c4 e5 Nf3 e4 Nd4 Nc6"))],
   why='The fianchetto is the next most common second move.', outcome='Equal')
-L('bo-reti', 'bo-flank', 'Knight out first', 'Knight out too, then your Queen\'s Gambit setup', 'core',
-  J("Nf3 Nf6 g3 d5 Bg2 e6 O-O Be7"),
-  alts=[('bo-reti-d4', 'Center push: back in your d-pawn lines', J("Nf3 Nf6 d4 d5 Bf4 c5")),
-        ('bo-reti-d4e3', 'Center push, then the small e-pawn', J("Nf3 Nf6 d4 d5 e3 e6")),
-        ('bo-reti-c4', 'The c-pawn', J("Nf3 Nf6 c4 e6 Nc3 d5")),
-        ('bo-reti-c4d4', 'The c-pawn, then the center', J("Nf3 Nf6 c4 e6 d4 d5")),
-        ('bo-reti-c4g3', 'The c-pawn, then the fianchetto', J("Nf3 Nf6 c4 e6 g3 d5")),
-        ('bo-reti-nc3', 'The queen\'s knight comes out', J("Nf3 Nf6 Nc3 d5")),
-        ('bo-reti-e3', 'Small e-pawn move', J("Nf3 Nf6 e3 d5")),
-        ('bo-reti-b3', 'Queen\'s fianchetto', J("Nf3 Nf6 b3 d5"))],
-  why='You played the queen\'s knight out against this twice. The king\'s knight keeps you in setups you already know.', outcome='Equal')
+L('bo-reti', 'bo-flank', 'Knight out first', 'D-pawn to the middle, then your Slav setup', 'core',
+  J("Nf3 d5 g3 Nf6 Bg2 c6 O-O Bf5 d3 e6"),
+  alts=[('bo-reti-d4', 'Center push: back in your d-pawn lines', J("Nf3 d5 d4 Nf6 Bf4 Bf5 e3 e6")),
+        ('bo-reti-d4e3', 'Center push, then the small e-pawn', J("Nf3 d5 d4 Nf6 e3 Bf5 Bd3 Bxd3")),
+        ('bo-reti-c4', 'The c-pawn: guard with yours', J("Nf3 d5 c4 c6 e3 Nf6 Nc3 Bf5")),
+        ('bo-reti-cxd5', 'The c-pawn, then the pawn trade', J("Nf3 d5 c4 c6 cxd5 cxd5 d4 Nc6")),
+        ('bo-reti-c4d4', 'The c-pawn, then the center push', J("Nf3 d5 c4 c6 d4 Nf6 e3 Bf5")),
+        ('bo-reti-e3', 'Small e-pawn move', J("Nf3 d5 e3 Nf6 c4 c6")),
+        ('bo-reti-b3', 'Queen\'s fianchetto', J("Nf3 d5 b3 Nf6 Bb2 Bf5"))],
+  why='Against the king\'s knight first, the d-pawn goes to the middle and the same Slav setup follows.', outcome='Equal')
 L('bo-g3', 'bo-flank', 'King\'s fianchetto first', 'E-pawn two squares, then the d-pawn', 'common',
   J("g3 e5 Bg2 d5 d3 Nf6"),
   alts=[('bo-g3-b3', 'Double fianchetto', J("g3 e5 Bg2 d5 b3 Nf6")),
@@ -663,3 +490,5 @@ L('bo-misc', 'bo-rare', 'Edge moves and the b-pawn', 'Take the center; the b-paw
         ('bo-misc-h3', 'Edge pawn on the king\'s side', J("h3 e5")),
         ('bo-misc-c3', 'Small c-pawn move', J("c3 e5"))],
   why='These come up once in a long while. Take the center and develop.', outcome='Equal or better')
+
+import bslav  # noqa: E402,F401  the Slav setup against the d-pawn (registers its lessons)

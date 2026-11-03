@@ -108,7 +108,7 @@ p{margin:0}
 .ring.g{stroke:var(--arr-g)} .ring.r{stroke:var(--arr-r)} .ring.b{stroke:var(--arr-b)} .ring.y{stroke:var(--arr-y)}
 .dot{fill:rgba(18,32,26,.28)} .capring{fill:none;stroke:rgba(18,32,26,.3);stroke-width:8}
 .board.input{touch-action:none;cursor:pointer}
-.ghost{pointer-events:none}
+.board .ghost{pointer-events:none}
 .board-wrap{display:grid;grid-template-columns:12px minmax(0,1fr);gap:8px;align-items:stretch}
 .evalbar{position:relative;border-radius:6px;overflow:hidden;background:#2B312E;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
 .evalbar .fill{position:absolute;left:0;right:0;bottom:0;background:#F4F1E8;transition:height .35s ease}
@@ -343,6 +343,94 @@ p{margin:0}
 .legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12.5px;color:var(--muted)}
 .legend i{display:inline-block;width:18px;height:4px;border-radius:2px;vertical-align:middle;margin-right:5px}
 
+/* course: a path of units down a rail; the current unit gets a hero card */
+.chead{display:flex;align-items:flex-end;justify-content:space-between;gap:14px 28px;flex-wrap:wrap;margin:4px 0 20px}
+.chead > div:first-child{min-width:0;flex:1 1 420px}
+.chead h2{font-family:var(--f-display);font-size:clamp(30px,4vw,44px);font-weight:700;letter-spacing:-.015em;line-height:1.05;margin-top:6px}
+.chead p{color:var(--muted);max-width:64ch;margin-top:10px}
+.cmeter{display:grid;gap:7px;flex:0 1 300px;min-width:0}
+.cmeter .bar{display:flex;gap:3px}
+.cmeter .bar i{flex:1;height:9px;border-radius:5px;background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line)}
+.cmeter .bar i.on{background:var(--accent);box-shadow:none}
+.cmeter .bar i.soon{background:none;box-shadow:inset 0 0 0 1px var(--line);opacity:.6}
+.cmeter span{font-size:12.5px;color:var(--muted)}
+.chero{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:32px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:var(--shadow);margin-bottom:34px}
+.chero h3{font-family:var(--f-display);font-size:clamp(28px,3.4vw,40px);font-weight:700;line-height:1.05;letter-spacing:-.01em;margin:10px 0 10px}
+.chero .lede{font-size:16px}
+.chero.done{grid-template-columns:minmax(0,1fr)}
+.ministeps{list-style:none;margin:18px 0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.ministeps li{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:5px 11px;border-radius:999px;background:var(--surface-2);color:var(--muted)}
+.ministeps li.done{background:var(--accent-soft);color:var(--accent)}
+.ministeps li.next{background:var(--ink);color:var(--bg)}
+.ministeps li svg{width:13px;height:13px}
+.path{list-style:none;margin:0;padding:0}
+.urow{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px}
+.rail{position:relative;display:flex;justify-content:center}
+.rail::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--line)}
+.urow:first-child .rail::before{top:30px}
+.urow:last-child .rail::before{bottom:auto;height:30px}
+.ubub{position:relative;z-index:1;width:36px;height:36px;margin-top:12px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-mono);font-size:13px;font-weight:600;background:var(--bg);border:2px solid var(--line);color:var(--muted)}
+.ubub svg{width:16px;height:16px}
+.ubub.pass{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.ubub.cur{background:var(--surface);border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 5px var(--accent-soft)}
+.ubub.soon{border-style:dashed}
+.ucard{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:14px;align-items:center;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 14px 10px 10px;margin:6px 0;cursor:pointer;transition:border-color .15s,transform .15s}
+button.ucard:hover{border-color:var(--accent);transform:translateY(-1px)}
+.ucard.cur{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+.ucard.locked{cursor:default;background:none}
+.ucard.locked .thumb{opacity:.45;filter:grayscale(.7)}
+.ucard.locked b{color:var(--muted)}
+.ucard.soon{cursor:default;background:none;border-style:dashed}
+.ut{display:grid;gap:4px;min-width:0}
+.ut b{font-size:16px;font-weight:650;line-height:1.25}
+.ut .us{font-size:13px;color:var(--muted);line-height:1.4}
+.ust{display:grid;justify-items:end;gap:6px;font-size:12px;color:var(--muted);white-space:nowrap}
+.chip.sw-w{background:var(--surface-2);color:var(--ink)} .chip.sw-b{background:var(--ink);color:var(--bg)}
+.chip.skill{background:var(--viola-soft);color:var(--viola)} .chip.soon{background:none;box-shadow:inset 0 0 0 1px var(--line);color:var(--muted)}
+.chip .disc{width:9px;height:9px;border-radius:50%;border:1.5px solid currentColor;display:inline-block}
+.chip.sw-w .disc{background:#FFFFFF;border-color:#566960} .chip.sw-b .disc{background:#1B1F1D;border-color:var(--bg)}
+.thumb.ph{display:grid;place-items:center} .thumb.ph svg{width:62%;height:62%;opacity:.4}
+/* unit page */
+.ugrid{display:grid;grid-template-columns:minmax(0,460px) minmax(0,1fr);gap:36px;align-items:start}
+.ucol{min-width:0;display:grid;gap:18px}
+.uhead h2{font-family:var(--f-display);font-weight:700;font-size:clamp(30px,3.6vw,44px);line-height:1.05;letter-spacing:-.015em;margin:10px 0 10px}
+.uhead .lede{font-size:16px}
+.idea{display:grid;gap:12px}
+.ideacap{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;gap:6px}
+.ideacap h3{font-family:var(--f-display);font-size:24px;font-weight:700;line-height:1.15}
+.ideacap p{color:var(--muted)}
+.ideanav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px}
+.dots{display:inline-flex;gap:5px;align-items:center;flex-wrap:wrap}
+.dots i{width:10px;height:10px;border-radius:50%;background:var(--line);display:block}
+.dots i.on{background:var(--accent)} .dots i.miss{background:var(--rosso)} .dots i.cur{background:var(--ink)}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.step.next{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+.step .sn{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-mono);font-size:13px;font-weight:600;background:var(--surface-2);color:var(--muted)}
+.step.done .sn{background:var(--accent);color:var(--accent-ink)}
+.step .sn svg{width:15px;height:15px}
+.step h3{font-size:17px;font-weight:650;line-height:1.3;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.step h3 .cnt{font-family:var(--f-mono);font-size:12.5px;font-weight:600;color:var(--muted)}
+.step .sp{font-size:14px;color:var(--muted);margin-top:3px;max-width:64ch}
+.step .sx{display:grid;gap:10px;margin-top:12px}
+.lrows{display:grid;gap:6px}
+.lrow{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;text-align:left;background:none;border:1px solid var(--line);border-radius:10px;padding:6px 10px 6px 6px;cursor:pointer;font-size:14px}
+.lrow:hover{border-color:var(--accent)}
+.lrow .thumb{border-radius:6px}
+.lrow b{display:block;font-weight:600;line-height:1.3}
+.lrow .s{display:block;font-size:12.5px;color:var(--muted);line-height:1.35}
+.tick{font-weight:700;font-size:12.5px;white-space:nowrap;color:var(--accent);display:inline-flex;align-items:center;gap:4px}
+.tick svg{width:13px;height:13px}
+.tick.no{color:var(--muted);font-weight:500}
+.tick.due{color:var(--rosso)}
+.cban{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 12px;border-radius:10px;background:var(--viola-soft);font-size:13.5px}
+.cban span{flex:1 1 200px;min-width:0}
+.lockednote{padding:12px 14px;border-radius:12px;background:var(--surface-2);color:var(--muted);font-size:14px}
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:8px 12px;flex-wrap:wrap}
+.qhead .evaltext{margin:0}
+.ask{font-size:15.5px}
+.ask b{font-weight:650}
+
 footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
 
 @media (max-width: 760px){
@@ -360,6 +448,9 @@ footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);fo
   .bcol{position:static;max-width:560px;width:100%;margin:0 auto}
   .changes,.insights{grid-template-columns:minmax(0,1fr)}
   .rgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .chero,.ugrid{grid-template-columns:minmax(0,1fr);gap:22px}
+  .chero > .board{max-width:360px}
+  .ugrid .bcol{max-width:520px}
 }
 @media (max-width: 560px){
   .stats{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
@@ -373,7 +464,7 @@ footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);fo
   .gcard{grid-template-columns:96px minmax(0,1fr)}
   .wordmark{font-size:21px}
   .tabs{width:100%}
-  .tabs button{flex:1;padding:8px 6px}
+  .tabs button{flex:1 1 auto;padding:8px 4px;font-size:13.5px}
   .part-head{grid-template-columns:minmax(0,1fr)}
   .part-head .count{grid-row:auto;grid-column:1;text-align:left}
   .trow{grid-template-columns:38px 22px minmax(0,1fr) auto}
@@ -396,6 +487,16 @@ footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);fo
   .queue b{font-size:20px}
   .lhead .why{display:none}
   .lhead h2{font-size:26px}
+  .chero{padding:14px;border-radius:16px}
+  .urow{grid-template-columns:30px minmax(0,1fr);gap:8px}
+  .ubub{width:30px;height:30px;font-size:12px;margin-top:14px}
+  .urow:first-child .rail::before{top:29px}
+  .urow:last-child .rail::before{height:29px}
+  .ucard{grid-template-columns:52px minmax(0,1fr);gap:10px;padding:8px 10px 8px 8px}
+  .ust{grid-column:2;justify-items:start;grid-auto-flow:column;align-items:center;justify-content:start}
+  .step{grid-template-columns:28px minmax(0,1fr);gap:10px;padding:12px}
+  .step .sn{width:28px;height:28px}
+  .lrow{grid-template-columns:40px minmax(0,1fr) auto}
 }
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -405,7 +506,7 @@ footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);fo
 <div class="app" id="app">
   <header class="top">
     <div class="brandrow">
-      <button class="brand" data-go="learn" aria-label="Opening Playbook home">
+      <button class="brand" data-go="course" aria-label="Opening Playbook home">
         <span class="mark" aria-hidden="true"><svg viewBox="0 0 45 45"><use id="brandPiece" href="#p-wb"/></svg></span>
         <span><span class="kicker" id="brandKick">White repertoire</span><h1 class="wordmark">The Opening <em>Playbook</em></h1></span>
       </button>
@@ -415,11 +516,12 @@ footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);fo
       </div>
     </div>
     <nav class="tabs" role="tablist" aria-label="Sections">
-      <button role="tab" data-view="learn" aria-selected="true">Learn</button>
+      <button role="tab" data-view="course" aria-selected="true">Course</button>
+      <button role="tab" data-view="learn" aria-selected="false">Learn</button>
       <button role="tab" data-view="sandbox" aria-selected="false">Sandbox</button>
       <button role="tab" data-view="drill" aria-selected="false">Drill<span class="badge" id="dueBadge" hidden>0</span></button>
       <button role="tab" data-view="games" aria-selected="false"><span class="lg">Your games</span><span class="sm">Games</span></button>
-      <button role="tab" data-view="cheat" aria-selected="false">Cheat sheet</button>
+      <button role="tab" data-view="cheat" aria-selected="false"><span class="lg">Cheat sheet</span><span class="sm">Cheats</span></button>
     </nav>
   </header>
   <main id="view" aria-live="polite"></main>
@@ -429,6 +531,7 @@ footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);fo
 <script>
 const DATA_W = /*__DATA_W__*/;
 const DATA_B = /*__DATA_B__*/;
+const DATA_C = /*__DATA_C__*/;
 </script>
 <script>
 "use strict";
@@ -451,14 +554,18 @@ function loadBook(side){
   DATA.games.forEach(g => GAMES[g.id] = g);
   DATA.chapters.forEach(c => CHAPTERS[c.id] = c);
   E4 = DATA.e4; REPN = DATA.repCount; ODDS_ROOT = DATA.oddsRoot ?? DATA.e4;
-  ME = SIDE === 'w' ? 1 : 0; MYC = SIDE === 'w' ? 'White' : 'Black'; OPP = SIDE === 'w' ? 'Black' : 'White'; FLIP = SIDE === 'b';
+  setPerspective(SIDE);
   LESSON_ORDER = DATA.lessons.map(l => l.id);
   linesByNode = new Map();
   for (const l of DATA.lines) for (const i of l.n) { if (!linesByNode.has(i)) linesByNode.set(i, []); linesByNode.get(i).push(l.id); }
   DRILLABLE = DATA.drillable; DRILLSET = new Set(DRILLABLE);
   _reach.clear(); _sbl.clear(); _anc = {};
-  TAGNAMES.best = OPP + "'s best";
   SBS = SB_STATE[SIDE];
+}
+// whose pieces you move and which way the board faces; a threat puzzle can face the other way from the loaded book
+function setPerspective(side){
+  ME = side === 'w' ? 1 : 0; FLIP = side === 'b'; MYC = side === 'w' ? 'White' : 'Black'; OPP = side === 'w' ? 'Black' : 'White';
+  TAGNAMES.best = OPP + "'s best";
 }
 const isMine = nd => nd.w === ME;
 const isMyPiece = p => !!p && (ME === 1 ? p === p.toUpperCase() : p === p.toLowerCase());
@@ -491,8 +598,22 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 function fenArr(f){ const a = new Array(64).fill(null); let r = 7, c = 0; for (const ch of f){ if (ch === '/'){ r--; c = 0; continue; } if (ch >= '1' && ch <= '8'){ c += +ch; continue; } a[r*8+c] = ch; c++; } return a; }
 const sqi = s => (s.charCodeAt(1) - 49) * 8 + (s.charCodeAt(0) - 97);
 const sqn = i => FILES[i % 8] + (Math.floor(i / 8) + 1);
-// square index -> top-left corner in an 800x800 board; the Black book shows Black at the bottom
-const sqxy = i => FLIP ? [(7 - i % 8) * 100, Math.floor(i / 8) * 100] : [(i % 8) * 100, (7 - Math.floor(i / 8)) * 100];
+// square index -> top-left corner in an 800x800 board; the Black book shows Black at the bottom.
+// FLIPX overrides the orientation while one board is drawn (course cards show both books side by side).
+let FLIPX = null;
+const flipNow = () => FLIPX === null ? FLIP : FLIPX;
+const sqxy = i => flipNow() ? [(7 - i % 8) * 100, Math.floor(i / 8) * 100] : [(i % 8) * 100, (7 - Math.floor(i / 8)) * 100];
+function arrFen(a){ let out = ''; for (let r = 7; r >= 0; r--){ let e = 0; for (let c = 0; c < 8; c++){ const p = a[r*8+c]; if (!p) e++; else { if (e){ out += e; e = 0; } out += p; } } if (e) out += e; if (r) out += '/'; } return out; }
+// play a move on a board-only FEN: castling moves the rook, en passant removes the pawn, promotions use the 5th letter
+function applyMove(fen, u){
+  const a = fenArr(fen), f = sqi(u.slice(0, 2)), t = sqi(u.slice(2, 4)), p = a[f];
+  if (!p) return fen;
+  const k = p.toLowerCase();
+  if (k === 'k' && Math.abs(t - f) === 2){ const rf = t > f ? f + 3 : f - 4, rt = t > f ? f + 1 : f - 1; a[rt] = a[rf]; a[rf] = null; }
+  if (k === 'p' && t % 8 !== f % 8 && !a[t]) a[t + (p === 'P' ? -8 : 8)] = null;
+  a[t] = u[4] ? (p === 'P' ? u[4].toUpperCase() : u[4]) : p; a[f] = null;
+  return arrFen(a);
+}
 const ply = idx => { let k = 0, i = idx; while (N[i].p !== null && N[i].p !== undefined){ i = N[i].p; k++; } return k; };
 const moveNo = p => Math.ceil(p / 2);
 const PIECE_NAME = {p:'pawn', n:'knight', b:'bishop', r:'rook', q:'queen', k:'king'};
@@ -507,6 +628,10 @@ function arrowSVG(a, b, col, w = 17, extra = ''){
   return `<g class="arr ${col} ${extra}"><path d="M${sx.toFixed(1)},${sy.toFixed(1)} L${bx.toFixed(1)},${by.toFixed(1)}" stroke-width="${w}"/><polygon points="${ex.toFixed(1)},${ey.toFixed(1)} ${(bx+px*hw).toFixed(1)},${(by+py*hw).toFixed(1)} ${(bx-px*hw).toFixed(1)},${(by-py*hw).toFixed(1)}"/></g>`;
 }
 function boardSVG(fen, o = {}){
+  const prev = FLIPX; if (o.flip !== undefined) FLIPX = !!o.flip;
+  try { return boardSVGInner(fen, o); } finally { FLIPX = prev; }
+}
+function boardSVGInner(fen, o){
   const a = fenArr(fen);
   let s = `<svg viewBox="0 0 800 800" role="img" aria-label="${esc(o.aria || 'Chess position')}"><rect width="800" height="800" class="sq-l"/>`;
   for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) if ((r + c) % 2 === 0){ const [x, y] = sqxy(r * 8 + c); s += `<rect x="${x}" y="${y}" width="100" height="100" class="sq-d"/>`; }
@@ -514,7 +639,7 @@ function boardSVG(fen, o = {}){
   if (o.sel){ const [x, y] = sqxy(sqi(o.sel)); s += `<rect x="${x}" y="${y}" width="100" height="100" class="selsq"/>`; }
   if (o.flash){ const [x, y] = sqxy(sqi(o.flash.sq)); s += `<rect x="${x}" y="${y}" width="100" height="100" class="${o.flash.ok ? 'flash-ok' : 'flash-bad'}"/>`; }
   if (o.coords){
-    const lc = FLIP ? 7 : 0, br = FLIP ? 7 : 0; // left-edge file and bottom-edge rank
+    const lc = flipNow() ? 7 : 0, br = flipNow() ? 7 : 0; // left-edge file and bottom-edge rank
     for (let r = 0; r < 8; r++){ const dark = ((r + lc) % 2 === 0); s += `<text x="5" y="${sqxy(r * 8 + lc)[1] + 19}" class="coord ${dark ? 'on-d' : 'on-l'}">${r+1}</text>`; }
     for (let c = 0; c < 8; c++){ const dark = ((br + c) % 2 === 0); s += `<text x="${sqxy(br * 8 + c)[0] + 87}" y="793" class="coord ${dark ? 'on-d' : 'on-l'}">${FILES[c]}</text>`; }
   }
@@ -607,7 +732,7 @@ const Prog = {
 };
 
 /* ------------------------------------------------------------------ app state + routing */
-const S = {view: 'learn', chapter: 'italian', line: null, i: 0, playing: null, drill: null, drillState: null, sbState: null, dfilter: {ch: 'all', pri: 'all', from: 'branch'}, dmode: 'smart', showPre: false};
+const S = {view: 'course', unit: null, slide: 0, quizState: null, chapter: 'italian', line: null, i: 0, playing: null, drill: null, drillState: null, sbState: null, dfilter: {ch: 'all', pri: 'all', from: 'branch'}, dmode: 'smart', showPre: false};
 const CH_KEY = s => s === 'w' ? 'e4-playbook-chapter' : 'playbook-b-chapter';
 function savedChapter(s){ try { const c = localStorage.getItem(CH_KEY(s)); if (c && BOOKS[s].chapters.some(x => x.id === c)) return c; } catch(e){} return BOOKS[s].chapters[0].id; }
 const TXT = {
@@ -634,28 +759,45 @@ function renderChrome(){
   document.getElementById('foot').innerHTML = T.foot.map(t => `<span>${esc(t)}</span>`).join('');
 }
 const STASH = {};
+function stashSide(){ STASH[SIDE] = {view: S.view, chapter: S.chapter, line: S.line, i: S.i, studyFrom: S.studyFrom, drillState: S.drillState, sbState: S.sbState, dfilter: S.dfilter, sbSession: S.sbSession}; }
 function switchSide(side){
   if (side === SIDE || !BOOKS[side]) return;
-  stopPlay(); clearTimeout(heroTimer);
-  STASH[SIDE] = {view: S.view, chapter: S.chapter, line: S.line, i: S.i, studyFrom: S.studyFrom, drillState: S.drillState, sbState: S.sbState, dfilter: S.dfilter, sbSession: S.sbSession};
+  const inCourse = CVIEWS.includes(S.view) || (S.view === 'study' && S.studyFrom === 'unit');
+  stopPlay(); clearTimeout(heroTimer); stashSide();
   loadBook(side);
   Object.assign(S, STASH[side] || {view: S.view === 'study' ? 'learn' : S.view, chapter: savedChapter(side), line: null, i: 0, studyFrom: 'learn', drillState: null, sbState: null, dfilter: {ch: 'all', pri: 'all', from: 'branch'}, sbSession: null});
+  if (inCourse) S.view = 'course'; // the course spans both books; switching colour just goes back to the path
   S.drill = null; S.renderedLine = null; S.showPre = false;
   try { localStorage.setItem(SIDE_KEY, side); } catch(e){}
   render(); setHash(); window.scrollTo({top: 0, behavior: 'auto'});
 }
+// load the other book without leaving the course: keeps the view, the unit and any running quiz
+function useSide(side){
+  if (!side || side === SIDE || !BOOKS[side]) return;
+  const keep = {view: S.view, unit: S.unit, slide: S.slide, studyFrom: S.studyFrom, quizState: S.quizState};
+  stopPlay(); clearTimeout(heroTimer); stashSide();
+  loadBook(side);
+  Object.assign(S, STASH[side] || {chapter: savedChapter(side), line: null, i: 0, drillState: null, sbState: null, dfilter: {ch: 'all', pri: 'all', from: 'branch'}, sbSession: null}, keep);
+  S.drill = null; S.renderedLine = null; S.showPre = false;
+  try { localStorage.setItem(SIDE_KEY, side); } catch(e){}
+}
 const view = document.getElementById('view');
-const VIEWS = ['learn', 'sandbox', 'drill', 'games', 'cheat'];
-function setTab(v){ document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.view === v || (v === 'study' && b.dataset.view === (S.studyFrom || 'learn'))))); }
+const VIEWS = ['course', 'learn', 'sandbox', 'drill', 'games', 'cheat'];
+const CVIEWS = ['course', 'unit', 'quiz'];
+function setTab(v){
+  const t = CVIEWS.includes(v) || (v === 'study' && S.studyFrom === 'unit') ? 'course' : v === 'study' ? (S.studyFrom || 'learn') : v;
+  document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.view === t)));
+}
 function setHash(){
-  const h = (SIDE === 'b' ? 'b.' : '') + (S.view === 'study' && S.line ? 'line.' + S.line : S.view === 'learn' && S.chapter !== DATA.chapters[0].id ? 'learn.' + S.chapter : S.view);
+  const h = S.view === 'course' ? 'course' : (S.view === 'unit' || S.view === 'quiz') && S.unit ? 'unit.' + S.unit
+    : (SIDE === 'b' ? 'b.' : '') + (S.view === 'study' && S.line ? 'line.' + S.line : S.view === 'learn' && S.chapter !== DATA.chapters[0].id ? 'learn.' + S.chapter : S.view);
   try { history.replaceState(null, '', '#' + h); } catch(e){}
 }
 function go(v, opts = {}){
   stopPlay();
   const prevView = S.view;
   if (v === 'study'){ S.view = 'study'; if (opts.from) S.studyFrom = opts.from; }
-  else { S.view = v; S.studyFrom = v === 'games' ? 'games' : v === 'cheat' ? 'cheat' : v === 'sandbox' ? 'sandbox' : 'learn'; }
+  else { S.view = v; S.studyFrom = v === 'games' ? 'games' : v === 'cheat' ? 'cheat' : v === 'sandbox' ? 'sandbox' : CVIEWS.includes(v) ? 'unit' : 'learn'; }
   render(); if (prevView !== S.view || opts.top) window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
   setHash();
 }
@@ -668,10 +810,16 @@ function setChapter(id, scroll){
 function openLine(lineId, i, from){ S.line = lineId; S.i = (i === undefined ? lineStart(lineId) : i); S.showPre = false; go('study', {from}); }
 function refresh(){ render(); }
 function render(){
+  const U = (S.view === 'unit' || S.view === 'quiz') && UNIT[S.unit];
+  if (U && U.side && !U.soon && U.kind !== 'skill' && U.side !== SIDE) useSide(U.side);
+  setPerspective(viewSide());
   setTab(S.view); renderChrome();
   const b = document.getElementById('dueBadge'), d = Prog.dueCount(); b.hidden = !d; b.textContent = d;
-  if (S.view === 'drill') S.drill = S.drillState; else if (S.view === 'sandbox') S.drill = S.sbState; else S.drill = null;
-  if (S.view === 'learn') renderLearn();
+  if (S.view === 'drill') S.drill = S.drillState; else if (S.view === 'sandbox') S.drill = S.sbState; else if (S.view === 'quiz') S.drill = S.quizState; else S.drill = null;
+  if (S.view === 'course') renderCourse();
+  else if (S.view === 'unit') renderUnit();
+  else if (S.view === 'quiz') renderQuiz();
+  else if (S.view === 'learn') renderLearn();
   else if (S.view === 'study') renderStudy();
   else if (S.view === 'drill') renderDrill();
   else if (S.view === 'sandbox') renderSandbox();
@@ -679,9 +827,11 @@ function render(){
   else if (S.view === 'cheat') renderCheat();
 }
 document.addEventListener('click', e => {
-  const t = e.target.closest('[data-go],[data-view],[data-lesson],[data-line],[data-ch],[data-sbch],[data-drillch],[data-side]');
+  const t = e.target.closest('[data-go],[data-view],[data-lesson],[data-line],[data-ch],[data-sbch],[data-drillch],[data-side],[data-unit],[data-soon]');
   if (!t || !document.getElementById('app').contains(t)) return;
   if (t.dataset.side){ switchSide(t.dataset.side); return; }
+  if (t.dataset.unit){ openUnit(t.dataset.unit); return; }
+  if (t.dataset.soon){ const U = UNIT[t.dataset.soon]; useSide(U.side); setChapter(U.chapter, true); return; }
   if (t.dataset.view){ go(t.dataset.view); return; }
   if (t.dataset.ch){ setChapter(t.dataset.ch, true); return; }
   if (t.dataset.sbch){ SBS.scope = t.dataset.sbch; sbSave(); S.sbState = null; go('sandbox'); sbStart(); return; }
@@ -828,12 +978,17 @@ function renderStudy(){
   const idx = line.n[S.i], nd = N[idx], start = lineStart(S.line);
   const part = les ? PARTS[les.part] : null;
   const allLines = les ? les.lines : game.lines;
-  // neighbors for prev/next lesson
+  // neighbors for prev/next lesson (inside a course unit: that unit's lessons)
+  const CU = S.studyFrom === 'unit' && UNIT[S.unit] && UNIT[S.unit].lessons ? UNIT[S.unit] : null;
+  const unitOrder = CU ? CU.lessons.concat(CU.deeper) : null, order = les && unitOrder && unitOrder.includes(les.id) ? unitOrder : LESSON_ORDER;
   let navPrev = '', navNext = '';
-  if (les){ const k = LESSON_ORDER.indexOf(les.id);
-    if (k > 0) navPrev = `<button class="btn small" data-lesson="${LESSON_ORDER[k-1]}" aria-label="Previous lesson: ${esc(LESSONS[LESSON_ORDER[k-1]].title)}">‹<span class="navtxt"> ${esc(LESSONS[LESSON_ORDER[k-1]].title)}</span></button>`;
-    if (k < LESSON_ORDER.length - 1) navNext = `<button class="btn small" data-lesson="${LESSON_ORDER[k+1]}" aria-label="Next lesson: ${esc(LESSONS[LESSON_ORDER[k+1]].title)}"><span class="navtxt">${esc(LESSONS[LESSON_ORDER[k+1]].title)} </span>›</button>`; }
-  const back = S.studyFrom === 'games' ? '<button class="btn small" data-go="games">← Your games</button>' : S.studyFrom === 'cheat' ? '<button class="btn small" data-go="cheat">← Cheat sheet</button>' : S.studyFrom === 'sandbox' ? '<button class="btn small" data-go="sandbox">← Sandbox</button>' : '<button class="btn small" data-go="learn">← All lessons</button>';
+  if (les){ const k = order.indexOf(les.id);
+    if (k > 0) navPrev = `<button class="btn small" data-lesson="${order[k-1]}" aria-label="Previous lesson: ${esc(LESSONS[order[k-1]].title)}">‹<span class="navtxt"> ${esc(LESSONS[order[k-1]].title)}</span></button>`;
+    if (k < order.length - 1) navNext = `<button class="btn small" data-lesson="${order[k+1]}" aria-label="Next lesson: ${esc(LESSONS[order[k+1]].title)}"><span class="navtxt">${esc(LESSONS[order[k+1]].title)} </span>›</button>`; }
+  const back = CU ? `<button class="btn small" data-unit="${CU.id}">← ${esc(CU.title)}</button>` : S.studyFrom === 'games' ? '<button class="btn small" data-go="games">← Your games</button>' : S.studyFrom === 'cheat' ? '<button class="btn small" data-go="cheat">← Cheat sheet</button>' : S.studyFrom === 'sandbox' ? '<button class="btn small" data-go="sandbox">← Sandbox</button>' : '<button class="btn small" data-go="learn">← All lessons</button>';
+  // reaching the last move of a lesson's main line counts as studying it
+  const atEnd = !!les && !!line.main && S.i === line.n.length - 1;
+  if (atEnd) markSeen(les.id);
   const where = les ? `${esc(chapterOf(les).name)} · ${esc(part.title)}` : `Game vs ${esc(game.opp)} · ${esc(game.date)}`;
   // header
   const chips = les ? [`<span class="chip ${les.pri}">${{core:'Core',common:'Common',rare:'Rare'}[les.pri]}</span>`].concat(les.tags.map(t => `<span class="chip ${t}">${esc(TAGNAMES[t])}</span>`)).join('')
@@ -879,8 +1034,13 @@ function renderStudy(){
   const endIdx = line.n[line.n.length - 1], ei = evalInfo(N[endIdx].e);
   const outcome = les ? `<div class="outcome"><span class="kicker">Where it ends</span><b>${esc(LINES[S.line].main ? (les.outcome || (ei && ei.txt)) : (ei ? ei.txt : ''))}</b></div>` : '';
   const curEval = evalInfo(nd.e);
-  const drillBtn = (les && DRILLABLE.includes(S.line)) ? `<button class="btn primary" id="drillThis">Drill this line</button>` : '';
+  const drillBtn = (les && DRILLABLE.includes(S.line)) ? `<button class="btn ${CU && atEnd ? '' : 'primary'}" id="drillThis">Drill this line</button>` : '';
   const lessonBtn = (!les && game.lesson) ? `<button class="btn" data-lesson="${game.lesson}">Open the related lesson</button>` : '';
+  let unitBtns = '';
+  if (CU && les && CU.lessons.includes(les.id)){
+    const nextL = CU.lessons.find(l => l !== les.id && !lessonSeen(CU.side, l));
+    unitBtns = (atEnd && nextL ? `<button class="btn primary" data-lesson="${nextL}">Next lesson: ${esc(LESSONS[nextL].title)}</button>` : '') + `<button class="btn ${atEnd && !nextL ? 'primary' : 'ghost'}" data-unit="${CU.id}">Back to the unit</button>`;
+  }
   const oldTl = view.querySelector('.timeline'), oldScroll = oldTl ? oldTl.scrollTop : 0, sameLine = S.renderedLine === S.line;
   S.renderedLine = S.line;
   view.innerHTML = `<div class="crumbs">${back}<span class="where">${where}</span><span class="spacer"></span>${navPrev}${navNext}</div>
@@ -901,7 +1061,7 @@ function renderStudy(){
       ${mcard}${optHTML}${linesHTML}
       <ol class="timeline" aria-label="Moves in this line">${rows.join('')}</ol>
       ${outcome}
-      <div class="lesson-actions">${drillBtn}${lessonBtn}</div>
+      <div class="lesson-actions">${unitBtns}${drillBtn}${lessonBtn}</div>
     </div></div>`;
   const svg = document.querySelector('#sb svg');
   if (S.anim){ const a = S.anim; S.anim = null; animateMove(svg, a.u, a.meta, a.back); }
@@ -912,7 +1072,7 @@ function renderStudy(){
   document.getElementById('cPlay').onclick = togglePlay;
   const sp = document.getElementById('showPre'); if (sp) sp.onclick = () => { S.showPre = true; renderStudy(); };
   view.querySelectorAll('[data-step]').forEach(b => b.onclick = () => jump(+b.dataset.step));
-  const dt = document.getElementById('drillThis'); if (dt) dt.onclick = () => startDrillLine(S.line);
+  const dt = document.getElementById('drillThis'); if (dt) dt.onclick = () => startDrillLine(S.line, '', CU ? CU.id : null);
   const tl = view.querySelector('.timeline'), cur = view.querySelector('.trow.cur');
   if (tl && tl.scrollHeight > tl.clientHeight + 4){
     tl.scrollTop = sameLine ? oldScroll : 0;
@@ -943,6 +1103,7 @@ document.addEventListener('keydown', e => {
     else if (e.key === 'Home'){ e.preventDefault(); step(-999); }
     else if (e.key === 'End'){ e.preventDefault(); step(999); }
   }
+  else if (S.view === 'unit' && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')){ e.preventDefault(); ideaStep(e.key === 'ArrowRight' ? 1 : -1); }
 });
 
 /* ------------------------------------------------------------------ DRILL */
@@ -960,10 +1121,10 @@ function nextSmart(exclude){
   const soon = el.slice().sort((a, b) => Prog.rec(a).due - Prog.rec(b).due);
   return soon.length ? {id: soon[0], why: 'Extra practice (nothing due)'} : null;
 }
-function startDrillLine(id, why){
+function startDrillLine(id, why, unit){
   const line = LINES[id];
   const s0 = S.dfilter.from === 'start' ? 0 : lineStart(id);
-  S.drill = S.drillState = {kind: 'line', id, i: s0, s0, mistakes: 0, tries: 0, sel: null, busy: false, msg: why || '', state: 'play', hint: null, flash: null};
+  S.drill = S.drillState = {kind: 'line', id, i: s0, s0, mistakes: 0, tries: 0, sel: null, busy: false, msg: why || '', state: 'play', hint: null, flash: null, unit: unit || null};
   S.view = 'drill'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
   setTimeout(drillAdvance, 450);
 }
@@ -972,7 +1133,13 @@ function startPuzzle(k){
   S.drill = S.drillState = {kind: 'puz', k, i: 0, mistakes: 0, tries: 0, sel: null, busy: false, state: 'play', hint: null, flash: null, msg: ''};
   S.view = 'drill'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
 }
-function dNode(){ const D = S.drill; return D.kind === 'sb' ? D.node : D.kind === 'line' ? LINES[D.id].n[D.i] : DATA.puzzles[D.k].node; }
+function dNode(){ const D = S.drill; return D.kind === 'sb' ? D.node : D.kind === 'line' ? LINES[D.id].n[D.i] : D.kind === 'q' ? D.items[D.k].node : DATA.puzzles[D.k].node; }
+// the position on the drill board: course quizzes can show a position that isn't in the book (a threat puzzle, or a move played out)
+function dFen(){
+  const D = S.drill;
+  if (D.kind === 'q'){ if (D.view) return D.view; const it = D.items[D.k]; return it.fen || N[it.node].f; }
+  return N[dNode()].f;
+}
 function drillAdvance(){
   const D = S.drill; if (!D || D.kind !== 'line' || S.view !== 'drill') return;
   const n = LINES[D.id].n;
@@ -983,8 +1150,8 @@ function drillAdvance(){
     setTimeout(() => { if (S.drill !== D) return; D.i++; D.busy = false; D.flash = null; renderDrillBoard({u: nx.u, meta: nx}); renderDrillPanel(); drillAdvance(); }, 520);
   } else { D.busy = false; D.tries = 0; renderDrillPanel(); }
 }
-function expectedMove(){ const D = S.drill; if (D.kind === 'puz') return DATA.puzzles[D.k].ok; if (D.kind === 'sb') return sbMyKids(D.node).map(c => N[c].u); return [N[LINES[D.id].n[D.i + 1]].u]; }
-function legalFor(){ const D = S.drill; if (D.kind === 'puz') return DATA.puzzles[D.k].legal; return DATA.legal[String(dNode())] || []; }
+function expectedMove(){ const D = S.drill; if (D.kind === 'puz') return DATA.puzzles[D.k].ok; if (D.kind === 'q'){ const it = D.items[D.k]; return it.ok || it.safe; } if (D.kind === 'sb') return sbMyKids(D.node).map(c => N[c].u); return [N[LINES[D.id].n[D.i + 1]].u]; }
+function legalFor(){ const D = S.drill; if (D.kind === 'puz') return DATA.puzzles[D.k].legal; if (D.kind === 'q'){ const it = D.items[D.k]; return it.legal || DATA.legal[String(it.node)] || []; } return DATA.legal[String(dNode())] || []; }
 function tryMove(from, to){
   const D = S.drill; if (!D || D.busy || D.state !== 'play') return;
   let u = from + to;
@@ -997,6 +1164,7 @@ function tryMove(from, to){
     else { D.sel = null; renderDrillBoard(); return; }
   }
   if (D.kind === 'sb'){ sbTry(u, to); return; }
+  if (D.kind === 'q'){ quizTry(u, to); return; }
   const exp = expectedMove();
   D.sel = null;
   if (exp.includes(u)){
@@ -1020,12 +1188,7 @@ function tryMove(from, to){
     setTimeout(() => { if (S.drill === D && D.flash && !D.flash.ok){ D.flash = null; renderDrillBoard(); } }, 650);
   }
 }
-function fenAfter(idx, u){ // only for puzzle reveal: move piece on a copy
-  const a = fenArr(N[idx].f); const f = sqi(u.slice(0, 2)), t = sqi(u.slice(2, 4)); const castle = a[f] && a[f].toLowerCase() === 'k' && Math.abs(t - f) === 2;
-  a[t] = a[f]; a[f] = null;
-  if (castle){ const rf = t > f ? f + 3 : f - 4, rt = t > f ? f + 1 : f - 1; a[rt] = a[rf]; a[rf] = null; }
-  let out = ''; for (let r = 7; r >= 0; r--){ let e = 0; for (let c = 0; c < 8; c++){ const p = a[r*8+c]; if (!p) e++; else { if (e){ out += e; e = 0; } out += p; } } if (e) out += e; if (r) out += '/'; } return out;
-}
+function fenAfter(idx, u){ return applyMove(N[idx].f, u); } // puzzle reveal
 function finishLine(){
   const D = S.drill; D.state = 'done';
   Prog.record(D.id, D.mistakes === 0);
@@ -1033,9 +1196,13 @@ function finishLine(){
 }
 function renderDrillBoard(anim){
   const D = S.drill, el = document.getElementById('db'); if (!el || !D) return;
-  let idx = dNode(), fen = N[idx].f, o;
-  if (D.kind === 'puz' && D.after){ fen = D.after.fen; o = {coords: true, last: [D.after.u.slice(0,2), D.after.u.slice(2,4)]}; }
-  else { o = {coords: true}; if (N[idx].u) o.last = [N[idx].u.slice(0, 2), N[idx].u.slice(2, 4)]; }
+  let fen, o;
+  if (D.kind === 'q'){
+    const it = D.items[D.k], lu = D.lastU || it.last || (it.node !== undefined ? N[it.node].u : null);
+    fen = dFen(); o = {coords: true}; if (lu) o.last = [lu.slice(0, 2), lu.slice(2, 4)]; if (D.arrows) o.arrows = D.arrows;
+  }
+  else if (D.kind === 'puz' && D.after){ fen = D.after.fen; o = {coords: true, last: [D.after.u.slice(0,2), D.after.u.slice(2,4)]}; }
+  else { const idx = dNode(); fen = N[idx].f; o = {coords: true}; if (N[idx].u) o.last = [N[idx].u.slice(0, 2), N[idx].u.slice(2, 4)]; }
   if (D.flash) o.flash = D.flash;
   if (D.sel){ o.sel = D.sel; o.dots = legalFor().filter(m => m.startsWith(D.sel)).map(m => m.slice(2, 4)); }
   if (D.hint) o.hint = D.hint;
@@ -1061,11 +1228,15 @@ function drillPanelHTML(){
   let doneBox = '';
   if (D.state === 'done'){
     const r = Prog.rec(D.id), clean = D.mistakes === 0, days = INTERVALS[r.box];
+    const CU = D.unit && UNIT[D.unit], nxU = CU ? unitNextLine(CU, D.id) : null;
+    const acts = CU ? `${nxU ? `<button class="btn primary" id="dNextU">Next line in this unit</button>` : ''}<button class="btn ${nxU ? '' : 'primary'}" data-unit="${CU.id}">Back to the unit</button><button class="btn" id="dAgain">Again</button>`
+      : `<button class="btn primary" id="dNext">Next line</button><button class="btn" id="dAgain">Again</button><button class="btn ghost" data-line="${D.id}">Study it</button>`;
+    const cnote = CU ? ` ${CU.lines.filter(lineClean).length} of ${CU.lines.length} main lines in this unit are clean.` : '';
     doneBox = `<div class="donebox ${clean ? '' : 'bad'}"><h4>${clean ? 'Clean run.' : `Done, with ${D.mistakes} ${D.mistakes === 1 ? 'slip' : 'slips'}.`}</h4>
-      <p>${clean ? `This line comes back in ${days} ${days === 1 ? 'day' : 'days'}.` : 'This line stays in today\'s review until you get it clean.'} Ends: ${esc(line.main ? (L.outcome || '') : ((evalInfo(N[n[n.length-1]].e) || {}).txt || ''))}.</p>
-      <div class="lesson-actions"><button class="btn primary" id="dNext">Next line</button><button class="btn" id="dAgain">Again</button><button class="btn ghost" data-line="${D.id}">Study it</button></div></div>`;
+      <p>${clean ? `This line comes back in ${days} ${days === 1 ? 'day' : 'days'}.` : 'This line stays in today\'s review until you get it clean.'} Ends: ${esc(line.main ? (L.outcome || '') : ((evalInfo(N[n[n.length-1]].e) || {}).txt || ''))}.${cnote}</p>
+      <div class="lesson-actions">${acts}</div></div>`;
   }
-  return `<div class="dpanel"><p class="kicker">${esc(L.title)}${line.main ? '' : ' · ' + esc(line.title)}${D.msgWhy ? ' · ' + esc(D.msgWhy) : ''}</p><h3>Play ${MYC}'s moves from memory</h3>
+  return `<div class="dpanel"><p class="kicker">${D.unit && UNIT[D.unit] ? 'Course · ' + esc(UNIT[D.unit].title) + ' · ' : ''}${esc(L.title)}${line.main ? '' : ' · ' + esc(line.title)}${D.msgWhy ? ' · ' + esc(D.msgWhy) : ''}</p><h3>Play ${MYC}'s moves from memory</h3>
     <div class="progressbar" aria-hidden="true"><i style="width:${pct}%"></i></div>
     ${status ? `<div class="status ${D.busy ? 'wait' : ''} ${D.tries ? 'bad' : ''}"><span class="bub"></span>${status}</div>` : ''}
     <p class="feedback">${D.msg || (D.i === D.s0 ? `${OPP}'s moves play automatically. Drag a piece or tap it, then tap where it goes.` : '&nbsp;')}</p>${doneBox}</div>`;
@@ -1074,7 +1245,8 @@ function renderDrillPanel(){ const el = document.getElementById('dpanel'); if (e
 function wireDrillPanel(){
   const D = S.drill;
   const nx = document.getElementById('dNext'); if (nx) nx.onclick = () => { const s = nextSmart(D.id); if (s){ startDrillLine(s.id); S.drill.msgWhy = s.why; renderDrillPanel(); } };
-  const ag = document.getElementById('dAgain'); if (ag) ag.onclick = () => startDrillLine(D.id);
+  const ag = document.getElementById('dAgain'); if (ag) ag.onclick = () => startDrillLine(D.id, '', D.unit);
+  const nu = document.getElementById('dNextU'); if (nu) nu.onclick = () => { const s = unitNextLine(UNIT[D.unit], D.id); if (s) startDrillLine(s, '', D.unit); };
   const np = document.getElementById('nextPuz'); if (np) np.onclick = () => startPuzzle(D.k + 1);
 }
 function fmtDue(r){ if (!r) return 'new'; const d = r.due - Date.now(); if (d <= 0) return 'due'; const days = Math.ceil(d / DAY); return `in ${days}d`; }
@@ -1124,7 +1296,7 @@ function wireBoardInput(){
     const D = S.drill; if (!D || D.busy || D.state !== 'play') return;
     const svg = el.querySelector('svg'); if (!svg) return;
     const sq = squareAt(svg, e); if (!sq) return;
-    const a = fenArr(N[dNode()].f), p = a[sqi(sq)];
+    const a = fenArr(dFen()), p = a[sqi(sq)];
     if (D.sel && D.sel !== sq && !isMyPiece(p)){ e.preventDefault(); tryMove(D.sel, sq); return; }
     if (isMyPiece(p)){
       e.preventDefault();
@@ -1171,6 +1343,7 @@ function gameOdds(){ const D = S.drill; return D && D.kind === 'sb' ? D.odds : S
 function inScope(c, scope){
   scope = scope || gameScope();
   if (scope === 'all') return true;
+  if (scope.startsWith('u:')){ const set = unitSparSet(scope.slice(2)); return sbLinesThrough(c).some(id => set.has(id)); }
   const C = CHAPTERS[scope]; if (!C) return true;
   if (scopeAncestors(C.id).has(c)) return true;
   let i = c; while (i !== null && i !== undefined){ if (C.roots.includes(i)) return true; i = N[i].p; }
@@ -1185,11 +1358,19 @@ function sbWeights(kids){
   if (odds === 'weak') return kids.map(c => (sbLinesThrough(c).filter(id => inScopeLine(id)).reduce((a, id) => a + lineNeed(id), 0) || 0.0001) * Math.sqrt(Math.max(N[c].q || 0.02, 0.02)));
   return kids.map(c => Math.max(N[c].q || 0, 0.003));
 }
-function inScopeLine(id, scope){ const n = LINES[id].n; return inScope(n[n.length - 1], scope); }
+function inScopeLine(id, scope){
+  scope = scope || gameScope();
+  if (scope.startsWith('u:')) return unitSparSet(scope.slice(2)).has(id);
+  const n = LINES[id].n; return inScope(n[n.length - 1], scope);
+}
+const _spar = {};
+function unitSparSet(uid){ return _spar[uid] || (_spar[uid] = new Set((UNIT[uid] && UNIT[uid].spar) || [])); }
+function scopeLabel(sc){ return sc === 'all' ? 'Every opening' : sc.startsWith('u:') ? 'Course: ' + ((UNIT[sc.slice(2)] || {}).title || '') : (CHAPTERS[sc] || {}).name || ''; }
 function pickWeighted(kids, ws){ const tot = ws.reduce((a, b) => a + b, 0); let r = Math.random() * tot; for (let i = 0; i < kids.length; i++){ r -= ws[i]; if (r <= 0) return kids[i]; } return kids[kids.length - 1]; }
 function myTurnAt(idx){ return (ply(idx) % 2 === 0) === (ME === 1); }
-function sbStart(){
-  const D = {kind: 'sb', node: 0, hist: [0], slips: [], slipAt: new Set(), tries: 0, busy: false, tick: 0, state: 'play', hint: null, flash: null, sel: null, choices: [], msg: '', scope: SBS.scope, odds: SBS.odds};
+// scope/odds override the chips for one game: a course unit's practice games use 'u:<unit>' and the weak-spot odds
+function sbStart(scope, odds){
+  const D = {kind: 'sb', node: 0, hist: [0], slips: [], slipAt: new Set(), tries: 0, busy: false, tick: 0, state: 'play', hint: null, flash: null, sel: null, choices: [], msg: '', scope: scope || SBS.scope, odds: odds || SBS.odds};
   S.sbState = S.drill = D;
   if (S.view !== 'sandbox'){ S.view = 'sandbox'; setHash(); }
   render();
@@ -1254,6 +1435,7 @@ function sbFinish(){
   if (D.line) Prog.record(D.line, clean);
   const sb = Prog.d.sb || (Prog.d.sb = {games: 0, clean: 0, slips: 0, seen: {}});
   sb.games++; if (clean) sb.clean++; sb.slips += D.slips.length; if (D.line) sb.seen[D.line] = (sb.seen[D.line] || 0) + 1;
+  if (D.scope.startsWith('u:') && UNIT[D.scope.slice(2)]){ const p = upW(D.scope.slice(2)); p.sparGames = (p.sparGames || 0) + 1; if (clean) p.spar = (p.spar || 0) + 1; }
   Prog.save();
   S.sbSession = S.sbSession || {games: 0, clean: 0, slips: 0};
   S.sbSession.games++; if (clean) S.sbSession.clean++; S.sbSession.slips += D.slips.length;
@@ -1283,12 +1465,14 @@ function sbReport(){
     return `<div class="slipc">${thumb(s.at, o)}<div><b>${esc(N[good].l)}</b><p>${after.u ? `${OPP} had just played: ${esc(after.l)}. ` : ''}${s.warn !== undefined ? 'You played the move to avoid.' : 'Red: what you tried. Green: your prep.'}</p></div></div>`;
   }).join('');
   const r = lid ? Prog.rec(lid) : null, days = r ? INTERVALS[r.box] : 0;
-  return `<div class="donebox ${n ? 'bad' : ''}">
+  const CU = D.scope.startsWith('u:') ? UNIT[D.scope.slice(2)] : null, cs = CU ? (up(CU.id).spar || 0) : 0;
+  const cline = CU ? `<p class="evaltext" style="text-align:left;margin:0">Course · ${esc(CU.title)}: ${Math.min(cs, SPAR)} of ${SPAR} clean practice games${cs >= SPAR ? '. This step is done.' : '.'}</p>` : '';
+  return `<div class="donebox ${n ? 'bad' : ''}">${cline}
       <p class="kicker">${C ? esc(C.name) + ' · ' : ''}${L ? esc(L.title) : 'Line complete'}${lid && !LINES[lid].main ? ' · ' + esc(LINES[lid].title) : ''}</p>
       <div class="bigstat"><b class="tnum">${n}</b><span>${n === 1 ? 'slip' : 'slips'} in this game · ${n ? 'this line is back in today\'s review' : `clean; it comes back in ${days} ${days === 1 ? 'day' : 'days'}`}</span></div>
       ${n ? `<div class="slips">${slipCards}</div>` : ''}
       ${D.choices.length ? `<div><p class="kicker" style="margin-bottom:6px">${OPP}'s choices</p><div class="chain">${chain}</div><p class="evaltext" style="text-align:left">This exact line: ${oneIn(prob)}.</p></div>` : ''}
-      <div class="lesson-actions"><button class="btn primary" id="sbAgain">Next game</button>${lid ? `<button class="btn" data-line="${lid}">Study this line</button><button class="btn ghost" id="sbDrill">Drill it</button>` : ''}</div></div>`;
+      <div class="lesson-actions"><button class="btn ${CU && cs >= SPAR ? '' : 'primary'}" id="sbAgain">Next game</button>${CU ? `<button class="btn ${cs >= SPAR ? 'primary' : ''}" data-unit="${CU.id}">Back to the unit</button>` : ''}${lid ? `<button class="btn" data-line="${lid}">Study this line</button><button class="btn ghost" id="sbDrill">Drill it</button>` : ''}</div></div>`;
 }
 function sbPanelHTML(){
   const D = S.drill;
@@ -1305,7 +1489,7 @@ function sbPanelHTML(){
   const black = bnode ? `<div class="mcard"><div class="who"><span class="side blk">${OPP}</span><span class="stepno">${pctTxt(bnode.q || 0)} of ${lastBlack.at === ODDS_ROOT ? 'your games' : 'players at your level'} go this way</span></div>
       <h3>${pieceIcon(bnode.pc, bnode.w === 1)}<span>${esc(bnode.l)}</span></h3>${bnode.t ? `<p class="note">${esc(bnode.t)}</p>` : ''}${bnode.g ? `<div class="chips">${tagChips(bnode.g)}</div>` : ''}
       ${lastBlack.kids.length > 1 ? `<details style="margin-top:10px"><summary class="kicker" style="cursor:pointer">What else ${OPP} could play here</summary><div style="margin-top:8px">${oddsRows(lastBlack)}</div></details>` : ''}</div>` : '';
-  const head = `<div class="dpanel"><p class="kicker">Sandbox · ${esc(D.scope === 'all' ? 'Every opening' : CHAPTERS[D.scope].name)} · ${D.slips.length} ${D.slips.length === 1 ? 'slip' : 'slips'} so far</p>
+  const head = `<div class="dpanel"><p class="kicker">Sandbox · ${esc(scopeLabel(D.scope))} · ${D.slips.length} ${D.slips.length === 1 ? 'slip' : 'slips'} so far</p>
       ${status ? `<div class="status ${D.busy ? 'wait' : ''} ${D.tries ? 'bad' : ''}"><span class="bub"></span>${status}</div>` : ''}
       ${D.state === 'done' ? sbReport() : `<p class="feedback">${D.msg || (D.hist.length <= 2 ? 'Drag a piece or tap it, then tap where it goes.' : '&nbsp;')}</p>`}</div>`;
   return head + (D.state === 'done' ? '' : black) + sbFeed();
@@ -1316,15 +1500,17 @@ function renderSbPanel(){
   const f = document.getElementById('sbfeed'); if (f) f.scrollTop = f.scrollHeight;
 }
 function wireSbPanel(){
-  const g = document.getElementById('sbGo'); if (g) g.onclick = sbStart;
-  const a = document.getElementById('sbAgain'); if (a) a.onclick = sbStart;
+  const g = document.getElementById('sbGo'); if (g) g.onclick = () => sbStart();
+  const a = document.getElementById('sbAgain'); if (a) a.onclick = () => { const D = S.drill; if (D && D.kind === 'sb' && D.scope.startsWith('u:')) sbStart(D.scope, D.odds); else sbStart(); };
   const dr = document.getElementById('sbDrill'); if (dr && S.drill && S.drill.line) dr.onclick = () => startDrillLine(S.drill.line);
 }
 function sbSideHTML(){
   const segBtn = (key, val, label) => `<button data-sbf="${key}:${val}" aria-pressed="${SBS[key] === val}">${label}</button>`;
   const ses = S.sbSession, all = Prog.d.sb;
   const pool = DRILLABLE.filter(id => inScopeLine(id, SBS.scope)), seen = all ? pool.filter(id => all.seen[id]).length : 0;
-  return `<div class="dpanel">
+  const D = S.drill, CU = D && D.kind === 'sb' && D.scope.startsWith('u:') ? UNIT[D.scope.slice(2)] : null;
+  const ban = CU ? `<div class="cban"><span><b>Course · ${unitNo(CU)}:</b> ${esc(CU.title)}. ${Math.min(up(CU.id).spar || 0, SPAR)} of ${SPAR} clean practice games. ${OPP} only plays moves from this unit and picks the lines you know least.</span><button class="btn small" data-unit="${CU.id}">Back to the unit</button></div>` : '';
+  return `${ban}<div class="dpanel">
       <div><p class="kicker" style="margin-bottom:6px">Openings</p><div class="seg">${segBtn('scope', 'all', 'Every opening')}${DATA.chapters.map(C => segBtn('scope', C.id, esc(C.name))).join('')}</div></div>
       <div><p class="kicker" style="margin-bottom:6px">${OPP}'s odds</p><div class="seg">${segBtn('odds', 'real', 'Like real games')}${segBtn('odds', 'even', 'Even spread')}${segBtn('odds', 'weak', 'My weak spots')}</div>
       <p class="evaltext" style="text-align:left;margin-top:8px">${SBS.odds === 'real' ? 'Common replies come up often, rare ones rarely, just like your games.' : SBS.odds === 'even' ? 'Every line in your prep is equally likely, so rare branches get their turn.' : 'Lines you haven\'t played, are due, or slipped on come up more.'}</p>${sbPendingHTML()}</div>
@@ -1334,7 +1520,7 @@ function sbSideHTML(){
 function sbPendingHTML(){
   const D = S.drill;
   if (!D || D.kind !== 'sb' || D.state !== 'play' || (D.scope === SBS.scope && D.odds === SBS.odds)) return '';
-  const nm = sc => sc === 'all' ? 'every opening' : CHAPTERS[sc].name;
+  const nm = sc => sc === 'all' ? 'every opening' : scopeLabel(sc);
   const what = D.scope !== SBS.scope ? `This game stays in ${nm(D.scope)}; ${nm(SBS.scope)} starts with the next one.` : 'The new odds start with the next game.';
   return `<div class="sbpend" role="status"><span>${esc(what)}</span><button class="btn small" id="sbNow">Start it now</button></div>`;
 }
@@ -1406,22 +1592,330 @@ function renderCheat(){
   view.querySelectorAll('[data-jump]').forEach(b => b.onclick = () => { const el = document.getElementById('cs-' + b.dataset.jump); if (el) el.scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block: 'start'}); });
 }
 
+/* ------------------------------------------------------------------ COURSE */
+// One path through both books, ordered by how much each system matters in your games. A lesson unit has five steps
+// (idea, learn, drill, practice games, checkpoint); a skill unit has the habit, two practice sets and a checkpoint.
+// Passing a unit's checkpoint opens the next one. Progress lives in Prog.d.course and syncs with everything else.
+const COURSE = DATA_C.units, UNIT = {};
+COURSE.forEach((U, k) => { U.k = k; UNIT[U.id] = U; });
+const LIDX = {};
+for (const s of ['w', 'b']){ LIDX[s] = {}; BOOKS[s].lessons.forEach(l => LIDX[s][l.id] = l); BOOKS[s].drillSet = new Set(BOOKS[s].drillable); }
+const SPAR = 3;
+const ICON = {
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg>',
+  lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+  prev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>',
+  next: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>'};
+const cprog = () => Prog.d.course || {u: {}, seen: {}};
+const up = id => (cprog().u || {})[id] || {};
+function upW(id){ const c = Prog.d.course || (Prog.d.course = {u: {}, seen: {}}); c.u = c.u || {}; return c.u[id] || (c.u[id] = {}); }
+function markSeen(lid){ const c = Prog.d.course || (Prog.d.course = {u: {}, seen: {}}); c.seen = c.seen || {}; if (c.seen[lid]) return; c.seen[lid] = Date.now(); Prog.save(); }
+function lessonSeen(side, lid){ if ((cprog().seen || {})[lid]) return true; const L = LIDX[side][lid], r = L && Prog.d.lines[L.lines[0]]; return !!(r && r.clean); }
+const lineClean = id => !!((Prog.d.lines[id] || {}).clean);
+const lc = s => s ? s[0].toLowerCase() + s.slice(1) : '';
+const unitNo = U => `Unit ${U.k + 1}`;
+const sideChip = U => U.kind === 'skill' ? '<span class="chip skill">Skill</span>' : `<span class="chip sw-${U.side}"><i class="disc" aria-hidden="true"></i>${U.side === 'w' ? 'White' : 'Black'}</span>`;
+function unitAllLines(U){ if (U.soon || !U.lessons) return []; const ds = BOOKS[U.side].drillSet; return U.lessons.concat(U.deeper).flatMap(lid => LIDX[U.side][lid].lines.filter(id => ds.has(id))); }
+function unitDue(U){ const now = Date.now(); return unitAllLines(U).filter(id => { const r = Prog.d.lines[id]; return r && r.due <= now; }).length; }
+function unitSteps(U){
+  const p = up(U.id);
+  if (U.kind === 'skill') return [
+    {key: 'idea', title: 'The habit', done: !!p.idea},
+    {key: 's1', title: 'Practice set 1', done: (p.s1 || 0) >= U.passSet, best: p.s1, of: U.sets[0].length},
+    {key: 's2', title: 'Practice set 2', done: (p.s2 || 0) >= U.passSet, best: p.s2, of: U.sets[1].length},
+    {key: 'cp', title: 'Checkpoint', done: !!p.pass, best: p.cp, of: U.check.length}];
+  const seen = U.lessons.filter(l => lessonSeen(U.side, l)).length, clean = U.lines.filter(lineClean).length;
+  return [
+    {key: 'idea', title: 'The idea', done: !!p.idea},
+    {key: 'learn', title: 'Learn the lines', done: seen === U.lessons.length, n: seen, of: U.lessons.length},
+    {key: 'drill', title: 'Drill', done: clean === U.lines.length, n: clean, of: U.lines.length},
+    {key: 'spar', title: 'Practice games', done: (p.spar || 0) >= SPAR, n: Math.min(SPAR, p.spar || 0), of: SPAR},
+    {key: 'cp', title: 'Checkpoint', done: !!p.pass, best: p.cp, of: U.quiz.length}];
+}
+const unitPassed = U => !U.soon && !!up(U.id).pass;
+function unitOpen(U){ if (U.soon) return false; for (const V of COURSE){ if (V === U) return true; if (!V.soon && !unitPassed(V)) return false; } return false; }
+const currentUnit = () => COURSE.find(U => !U.soon && !unitPassed(U)) || null;
+const nextUnitAfter = U => COURSE.slice(U.k + 1).find(V => !V.soon) || null;
+function unitNextLine(U, exclude){
+  const fresh = U.lines.find(id => id !== exclude && !lineClean(id)); if (fresh) return fresh;
+  const now = Date.now(); return unitAllLines(U).find(id => id !== exclude && Prog.d.lines[id] && Prog.d.lines[id].due <= now) || null;
+}
+function stepCta(U, s){
+  if (!s) return 'Open the unit';
+  if (s.key === 'learn'){ const lid = U.lessons.find(l => !lessonSeen(U.side, l)); return lid ? `Study: ${LIDX[U.side][lid].title}` : 'Learn the lines'; }
+  return {idea: U.kind === 'skill' ? 'Start with the habit' : 'Start with the idea', drill: 'Drill the next line', spar: 'Play a practice game', cp: 'Take the checkpoint', s1: 'Practice set 1', s2: 'Practice set 2'}[s.key];
+}
+function doStep(U, key){
+  if (key === 'idea'){ S.slide = 0; openUnit(U.id); return; }
+  if (key === 'learn'){ openUnitLesson(U, U.lessons.find(l => !lessonSeen(U.side, l)) || U.lessons[0]); return; }
+  if (key === 'drill'){ useSide(U.side); const id = unitNextLine(U) || U.lines[0]; startDrillLine(id, '', U.id); return; }
+  if (key === 'spar'){ useSide(U.side); S.unit = U.id; sbStart('u:' + U.id, 'weak'); return; }
+  startQuiz(U.id, key);
+}
+function openUnit(id){ const U = UNIT[id]; if (!U || U.soon) return; if (U.side && U.kind !== 'skill') useSide(U.side); if (S.unit !== id) S.slide = 0; S.unit = id; go('unit', {top: true}); }
+function openUnitLesson(U, lid){ useSide(U.side); S.unit = U.id; openLine(LIDX[U.side][lid].lines[0], undefined, 'unit'); }
+
+/* idea cards: positions from either book, or a position from your games for the skill unit */
+function slideSVG(U, s, extra){
+  const B = U.side ? BOOKS[U.side].nodes : null, fen = s.fen || B[s.node].f, lu = s.last || (s.node !== undefined ? B[s.node].u : null);
+  return boardSVG(fen, Object.assign({coords: true, flip: (s.me || U.side) === 'b', last: lu ? [lu.slice(0, 2), lu.slice(2, 4)] : null, arrows: s.arrows, circles: s.circles, aria: s.h}, extra || {}));
+}
+function unitThumb(U){
+  if (U.idea && U.idea.length) return `<div class="thumb">${slideSVG(U, U.idea[0], {coords: false, mini: true})}</div>`;
+  const C = U.chapter && BOOKS[U.side].chapters.find(c => c.id === U.chapter);
+  if (C) return `<div class="thumb">${boardSVG(BOOKS[U.side].nodes[C.tile].f, {mini: true, flip: U.side === 'b'})}</div>`;
+  return `<div class="thumb ph">${pieceIcon(U.id === 'endings' ? 'k' : 'r', true)}</div>`;
+}
+function ideaStep(d){
+  const U = UNIT[S.unit]; if (!U || !U.idea) return;
+  S.slide = Math.max(0, Math.min(U.idea.length - 1, (S.slide || 0) + d));
+  if (S.slide === U.idea.length - 1 && !up(U.id).idea){ upW(U.id).idea = Date.now(); Prog.save(); } // seeing the last card completes the step
+  renderUnit();
+}
+
+/* the path */
+function renderCourse(){
+  const cur = currentUnit(), open = COURSE.filter(U => !U.soon), passedN = open.filter(unitPassed).length;
+  const bar = COURSE.map(U => `<i class="${U.soon ? 'soon' : unitPassed(U) ? 'on' : ''}" title="${esc(unitNo(U) + ': ' + U.title)}"></i>`).join('');
+  let hero;
+  if (cur){
+    const steps = unitSteps(cur), nx = steps.find(s => !s.done);
+    hero = `<section class="chero"><div class="board">${slideSVG(cur, cur.idea[0])}</div>
+      <div><div class="chips">${sideChip(cur)}<span class="chip">Up next · ${unitNo(cur)} of ${COURSE.length}</span></div>
+        <h3>${esc(cur.title)}</h3><p class="lede">${esc(cur.why)}</p>
+        <ol class="ministeps" aria-label="Steps in this unit">${steps.map(s => `<li class="${s.done ? 'done' : s === nx ? 'next' : ''}">${s.done ? ICON.check : ''}${esc(s.title)}</li>`).join('')}</ol>
+        <div class="cta"><button class="btn primary" id="cGo">${esc(stepCta(cur, nx))}</button><button class="btn" data-unit="${cur.id}">See the whole unit</button></div></div></section>`;
+  } else hero = `<section class="chero done"><div><p class="kicker">Every open unit passed</p><h3>Now keep it fresh.</h3><p class="lede">Lines you've learned come back for review in the Drill tab, and the units marked "coming soon" open as they're built.</p></div></section>`;
+  view.innerHTML = `<div class="chead"><div><p class="kicker">Your course · White and Black together</p><h2>One path, in the order that matters</h2>
+      <p>Units are ordered by how often each system comes up in your games and how you score in it. Each unit: the idea, the lines, a drill, ${SPAR} practice games, then a checkpoint. Pass the checkpoint and the next unit opens. Finished units keep coming back for review, and every line is still in Learn if you want to look ahead.</p></div>
+    <div class="cmeter"><div class="bar" aria-hidden="true">${bar}</div><span>${passedN} of ${open.length} units passed${COURSE.length > open.length ? ` · ${COURSE.length - open.length} coming soon` : ''}</span></div></div>
+    ${hero}<ol class="path" aria-label="Course units">${COURSE.map(U => unitRow(U, cur)).join('')}</ol>`;
+  const g = document.getElementById('cGo'); if (g) g.onclick = () => { const nx = unitSteps(cur).find(s => !s.done); if (nx) doStep(cur, nx.key); else openUnit(cur.id); };
+}
+function unitRow(U, cur){
+  const open = unitOpen(U), passed = unitPassed(U), isCur = U === cur, steps = U.soon ? [] : unitSteps(U), done = steps.filter(s => s.done).length, due = passed ? unitDue(U) : 0;
+  const bub = U.soon ? `<span class="ubub soon">${U.k + 1}</span>` : passed ? `<span class="ubub pass" title="Passed">${ICON.check}</span>` : isCur ? `<span class="ubub cur">${U.k + 1}</span>` : open ? `<span class="ubub">${U.k + 1}</span>` : `<span class="ubub" title="Locked">${ICON.lock}</span>`;
+  const before = COURSE.slice(0, U.k).reverse().find(V => !V.soon);
+  const status = U.soon ? '' : passed ? (done === steps.length ? 'Complete' : 'Passed') : open ? `${done} of ${steps.length} steps` : `Opens after unit ${before.k + 1}`;
+  const pips = U.soon ? '' : `<span class="pips" aria-hidden="true">${steps.map(s => `<i class="${s.done ? 'on' : ''}"></i>`).join('')}</span>`;
+  const meta = U.soon ? '' : `<span class="ust">${pips}<span>${status}</span>${due ? `<span class="chip blunder">${due} to review</span>` : ''}</span>`;
+  const tail = U.kicker.split(' · ').slice(1).join(' · ') || U.kicker, sub = U.soon ? U.why : tail[0].toUpperCase() + tail.slice(1);
+  const inner = `${unitThumb(U)}<span class="ut"><span class="chips">${sideChip(U)}${U.soon ? '<span class="chip soon">Coming soon</span>' : ''}</span><b>${esc(U.title)}</b><span class="us">${esc(sub)}</span>${U.soon && U.chapter ? `<span><button class="linkish" data-soon="${U.id}">See the current lines</button></span>` : ''}</span>${meta}`;
+  const card = U.soon ? `<div class="ucard soon">${inner}</div>` : open ? `<button class="ucard ${isCur ? 'cur' : ''}" data-unit="${U.id}" aria-label="${esc(unitNo(U) + ': ' + U.title + (passed ? ', passed' : ''))}">${inner}</button>` : `<div class="ucard locked" aria-label="${esc(unitNo(U) + ': ' + U.title + ', locked')}">${inner}</div>`;
+  return `<li class="urow"><div class="rail">${bub}</div>${card}</li>`;
+}
+
+/* a unit */
+function lessonRow(U, lid){
+  const L = LIDX[U.side][lid], {idx, o} = lessonThumbOpts(L), seen = lessonSeen(U.side, lid);
+  return `<button class="lrow" data-ulesson="${lid}">${thumb(idx, o)}<span><b>${esc(L.title)}</b><span class="s">${esc(L.sub)}</span></span><span class="tick ${seen ? '' : 'no'}">${seen ? ICON.check + 'Studied' : 'Not yet'}</span></button>`;
+}
+function drillRow(U, id){
+  const r = Prog.rec(id), L = lessonOf(id), now = Date.now(), st = !r ? ['no', 'Not yet'] : r.due <= now ? ['due', r.clean ? 'Review now' : 'Again today'] : r.clean ? ['', 'Clean'] : ['due', 'Again today'];
+  return `<button class="mrow" data-udrill="${id}"><span>${esc(L.title)}</span><span class="pips">${[1,2,3,4,5].map(k => `<i class="${k <= ((r || {}).box || 0) ? 'on' : ''}"></i>`).join('')}</span><span class="tick ${st[0]}">${st[0] === '' ? ICON.check : ''}${st[1]}</span></button>`;
+}
+function stepHTML(U, s, k, nx, open){
+  const isNext = open && s === nx, prim = isNext ? 'primary' : '', dis = open ? '' : 'disabled';
+  const head = (t, cnt) => `<h3>${esc(t)}${cnt ? ` <span class="cnt">${cnt}</span>` : ''}</h3>`;
+  const best = s.best !== undefined ? ` Best so far: ${s.best} of ${s.of}.` : '';
+  let body;
+  if (s.key === 'idea') body = head(U.kind === 'skill' ? 'The habit' : 'The idea') + `<p class="sp">${U.idea.length} pictures on the board${U.kind === 'skill' ? ', each from one of your games' : ''}. Step through to the last one with the arrows under the board.</p>`;
+  else if (s.key === 'learn') body = head('Learn the lines', `${s.n}/${s.of}`) + `<p class="sp">Step through each lesson to its last move. The notes say why each move matters.</p><div class="sx"><div class="lrows">${U.lessons.map(l => lessonRow(U, l)).join('')}</div></div>`;
+  else if (s.key === 'drill'){
+    const nl = unitNextLine(U), due = unitDue(U);
+    body = head('Drill', `${s.n}/${s.of}`) + `<p class="sp">Play each main line from memory once without a slip. Clean lines come back later for review.</p><div class="sx"><div class="mtable">${U.lines.map(id => drillRow(U, id)).join('')}</div>
+      <div class="lesson-actions"><button class="btn ${prim}" data-ustep="drill" ${dis || (nl ? '' : 'disabled')}>${s.done ? (due ? `Review ${due} due ${due === 1 ? 'line' : 'lines'}` : 'Nothing due') : 'Drill the next line'}</button></div></div>`;
+  }
+  else if (s.key === 'spar') body = head('Practice games', `${s.n}/${s.of}`) + `<p class="sp">Play ${SPAR} games in the Sandbox without a slip. Your opponent only plays moves from this unit and picks the lines you know least.${up(U.id).sparGames ? ` ${up(U.id).sparGames} played so far.` : ''}</p>
+      <div class="sx"><div class="lesson-actions"><button class="btn ${prim}" data-ustep="spar" ${dis}>Play a practice game</button></div></div>`;
+  else if (s.key === 's1' || s.key === 's2') body = head(s.title, s.best !== undefined ? `${s.best}/${s.of}` : '') + `<p class="sp">${s.of} positions from your games where the next move lost material. Find a safe move; ${U.passSet} right on the first try clears the set.${best}</p>
+      <div class="sx"><div class="lesson-actions"><button class="btn ${prim}" data-ustep="${s.key}" ${dis}>${s.best !== undefined ? 'Try it again' : 'Start the set'}</button></div></div>`;
+  else {
+    const n = s.of, need = U.kind === 'skill' ? U.passCheck : U.pass;
+    body = head('Checkpoint', s.best !== undefined ? `${s.best}/${n}` : '') + `<p class="sp">${n} ${U.kind === 'skill' ? 'new positions from your games' : 'positions from this unit'}. Get ${need} right on the first try to pass${nextUnitAfter(U) ? ' and open the next unit' : ''}.${best}</p>
+      <div class="sx"><div class="lesson-actions"><button class="btn ${prim}" data-ustep="cp" ${dis}>${s.done ? 'Take it again' : 'Take the checkpoint'}</button></div>${!s.done && !isNext && open ? '<p class="sp">Already know this? You can take it now.</p>' : ''}</div>`;
+  }
+  return `<li class="step ${s.done ? 'done' : ''} ${isNext ? 'next' : ''}"><span class="sn">${s.done ? ICON.check : k + 1}</span><div>${body}</div></li>`;
+}
+function renderUnit(){
+  const U = UNIT[S.unit]; if (!U || U.soon){ go('course'); return; }
+  const open = unitOpen(U), passed = unitPassed(U), steps = unitSteps(U), nx = steps.find(s => !s.done);
+  S.slide = Math.max(0, Math.min(S.slide || 0, U.idea.length - 1));
+  const s = U.idea[S.slide], seenIdea = !!up(U.id).idea, nextU = nextUnitAfter(U);
+  const prevOpen = COURSE.slice(0, U.k).reverse().find(V => !V.soon);
+  const crumbs = `<div class="crumbs"><button class="btn small" data-go="course">← Course</button><span class="where">${unitNo(U)} of ${COURSE.length} · ${U.kind === 'skill' ? 'Skill' : U.side === 'w' ? 'White' : 'Black'}</span><span class="spacer"></span>
+    ${prevOpen ? `<button class="btn small" data-unit="${prevOpen.id}" aria-label="Previous unit">‹<span class="navtxt"> Unit ${prevOpen.k + 1}</span></button>` : ''}${nextU && unitOpen(nextU) ? `<button class="btn small" data-unit="${nextU.id}" aria-label="Next unit"><span class="navtxt">Unit ${nextU.k + 1} </span>›</button>` : ''}</div>`;
+  const idea = `<div class="idea"><div class="board" id="ideaBoard">${slideSVG(U, s)}</div>
+    <div class="ideacap"><p class="kicker">${U.kind === 'skill' ? 'The habit' : 'The idea'} · ${S.slide + 1} of ${U.idea.length}${s.game ? ' · ' + esc(s.game) : ''}</p><h3>${esc(s.h)}</h3><p>${esc(s.t)}</p>
+      <div class="ideanav"><button class="ctl" id="iPrev" aria-label="Previous picture" ${S.slide === 0 ? 'disabled' : ''}>${ICON.prev}</button>
+        <span class="dots" aria-hidden="true">${U.idea.map((_, k) => `<i class="${k === S.slide ? 'cur' : (seenIdea || k < S.slide) ? 'on' : ''}"></i>`).join('')}</span>
+        <button class="ctl" id="iNext" aria-label="Next picture" ${S.slide >= U.idea.length - 1 ? 'disabled' : ''}>${ICON.next}</button></div></div></div>`;
+  const lockN = COURSE.slice(0, U.k).find(V => !V.soon && !unitPassed(V));
+  const deeper = U.deeper && U.deeper.length ? `<section class="part" style="margin:14px 0 0"><div class="part-head"><div><p class="kicker">Optional</p><h3>Go deeper</h3></div><p>More lines from the same openings. Not needed to pass; come back when the core feels easy.</p><span class="count tnum">${U.deeper.length} ${U.deeper.length === 1 ? 'lesson' : 'lessons'}</span></div>
+      <div class="cards">${U.deeper.map(l => lessonCard(LIDX[U.side][l])).join('')}</div></section>` : '';
+  view.innerHTML = `${crumbs}<div class="ugrid"><div class="bcol">${idea}</div>
+    <div class="ucol"><header class="uhead"><div class="chips">${sideChip(U)}<span class="chip">${unitNo(U)} of ${COURSE.length}</span>${passed ? '<span class="chip good">Passed</span>' : ''}</div><h2>${esc(U.title)}</h2><p class="lede">${esc(U.why)}</p>
+      ${open && nx ? `<div class="cta" style="margin-top:14px"><button class="btn primary" id="uGo">${nx.key === 'idea' ? 'Next picture' : esc(stepCta(U, nx))}</button></div>` : ''}</header>
+      ${!open && lockN ? `<p class="lockednote">This unit opens when you pass the checkpoint in ${unitNo(lockN).toLowerCase()}, ${esc(lockN.title)}.</p>` : ''}
+      <ol class="steps">${steps.map((st, k) => stepHTML(U, st, k, nx, open)).join('')}</ol>
+      ${deeper}</div></div>`;
+  document.getElementById('iPrev').onclick = () => ideaStep(-1);
+  document.getElementById('iNext').onclick = () => ideaStep(1);
+  const g = document.getElementById('uGo'); if (g) g.onclick = () => { const n2 = unitSteps(U).find(x => !x.done); if (!n2) return; if (n2.key === 'idea') ideaStep(1); else doStep(U, n2.key); };
+  view.querySelectorAll('[data-ustep]').forEach(b => b.onclick = () => { if (b.dataset.ustep === 'idea'){ S.slide = 0; renderUnit(); const el = document.getElementById('ideaBoard'); if (el && el.getBoundingClientRect().top < 0) el.scrollIntoView({behavior: reduced ? 'auto' : 'smooth'}); return; } doStep(U, b.dataset.ustep); });
+  view.querySelectorAll('[data-ulesson]').forEach(b => b.onclick = () => openUnitLesson(U, b.dataset.ulesson));
+  view.querySelectorAll('[data-udrill]').forEach(b => b.onclick = () => { useSide(U.side); startDrillLine(b.dataset.udrill, '', U.id); });
+}
+
+/* checkpoint and practice sets: one position at a time, scored on the first try */
+const quizName = set => set === 'cp' ? 'Checkpoint' : set === 's1' ? 'Practice set 1' : 'Practice set 2';
+const quizPass = (U, set) => U.kind === 'skill' ? (set === 'cp' ? U.passCheck : U.passSet) : U.pass;
+function viewSide(){ const Q = S.view === 'quiz' && S.quizState; if (Q){ const it = Q.items[Q.k]; if (it && it.me) return it.me; } return SIDE; }
+function startQuiz(uid, set){
+  const U = UNIT[uid]; if (!U) return;
+  if (U.kind !== 'skill') useSide(U.side);
+  const items = U.kind === 'skill' ? (set === 'cp' ? U.check : U.sets[set === 's1' ? 0 : 1]) : U.quiz;
+  S.unit = uid;
+  S.quizState = {kind: 'q', unit: uid, set, items, k: 0, res: [], tries: 0, state: 'play', sel: null, busy: false, flash: null, hint: null, msg: '', view: null, lastU: null, arrows: null};
+  S.view = 'quiz'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
+}
+function quizTry(u, to){
+  const Q = S.drill, it = Q.items[Q.k], threat = !!it.fen;
+  Q.sel = null;
+  if ((it.ok || it.safe).includes(u)){
+    const first = Q.tries === 0; Q.res[Q.k] = first; Q.state = 'shown'; Q.flash = {sq: to, ok: true}; Q.hint = null;
+    if (!threat){
+      Q.view = applyMove(dFen(), u); Q.lastU = u; Q.arrows = null;
+      Q.msg = `<b>${first ? 'Right' : 'That\'s it'}: ${esc(it.rule)}.</b> ${esc(it.note || '')}`;
+      renderDrillBoard({u, meta: {}});
+    } else {
+      const danger = it.threat || it.reply;
+      Q.arrows = [u.slice(0, 4) + 'g'].concat(danger ? [danger.slice(0, 4) + 'r'] : []);
+      Q.msg = `<b>${first ? 'Safe.' : 'Safe this time.'}</b> ${it.threat ? `The danger (red): ${esc(lc(it.threatLabel))}. ` : ''}In the game you played ${esc(lc(it.playedLabel))}, and ${esc(it.opp)} answered: ${esc(lc(it.replyLabel))}.`;
+      renderDrillBoard();
+    }
+    renderQuizPanel(); return;
+  }
+  if (Q.tries === 0) Q.res[Q.k] = false;
+  Q.tries++;
+  if (!threat){
+    Q.flash = {sq: to, ok: false};
+    Q.msg = Q.tries >= 2 ? 'Not that one. The arrow shows your move; play it to continue.' : 'Not your move here. Try again.';
+    if (Q.tries >= 2) Q.hint = it.ans;
+    renderDrillBoard(); renderQuizPanel();
+    setTimeout(() => { if (S.drill === Q && Q.flash && !Q.flash.ok){ Q.flash = null; renderDrillBoard(); } }, 650);
+    return;
+  }
+  // a threat position: play the move out and show the punishment, then let them try again
+  const r = it.refute[u], after = applyMove(dFen(), u), game = u === it.played;
+  Q.state = 'refuted'; Q.busy = !!r; Q.view = after; Q.lastU = u; Q.flash = {sq: to, ok: false}; Q.arrows = null; Q.hint = null;
+  Q.msg = game ? 'That\'s the move you played in the game.' : '';
+  renderDrillBoard({u, meta: {}}); renderQuizPanel();
+  if (!r){ Q.busy = false; return; }
+  setTimeout(() => {
+    if (S.drill !== Q || Q.state !== 'refuted') return;
+    Q.view = applyMove(after, r[0]); Q.lastU = r[0]; Q.flash = null; Q.arrows = [r[0].slice(0, 4) + 'r']; Q.busy = false;
+    Q.msg = `<b>${esc(OPP)} answers: ${esc(lc(r[1]))}.</b> ${game ? 'That\'s what happened in the game. ' : ''}Look again: what is attacked, and what would your move leave unguarded?`;
+    renderDrillBoard({u: r[0], meta: {}}); renderQuizPanel();
+  }, 750);
+}
+function quizRetry(){
+  const Q = S.quizState, it = Q.items[Q.k];
+  Q.state = 'play'; Q.view = null; Q.lastU = null; Q.arrows = null; Q.flash = null; Q.busy = false;
+  if (Q.tries >= 2){ Q.hint = it.safe[0]; Q.msg = 'The arrow shows a safe move; play it to continue.'; } else Q.msg = '';
+  renderDrillBoard(); renderQuizPanel();
+}
+function quizNext(){
+  const Q = S.quizState;
+  if (Q.k >= Q.items.length - 1){ quizFinish(); return; }
+  Object.assign(Q, {k: Q.k + 1, tries: 0, state: 'play', sel: null, busy: false, flash: null, hint: null, msg: '', view: null, lastU: null, arrows: null});
+  render();
+}
+function quizFinish(){
+  const Q = S.quizState, U = UNIT[Q.unit], score = Q.res.filter(Boolean).length, need = quizPass(U, Q.set), p = upW(U.id);
+  if (Q.set === 'cp'){ const was = !!p.pass; p.cp = Math.max(p.cp || 0, score); if (score >= need && !p.pass) p.pass = Date.now(); Q.unlockedNow = !was && !!p.pass; }
+  else p[Q.set] = Math.max(p[Q.set] || 0, score);
+  // the board then shows the first miss with its answer (or the last position if there was none)
+  const miss = Q.res.findIndex(r => !r);
+  Object.assign(Q, {state: 'done', view: null, lastU: null, arrows: null, flash: null, hint: null, sel: null});
+  if (miss >= 0){ const it = Q.items[miss], d = it.threat || it.reply; Q.k = miss; Q.arrows = it.fen ? [it.safe[0].slice(0, 4) + 'g'].concat(d ? [d.slice(0, 4) + 'r'] : []) : [it.ans.slice(0, 4) + 'g']; }
+  Prog.save(); render();
+}
+function missCard(it){
+  if (it.fen){
+    const o = {mini: true, coords: false, flip: it.me === 'b', arrows: [it.safe[0].slice(0, 4) + 'g'].concat((it.threat || it.reply) ? [(it.threat || it.reply).slice(0, 4) + 'r'] : [])};
+    if (it.last) o.last = [it.last.slice(0, 2), it.last.slice(2, 4)];
+    return `<div class="slipc"><div class="thumb">${boardSVG(it.fen, o)}</div><div><b>${esc(it.threat ? it.threatLabel : it.replyLabel)}</b><p>vs ${esc(it.opp)}, ${esc(it.date)}. Red: the danger. Green: a safe move.</p></div></div>`;
+  }
+  const nd = N[it.node], o = {coords: false, arrows: [it.ans.slice(0, 4) + 'g']}; if (nd.u) o.last = [nd.u.slice(0, 2), nd.u.slice(2, 4)];
+  return `<div class="slipc">${thumb(it.node, o)}<div><b>${esc(it.rule)}</b><p>${esc(OPP)} had just played: ${esc(lc(nd.l))}. Green: your move.</p></div></div>`;
+}
+function quizPanelHTML(){
+  const Q = S.quizState, U = UNIT[Q.unit], n = Q.items.length, need = quizPass(U, Q.set), it = Q.items[Q.k], threat = !!it.fen;
+  const dots = `<span class="dots" role="img" aria-label="${Q.res.filter(Boolean).length} right so far">${Q.items.map((_, k) => `<i class="${k < Q.res.length && Q.res[k] !== undefined ? (Q.res[k] ? 'on' : 'miss') : k === Q.k && Q.state !== 'done' ? 'cur' : ''}"></i>`).join('')}</span>`;
+  if (Q.state === 'done'){
+    const score = Q.res.filter(Boolean).length, passed = score >= need, nxt = nextUnitAfter(U), opened = Q.set === 'cp' && passed && nxt && unitOpen(nxt);
+    const misses = Q.items.filter((_, k) => !Q.res[k]);
+    const msg = passed ? (Q.set === 'cp' ? (opened ? `Passed. ${Q.unlockedNow ? 'New: ' : ''}${unitNo(nxt).toLowerCase()}, ${esc(nxt.title)}, is open.` : 'Passed.') : 'Set cleared.') : `Not yet: ${need} needed. Look at the ones you missed, then go again.`;
+    return `<div class="dpanel"><p class="kicker">${esc(U.title)} · ${quizName(Q.set)}</p><div class="qhead">${dots}</div>
+      <div class="donebox ${passed ? '' : 'bad'}"><div class="bigstat"><b class="tnum">${score} of ${n}</b><span>right on the first try</span></div><p>${msg}</p>
+        ${misses.length ? `<div class="slips">${misses.map(missCard).join('')}</div>` : ''}
+        <div class="lesson-actions">${opened ? `<button class="btn primary" data-unit="${nxt.id}">Go to ${unitNo(nxt).toLowerCase()}</button>` : ''}<button class="btn ${passed ? '' : 'primary'}" id="qAgain">Try again</button><button class="btn ${passed && !opened ? 'primary' : 'ghost'}" data-unit="${U.id}">Back to the unit</button></div></div></div>`;
+  }
+  const ask = threat ? `${it.lastLabel ? `${esc(OPP)} just played: <b>${esc(lc(it.lastLabel))}</b>. ` : ''}In this game your next move lost material. Find one that keeps everything safe.`
+    : `${esc(OPP)} just played: <b>${esc(lc(N[it.node].l))}</b>. What's your move?`;
+  const status = Q.state === 'play' ? `<div class="status ${Q.tries ? 'bad' : ''}"><span class="bub"></span>${Q.tries ? 'Try again' : 'Your move'}</div>`
+    : Q.state === 'shown' ? `<div class="status"><span class="bub"></span>${Q.res[Q.k] ? 'Right first time' : 'Solved'}</div>` : `<div class="status bad"><span class="bub"></span>${Q.busy ? `${esc(OPP)} replies…` : 'Not safe'}</div>`;
+  const act = Q.state === 'shown' ? `<div class="lesson-actions"><button class="btn primary" id="qNext">${Q.k < n - 1 ? 'Next position' : 'See your score'}</button></div>`
+    : Q.state === 'refuted' ? `<div class="lesson-actions"><button class="btn primary" id="qRetry" ${Q.busy ? 'disabled' : ''}>Try again</button></div>` : '';
+  return `<div class="dpanel"><p class="kicker">${esc(U.title)} · ${quizName(Q.set)}${threat ? ` · vs ${esc(it.opp)}, ${esc(it.date)}` : ''}</p>
+    <h3>${threat ? 'Find a safe move' : 'Find your move'}</h3>
+    <div class="qhead">${dots}<span class="evaltext">${Q.k + 1} of ${n} · ${need} right to pass</span></div>
+    <p class="ask">${ask}</p>${status}
+    <p class="feedback">${Q.msg || (Q.state === 'play' && Q.k === 0 && !Q.tries ? 'Drag a piece or tap it, then tap where it goes. Only your first try counts toward the score.' : '&nbsp;')}</p>${act}</div>`;
+}
+function renderQuizPanel(){ const el = document.getElementById('qpanel'); if (el){ el.innerHTML = quizPanelHTML(); wireQuizPanel(); } }
+function wireQuizPanel(){
+  const Q = S.quizState; if (!Q) return;
+  const nx = document.getElementById('qNext'); if (nx) nx.onclick = quizNext;
+  const rt = document.getElementById('qRetry'); if (rt) rt.onclick = quizRetry;
+  const ag = document.getElementById('qAgain'); if (ag) ag.onclick = () => startQuiz(Q.unit, Q.set);
+}
+function renderQuiz(){
+  const Q = S.quizState; if (!Q || !UNIT[Q.unit]){ go('course'); return; }
+  const U = UNIT[Q.unit], it = Q.items[Q.k];
+  view.innerHTML = `<div class="crumbs"><button class="btn small" data-unit="${U.id}">← ${esc(U.title)}</button><span class="where">${unitNo(U)} · ${quizName(Q.set)}</span></div>
+  <div class="sgrid"><div class="bcol"><div class="board ${Q.state !== 'done' ? 'input' : ''}" id="db"></div>
+    ${it.fen ? '<div class="legend" style="margin-top:10px"><span><i style="background:var(--arr-r)"></i>the danger</span><span><i style="background:var(--arr-g)"></i>your move</span></div>' : ''}</div>
+    <div class="ccol"><div id="qpanel">${quizPanelHTML()}</div></div></div>`;
+  renderDrillBoard(); wireQuizPanel(); wireBoardInput();
+}
+
 /* ------------------------------------------------------------------ boot */
 function start(saved){
   Prog.load();
   let h = (location.hash || '').slice(1), side = 'w';
   try { const v = localStorage.getItem(SIDE_KEY); if (v && BOOKS[v]) side = v; } catch(e){}
+  const hu = h.startsWith('unit.') ? UNIT[h.slice(5)] : null; // course hashes carry no colour: a unit brings its own book
   if (saved && saved.side && BOOKS[saved.side]) side = saved.side;
+  else if (hu){ if (hu.side && hu.kind !== 'skill') side = hu.side; }
+  else if (h === 'course'){}
   else if (h.startsWith('b.')){ side = 'b'; h = h.slice(2); }
   else if (h) side = 'w';
   loadBook(side); S.chapter = savedChapter(SIDE);
-  if (saved && saved.view){ Object.assign(S, {view: saved.view, line: saved.line && LINES[saved.line] ? saved.line : null, i: saved.i || 0, studyFrom: saved.studyFrom || 'learn'}); if (saved.chapter && CHAPTERS[saved.chapter]) S.chapter = saved.chapter; if (S.view === 'study' && !S.line) S.view = 'learn'; }
+  if (saved && saved.view){
+    Object.assign(S, {view: saved.view === 'quiz' ? 'unit' : saved.view, unit: saved.unit && UNIT[saved.unit] ? saved.unit : null, slide: saved.slide || 0, line: saved.line && LINES[saved.line] ? saved.line : null, i: saved.i || 0, studyFrom: saved.studyFrom || 'learn'});
+    if (saved.chapter && CHAPTERS[saved.chapter]) S.chapter = saved.chapter;
+    if (S.view === 'study' && !S.line) S.view = 'learn';
+    if (S.view === 'unit' && !S.unit) S.view = 'course';
+  }
+  else if (hu){ S.unit = hu.id; S.view = hu.soon ? 'course' : 'unit'; }
   else if (h.startsWith('line.') && LINES[h.slice(5)]){ S.line = h.slice(5); S.i = lineStart(S.line); S.view = 'study'; }
   else if (h.startsWith('learn.') && CHAPTERS[h.slice(6)]){ S.chapter = h.slice(6); S.view = 'learn'; }
   else if (VIEWS.includes(h)) S.view = h;
   render();
   Prog.connect();
-  try { window.claude && window.claude.hot && window.claude.hot.snapshot && window.claude.hot.snapshot(() => ({side: SIDE, view: S.view, line: S.line, i: S.i, studyFrom: S.studyFrom, chapter: S.chapter})); } catch(e){}
+  try { window.claude && window.claude.hot && window.claude.hot.snapshot && window.claude.hot.snapshot(() => ({side: SIDE, view: S.view, unit: S.unit, slide: S.slide, line: S.line, i: S.i, studyFrom: S.studyFrom, chapter: S.chapter})); } catch(e){}
 }
 try { if (window.claude && window.claude.hot && window.claude.hot.ready) window.claude.hot.ready(start); else start((window.claude && window.claude.hot && window.claude.hot.data) || {}); }
 catch(e){ start({}); }

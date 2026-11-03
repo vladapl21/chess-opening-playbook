@@ -72,7 +72,15 @@ with sync_playwright() as p:
     ctx = b.new_context(viewport={'width': 1280, 'height': 860}, device_scale_factor=2); local_fonts(ctx)
     pg = ctx.new_page(); errors = []; pg.on('pageerror', lambda e: errors.append(str(e)))
 
-    pg.goto(URL + '#learn'); pg.wait_for_timeout(900); settle(pg)
+    # Course: unit 1 passed, unit 2 under way
+    pg.goto(URL + '#course'); pg.wait_for_timeout(900)
+    pg.evaluate("""(() => { const now = Date.now(), W = UNIT['w-italian'], B = UNIT['b-slav'];
+      Prog.d.course = {u: {'w-italian': {idea: now, pass: now, cp: 6, spar: 3, sparGames: 4}, 'b-slav': {idea: now, spar: 1, sparGames: 1}}, seen: {}};
+      W.lessons.concat(B.lessons.slice(0, 2)).forEach(l => Prog.d.course.seen[l] = now);
+      W.lines.forEach(id => Prog.d.lines[id] = {box: 2, seen: 2, clean: 2, last: now, due: now + 2 * DAY});
+      render(); })()"""); pg.wait_for_timeout(400); settle(pg)
+    save(pg.screenshot(), 'course.png')
+    pg.evaluate("localStorage.clear()"); pg.goto(URL + '#learn'); pg.reload(); pg.wait_for_timeout(900); settle(pg)
     save(pg.screenshot(), 'learn-white.png')
     pg.click('.sidesw [data-side="b"]'); pg.wait_for_timeout(700); settle(pg)
     save(pg.screenshot(), 'learn-black.png')
@@ -122,7 +130,7 @@ with sync_playwright() as p:
 
     # Three phones: Learn (light), a lesson (dark), Your games (light)
     phones = []
-    for scheme, hash_ in [('light', '#b.learn'), ('dark', '#b.line.bq-ortho'), ('light', '#b.games')]:
+    for scheme, hash_ in [('light', '#b.learn'), ('dark', '#b.line.bsl-slow'), ('light', '#b.games')]:
         c = b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=2, color_scheme=scheme, is_mobile=True, has_touch=True)
         local_fonts(c); q = c.new_page(); q.goto(URL + hash_); q.wait_for_timeout(900); settle(q)
         if '.line.' in hash_:
