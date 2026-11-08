@@ -1,6 +1,6 @@
 """Notes for the Black book (labels + plain-English text). f7 and f2 are the only squares ever named.
 Paths are full SAN paths from the start position; every path must exist in the repertoire tree."""
-from bcontent import n, J, E, KN, IT, GP, RL, SC, SN, FK, VI, QH, D, QG, QC, LD, LC
+from bcontent import n, J, E, KN, IT, GP, RL, SC, SN, FK, VI, QH
 
 # ------------------------------------------------------------------ first moves
 n('e4', 'E-pawn two squares', 'White\'s most common first move: six games in ten.')
@@ -8,7 +8,6 @@ n(E, 'E-pawn two squares', 'Meet it head on. Your knight and bishop come out nex
 n('e4 e5 Nf3', 'Knight hits your e-pawn')
 n(KN, 'Knight guards it', 'Your knight defends the pawn and heads for the center.', ['key'])
 n('d4', 'D-pawn two squares', 'About a third of your games with Black start this way.')
-n(D, 'Knight out', 'Your answer to the d-pawn: knight first, then the pawns.', ['key'])
 
 # ================================================================== ITALIAN
 n(J(KN, 'Bc4'), 'Bishop aims at f7', 'The Italian. White\'s most common third move.', arrows=['c4f7r'])
@@ -241,38 +240,7 @@ n(J(IT, 'Bxf7+ Kxf7 Ng5+ Qxg5'), 'Queen takes the knight', 'Nothing guards it. T
 n(J(KN, 'Bb5'), 'Bishop hits your knight', 'The Spanish.')
 n(RL, 'Knight hits the e-pawn', 'The Berlin. Go after White\'s e-pawn at once.', ['key'], arrows=['f6e4g'])
 # --- br-oo
-n(J(RL, 'O-O'), 'White castles', 'White leaves the e-pawn and castles.')
-n(J(RL, 'O-O Nxe4'), 'Knight takes the pawn', 'A free pawn for now. White will try to win it back.', ['key'])
-n(J(RL, 'O-O Nxe4 Re1'), 'Rook hits your knight')
-n(J(RL, 'O-O Nxe4 Re1 Nd6'), 'Knight steps back', 'It hits White\'s bishop.', ['key'])
-n(J(RL, 'O-O Nxe4 Re1 Nd6 Bxc6'), 'Bishop takes your knight')
-n(J(RL, 'O-O Nxe4 Re1 Nd6 Bxc6 dxc6'), 'Take toward the center', 'The d-pawn recapture opens your queen and bishop.', ['key'])
-n(J(RL, 'O-O Nxe4 Re1 Nd6 Bxc6 dxc6 Nxe5'), 'Knight wins the pawn back')
-n(J(RL, 'O-O Nxe4 Re1 Nd6 Bxc6 dxc6 Nxe5 Be7'), 'Bishop blocks the file', 'Castle next. Equal, and you have the two bishops. Against Mortarach the opening went like this and you were fine.', ['game'])
-n(J(RL, 'O-O Nxe4 Re1 Nd6 Nxe5'), 'Knight takes first')
-n(J(RL, 'O-O Nxe4 Re1 Nd6 Nxe5 Be7'), 'Bishop blocks the file', 'Castle next.', ['key'])
-n(J(RL, 'O-O Nxe4 Re1 Nd6 Nxe5 Be7 Nxc6 dxc6'), 'Take toward the center', 'Equal; your bishops are free.')
-n(J(RL, 'O-O Nxe4 Re1 Nd6 Bxc6 dxc6 Rxe5+'), 'Rook takes with check')
-n(J(RL, 'O-O Nxe4 Re1 Nd6 Bxc6 dxc6 Rxe5+ Be7'), 'Bishop blocks', 'Castle next.')
-n(J(RL, 'O-O Nxe4 Bxc6'), 'Bishop takes at once')
-n(J(RL, 'O-O Nxe4 Bxc6 dxc6'), 'Take toward the center', ['key'])
-n(J(RL, 'O-O Nxe4 Bxc6 dxc6 Nxe5 Nd6'), 'Knight steps back', 'Equal; your bishops are free.')
-n(J(RL, 'O-O Nxe4 Bxc6 dxc6 d3'), 'Pawn hits your knight')
-n(J(RL, 'O-O Nxe4 Bxc6 dxc6 d3 Nd6'), 'Knight steps back')
-n(J(RL, 'O-O Nxe4 d3'), 'Pawn hits your knight')
-n(J(RL, 'O-O Nxe4 d3 Nd6'), 'Knight steps back', 'It hits the bishop.', ['key'])
-n(J(RL, 'O-O Nxe4 d4'), 'Center push')
-n(J(RL, 'O-O Nxe4 d4 Nd6'), 'Knight steps back', 'It hits the bishop.', ['key'])
-n(J(RL, 'O-O Nxe4 d4 Nd6 Bxc6 dxc6'), 'Take toward the center', ['key'])
-n(J(RL, 'O-O Nxe4 d4 Nd6 Bxc6 dxc6 dxe5 Nf5'), 'Knight steps forward', 'Out of the pawn\'s way, and it offers the queen trade.')
-n(J(RL, 'O-O Nxe4 d4 Nd6 Bxc6 dxc6 dxe5 Nf5 Qxd8+ Kxd8'), 'King takes back', 'The Berlin endgame: without queens your king is safe in the middle, and you have the two bishops.', ['key'])
-n(J(RL, 'O-O Nxe4 d4 Nd6 dxe5'), 'Pawn takes, leaving the bishop')
-n(J(RL, 'O-O Nxe4 d4 Nd6 dxe5 Nxb5'), 'Knight takes the bishop', 'White forgot the bishop. A piece for a pawn.', ['key'])
-n(J(RL, 'O-O Nxe4 Qe2'), 'Queen hits your knight')
-n(J(RL, 'O-O Nxe4 Qe2 Nd6'), 'Knight steps back', 'It hits the bishop.', ['key'])
-n(J(RL, 'O-O Nxe4 Qe2 Nd6 Nxe5 Nd4'), 'Knight hits the queen', 'Your other knight jumps forward with a threat.', ['key'])
-n(J(RL, 'O-O Nxe4 Qe2 Nd6 Bxc6 dxc6'), 'Take toward the center', ['key'])
-n(J(RL, 'O-O Nxe4 Qe2 Nd6 Bxc6 dxc6 Qxe5+ Qe7'), 'Queen blocks', 'Offer the queen trade. Equal.')
+n(J(RL, 'O-O'), 'White castles', 'White leaves the e-pawn guarded only by tactics and castles.')
 
 # --- br-d3
 n(J(RL, 'd3'), 'Pawn guards the e-pawn')
@@ -296,29 +264,6 @@ n(J(RL, 'd3 Bc5 c3 O-O'), 'Castle')
 
 # --- br-nc3
 n(J(RL, 'Nc3'), 'Knight out', 'The Four Knights version of the Spanish.')
-n(J(RL, 'Nc3 Bb4'), 'Copy it', 'Your bishop mirrors White\'s.', ['key'])
-n(J(RL, 'Nc3 Bb4 O-O O-O'), 'Castle')
-n(J(RL, 'Nc3 Bb4 O-O O-O d3 d6'), 'Small d-pawn move', 'Equal and symmetrical.')
-n(J(RL, 'Nc3 Bb4 d3 d6'), 'Small d-pawn move')
-n(J(RL, 'Nc3 Bb4 d3 d6 Bd2'), 'Bishop breaks the pin')
-n(J(RL, 'Nc3 Bb4 d3 d6 Bg5'), 'Bishop pins your knight')
-n(J(RL, 'Nc3 Bb4 d3 d6 Bg5 h6'), 'Ask the bishop', ['key'])
-n(J(RL, 'Nc3 Bb4 Bxc6'), 'Bishop takes your knight')
-n(J(RL, 'Nc3 Bb4 Bxc6 dxc6'), 'Take toward the center', ['key'])
-n(J(RL, 'Nc3 Bb4 Bxc6 dxc6 d3 Nd7'), 'Knight steps back to guard')
-n(J(RL, 'Nc3 Bb4 Bxc6 dxc6 Nxe5'), 'Knight grabs the pawn')
-n(J(RL, 'Nc3 Bb4 Bxc6 dxc6 Nxe5 Qe7'), 'Queen hits the knight', 'Next your bishop can take the knight that guards the e-pawn. You win the pawn back.', ['key'])
-n(J(RL, 'Nc3 Bb4 a3'), 'Pawn hits your bishop')
-n(J(RL, 'Nc3 Bb4 a3 Bxc3'), 'Take the knight', 'Trade rather than step back.', ['key'])
-n(J(RL, 'Nc3 Bb4 a3 Bxc3 dxc3 d6'), 'Small d-pawn move', 'Your e-pawn is safe. Equal.')
-n(J(RL, 'Nc3 Bb4 a3 Bxc3 bxc3 O-O'), 'Castle')
-n(J(RL, 'Nc3 Bb4 O-O O-O a3'), 'Pawn hits your bishop')
-n(J(RL, 'Nc3 Bb4 O-O O-O a3 Bxc3'), 'Take the knight', ['key'])
-n(J(RL, 'Nc3 Bb4 O-O O-O a3 Bxc3 dxc3 Nxe4'), 'Knight takes the e-pawn', 'With the knight gone, nothing guards it.', ['key'])
-n(J(RL, 'Nc3 Bb4 Nd5'), 'Knight jumps into the middle', 'It hits your bishop and your knight.')
-n(J(RL, 'Nc3 Bb4 Nd5 Nxd5'), 'Knight takes it', ['key'])
-n(J(RL, 'Nc3 Bb4 Nd5 Nxd5 exd5'), 'Pawn takes back', 'Now it hits your other knight.')
-n(J(RL, 'Nc3 Bb4 Nd5 Nxd5 exd5 e4'), 'E-pawn hits the knight', 'Counter-attack: White\'s knight is attacked too.', ['key'])
 
 # --- br-bxc6
 n(J(RL, 'Bxc6'), 'Bishop takes your knight', 'The most common move at your level here.')

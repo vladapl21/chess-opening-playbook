@@ -16,8 +16,8 @@ def chapter_of(sans):
         if w2 in ('Qh5', 'Qf3', 'f4'): return 'attacks'
         return 'vienna'
     if s[0] == 'd4':
-        if s[2] == 'c4': return 'qgd'
-        if s[2] == 'Bf4' or (s[2] == 'Nf3' and s[4] == 'Bf4'): return 'london'
+        if s[2] == 'c4': return 'slav'
+        if s[2] == 'Bf4' or (s[2] in ('Nf3', 'Nc3') and s[4] == 'Bf4'): return 'london'
         return 'd4x'
     return 'other'
 if __name__ == '__main__':

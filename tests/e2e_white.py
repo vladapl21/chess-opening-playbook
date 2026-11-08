@@ -58,7 +58,7 @@ if __name__ == '__main__':
         pg = ctx.new_page()
         pg.on('pageerror', lambda e: errors.append(f'pageerror: {e}'))
         pg.on('console', lambda m: errors.append(f'console {m.type}: {m.text}') if m.type == 'error' else None)
-        pg.goto(URL); pg.wait_for_timeout(1200)
+        pg.goto(URL + '#learn'); pg.wait_for_timeout(1200)
         pg.screenshot(path=out + 'v2_learn_italian.png')
         for ch in ['e5x', 'caro', 'sic', 'scandi', 'pirc', 'french', 'rare']:
             pg.click(f'.rtile[data-ch="{ch}"]'); pg.wait_for_timeout(350)
@@ -124,7 +124,7 @@ if __name__ == '__main__':
         # phone
         ctx = b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=2, is_mobile=True, has_touch=True)
         pg = ctx.new_page(); pg.on('pageerror', lambda e: errors.append(f'pageerror(m): {e}'))
-        pg.goto(URL); pg.wait_for_timeout(1200)
+        pg.goto(URL + '#learn'); pg.wait_for_timeout(1200)
         print('m learn scrollWidth', pg.evaluate('document.documentElement.scrollWidth'))
         pg.screenshot(path=out + 'v2_m_learn.png')
         pg.evaluate("document.querySelector('.rtile[data-ch=\"sic\"]').click()"); pg.wait_for_timeout(500)

@@ -9,6 +9,7 @@ from pieces import piece_svg_inner
 syms = ''.join(f'<symbol id="p-{c}{k}" viewBox="0 0 45 45">{piece_svg_inner(c, k)}</symbol>' for c in 'wb' for k in 'kqrbnp')
 W = json.load(open(paths.BUILD / 'data_white.json'))
 B = json.load(open(paths.BUILD / 'data_black.json'))
+C = json.load(open(paths.BUILD / 'data_course.json'))
 # White book extras (the White data was built before the Black book existed)
 W['side'] = 'w'; W['oddsRoot'] = W['e4']
 first_puz = lambda gid: next(k for k, p in enumerate(W['puzzles']) if p['game'] == gid)
@@ -25,12 +26,12 @@ assert not ({p['id'] for p in W['puzzles']} & {p['id'] for p in B['puzzles']})
 
 dump = lambda d: json.dumps(d, separators=(',', ':')).replace('</', '<\\/')
 tpl = (paths.APP / 'template.html').read_text()
-body = tpl.replace('<!--__PIECES__-->', syms).replace('/*__DATA_W__*/', dump(W)).replace('/*__DATA_B__*/', dump(B))
+body = tpl.replace('<!--__PIECES__-->', syms).replace('/*__DATA_W__*/', dump(W)).replace('/*__DATA_B__*/', dump(B)).replace('/*__DATA_C__*/', dump(C))
 assert '/*__DATA' not in body
 (paths.BUILD / 'playbook.html').write_text(body)
 head = ('<!doctype html><html lang="en"><head><meta charset="utf-8">'
         '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
-        '<meta name="description" content="A notation-free chess opening trainer built from 149 real games: White and Black repertoires, drills, a sparring sandbox and engine-checked game reviews.">'
+        '<meta name="description" content="A notation-free chess opening course built from 200 real games: one path through White and Black repertoires, drills, a sparring sandbox, threat-spotting from your own blunders and engine-checked game reviews.">'
         '<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}'
         'body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body>')
 (paths.DOCS / 'index.html').write_text(head + body + '</body></html>')

@@ -29,7 +29,7 @@ with sync_playwright() as p:
     b = launch(p)
     ctx = b.new_context(viewport={'width': 1280, 'height': 900})
     pg = ctx.new_page(); hook(pg)
-    pg.goto(URL); pg.wait_for_timeout(1200)
+    pg.goto(URL + '#learn'); pg.wait_for_timeout(1200)
     assert pg.evaluate('SIDE') == 'w'
     # ---- switch to Black
     pg.click('.sidesw [data-side="b"]'); pg.wait_for_timeout(600)
@@ -41,7 +41,7 @@ with sync_playwright() as p:
     yk = pg.evaluate("""(() => { const s = document.querySelector('.hero-board svg'); const e8 = s.querySelector('use[data-sq="e8"]'), e1 = s.querySelector('use[data-sq="e1"]'); return [e8 && +e8.getAttribute('y'), e1 && +e1.getAttribute('y')]; })()""")
     print('hero e8/e1 y:', yk)
     pg.screenshot(path=out + 'b_learn_italian.png')
-    for ch in ['ruy', 'scotch', 'vienna', 'attacks', 'qgd', 'london', 'd4x', 'other', 'italian']:
+    for ch in ['ruy', 'scotch', 'vienna', 'attacks', 'slav', 'london', 'd4x', 'other', 'italian']:
         pg.click(f'.rtile[data-ch="{ch}"]'); pg.wait_for_timeout(300)
         assert pg.evaluate('S.chapter') == ch
         stats = pg.evaluate("[...document.querySelectorAll('.hero .stat')].map(s => s.innerText.replace(/\\n/g, ' '))")
@@ -62,7 +62,7 @@ with sync_playwright() as p:
     # ---- drill: White's moves play themselves, you play Black's
     r = drill_line(pg, 'bi-main'); print('drill bi-main:', r); assert r['state'] == 'done' and r['mistakes'] == 0
     r = drill_line(pg, 'br-oo', slip=True); print('drill br-oo with a slip:', r); assert r['state'] == 'done' and r['mistakes'] == 1
-    r = drill_line(pg, 'bq-ortho'); print('drill bq-ortho:', r); assert r['state'] == 'done'
+    r = drill_line(pg, 'bsl-slow'); print('drill bsl-slow:', r); assert r['state'] == 'done'
     # castling line
     r = drill_line(pg, 'bi-ng5'); print('drill bi-ng5 (castles):', r); assert r['state'] == 'done' and r['mistakes'] == 0
     pg.screenshot(path=out + 'b_drill_done.png')
@@ -86,7 +86,7 @@ with sync_playwright() as p:
     res = play_sandbox(pg, 0.25, 'b all/real'); assert res['state'] == 'done'
     roots = pg.evaluate("S.drill.choices.filter(c => c.at === 0).length"); print('choices at the start position:', roots); assert roots == 1
     pg.screenshot(path=out + 'b_sb_report.png', full_page=True)
-    for scope, odds in [('london', 'real'), ('qgd', 'even'), ('scotch', 'weak'), ('attacks', 'real'), ('other', 'even'), ('vienna', 'real'), ('d4x', 'even'), ('ruy', 'real')]:
+    for scope, odds in [('london', 'real'), ('slav', 'even'), ('scotch', 'weak'), ('attacks', 'real'), ('other', 'even'), ('vienna', 'real'), ('d4x', 'even'), ('ruy', 'real')]:
         pg.click(f'[data-sbf="scope:{scope}"]'); pg.click(f'[data-sbf="odds:{odds}"]'); pg.wait_for_timeout(100)
         pg.click('#sbAgain'); pg.wait_for_timeout(200)
         r = play_sandbox(pg, 0.1, f'b {scope}/{odds}'); assert r['state'] == 'done'

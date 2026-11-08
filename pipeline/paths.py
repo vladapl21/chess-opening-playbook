@@ -11,6 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PIPE = ROOT / 'pipeline'
 APP = ROOT / 'app'
+CONTENT = ROOT / 'content'
 CONTENT_WHITE = ROOT / 'content' / 'white'
 CONTENT_BLACK = ROOT / 'content' / 'black'
 DATA = ROOT / 'data'
@@ -19,7 +20,7 @@ CACHE = DATA / 'cache'
 BUILD = DATA / 'build'
 DOCS = ROOT / 'docs'
 
-for p in (PIPE, CONTENT_WHITE, CONTENT_BLACK, APP):
+for p in (PIPE, CONTENT, CONTENT_WHITE, CONTENT_BLACK, APP):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 

@@ -2,13 +2,13 @@
 
 # The Opening Playbook
 
-**A chess opening trainer built from my own games, with no notation anywhere.**
+**A chess opening course built from my own games, with no notation anywhere.**
 
-A White repertoire, a Black repertoire, spaced-repetition drills, a sparring sandbox whose opponent plays like real club players, and engine-checked reviews of the games that got away. It all ships as a single self-contained HTML page.
+One path through a White and a Black repertoire, ordered by what my games say matters most. Each unit has the idea, the lines, spaced-repetition drills, practice games against an opponent who plays like real club players, and a checkpoint that opens the next unit. Threat-spotting sets come straight from my own blunders. It all ships as a single self-contained HTML page.
 
 [**Open the app →**](https://vladapl21.github.io/chess-opening-playbook/)
 
-[Tour](#a-tour) · [The repertoires](#the-repertoires) · [How it was made](#how-it-was-made) · [Under the hood](#under-the-hood) · [Build it yourself](#build-it-yourself)
+[Tour](#a-tour) · [The course](#course-one-path-through-both-books) · [The repertoires](#the-repertoires) · [How it was made](#how-it-was-made) · [Under the hood](#under-the-hood) · [Build it yourself](#build-it-yourself)
 
 ![Stockfish 17.1](https://img.shields.io/badge/checked%20with-Stockfish%2017.1-2f6b52)
 ![Maia](https://img.shields.io/badge/opponent%20odds-Maia%201300%2F1500-2f6b52)
@@ -21,12 +21,13 @@ A White repertoire, a Black repertoire, spaced-repetition drills, a sparring san
 
 ## Why it exists
 
-Most opening courses are written for everyone. They give long lines in algebraic notation, chosen because they are theoretically best and taught in an order that has nothing to do with what you will actually face. This project goes the other way. It starts from **149 of my blitz games** on two chess.com accounts, played between July and October 2026, and builds the openings around them.
+Most opening courses are written for everyone. They give long lines in algebraic notation, chosen because they are theoretically best and taught in an order that has nothing to do with what you will actually face. This project goes the other way. It starts from **my own blitz games** on two chess.com accounts and builds the openings around them: 149 games from July to October 2026 shaped the two books, and all 200 up to November 2 decide the order of the course.
 
 - **The chapters come from the games.** Each book is split by what the opponent actually played, ordered by how often it happened, with the win–loss record next to it.
 - **The opponent plays like a real opponent.** Every opponent move in the book carries the odds that a club player at this level would choose it. The first move's odds come from the games themselves. After that they come from [Maia](https://maiachess.com), a neural network trained to predict human moves at a given rating. The drills, the sandbox and every "how often" figure use these odds, so preparation goes where the games actually go.
 - **Words instead of notation.** Moves are described the way you would explain them over a board: *Bishop aims at f7*, *Knight takes back*, *Queen breaks the pin*. Positions that matter get a short note explaining why.
 - **Checked by an engine, built for a human.** Every move in both books was checked with Stockfish 17.1. Lines were chosen to be easy to remember, such as one setup against a whole family of move orders, rather than to squeeze out the last hundredth of a pawn.
+- **One path, unlocked as you go.** The course mixes White and Black units by how often each system comes up and how I score in it. Passing a unit's checkpoint opens the next one, so there is never everything at once.
 - **The games feed back in.** Missed tactics become puzzles. Habits that cost games become "insights" with a button that drills the real positions. Notes point back to the games they came from: *"Against ZhoskaStreezh in July you pushed the d-pawn first and the e-pawn took your knight. Knight first, every time."*
 
 ## At a glance
@@ -36,16 +37,34 @@ Most opening courses are written for everyone. They give long lines in algebraic
 | Games it is built from            | 76, all opened with 1.e4  | 73: 44 against 1.e4, 24 against 1.d4 |
 | Record in those games             | 48–28                     | 37–35–1                          |
 | Chapters (openings)               | 8                         | 9                                |
-| Lessons                           | 79                        | 63                               |
-| Lines you can drill               | 274                       | 418                              |
-| Positions in the tree             | 2,233                     | 2,081                            |
-| Positions with a written note     | 826                       | 602                              |
+| Lessons                           | 79                        | 62                               |
+| Lines you can drill               | 274                       | 448                              |
+| Positions in the tree             | 2,233                     | 2,439                            |
+| Positions with a written note     | 826                       | 661                              |
 | Game reviews                      | 10                        | 11                               |
 | Missed-shot puzzles               | 12                        | 13                               |
 | Patterns across games             | 4                         | 4                                |
-| Cheat-sheet cards                 | 47                        | 48                               |
+| Cheat-sheet cards                 | 47                        | 61                               |
+
+The course on top of both books has **17 units** (13 open, 4 being built): 45 core lessons, 73 optional ones, 72 checkpoint positions and 26 threat-spotting positions from my own games.
 
 ## A tour
+
+### Course: one path through both books
+
+<img src="docs/img/course.png" alt="The Course page: the current unit with its idea board and steps, then the path of seventeen units with White, Black and skill units, locked ones greyed out" width="100%">
+
+The course is the front page. Units alternate between White, Black and skills in the order that matters for my games: the Italian first (my main weapon, and only 5 wins in the last 12), then the Slav setup against the d-pawn (a third of my Black games), then threat-spotting. Every lesson unit has five steps:
+
+1. **The idea.** Three or four boards with arrows and one sentence each.
+2. **Learn the lines.** The core lessons, studied to their last move.
+3. **Drill.** Each main line played once from memory without a slip.
+4. **Practice games.** Three clean sandbox games where the opponent only plays this unit's lines and picks the ones I know least.
+5. **Checkpoint.** Six positions from the unit; five right on the first try opens the next unit.
+
+Optional "go deeper" lessons sit under each unit, finished units come back through the drill schedule, and everything stays in Learn for looking ahead.
+
+**Spot the threat** is built from positions in my own games where my next move lost material. Play a losing move and the opponent's real answer is played out on the board; find a safe one and you see the danger in red next to what happened in the game.
 
 ### Learn: two books, one switch
 
@@ -97,7 +116,7 @@ The cheat sheet has one card per decision. The opponent's move is highlighted an
 
 ### On a phone, in light or dark
 
-<img src="docs/img/phones.png" alt="Three phone screens: the Black book's Learn page in light mode, a Queen's Gambit lesson in dark mode, and the patterns from Your games" width="100%">
+<img src="docs/img/phones.png" alt="Three phone screens: the Black book's Learn page in light mode, a Slav lesson in dark mode, and the patterns from Your games" width="100%">
 
 The layout collapses to one column on phones and follows the system's light or dark setting. The board, menus and drills all work by touch.
 
@@ -116,19 +135,19 @@ The layout collapses to one column on phones and follows the system's light or d
 | **French** | 1…e6 | 6 | 4–2 | Advance: lock the center and support the pawn chain from behind. |
 | **Rare first moves** | 1…Nc6, 1…Nf6, 1…b6 | 4 | 3–1 | Take the whole center, develop and castle, with the one trick to know for each. |
 
-### Black: 1…e5 against the e-pawn, the Queen's Gambit Declined against the d-pawn
+### Black: 1…e5 against the e-pawn, one Slav setup against the d-pawn
 
 | Chapter | When White plays | Games | Record | The plan in one line |
 | --- | --- | ---: | :---: | --- |
 | **The Italian** | 1.e4 e5 2.Nf3 Nc6 3.Bc4 | 14 | 9–5 | Giuoco Piano. Against c3 and d4: take, check, trade bishops, strike with …d5. Against the slow Italian, one setup every time, castling before the knight can jump at f7. |
-| **Ruy Lopez** | 3.Bb5 | 7 | 5–2 | Berlin: the knight hits the e-pawn at once. Against the exchange, take back toward the center. |
-| **Scotch & center gambits** | 2.d4 or 3.d4 | 9 | 3–6 | Knight first, then the pawns. Against the gambits (Scotch Gambit, Danish, Center Game), develop and hit back with …d5. |
-| **Four Knights & Vienna** | 2.Nc3 or 3.Nc3 | 8 | 3–5 | Copy the bishop or slide into the Italian setup. Against the Vienna bishop, the knight jumps to the edge to trade it off. |
+| **Ruy Lopez** | 3.Bb5 | 7 | 5–2 | The knight hits the e-pawn, then the bishop goes to its Italian diagonal and you castle. Against the exchange, take back toward the center. |
+| **Scotch & center gambits** | 2.d4 or 3.d4 | 9 | 3–6 | Knight first, then the pawns. Against the gambits (Scotch Gambit, Danish, Center Game), develop and hit back with …d5. Being rebuilt around the …Bc5 setup. |
+| **Four Knights & Vienna** | 2.Nc3 or 3.Nc3 | 8 | 3–5 | Copy the bishop or slide into the Italian setup. Against the Vienna bishop, the knight jumps to the edge to trade it off. Being rebuilt around the …Bc5 setup. |
 | **Early attacks** | 2.Qh5, 2.Qf3, 2.f4, 2.Bc4 | 6 | 3–3 | Block f7, tuck the bishop beside the king, then castle or jump into the center. Take the King's Gambit pawn and strike with …d5. |
-| **Queen's Gambit** | 1.d4 d5 2.c4 | 8 | 5–3 | Declined. When the bishop pins, play …h6 and …Ne4 to trade two pairs. In the Exchange, take back with the e-pawn. |
-| **London System** | 1.d4 d5 2.Bf4 | 4 | 1–3 | …d5, …c5, knight, …e6, then offer the dark bishop for White's. |
-| **Other d-pawn systems** | Colle, Trompowsky, Torre, Jobava | 12 | 6–5–1 | The same setup every time: …d5, …e6, …c5. If the knight is taken early, recapture toward the center. |
-| **Other first moves** | 1.c4, 1.Nf3, 1.g3, 1.e3 | 4 | 2–2 | …e5 against the flank openings, and the Queen's Gambit setup against 1.Nf3. |
+| **Queen's Gambit** | 1.d4 d5 2.c4 | 8 | 5–3 | The Slav: …c6, the light bishop out before …e6, then trade it for White's. Against the pin, the knight jumps to the middle and a queen check on the edge wins the bishop. |
+| **London System** | 1.d4 d5 2.Bf4 | 5 | 2–3 | Copy the bishop, …e6, trade the light bishops, then offer the dark ones. |
+| **Other d-pawn systems** | Colle, Torre, Veresov, Jobava, gambits | 11 | 5–5–1 | The same setup: bishop out before White's bishop, …e6, then …c5 against the Colle. When the knight is taken, take back with the e-pawn. |
+| **Other first moves** | 1.c4, 1.Nf3, 1.g3, 1.e3 | 4 | 2–2 | …e5 against the c-pawn, and the Slav setup against 1.Nf3. |
 
 72 of the 73 Black games fall into a chapter. The remaining one, an experiment with 1…b6, sits outside the book.
 
@@ -147,6 +166,9 @@ flowchart LR
     R --> B
     B --> J["data_white.json<br/>data_black.json"]
     J --> A["assemble.py<br/>+ app/template.html"]
+    K["content/course.py<br/>+ threat positions"] --> CB["build_course.py"]
+    J --> CB
+    CB --> A
     A --> P["docs/index.html<br/>one page, both books"]
 ```
 
@@ -156,15 +178,16 @@ flowchart LR
 4. **Words, not notation.** Hand-written labels and notes live in [`content/`](content), keyed by the move sequence that reaches each position: `n(path, label, text, tags, arrows, circles)`. Moves without a hand-written label get one from [`label2.py`](pipeline/label2.py), which describes what the move does in context: captures and recaptures, checks, pins, attacks on a bigger or loose piece, castling, pawn pushes. [`lint_notes.py`](pipeline/lint_notes.py) checks claims in the notes, such as pins or "a piece up", against the real positions.
 5. **Game reviews.** [`scan_games.py`](pipeline/scan_games.py) evaluates every move of every game. [`find_shots.py`](pipeline/find_shots.py) keeps positions where the move played lost at least 1.8 pawns and a deeper multi-PV search shows one clearly best move, at least 1.5 pawns ahead of the next. The cleanest of these became the puzzles. The game stories and the cross-game patterns were written from the same scans.
 6. **Build.** [`build_white.py`](pipeline/build_white.py) and [`build_black.py`](pipeline/build_black.py) merge all lines into one tree per book ([`tree.py`](pipeline/tree.py)). They attach labels, notes, arrows, odds and evaluations, precompute the legal moves wherever you are to move, and write `data/build/data_*.json`. [`assemble.py`](pipeline/assemble.py) injects both books and the piece set into [`app/template.html`](app/template.html) and writes [`docs/index.html`](docs/index.html).
-7. **Caches.** Every Stockfish and Maia result is cached in [`data/cache`](data/cache) and committed. That makes the build reproducible byte for byte with nothing but python-chess, in a few seconds and without any engine.
+7. **The course.** [`content/course.py`](content/course.py) lists the units in order: required and optional lessons, the idea boards as move paths with arrows, and the checkpoint positions. [`build_course.py`](pipeline/build_course.py) resolves every path against its book (a path that leaves the repertoire fails the build) and writes `data/build/data_course.json`. The threat positions in [`data/course_threats.json`](data/course_threats.json) come from a Stockfish scan of all 200 games: moves that lost at least 20 points of win chance to a tactic, the moves that would have held, and the engine's answer to every other legal move.
+8. **Caches.** Every Stockfish and Maia result is cached in [`data/cache`](data/cache) and committed. That makes the build reproducible byte for byte with nothing but python-chess, in a few seconds and without any engine.
 
 ## Under the hood
 
-- **One file.** The app is one HTML file of about 1.4 MB with both books inline: plain HTML, CSS and JavaScript, with no framework, bundler or third-party script. The only network requests are for three Google Fonts (Bodoni Moda, Instrument Sans, JetBrains Mono). Offline, it falls back to system fonts.
+- **One file.** The app is one HTML file of about 1.7 MB with both books inline: plain HTML, CSS and JavaScript, with no framework, bundler or third-party script. The only network requests are for three Google Fonts (Bodoni Moda, Instrument Sans, JetBrains Mono). Offline, it falls back to system fonts.
 - **Board.** The board is SVG, drawn with an original piece set ([`app/pieces.py`](app/pieces.py)). It supports drag and tap input, legal-move hints, arrows, circles and a flipped view for Black. Legal moves are precomputed for every position where you move, so the page needs no chess library.
 - **Two books, one engine.** `loadBook()` swaps every index (nodes, lines, lessons, chapters, whose move is whose, board orientation) when you flip the switch. Line ids never collide between the books (the build checks this), so one progress store holds both.
 - **Progress.** Progress is saved in `localStorage`. When the page runs as a Claude artifact, it also syncs to the artifact's per-user storage, so it follows you between devices.
-- **Deep links.** `#learn`, `#sandbox`, `#drill`, `#games`, `#cheat`, `#learn.<chapter>` and `#line.<line-id>` open the matching view. Add a `b.` prefix for the Black book, for example [`#b.learn.london`](https://vladapl21.github.io/chess-opening-playbook/#b.learn.london) or [`#b.line.bs-mieses`](https://vladapl21.github.io/chess-opening-playbook/#b.line.bs-mieses).
+- **Deep links.** `#course` and `#unit.<unit-id>` open the course and a unit (a unit brings its own book). `#learn`, `#sandbox`, `#drill`, `#games`, `#cheat`, `#learn.<chapter>` and `#line.<line-id>` open the matching view. Add a `b.` prefix for the Black book, for example [`#b.learn.london`](https://vladapl21.github.io/chess-opening-playbook/#b.learn.london) or [`#b.line.bs-mieses`](https://vladapl21.github.io/chess-opening-playbook/#b.line.bs-mieses).
 
 <details>
 <summary><b>Data model</b></summary>
@@ -226,13 +249,15 @@ app/
   template.html            the whole app: markup, styles and script for both books
   pieces.py                the original SVG piece set
 content/
+  course.py                the course: units, idea boards, checkpoint positions
   white/                   White book: lessons, labels and notes, chapter text, game reviews
   black/                   Black book: bcontent (lessons), bnotes + bnotes2 (labels, notes, arrows),
                            bmeta (chapters, game reviews, puzzles, cheat sheet, insights)
 pipeline/
   build_white.py           build the White book    -> data/build/data_white.json
   build_black.py           build the Black book    -> data/build/data_black.json
-  assemble.py              inject both into the template -> docs/index.html
+  build_course.py          build the course        -> data/build/data_course.json
+  assemble.py              inject the books and the course into the template -> docs/index.html
   tree.py, label2.py       move tree; context-aware plain-English labels
   maia.py, expand.py       human move odds (Maia, NumPy only) and the coverage walk
   human_odds.py, sf.py     command-line helpers: Maia odds and Stockfish top moves for any line
@@ -246,12 +271,13 @@ data/
   games/                   PGN exports of both accounts (July to October 2026)
   cache/                   Stockfish and Maia results, so builds need no engine
   black_*.json             Black games, per-move scans, candidate shots
-  build/                   data_white.json, data_black.json, playbook.html
+  course_threats.json      threat-spotting positions from all 200 games, with the engine's answers
+  build/                   data_white.json, data_black.json, data_course.json, playbook.html
 docs/
   index.html               the built app, served by GitHub Pages
   img/                     the images in this README
 tests/
-  e2e_white.py, e2e_black.py, e2e_sandbox_switch.py
+  e2e_white.py, e2e_black.py, e2e_sandbox_switch.py, e2e_course.py
                            end-to-end browser tests (Playwright)
   readme_shots.py          regenerates docs/img
 ```
@@ -270,6 +296,7 @@ make build                                     # or run the three scripts below
 ```bash
 python3 pipeline/build_white.py
 python3 pipeline/build_black.py
+python3 pipeline/build_course.py
 python3 pipeline/assemble.py
 ```
 
@@ -302,7 +329,7 @@ python3 -m playwright install chromium
 make test
 ```
 
-The tests drive the real page in Chromium. They visit every chapter in both books, step through lessons, and play drills by dragging and tapping (correct moves, slips, castling). They solve every puzzle and play sandbox games across every opening and odds setting, including a regression test for changing the opening mid-game. They also follow deep links, switch books back and forth with state kept, and check that the phone layout never scrolls sideways, in light and dark mode. Screenshots land in `tests/out/`. To regenerate the images in this README, run `make shots`.
+The tests drive the real page in Chromium. They visit every chapter in both books, step through lessons, and play drills by dragging and tapping (correct moves, slips, castling). They solve every puzzle and play sandbox games across every opening and odds setting, including a regression test for changing the opening mid-game. They also follow deep links, switch books back and forth with state kept, and check that the phone layout never scrolls sideways, in light and dark mode. The course test works through the first units the way a person would: the idea boards, a lesson, a drill line, a checkpoint with a deliberate miss, practice games against a unit's lines, and a threat set where wrong moves get played out and punished. Screenshots land in `tests/out/`. To regenerate the images in this README, run `make shots`.
 
 ## Credits
 
