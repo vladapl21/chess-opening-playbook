@@ -15,7 +15,7 @@
   --f-display:"Bodoni Moda","Bodoni 72","Didot",Georgia,serif;
   --f-body:"Instrument Sans","Segoe UI",system-ui,-apple-system,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
-  --r:14px; --pico-b:none;
+  --r:14px; --pico-b:none; --scrim:rgba(18,32,26,.45);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0D1411; --surface:#151F1A; --surface-2:#1C2822; --ink:#E4EDE8; --muted:#97ACA2; --line:#2A3832;
@@ -23,14 +23,14 @@
   --rosso:#F2685B; --rosso-soft:#3D1C18; --oro:#E2B54C; --oro-soft:#3A2F14; --blu:#86AEF2; --blu-soft:#1B2A45; --viola:#B9A2EC; --viola-soft:#2C2342;
   --sq-light:#CFD8CC; --sq-dark:#6F8D7B; --hl:rgba(240,201,64,.5); --sel:rgba(67,192,143,.42);
   --arr-g:#1FA155; --arr-r:#E8463D; --arr-b:#4F82E6; --arr-y:#F0B92A;
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35); --pico-b:drop-shadow(0 0 1px rgba(214,226,219,.95)) drop-shadow(0 0 .6px rgba(214,226,219,.95)); color-scheme:dark}}
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35); --pico-b:drop-shadow(0 0 1px rgba(214,226,219,.95)) drop-shadow(0 0 .6px rgba(214,226,219,.95)); --scrim:rgba(0,0,0,.62); color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0D1411; --surface:#151F1A; --surface-2:#1C2822; --ink:#E4EDE8; --muted:#97ACA2; --line:#2A3832;
   --accent:#43C08F; --accent-ink:#06231A; --accent-soft:#173A2D;
   --rosso:#F2685B; --rosso-soft:#3D1C18; --oro:#E2B54C; --oro-soft:#3A2F14; --blu:#86AEF2; --blu-soft:#1B2A45; --viola:#B9A2EC; --viola-soft:#2C2342;
   --sq-light:#CFD8CC; --sq-dark:#6F8D7B; --hl:rgba(240,201,64,.5); --sel:rgba(67,192,143,.42);
   --arr-g:#1FA155; --arr-r:#E8463D; --arr-b:#4F82E6; --arr-y:#F0B92A;
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35); --pico-b:drop-shadow(0 0 1px rgba(214,226,219,.95)) drop-shadow(0 0 .6px rgba(214,226,219,.95)); color-scheme:dark}
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35); --pico-b:drop-shadow(0 0 1px rgba(214,226,219,.95)) drop-shadow(0 0 .6px rgba(214,226,219,.95)); --scrim:rgba(0,0,0,.62); color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit}
@@ -431,6 +431,40 @@ button.ucard:hover{border-color:var(--accent);transform:translateY(-1px)}
 .ask{font-size:15.5px}
 .ask b{font-weight:650}
 
+/* accounts (site build): header button, sign-in sheet, toast */
+.acct{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:4px 14px 4px 4px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 14px var(--f-body);cursor:pointer}
+.acct.out{padding:6px 16px;background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.acct:hover{border-color:var(--accent)}
+.acct .av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:14px;position:relative}
+.acct .av::after{content:"";position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:50%;border:2px solid var(--surface);background:var(--muted)}
+.acct.ok .av::after{background:var(--accent)} .acct.sync .av::after{background:var(--oro)} .acct.err .av::after{background:var(--rosso)}
+.acct .acctx{font-size:13px;color:var(--muted);font-weight:600}
+.scrim{position:fixed;inset:0;z-index:50;background:var(--scrim);display:grid;place-items:center;padding:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.sheet{width:min(440px,100%);max-height:calc(100dvh - 32px);overflow:auto;background:var(--surface);color:var(--ink);border-radius:20px;box-shadow:var(--shadow);padding:22px 22px 20px;display:grid;gap:14px;position:relative}
+.sheet h2{font-family:var(--f-display);font-size:30px;font-weight:700;line-height:1.1;letter-spacing:-.01em;padding-right:36px}
+.sheet p{color:var(--muted);font-size:14.5px}
+.sheet .x{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;border:0;background:var(--surface-2);color:var(--ink);font-size:20px;line-height:1;cursor:pointer}
+.sheet form{display:grid;gap:12px}
+.field{display:grid;gap:6px;font-size:13.5px;font-weight:600}
+.field input{font:15px var(--f-body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px;width:100%;min-width:0}
+.field input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.field small{font-weight:500;color:var(--muted)}
+.sheet .btn.primary{width:100%;justify-content:center;min-height:46px;font-size:15px}
+.sheet .alt{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:space-between;font-size:13.5px}
+.formmsg{font-size:14px;border-radius:10px;padding:10px 12px;background:var(--accent-soft);color:var(--ink)}
+.formmsg.bad{background:var(--rosso-soft)}
+.syncline{display:flex;align-items:center;gap:8px;font-size:14px}
+.syncline i{width:10px;height:10px;border-radius:50%;background:var(--muted);flex:none}
+.syncline.ok i{background:var(--accent)} .syncline.sync i{background:var(--oro)} .syncline.err i{background:var(--rosso)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;max-width:calc(100% - 32px);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:var(--shadow)}
+.nudge{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 14px;border-radius:14px;background:var(--surface);border:1px solid var(--line);margin:0 0 22px}
+.nudge span{flex:1 1 260px;min-width:0;font-size:14.5px}
+@media (max-width:560px){
+  .toast{top:calc(12px + env(safe-area-inset-top,0px));bottom:auto}
+  .scrim{place-items:end center;padding-bottom:0}
+  .sheet{border-radius:20px 20px 0 0;width:100%;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))}
+}
+
 footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
 
 @media (max-width: 760px){
@@ -514,6 +548,7 @@ footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);fo
         <button data-side="w" aria-pressed="true"><i class="sw w" aria-hidden="true"></i>White<span class="badge" id="dueW" hidden>0</span></button>
         <button data-side="b" aria-pressed="false"><i class="sw b" aria-hidden="true"></i>Black<span class="badge" id="dueB" hidden>0</span></button>
       </div>
+      <button class="acct out" id="acctBtn" type="button" aria-haspopup="dialog" hidden>Sign in</button>
     </div>
     <nav class="tabs" role="tablist" aria-label="Sections">
       <button role="tab" data-view="course" aria-selected="true">Course</button>
@@ -527,6 +562,8 @@ footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);fo
   <main id="view" aria-live="polite"></main>
   <footer class="foot" id="foot"></footer>
 </div>
+<div class="scrim" id="acctSheet" hidden><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="acctTitle" id="acctPanel"></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <script>
 const DATA_W = /*__DATA_W__*/;
@@ -708,7 +745,7 @@ const Prog = {
     } catch(e){ this.ref = null; }
   },
   saveLocal(){ try { localStorage.setItem(PKEY, JSON.stringify(this.d)); } catch(e){} },
-  save(){ this.d.updated = Date.now(); this.saveLocal(); this.push(); },
+  save(){ this.d.updated = Date.now(); if (Cloud.user) this.d.owner = Cloud.user.id; this.saveLocal(); this.push(); Cloud.push(); },
   async push(){
     if (!this.ref) return;
     if (this.saving){ this.again = true; return; }
@@ -729,6 +766,185 @@ const Prog = {
   lessonLevel(lid){ const ls = LESSONS[lid].lines.filter(x => DRILLABLE.includes(x)); if (!ls.length) return 0;
     return Math.round(ls.reduce((a, x) => a + Math.min(5, (this.rec(x) || {}).box || 0), 0) / ls.length); },
   dueCount(side){ const now = Date.now(), ids = side ? BOOKS[side].drillable : DRILLABLE; return ids.filter(id => { const r = this.rec(id); return r && r.due <= now; }).length; }
+};
+
+/* ------------------------------------------------------------------ accounts (site build only) */
+// The GitHub Pages build fills SITE from app/site.json and loads supabase-js; the claude.ai build leaves it null.
+// Progress stays local-first: every save lands in this browser at once and in the account a moment later.
+const SITE = /*__SITE__*/null;
+const canon = o => JSON.stringify(o, (k, v) => v && typeof v === 'object' && !Array.isArray(v) ? Object.keys(v).sort().reduce((a, x) => (a[x] = v[x], a), {}) : v);
+const newer = (x, y) => !x ? y : !y ? x : (y.last || 0) > (x.last || 0) ? y : x;
+// two copies of the progress object -> one: newest record per line and puzzle, best of everything else
+function mergeProg(a, b){
+  const o = JSON.parse(JSON.stringify(a || {})), r = b || {};
+  o.lines = o.lines || {}; o.puz = o.puz || {};
+  for (const k in (r.lines || {})) o.lines[k] = newer(o.lines[k], r.lines[k]);
+  for (const k in (r.puz || {})) o.puz[k] = newer(o.puz[k], r.puz[k]);
+  if (r.sb){
+    const s = o.sb || (o.sb = {games: 0, clean: 0, slips: 0, seen: {}}); s.seen = s.seen || {};
+    for (const f of ['games', 'clean', 'slips']) s[f] = Math.max(s[f] || 0, r.sb[f] || 0);
+    for (const k in (r.sb.seen || {})) s.seen[k] = Math.max(s.seen[k] || 0, r.sb.seen[k] || 0);
+  }
+  if (r.course){
+    const c = o.course || (o.course = {u: {}, seen: {}}); c.u = c.u || {}; c.seen = c.seen || {};
+    for (const id in (r.course.u || {})){ const x = c.u[id] || (c.u[id] = {}), y = r.course.u[id]; for (const f in y) x[f] = Math.max(x[f] || 0, y[f] || 0); }
+    for (const k in (r.course.seen || {})) c.seen[k] = Math.max(c.seen[k] || 0, r.course.seen[k] || 0);
+  }
+  o.updated = Math.max(o.updated || 0, r.updated || 0);
+  return o;
+}
+const Cloud = {
+  sb: null, user: null, state: 'off', at: 0, err: '', timer: null, writing: false, again: false, pulling: false, notice: '', link: null,
+  on(){ return !!this.sb; },
+  init(){
+    if (!SITE || !SITE.supabaseUrl || !SITE.supabaseKey || !window.supabase || typeof window.supabase.createClient !== 'function') return;
+    try { this.sb = window.supabase.createClient(SITE.supabaseUrl, SITE.supabaseKey, {auth: {flowType: 'pkce', persistSession: true, autoRefreshToken: true, detectSessionInUrl: true}}); }
+    catch(e){ this.sb = null; return; }
+    this.state = 'out';
+    // arriving from an email link: ?code=… (sign-up or password reset) or ?error_description=…
+    const q = new URLSearchParams(location.search);
+    if (q.has('code') || q.has('error_description') || q.has('reset')) this.link = {reset: q.has('reset'), error: q.get('error_description')};
+    this.sb.auth.onAuthStateChange((ev, session) => setTimeout(() => this.onAuth(ev, session), 0));
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && this.user) this.pull(); });
+    window.addEventListener('online', () => { if (this.user) this.pull(); });
+  },
+  async onAuth(ev, session){
+    const u = session ? session.user : null, was = this.user ? this.user.id : null;
+    this.user = u;
+    if (this.link && (ev === 'INITIAL_SESSION' || ev === 'SIGNED_IN' || ev === 'PASSWORD_RECOVERY')){
+      const L = this.link; this.link = null;
+      try { history.replaceState(null, '', location.pathname + location.hash); } catch(e){}
+      if (L.error) Acct.open('signin', 'That link has expired or was already used. Sign in, or ask for a new one.', true);
+      else if (L.reset) { if (u) Acct.open('newpass'); else Acct.open('forgot', 'Open the reset link on the device where you asked for it, or send yourself a new one here.', true); }
+      else if (!u) Acct.open('signin', 'Your email is confirmed. Sign in with your password.');
+      else toast('Your email is confirmed and you\'re signed in.');
+    }
+    if (ev === 'PASSWORD_RECOVERY' && u) Acct.open('newpass');
+    if (!u){ this.state = 'out'; renderAcct(); return; }
+    if (u.id !== was) await this.pull();
+    renderAcct();
+  },
+  // fetch the account's copy and merge it in; progress made by someone else on this device is set aside, not mixed in
+  async pull(){
+    if (!this.user || this.pulling) return;
+    this.pulling = true; this.state = 'sync'; renderAcct();
+    try {
+      const {data, error} = await this.sb.from('progress').select('data').eq('user_id', this.user.id).maybeSingle();
+      if (error) throw error;
+      const remote = data && data.data && data.data.lines ? data.data : null;
+      let local = Prog.d;
+      if (local.owner && local.owner !== this.user.id){ try { localStorage.setItem(PKEY + '-other', JSON.stringify(local)); } catch(e){} local = {lines: {}, puz: {}, updated: 0}; }
+      const merged = remote ? mergeProg(local, remote) : JSON.parse(JSON.stringify(local));
+      merged.owner = this.user.id;
+      const before = canon(Prog.d);
+      Prog.d = merged; Prog.saveLocal();
+      if (canon(merged) !== before) refresh();
+      if (!remote || canon(merged) !== canon(remote)) await this.write();
+      this.state = 'ok'; this.at = Date.now(); this.err = '';
+    } catch(e){ this.state = 'err'; this.err = (e && e.message) || 'Couldn\'t reach your account.'; }
+    this.pulling = false; renderAcct();
+  },
+  push(){ if (!this.user) return; clearTimeout(this.timer); this.timer = setTimeout(() => this.write(), 1200); },
+  async write(){
+    if (!this.user) return;
+    if (this.writing){ this.again = true; return; }
+    this.writing = true; clearTimeout(this.timer); this.state = 'sync'; renderAcct();
+    try {
+      const {error} = await this.sb.from('progress').upsert({user_id: this.user.id, data: Object.assign({}, Prog.d, {owner: this.user.id})});
+      if (error) throw error;
+      this.state = 'ok'; this.at = Date.now(); this.err = '';
+    } catch(e){ this.state = 'err'; this.err = (e && e.message) || 'Couldn\'t save to your account.'; }
+    this.writing = false; renderAcct();
+    if (this.again){ this.again = false; this.write(); }
+  }
+};
+function ago(t){ const s = Math.round((Date.now() - t) / 1000); return s < 45 ? 'just now' : s < 90 ? 'a minute ago' : s < 3600 ? `${Math.round(s / 60)} minutes ago` : s < 5400 ? 'an hour ago' : `${Math.round(s / 3600)} hours ago`; }
+let toastTimer = null;
+function toast(msg){ const t = document.getElementById('toast'); if (!t) return; t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 3200); }
+function renderAcct(){
+  const b = document.getElementById('acctBtn'); if (!b) return;
+  if (!Cloud.on()){ b.hidden = true; return; }
+  b.hidden = false;
+  const u = Cloud.user, st = Cloud.state;
+  if (u){
+    const word = st === 'sync' ? 'Saving…' : st === 'err' ? 'Not saved' : 'Saved';
+    b.className = 'acct ' + st;
+    b.innerHTML = `<span class="av" aria-hidden="true">${esc((u.email || '?')[0].toUpperCase())}</span><span class="acctx">${word}</span>`;
+    b.setAttribute('aria-label', `Your account, ${u.email}. Progress ${word.toLowerCase().replace('…', '')}.`);
+  } else { b.className = 'acct out'; b.textContent = 'Sign in'; b.setAttribute('aria-label', 'Sign in to save your progress'); }
+  if (Acct.mode) Acct.render();
+  const n = document.getElementById('nudge'); if (n) n.hidden = !!u;
+}
+// the sign-in sheet: modes signup, signin, forgot, newpass, check, in
+const Acct = {
+  mode: null, msg: '', bad: false, busy: false, email: '', back: null,
+  open(mode, msg, bad){
+    if (!Cloud.on()) return;
+    if (!this.mode) this.back = document.activeElement;
+    this.mode = mode || (Cloud.user ? 'in' : 'signup'); this.msg = msg || ''; this.bad = !!bad; this.busy = false;
+    document.getElementById('acctSheet').hidden = false; this.render();
+    const f = document.querySelector('#acctPanel input, #acctPanel .btn.primary'); if (f) f.focus();
+  },
+  close(){
+    this.mode = null; document.getElementById('acctSheet').hidden = true;
+    if (this.back && this.back.focus) this.back.focus(); this.back = null;
+  },
+  render(){
+    const P = document.getElementById('acctPanel'); if (!P || !this.mode) return;
+    const m = this.mode, u = Cloud.user, em = esc(this.email || (u && u.email) || '');
+    const msg = this.msg ? `<p class="formmsg ${this.bad ? 'bad' : ''}" role="${this.bad ? 'alert' : 'status'}">${esc(this.msg)}</p>` : '';
+    const email = `<label class="field">Email<input name="email" type="email" autocomplete="email" required value="${em}"></label>`;
+    const pass = (ac, hint) => `<label class="field">Password<input name="password" type="password" autocomplete="${ac}" required minlength="8">${hint ? '<small>At least 8 characters.</small>' : ''}</label>`;
+    const go = t => `<button class="btn primary" type="submit" ${this.busy ? 'disabled' : ''}>${this.busy ? 'One moment…' : t}</button>`;
+    let h;
+    if (m === 'signup') h = `<h2 id="acctTitle">Save your progress</h2><p>Make an account to keep your drills, course and practice games on every device. What you've done on this device comes with you.</p>${msg}
+      <form data-act="signup">${email}${pass('new-password', true)}${go('Create account')}</form><div class="alt"><button class="linkish" data-mode="signin" type="button">I already have an account</button></div>`;
+    else if (m === 'signin') h = `<h2 id="acctTitle">Welcome back</h2><p>Sign in to pick up where you left off.</p>${msg}
+      <form data-act="signin">${email}${pass('current-password')}${go('Sign in')}</form><div class="alt"><button class="linkish" data-mode="forgot" type="button">Forgot your password?</button><button class="linkish" data-mode="signup" type="button">New here? Make an account</button></div>`;
+    else if (m === 'forgot') h = `<h2 id="acctTitle">Reset your password</h2><p>We'll email you a link. Open it in this browser to choose a new password.</p>${msg}
+      <form data-act="forgot">${email}${go('Send the link')}</form><div class="alt"><button class="linkish" data-mode="signin" type="button">Back to sign in</button></div>`;
+    else if (m === 'newpass') h = `<h2 id="acctTitle">Choose a new password</h2>${msg}<form data-act="newpass">${pass('new-password', true)}${go('Save the password')}</form>`;
+    else if (m === 'check') h = `<h2 id="acctTitle">Check your email</h2><p>We sent a confirmation link to <b>${em}</b>. Open it in this browser to finish. Your progress here stays safe in the meantime.</p>${msg}
+      <div class="alt"><button class="linkish" data-mode="signin" type="button">Back to sign in</button></div>`;
+    else {
+      const st = Cloud.state, line = st === 'sync' ? 'Saving to your account…' : st === 'err' ? `Couldn't reach your account (${esc(Cloud.err)}). Your progress is still kept on this device and will be saved when the connection is back.` : `Progress saved to your account ${Cloud.at ? ago(Cloud.at) : ''}.`;
+      h = `<h2 id="acctTitle">Your account</h2><p>Signed in as <b>${esc(u ? u.email : '')}</b>. Sign in with the same email on any device to pick up where you left off.</p>${msg}
+        <p class="syncline ${st}"><i aria-hidden="true"></i><span>${line}</span></p>
+        <div class="lesson-actions"><button class="btn" data-act="sync" type="button">Sync now</button><button class="btn ghost" data-act="signout" type="button">Sign out</button></div>`;
+    }
+    P.innerHTML = `<button class="x" type="button" aria-label="Close" data-act="close">×</button>${h}`;
+    const F = P.querySelector('form'); if (F) F.onsubmit = e => { e.preventDefault(); this.submit(F.dataset.act, new FormData(F)); };
+    P.querySelectorAll('[data-mode]').forEach(x => x.onclick = () => { const i = P.querySelector('input[name=email]'); if (i) this.email = i.value; this.open(x.dataset.mode); });
+    P.querySelectorAll('button[data-act]').forEach(x => x.onclick = () => this.submit(x.dataset.act));
+  },
+  async submit(act, fd){
+    if (act === 'close'){ this.close(); return; }
+    const A = Cloud.sb.auth, email = fd ? String(fd.get('email') || '').trim() : this.email, password = fd ? String(fd.get('password') || '') : '';
+    if (email) this.email = email;
+    this.busy = true; this.msg = ''; this.render();
+    let r = {error: null};
+    try {
+      if (act === 'signup'){
+        r = await A.signUp({email, password, options: {emailRedirectTo: SITE.home}});
+        if (!r.error){ if (r.data && r.data.session){ this.close(); toast('Account made. Your progress is saved to it now.'); return; } this.busy = false; this.mode = 'check'; this.render(); return; }
+      }
+      else if (act === 'signin'){
+        r = await A.signInWithPassword({email, password});
+        if (!r.error){ this.close(); toast('Signed in. Your progress is saved to your account.'); return; }
+      }
+      else if (act === 'forgot'){
+        r = await A.resetPasswordForEmail(email, {redirectTo: SITE.home + '?reset=1'});
+        if (!r.error){ this.busy = false; this.msg = `If ${email} has an account, a reset link is on its way.`; this.bad = false; this.render(); return; }
+      }
+      else if (act === 'newpass'){
+        r = await A.updateUser({password});
+        if (!r.error){ this.close(); toast('Password changed.'); return; }
+      }
+      else if (act === 'sync'){ this.busy = false; await Cloud.pull(); this.render(); return; }
+      else if (act === 'signout'){ await A.signOut(); this.close(); toast('Signed out. Your progress stays on this device.'); return; }
+    } catch(e){ r = {error: e}; }
+    this.busy = false; this.msg = (r.error && r.error.message) || 'Something went wrong. Try again.'; this.bad = true; this.render();
+  }
 };
 
 /* ------------------------------------------------------------------ app state + routing */
@@ -1095,7 +1311,10 @@ function togglePlay(){
   S.playing = setInterval(() => { const l = LINES[S.line]; if (!l || S.view !== 'study' || S.i >= l.n.length - 1){ stopPlay(); if (S.view === 'study') renderStudy(); return; } step(1); }, 1150);
   step(1);
 }
+document.getElementById('acctBtn').addEventListener('click', () => Acct.open());
+document.getElementById('acctSheet').addEventListener('click', e => { if (e.target.id === 'acctSheet') Acct.close(); });
 document.addEventListener('keydown', e => {
+  if (Acct.mode){ if (e.key === 'Escape'){ e.preventDefault(); Acct.close(); } return; } // the sign-in sheet owns the keyboard while open
   if (e.target.closest && e.target.closest('input,textarea,select')) return;
   if (S.view === 'study'){
     if (e.key === 'ArrowRight'){ e.preventDefault(); stopPlay(); step(1); }
@@ -1686,11 +1905,15 @@ function renderCourse(){
         <ol class="ministeps" aria-label="Steps in this unit">${steps.map(s => `<li class="${s.done ? 'done' : s === nx ? 'next' : ''}">${s.done ? ICON.check : ''}${esc(s.title)}</li>`).join('')}</ol>
         <div class="cta"><button class="btn primary" id="cGo">${esc(stepCta(cur, nx))}</button><button class="btn" data-unit="${cur.id}">See the whole unit</button></div></div></section>`;
   } else hero = `<section class="chero done"><div><p class="kicker">Every open unit passed</p><h3>Now keep it fresh.</h3><p class="lede">Lines you've learned come back for review in the Drill tab, and the units marked "coming soon" open as they're built.</p></div></section>`;
-  view.innerHTML = `<div class="chead"><div><p class="kicker">Your course · White and Black together</p><h2>One path, in the order that matters</h2>
+  let nudgeOff = false; try { nudgeOff = sessionStorage.getItem('nudge-off') === '1'; } catch(e){}
+  const nudge = Cloud.on() && !nudgeOff ? `<div class="nudge" id="nudge" ${Cloud.user ? 'hidden' : ''}><span><b>Your progress is only saved in this browser.</b> Make a free account to keep it on every device.</span><button class="btn primary small" id="nudgeGo" type="button">Make an account</button><button class="btn ghost small" id="nudgeOff" type="button">Not now</button></div>` : '';
+  view.innerHTML = `${nudge}<div class="chead"><div><p class="kicker">Your course · White and Black together</p><h2>One path, in the order that matters</h2>
       <p>Units are ordered by how often each system comes up in your games and how you score in it. Each unit: the idea, the lines, a drill, ${SPAR} practice games, then a checkpoint. Pass the checkpoint and the next unit opens. Finished units keep coming back for review, and every line is still in Learn if you want to look ahead.</p></div>
     <div class="cmeter"><div class="bar" aria-hidden="true">${bar}</div><span>${passedN} of ${open.length} units passed${COURSE.length > open.length ? ` · ${COURSE.length - open.length} coming soon` : ''}</span></div></div>
     ${hero}<ol class="path" aria-label="Course units">${COURSE.map(U => unitRow(U, cur)).join('')}</ol>`;
   const g = document.getElementById('cGo'); if (g) g.onclick = () => { const nx = unitSteps(cur).find(s => !s.done); if (nx) doStep(cur, nx.key); else openUnit(cur.id); };
+  const ng = document.getElementById('nudgeGo'); if (ng) ng.onclick = () => Acct.open('signup');
+  const no = document.getElementById('nudgeOff'); if (no) no.onclick = () => { try { sessionStorage.setItem('nudge-off', '1'); } catch(e){} document.getElementById('nudge').hidden = true; };
 }
 function unitRow(U, cur){
   const open = unitOpen(U), passed = unitPassed(U), isCur = U === cur, steps = U.soon ? [] : unitSteps(U), done = steps.filter(s => s.done).length, due = passed ? unitDue(U) : 0;
@@ -1893,7 +2116,7 @@ function renderQuiz(){
 
 /* ------------------------------------------------------------------ boot */
 function start(saved){
-  Prog.load();
+  Prog.load(); Cloud.init();
   let h = (location.hash || '').slice(1), side = 'w';
   try { const v = localStorage.getItem(SIDE_KEY); if (v && BOOKS[v]) side = v; } catch(e){}
   const hu = h.startsWith('unit.') ? UNIT[h.slice(5)] : null; // course hashes carry no colour: a unit brings its own book
@@ -1914,7 +2137,7 @@ function start(saved){
   else if (h.startsWith('learn.') && CHAPTERS[h.slice(6)]){ S.chapter = h.slice(6); S.view = 'learn'; }
   else if (VIEWS.includes(h)) S.view = h;
   render();
-  Prog.connect();
+  Prog.connect(); renderAcct();
   try { window.claude && window.claude.hot && window.claude.hot.snapshot && window.claude.hot.snapshot(() => ({side: SIDE, view: S.view, unit: S.unit, slide: S.slide, line: S.line, i: S.i, studyFrom: S.studyFrom, chapter: S.chapter})); } catch(e){}
 }
 try { if (window.claude && window.claude.hot && window.claude.hot.ready) window.claude.hot.ready(start); else start((window.claude && window.claude.hot && window.claude.hot.data) || {}); }

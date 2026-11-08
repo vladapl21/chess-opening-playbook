@@ -8,7 +8,7 @@ One path through a White and a Black repertoire, ordered by what my games say ma
 
 [**Open the app →**](https://vladapl21.github.io/chess-opening-playbook/)
 
-[Tour](#a-tour) · [The course](#course-one-path-through-both-books) · [The repertoires](#the-repertoires) · [How it was made](#how-it-was-made) · [Under the hood](#under-the-hood) · [Build it yourself](#build-it-yourself)
+[Tour](#a-tour) · [The course](#course-one-path-through-both-books) · [The repertoires](#the-repertoires) · [How it was made](#how-it-was-made) · [Under the hood](#under-the-hood) · [Build it yourself](#build-it-yourself) · [Roadmap](ROADMAP.md)
 
 ![Stockfish 17.1](https://img.shields.io/badge/checked%20with-Stockfish%2017.1-2f6b52)
 ![Maia](https://img.shields.io/badge/opponent%20odds-Maia%201300%2F1500-2f6b52)
@@ -183,10 +183,10 @@ flowchart LR
 
 ## Under the hood
 
-- **One file.** The app is one HTML file of about 1.7 MB with both books inline: plain HTML, CSS and JavaScript, with no framework, bundler or third-party script. The only network requests are for three Google Fonts (Bodoni Moda, Instrument Sans, JetBrains Mono). Offline, it falls back to system fonts.
+- **One file.** The app is one HTML file of about 1.7 MB with both books inline: plain HTML, CSS and JavaScript, with no framework or bundler. The only third-party script is supabase-js, and only on the website when accounts are set up. Fonts come from Google Fonts (Bodoni Moda, Instrument Sans, JetBrains Mono); offline, the app falls back to system fonts.
 - **Board.** The board is SVG, drawn with an original piece set ([`app/pieces.py`](app/pieces.py)). It supports drag and tap input, legal-move hints, arrows, circles and a flipped view for Black. Legal moves are precomputed for every position where you move, so the page needs no chess library.
 - **Two books, one engine.** `loadBook()` swaps every index (nodes, lines, lessons, chapters, whose move is whose, board orientation) when you flip the switch. Line ids never collide between the books (the build checks this), so one progress store holds both.
-- **Progress.** Progress is saved in `localStorage`. When the page runs as a Claude artifact, it also syncs to the artifact's per-user storage, so it follows you between devices.
+- **Progress and accounts.** Progress is always saved in the browser first. On the website, an account (email and password through [Supabase](https://supabase.com)) keeps a copy in the cloud, so the same progress shows up on every device. Sync pulls and merges on sign-in, on load and whenever the tab comes back into view: the newest record wins for each drill line and puzzle, and course steps keep the best result. The project URL and publishable key live in [`app/site.json`](app/site.json), the tables and row-level security in [`supabase/schema.sql`](supabase/schema.sql). When the page runs as a Claude artifact, it syncs to the artifact's own per-user storage instead.
 - **Deep links.** `#course` and `#unit.<unit-id>` open the course and a unit (a unit brings its own book). `#learn`, `#sandbox`, `#drill`, `#games`, `#cheat`, `#learn.<chapter>` and `#line.<line-id>` open the matching view. Add a `b.` prefix for the Black book, for example [`#b.learn.london`](https://vladapl21.github.io/chess-opening-playbook/#b.learn.london) or [`#b.line.bs-mieses`](https://vladapl21.github.io/chess-opening-playbook/#b.line.bs-mieses).
 
 <details>
@@ -248,6 +248,9 @@ The rarity line in the report is the product of `q` along the opponent's moves: 
 app/
   template.html            the whole app: markup, styles and script for both books
   pieces.py                the original SVG piece set
+  site.json                Supabase project URL and publishable key for the website build
+supabase/
+  schema.sql               accounts: profiles and progress tables, row-level security
 content/
   course.py                the course: units, idea boards, checkpoint positions
   white/                   White book: lessons, labels and notes, chapter text, game reviews
@@ -277,8 +280,9 @@ docs/
   index.html               the built app, served by GitHub Pages
   img/                     the images in this README
 tests/
-  e2e_white.py, e2e_black.py, e2e_sandbox_switch.py, e2e_course.py
+  e2e_white.py, e2e_black.py, e2e_sandbox_switch.py, e2e_course.py, e2e_accounts.py
                            end-to-end browser tests (Playwright)
+  fake_supabase.js         stand-in for supabase-js so account tests run offline
   readme_shots.py          regenerates docs/img
 ```
 
@@ -329,7 +333,7 @@ python3 -m playwright install chromium
 make test
 ```
 
-The tests drive the real page in Chromium. They visit every chapter in both books, step through lessons, and play drills by dragging and tapping (correct moves, slips, castling). They solve every puzzle and play sandbox games across every opening and odds setting, including a regression test for changing the opening mid-game. They also follow deep links, switch books back and forth with state kept, and check that the phone layout never scrolls sideways, in light and dark mode. The course test works through the first units the way a person would: the idea boards, a lesson, a drill line, a checkpoint with a deliberate miss, practice games against a unit's lines, and a threat set where wrong moves get played out and punished. Screenshots land in `tests/out/`. To regenerate the images in this README, run `make shots`.
+The tests drive the real page in Chromium. They visit every chapter in both books, step through lessons, and play drills by dragging and tapping (correct moves, slips, castling). They solve every puzzle and play sandbox games across every opening and odds setting, including a regression test for changing the opening mid-game. They also follow deep links, switch books back and forth with state kept, and check that the phone layout never scrolls sideways, in light and dark mode. The course test works through the first units the way a person would: the idea boards, a lesson, a drill line, a checkpoint with a deliberate miss, practice games against a unit's lines, and a threat set where wrong moves get played out and punished. The accounts test runs two browsers against a fake Supabase server as two devices on one account: sign-up carrying local progress along, sync both ways, an outage and recovery, a second account on the same device, and the email confirmation, password reset and expired-link flows. Screenshots land in `tests/out/`. To regenerate the images in this README, run `make shots`.
 
 ## Credits
 
