@@ -68,8 +68,20 @@ UNITS = [
          dict(path='e4 c5 c3 Nc6 d4 cxd4 cxd4 d5 exd5 Qxd5 Nf3 Bg4 Be2 Bxf3 Bxf3 Qxd4', arrows=['f3c6g', 'd1d4g'], circles=['d4r'], h='The loose pawn is bait',
               t='If the queen grabs your d-pawn, take the knight with check first. When the pawn takes back, your queen takes Black\'s.'),
        ]),
-  dict(id='b-scotch', side='b', soon=True, title='Scotch & center gambits', kicker='Black · being rebuilt', chapter='scotch',
-       why='Thirteen games and only four wins: your weakest Black opening. It is being rebuilt around your one setup, so the moves will match the Italian. The current lines are still in Learn.'),
+  dict(id='b-scotch', side='b', title='Scotch & center gambits', kicker='Black · same bishop, same diagonal',
+       why='Thirteen games and only four wins: your weakest Black opening. Now it is your Italian setup: the bishop goes straight to its diagonal, the queen joins it against f2, and against the gambits you develop instead of grabbing a second pawn.',
+       lessons=['bs-classical', 'bs-classical-be3', 'bs-gambit', 'bs-danish', 'bs-center'],
+       deeper=['bs-classical-c3', 'bs-classical-nb3', 'bs-goring', 'bs-d4move'],
+       idea=[
+         dict(path='e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Bc5', arrows=['c5f2g', 'c5d4r'], h='Bishop out at once',
+              t='When White takes back with the knight, your bishop goes straight to its Italian diagonal. It hits the knight in the middle and aims at f2. A check first only costs a move.'),
+         dict(path='e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Bc5 Nxc6 Qf6', arrows=['f6f2r', 'c5f2r'], circles=['f2r'], h='Knight trade? The queen joins in',
+              t='Queen and bishop both hit f2 and mate is threatened. White has to spend a move on it; then your d-pawn takes back toward the middle and you castle long.'),
+         dict(path='e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6', arrows=['f6e4g'], circles=['f7r'], h='Gambit? Develop, don\'t grab',
+              t='Taking the second pawn lets White\'s bishop take on f7 and the queen win your bishop back with check. It happened twice. Bring the knight out and you are in your Italian.'),
+         dict(path='e4 e5 d4 exd4 c3 d5', arrows=['d5e4g'], h='The Danish: hit back',
+              t='Don\'t take the second pawn here either. The d-pawn strike opens the center for your pieces and leaves White with a lone pawn in the middle.'),
+       ]),
   dict(id='w-caro', side='w', title='The Caro-Kann', kicker='White · two lines cover most games',
        why='About one White game in seven, and you win two in three. Two lines cover most of them: the h-pawn march and the knight trade.',
        lessons=['ck-march', 'ck-nf6'],
@@ -96,8 +108,9 @@ UNITS = [
          dict(path='e4 e5 Nf3 Nc6 Bb5 Nf6 Bxc6 dxc6 Nxe5 Qd4', arrows=['d4e5g', 'd4e4g'], h='Take back toward the center',
               t='After the bishop takes your knight, take back with the d-pawn. If the knight grabs your pawn, your queen hits the knight and the e-pawn at once.'),
        ]),
-  dict(id='finish', kind='skill', soon=True, title='Finish the job', kicker='Skill · coming soon',
-       why='Positions from your games where you were winning and the game slipped away: how to trade down, stop counterplay and make the extra piece count.'),
+  dict(id='finish', kind='skill', skill='finish', title='Finish the job', kicker='Skill · from your own games',
+       why='21 of your 91 losses came after you had been winning by a lot. Every position here is one of those games, at the move where it slipped. Find the move that keeps the win.',
+       pass_set=4, pass_check=4),
   dict(id='w-2knights', side='w', title='Two Knights & the third-move tricks', kicker='White · keep the streak going',
        why='You have won eight of nine when Black brings the second knight out. Keep it that way, and know the two traps Black sets on move three.',
        lessons=['fried-liver', 'two-knights-na5', 'traxler', 'shilling'],
@@ -110,8 +123,22 @@ UNITS = [
          dict(path='e4 e5 Nf3 Nc6 Bc4 Nd4', arrows=['f3d4g'], circles=['e5r'], h='The knight-jump trap',
               t='Black leaves the center pawn hanging on purpose. Trade knights; never grab the pawn.'),
        ]),
-  dict(id='b-vienna', side='b', soon=True, title='Vienna & early attacks', kicker='Black · being rebuilt', chapter='vienna', also=['attacks'],
-       why='Nineteen games between them and only seven wins. Like the Scotch, these lines are being rebuilt around your one setup.'),
+  dict(id='b-vienna', side='b', title='Vienna & early attacks', kicker='Black · knights first, then the bishop',
+       why='Nineteen games between them and only seven wins. Against the early bishop and the f-pawn gambits it is your setup again: knight out first, then the bishop to its diagonal. Against the early queen the bishop goes next to your king.',
+       lessons=['bv-bc5', 'bv-f4bc5', 'ba-kgd', 'ba-qh5', 'ba-bc4'],
+       deeper=['bv-spanish', 'bv-scotch4n', 'bv-italian4n', 'bv-quiet4n', 'bv-vmisc', 'ba-qh5-other', 'bv-ponziani', 'bv-d3', 'bv-tricks'],
+       idea=[
+         dict(path='e4 e5 Nc3 Nc6 Bc4 Nf6', arrows=['f6g4g'], h='Knight first',
+              t='Against the early bishop your knight comes out before your bishop. It covers the square White\'s queen wants, so the raid on your g-pawn never comes.'),
+         dict(path='e4 e5 Nc3 Nc6 Bc4 Nf6 d3 Bc5', arrows=['c5f2g'], circles=['f2r'], h='Then the bishop',
+              t='Now the bishop goes to its usual diagonal and aims at f2. It is your Italian setup with the knights already out.'),
+         dict(path='e4 e5 f4 Bc5', arrows=['c5g1g'], h='Gambit? Bishop out, don\'t take',
+              t='Against the f-pawn gambits your bishop takes the diagonal White\'s king needs. White can\'t castle short, and grabbing your e-pawn opens the king up.'),
+         dict(path='e4 e5 f4 Bc5 fxe5 Qh4+ g3 Qxe4+', arrows=['e4h1r'], circles=['h1r'], h='The pawn is poisoned',
+              t='If the f-pawn grabs your e-pawn, the queen checks, then takes the e-pawn with check and hits the rook in the corner.'),
+         dict(path='e4 e5 Qh5 Nc6 Bc4 g6 Qf3 Nf6 c3 Bg7', arrows=['g7f6g'], circles=['f6g'], h='Early queen? Bishop by the king',
+              t='Against the early queen, block f7 with the pawn and the knight. Then the bishop goes behind the pawn, where it guards your knight for good.'),
+       ]),
   dict(id='w-philidor', side='w', title='Philidor & Petrov', kicker='White · hit the center at once',
        why='About one White game in seven. Hit the center at once, and know the two shots: the bishop on f7 and the queen on the open file.',
        lessons=['ph-main', 'ph-nd7', 'pt-main', 'pt-copy'],
@@ -150,8 +177,9 @@ UNITS = [
          dict(path='e4 e6 d4 d5 e5', arrows=['c2c3g'], circles=['e5g'], h='Push past and lock the center',
               t='Your pawn cramps Black\'s kingside. Support the chain from behind with the c-pawn, as in your Italian.'),
        ]),
-  dict(id='endings', kind='skill', soon=True, title='Endings', kicker='Skill · coming soon',
-       why='The endgames from your games: king activity, passed pawns and the rook endings that decided games on the clock.'),
+  dict(id='endings', kind='skill', skill='endings', title='Endings', kicker='Skill · from your own games',
+       why='83 of your games reached an ending with you level or better, and 28 of those were lost. These are the moves that decided them: back ranks, pawn endings and active rooks.',
+       pass_set=4, pass_check=4),
   dict(id='b-other', side='b', title='Other first moves', kicker='Black · take the center',
        why='The c-pawn, the knight first, a fianchetto. Take the center and the setup you know follows.',
        lessons=['bo-english', 'bo-reti'],
@@ -174,7 +202,7 @@ UNITS = [
        ]),
 ]
 
-# Idea cards for the skill unit come from three of your own positions (data/course_threats.json 'examples')
+# Idea cards for the skill units come from your own positions (the 'examples' in data/course_<skill>.json), in order
 THREAT_IDEA = [
   dict(h='What did their last move attack?',
        t='Before you touch a piece, look at the move your opponent just made and everything it now hits. Here the knight attacked your queen.'),
@@ -183,6 +211,24 @@ THREAT_IDEA = [
   dict(h='Checks first',
        t='Last, look at every check your opponent has. Here the new queen didn\'t matter: the checks came first, and they ended the game.'),
 ]
+
+FINISH_IDEA = [
+  dict(h='Your checks first', show='keep',
+       t='You were winning, and the queen had mate in one (green). In the game a pawn move came instead (blue). When you are ahead, look at every check you have before anything else.'),
+  dict(h='Develop before you grab', show='keep',
+       t='The queen grabbed a pawn (blue) and Black developed with a hit on it. The last piece out (green) was stronger: it also stops Black from castling.'),
+  dict(h='What does their next move pin?', show='move',
+       t='The bishop stepped back (blue) and Black\'s bishop pinned your queen to your king (red). Trading that bishop, or stepping the king into the corner first, kept the win.'),
+]
+END_IDEA = [
+  dict(h='Back rank first', show='move',
+       t='Rooks on the board and no square for your king. Before any rook move, check their checks on your back rank: here one rook move (blue) let the other rook in with mate (red).'),
+  dict(h='Count before you trade pawns', show='keep',
+       t='In a pawn ending one trade decides it. Taking (blue) gave Black a passed pawn far from your king; pushing past (green) kept the draw.'),
+  dict(h='Active rook, active king', show='keep',
+       t='Your rook could cut White\'s king off (green), or your king could walk up to help the passed pawn. The rook went back to defend (blue), and White\'s pawns got going.'),
+]
+SKILL_IDEAS = {'threats': THREAT_IDEA, 'finish': FINISH_IDEA, 'endings': END_IDEA}
 
 # Checkpoint positions: the moves that lead to a position where it is your turn. The answer is your repertoire move there.
 QUIZ = {
@@ -242,6 +288,20 @@ QUIZ = {
     'e4 e5 Nf3 d6 d4 Nd7 Bc4 h6 dxe5 dxe5',
     'e4 e5 Nf3 Nf6',
     'e4 e5 Nf3 Nf6 Nxe5 Nxe4'],
+  'b-scotch': [
+    'e4 e5 Nf3 Nc6 d4 exd4 Nxd4',
+    'e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Bc5 Nxc6',
+    'e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Bc5 Nxc6 Qf6 f3',
+    'e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Bc5 Be3',
+    'e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3',
+    'e4 e5 d4 exd4 c3'],
+  'b-vienna': [
+    'e4 e5 Nc3 Nc6 Bc4',
+    'e4 e5 Nc3 Nc6 Bc4 Nf6 d3',
+    'e4 e5 Nc3 Nc6 f4',
+    'e4 e5 f4',
+    'e4 e5 f4 Bc5 fxe5',
+    'e4 e5 Qh5 Nc6 Bc4 g6 Qf3 Nf6 c3'],
   'b-d4tricks': [
     'd4 d5 c4 c6 Nc3 Nf6 Bg5',
     'd4 d5 c4 c6 Nc3 Nf6 Bg5 Ne4 Nxe4 dxe4 e3',

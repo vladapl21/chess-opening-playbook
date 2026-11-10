@@ -19,7 +19,7 @@ for path, nt in BC.NOTES.items():
     mine = piece.color == chess.BLACK
     def bad(msg): issues.append(f"{msg:38s} | {lab} | {txt[:70]} | {' '.join(toks[-4:])}")
     if re.search(r'\bcheck\b', L) and 'blocks the check' not in L and 'stops the queen check' not in L and not chk and 'out of check' not in L: bad('label says check, no check')
-    if re.search(r'\b(takes|take|grabs|grab)\b', L) and 'takes back' not in L and not cap and 'take the center' not in L: bad('label says take, not a capture')
+    if re.search(r'\b(takes|take|grabs|grab)\b', L) and 'takes back' not in L and not cap and 'take the center' not in L and not re.search(r"\b(don't|do not|not) (take|grab)\b", L): bad('label says take, not a capture')
     if L.startswith('castle') and not before.is_castling(mv): bad('castle label, not castling')
     if 'white castles' in L and not before.is_castling(mv): bad('castles label, not castling')
     if 'hits the queen' in L or 'hits your queen' in L:

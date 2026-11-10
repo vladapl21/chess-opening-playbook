@@ -41,6 +41,19 @@ def main():
       dict(puz=first_puz('g-malik'), big='3', unit='in one game', h='The e-pawn push, skipped', p='In the bishop-retreat line of the Italian, kicking the knight with your e-pawn was the best move three turns running.'),
       dict(puz=first_puz('g-gilmar'), big='6', unit='moves', h='Guard the e-pawn first', p='Against the bishop on the long diagonal your e-pawn was attacked twice and guarded once. It fell on move four, and two moves later the same bishop took another pawn with your corner rook next.'),
     ]
+    # plans for the end of each lesson's main line (content/plans.py), checked for notation like every other text
+    import re
+    from plans import W as PLAN_W, B as PLAN_B
+    for D, P in ((W, PLAN_W), (B, PLAN_B)):
+        ids = {l['id'] for l in D['lessons']}
+        assert set(P) <= ids, sorted(set(P) - ids)
+        for L in D['lessons']:
+            if L['id'] in P: L['plan'] = P[L['id']]
+    for k, pl in list(PLAN_W.items()) + list(PLAN_B.items()):
+        for t in [pl['h']] + [x[1] for x in pl['b']]:
+            bad = [m for m in re.findall(r'\b[a-h][1-8]\b', t) if m not in ('f7', 'f2')] + re.findall(r'\b[KQRBN]x?[a-h][1-8]\b|O-O', t)
+            assert not bad, (k, t, bad)
+        assert all(x[0] in ('king', 'pawns', 'pieces', 'target', 'them', 'watch') for x in pl['b']), k
     # progress records are shared between the books, so ids must never collide
     wl, bl = {l['id'] for l in W['lines']}, {l['id'] for l in B['lines']}
     assert not (wl & bl), sorted(wl & bl)[:10]
@@ -48,10 +61,14 @@ def main():
 
     dump = lambda d: json.dumps(d, separators=(',', ':')).replace('</', '<\\/')
     tpl = (paths.APP / 'template.html').read_text()
-    body = tpl.replace('<!--__PIECES__-->', syms).replace('/*__DATA_W__*/', dump(W)).replace('/*__DATA_B__*/', dump(B)).replace('/*__DATA_C__*/', dump(C))
-    assert '/*__DATA' not in body
-    (paths.BUILD / 'playbook.html').write_text(body)
     site = json.load(open(paths.APP / 'site.json'))
+    # chess.js (BSD-2) is inlined: free exploration needs legal moves, checks and full positions for the engine
+    chessjs = (paths.APP / 'vendor' / 'chess.js').read_text()
+    assert '</script' not in chessjs
+    body = tpl.replace('<!--__PIECES__-->', syms).replace('/*__DATA_W__*/', dump(W)).replace('/*__DATA_B__*/', dump(B)).replace('/*__DATA_C__*/', dump(C))
+    body = body.replace('/*__CHESSJS__*/', chessjs).replace("/*__HOME__*/''", json.dumps(site.get('home', '')))
+    assert '/*__DATA' not in body and '/*__CHESSJS__*/' not in body and '/*__HOME__*/' not in body
+    (paths.BUILD / 'playbook.html').write_text(body)
     page = site_html(body, site)
     (paths.DOCS / 'index.html').write_text(page)
     print('playbook.html', len(body), '| docs/index.html', len(page), '| accounts', 'on' if site.get('supabaseUrl') and site.get('supabaseKey') else 'off (app/site.json has no project yet)')

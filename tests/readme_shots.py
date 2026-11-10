@@ -12,6 +12,7 @@ from PIL import Image, ImageDraw
 from playwright.sync_api import sync_playwright
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from e2e_white import ROOT, URL, launch  # noqa: E402
+from serve import Site  # noqa: E402
 
 IMG = ROOT / 'docs' / 'img'; IMG.mkdir(exist_ok=True)
 FONTS_DIR = os.environ.get('FONTS_DIR')
@@ -86,7 +87,7 @@ with sync_playwright() as p:
     save(pg.screenshot(), 'learn-black.png')
 
     # Study: the Scotch lesson, a few moves in
-    pg.evaluate("openLine('bs-mieses')"); pg.wait_for_timeout(400)
+    pg.evaluate("openLine('bs-classical')"); pg.wait_for_timeout(400)
     for _ in range(9): pg.keyboard.press('ArrowRight'); pg.wait_for_timeout(120)
     settle(pg, 500); save(pg.screenshot(), 'study.png')
 
@@ -149,10 +150,10 @@ with sync_playwright() as p:
 
     # Animated walk through one lesson
     c = b.new_context(viewport={'width': 1280, 'height': 760}); local_fonts(c)
-    q = c.new_page(); q.goto(URL + '#b.line.bs-mieses'); q.wait_for_timeout(900); settle(q)
-    q.evaluate("openLine('bs-mieses', 0)"); q.wait_for_timeout(300)
+    q = c.new_page(); q.goto(URL + '#b.line.bs-classical'); q.wait_for_timeout(900); settle(q)
+    q.evaluate("openLine('bs-classical', 0)"); q.wait_for_timeout(300)
     frames = []
-    for _ in range(q.evaluate("LINES['bs-mieses'].n.length")):
+    for _ in range(q.evaluate("LINES['bs-classical'].n.length")):
         q.wait_for_timeout(350)
         shot = q.screenshot(clip={'x': 0, 'y': 90, 'width': 1280, 'height': 640})
         frames.append(Image.open(io.BytesIO(shot)).convert('RGB').resize((960, 480), Image.LANCZOS).convert('P', palette=Image.ADAPTIVE, colors=128))
@@ -160,5 +161,22 @@ with sync_playwright() as p:
     c.close()
     frames[0].save(IMG / 'demo.gif', save_all=True, append_images=frames[1:], duration=[1200] + [1300] * (len(frames) - 2) + [3000], loop=0, optimize=True)
     print(f"{'demo.gif':16s} {len(frames)} frames  {os.path.getsize(IMG / 'demo.gif') // 1024} KB")
+
+    # The engine and the explore board: the end of a Black lesson, played on. The engine runs in a web worker, which
+    # needs the page served over HTTP.
+    site = Site(); app = site.start()
+    try:
+        c = b.new_context(viewport={'width': 1280, 'height': 1120}, device_scale_factor=2); local_fonts(c)
+        q = c.new_page(); q.on('pageerror', lambda e: errors.append(str(e)))
+        q.goto(app + '#b.line.bs-classical'); q.wait_for_timeout(900)
+        q.keyboard.press('End'); q.wait_for_timeout(300)
+        q.click('#exHere'); q.wait_for_timeout(400)
+        for _ in range(100):
+            if q.evaluate('!!(EngineUI.r && EngineUI.r.done)'): break
+            q.wait_for_timeout(250)
+        settle(q, 400); save(q.screenshot(), 'engine.png')
+        c.close()
+    finally:
+        site.stop()
     b.close()
     if errors: sys.exit('page errors: ' + '; '.join(errors))

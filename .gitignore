@@ -6,7 +6,7 @@ __pycache__/
 tests/out/
 
 # engines and weights (see README: STOCKFISH, MAIA_WEIGHTS, LCZERO_TRAINING)
-vendor/
+/vendor/
 
 # cache write leftovers
 data/cache/*.lock

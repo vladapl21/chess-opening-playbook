@@ -116,7 +116,8 @@ with sync_playwright() as p:
     for _ in range(3): a.keyboard.press('ArrowRight'); a.wait_for_timeout(80)
     assert a.evaluate("!!up('w-italian').idea")
     a.click('.tabs button[data-view="course"]'); a.wait_for_timeout(300)
-    a.click('#nudgeGo'); a.wait_for_timeout(200)
+    assert a.locator('#nudge [data-nudge="signin"]').is_visible(), 'a new device can also sign in from the banner'
+    a.click('#nudge [data-nudge="signup"]'); a.wait_for_timeout(200)
     assert a.evaluate('Acct.mode') == 'signup'
     a.screenshot(path=out + 'acct_signup.png')
     sheet(a, 'signup', 'vlad@example.com', 'short')
@@ -133,6 +134,8 @@ with sync_playwright() as p:
     bp = B.new_page(); hook(bp, 'B')
     bp.goto(APP); bp.wait_for_timeout(900)
     assert not bp.evaluate("!!up('w-italian').idea")
+    assert bp.evaluate('document.documentElement.scrollWidth') <= 390
+    bp.screenshot(path=out + 'acct_phone_nudge_new.png')
     sheet(bp, 'signin', 'vlad@example.com', 'wrong password')
     print('wrong password ->', bp.inner_text('#acctPanel .formmsg'))
     assert 'Invalid login' in bp.inner_text('#acctPanel .formmsg')
@@ -159,6 +162,22 @@ with sync_playwright() as p:
     # ---- signing out keeps the device's progress; another account on the same device starts from its own
     a.click('#acctPanel [data-act="signout"]'); a.wait_for_timeout(300)
     assert a.inner_text('#acctBtn') == 'Sign in' and a.evaluate("lessonSeen('w', 'grab')")
+    # the first-try bug: after signing out, the button opened "make an account" and signing in was hard to find
+    assert a.locator('#nudge').is_visible() and 'signed out' in a.inner_text('#nudge'), a.inner_text('#nudge')
+    assert a.locator('#nudge [data-nudge="signup"]').count() == 0
+    a.screenshot(path=out + 'acct_nudge_signed_out.png')
+    a.click('#nudge [data-nudge="signin"]'); a.wait_for_timeout(200)
+    assert a.evaluate('Acct.mode') == 'signin'
+    a.click('#acctPanel [data-act="close"]'); a.wait_for_timeout(100)
+    a.click('#acctBtn'); a.wait_for_timeout(200)
+    assert a.evaluate('Acct.mode') == 'signin', a.evaluate('Acct.mode')
+    assert a.input_value('#acctPanel input[name=email]') == 'vlad@example.com', 'last email remembered'
+    assert a.evaluate('document.activeElement.name') == 'password', 'cursor waits in the password box'
+    assert a.locator('#acctPanel .atabs button').count() == 2
+    a.screenshot(path=out + 'acct_signin_after_signout.png')
+    a.click('#acctPanel .atabs [data-mode="signup"]'); a.wait_for_timeout(100)
+    assert a.evaluate('Acct.mode') == 'signup' and a.evaluate("document.activeElement.dataset.mode") == 'signup'
+    a.click('#acctPanel [data-act="close"]'); a.wait_for_timeout(100)
     sheet(a, 'signup', 'friend@example.com', 'another one')
     assert synced(a)
     assert not a.evaluate("lessonSeen('w', 'grab') || !!up('w-italian').idea"), "someone else's progress leaked into a new account"
@@ -194,13 +213,14 @@ with sync_playwright() as p:
     # phone, light: the sheet sits at the bottom and nothing scrolls sideways
     bp.click('#acctBtn'); bp.click('#acctPanel [data-act="signout"]'); bp.wait_for_timeout(200)
     bp.click('#acctBtn'); bp.wait_for_timeout(200)
+    assert bp.evaluate('Acct.mode') == 'signin'
     assert bp.evaluate('document.documentElement.scrollWidth') <= 390
-    bp.screenshot(path=out + 'acct_phone_signup.png')
+    bp.screenshot(path=out + 'acct_phone_signin.png')
 
     # ---- the claude.ai build and an unconfigured site have no account features at all
     D = b.new_context(viewport={'width': 1280, 'height': 860}); wire(D, PLAIN)
     d = D.new_page(); hook(d, 'D'); d.goto(APP); d.wait_for_timeout(800)
-    assert d.locator('#acctBtn').is_hidden() and d.locator('#nudge').count() == 0 and not d.evaluate('Cloud.on()')
+    assert d.locator('#acctBtn').is_hidden() and d.locator('#nudge').is_hidden() and not d.evaluate('Cloud.on()')
     print('unconfigured build: no account button, no nudge')
     print('ERRORS:', errors[:8])
     assert not errors

@@ -4,7 +4,7 @@
 
 **A chess opening course built from my own games, with no notation anywhere.**
 
-One path through a White and a Black repertoire, ordered by what my games say matters most. Each unit has the idea, the lines, spaced-repetition drills, practice games against an opponent who plays like real club players, and a checkpoint that opens the next unit. Threat-spotting sets come straight from my own blunders. It all ships as a single self-contained HTML page.
+One path through a White and a Black repertoire, ordered by what my games say matters most. Each unit has the idea, the lines, spaced-repetition drills, practice games against an opponent who plays like real club players, and a checkpoint that opens the next unit. Three skill units come straight from my own games: threats I walked into, wins I let slip and endings I gave away. Where a line ends, a plan says what to aim for next, and a built-in engine plays the position on. It all ships as one HTML page with Stockfish running in the browser beside it.
 
 [**Open the app →**](https://vladapl21.github.io/chess-opening-playbook/)
 
@@ -12,7 +12,8 @@ One path through a White and a Black repertoire, ordered by what my games say ma
 
 ![Stockfish 17.1](https://img.shields.io/badge/checked%20with-Stockfish%2017.1-2f6b52)
 ![Maia](https://img.shields.io/badge/opponent%20odds-Maia%201300%2F1500-2f6b52)
-![Single file](https://img.shields.io/badge/app-one%20HTML%20file%2C%20no%20dependencies-2f6b52)
+![Single file](https://img.shields.io/badge/app-one%20HTML%20file-2f6b52)
+![Engine in the browser](https://img.shields.io/badge/in%20the%20browser-Stockfish.js%2019-2f6b52)
 ![License: MIT](https://img.shields.io/badge/license-MIT-2f6b52)
 
 <img src="docs/img/learn-white.png" alt="The Learn page of the White book: eight opening tiles showing how often each came up and the record in those games, with the Italian chapter below" width="100%">
@@ -28,6 +29,7 @@ Most opening courses are written for everyone. They give long lines in algebraic
 - **Words instead of notation.** Moves are described the way you would explain them over a board: *Bishop aims at f7*, *Knight takes back*, *Queen breaks the pin*. Positions that matter get a short note explaining why.
 - **Checked by an engine, built for a human.** Every move in both books was checked with Stockfish 17.1. Lines were chosen to be easy to remember, such as one setup against a whole family of move orders, rather than to squeeze out the last hundredth of a pawn.
 - **One path, unlocked as you go.** The course mixes White and Black units by how often each system comes up and how I score in it. Passing a unit's checkpoint opens the next one, so there is never everything at once.
+- **A line ends, the game doesn't.** Where a lesson's main line stops, a plan takes over in a few lines: where the king goes, which pawns move, what to aim at and what the opponent wants. A built-in engine shows the best moves and the other side's threat in words, and plays the position on from there.
 - **The games feed back in.** Missed tactics become puzzles. Habits that cost games become "insights" with a button that drills the real positions. Notes point back to the games they came from: *"Against ZhoskaStreezh in July you pushed the d-pawn first and the e-pawn took your knight. Knight first, every time."*
 
 ## At a glance
@@ -38,15 +40,16 @@ Most opening courses are written for everyone. They give long lines in algebraic
 | Record in those games             | 48–28                     | 37–35–1                          |
 | Chapters (openings)               | 8                         | 9                                |
 | Lessons                           | 79                        | 62                               |
-| Lines you can drill               | 274                       | 448                              |
-| Positions in the tree             | 2,233                     | 2,439                            |
-| Positions with a written note     | 826                       | 661                              |
+| Lines you can drill               | 274                       | 474                              |
+| Positions in the tree             | 2,233                     | 2,517                            |
+| Positions with a written note     | 826                       | 718                              |
+| Lessons that end with a plan      | 76                        | 62                               |
 | Game reviews                      | 10                        | 11                               |
 | Missed-shot puzzles               | 12                        | 13                               |
 | Patterns across games             | 4                         | 4                                |
-| Cheat-sheet cards                 | 47                        | 61                               |
+| Cheat-sheet cards                 | 47                        | 65                               |
 
-The course on top of both books has **17 units** (13 open, 4 being built): 45 core lessons, 73 optional ones, 72 checkpoint positions and 26 threat-spotting positions from my own games.
+The course on top of both books has **17 units**. Fourteen are opening units: 55 core lessons, 86 optional ones and 84 checkpoint positions. Three are skill units made of positions from my own games: 26 threats I walked into, 18 winning positions I let slip and 16 endings.
 
 ## A tour
 
@@ -64,7 +67,13 @@ The course is the front page. Units alternate between White, Black and skills in
 
 Optional "go deeper" lessons sit under each unit, finished units come back through the drill schedule, and everything stays in Learn for looking ahead.
 
-**Spot the threat** is built from positions in my own games where my next move lost material. Play a losing move and the opponent's real answer is played out on the board; find a safe one and you see the danger in red next to what happened in the game.
+Three skill units sit between the opening units, each built from positions in my own games at the move where it went wrong:
+
+- **Spot the threat.** My next move lost material. Play a losing move and the opponent's real answer is played out on the board; find a safe one and you see the danger in red next to what happened in the game.
+- **Finish the job.** I was winning by a lot and my next move let it go, which is how 21 of my 91 losses happened. Find the move that keeps the win.
+- **Endings.** Endings I reached level or better and then lost: back ranks, pawn endings and active rooks. Find the move that holds the result.
+
+Any position I get wrong opens on the explore board with one click, so I can try my move against the engine and see why it fails.
 
 ### Learn: two books, one switch
 
@@ -79,6 +88,22 @@ The **White | Black** switch swaps the whole app: board orientation, chapters, d
 Each lesson is a board you step through with the buttons or the arrow keys. Every move has its label, an optional note, arrows and circles where they help, and the engine's verdict in words (*Equal*, *Better for White*) with the number beside it. Wherever the opponent has a choice, the alternatives are listed with how often players at this level pick them, and one click jumps into that branch.
 
 <img src="docs/img/study.png" alt="Study view: flipped board for Black, move card, the other lines in the lesson as chips, and the move list" width="100%">
+
+### The engine, and what to do when the line ends
+
+<img src="docs/img/engine.png" alt="The explore board at the end of a Scotch lesson: purple arrows for the engine's three best moves, a red dashed arrow for Black's threat, the moves described in words, and the plan card below" width="100%">
+
+A line in a book has to stop somewhere, and the position it stops in can still look dangerous. Two things pick up from there.
+
+**A plan.** The last position of a lesson's main line comes with a short card: where your king goes, which pawns to push, where the pieces belong, what to aim at, what the opponent wants and what to watch for. It shows in Study, after a drill and at the end of a practice game.
+
+**The engine.** Stockfish runs in the browser. Switch it on under the board in Study, or press **Play on with the engine** when a drill, puzzle or practice game ends. It stays out of the way while you are being tested. The card shows:
+
+- the three best moves for the side to move, in words, each with a purple arrow and its value;
+- the other side's idea, found by asking the engine what they would play if it were their move again: a red dashed arrow, marked **Threat** when it wins something;
+- the line it expects, as a row of plain-English moves that can be played out on the board.
+
+**Play on from here** opens the explore board, where you move the pieces for both sides, or tick a box and the engine answers your moves. Step back at any point to try something else.
 
 ### Drill: spaced repetition, with the opponent's moves played for you
 
@@ -141,9 +166,9 @@ The layout collapses to one column on phones and follows the system's light or d
 | --- | --- | ---: | :---: | --- |
 | **The Italian** | 1.e4 e5 2.Nf3 Nc6 3.Bc4 | 14 | 9–5 | Giuoco Piano. Against c3 and d4: take, check, trade bishops, strike with …d5. Against the slow Italian, one setup every time, castling before the knight can jump at f7. |
 | **Ruy Lopez** | 3.Bb5 | 7 | 5–2 | The knight hits the e-pawn, then the bishop goes to its Italian diagonal and you castle. Against the exchange, take back toward the center. |
-| **Scotch & center gambits** | 2.d4 or 3.d4 | 9 | 3–6 | Knight first, then the pawns. Against the gambits (Scotch Gambit, Danish, Center Game), develop and hit back with …d5. Being rebuilt around the …Bc5 setup. |
-| **Four Knights & Vienna** | 2.Nc3 or 3.Nc3 | 8 | 3–5 | Copy the bishop or slide into the Italian setup. Against the Vienna bishop, the knight jumps to the edge to trade it off. Being rebuilt around the …Bc5 setup. |
-| **Early attacks** | 2.Qh5, 2.Qf3, 2.f4, 2.Bc4 | 6 | 3–3 | Block f7, tuck the bishop beside the king, then castle or jump into the center. Take the King's Gambit pawn and strike with …d5. |
+| **Scotch & center gambits** | 2.d4 or 3.d4 | 9 | 3–6 | The bishop goes to c5 at once, as in the Italian. After a knight trade the queen comes to f6 with a threat on f2, the d-pawn takes back and you castle long. Against the Scotch Gambit the same bishop, then …d5; against the Danish and Göring, …d5 straight away; against the Center Game, kick the queen, pin and castle. |
+| **Four Knights & Vienna** | 2.Nc3 or 3.Nc3 | 8 | 3–5 | Copy the bishop or slide into the Italian setup. Against the Vienna bishop: knight out, …Bc5, …d6, and …h6 against the pin. Against the Vienna Gambit, leave the pawn, play …Bc5 and …d6, then the knight jumps at White's bishop. |
+| **Early attacks** | 2.Qh5, 2.Qf3, 2.f4, 2.Bc4 | 6 | 3–3 | Against the queen: block f7, tuck the bishop beside the king, then castle or jump into the center. Against the King's Gambit, leave the pawn and play …Bc5, which stops White castling, then …d6, knight out and castle. |
 | **Queen's Gambit** | 1.d4 d5 2.c4 | 8 | 5–3 | The Slav: …c6, the light bishop out before …e6, then trade it for White's. Against the pin, the knight jumps to the middle and a queen check on the edge wins the bishop. |
 | **London System** | 1.d4 d5 2.Bf4 | 5 | 2–3 | Copy the bishop, …e6, trade the light bishops, then offer the dark ones. |
 | **Other d-pawn systems** | Colle, Torre, Veresov, Jobava, gambits | 11 | 5–5–1 | The same setup: bishop out before White's bishop, …e6, then …c5 against the Colle. When the knight is taken, take back with the e-pawn. |
@@ -166,10 +191,12 @@ flowchart LR
     R --> B
     B --> J["data_white.json<br/>data_black.json"]
     J --> A["assemble.py<br/>+ app/template.html"]
-    K["content/course.py<br/>+ threat positions"] --> CB["build_course.py"]
+    K["content/course.py<br/>+ skill positions"] --> CB["build_course.py"]
     J --> CB
     CB --> A
+    PL["content/plans.py<br/>a plan per lesson"] --> A
     A --> P["docs/index.html<br/>one page, both books"]
+    E["docs/engine<br/>Stockfish.js 19"] -. "loaded on demand" .-> P
 ```
 
 1. **The games.** PGN exports of both accounts live in [`data/games`](data/games). `black_games.py` collects the Black games and `black_chapters.py` sorts them by White's setup. The White build does the same by Black's reply.
@@ -178,16 +205,18 @@ flowchart LR
 4. **Words, not notation.** Hand-written labels and notes live in [`content/`](content), keyed by the move sequence that reaches each position: `n(path, label, text, tags, arrows, circles)`. Moves without a hand-written label get one from [`label2.py`](pipeline/label2.py), which describes what the move does in context: captures and recaptures, checks, pins, attacks on a bigger or loose piece, castling, pawn pushes. [`lint_notes.py`](pipeline/lint_notes.py) checks claims in the notes, such as pins or "a piece up", against the real positions.
 5. **Game reviews.** [`scan_games.py`](pipeline/scan_games.py) evaluates every move of every game. [`find_shots.py`](pipeline/find_shots.py) keeps positions where the move played lost at least 1.8 pawns and a deeper multi-PV search shows one clearly best move, at least 1.5 pawns ahead of the next. The cleanest of these became the puzzles. The game stories and the cross-game patterns were written from the same scans.
 6. **Build.** [`build_white.py`](pipeline/build_white.py) and [`build_black.py`](pipeline/build_black.py) merge all lines into one tree per book ([`tree.py`](pipeline/tree.py)). They attach labels, notes, arrows, odds and evaluations, precompute the legal moves wherever you are to move, and write `data/build/data_*.json`. [`assemble.py`](pipeline/assemble.py) injects both books and the piece set into [`app/template.html`](app/template.html) and writes [`docs/index.html`](docs/index.html).
-7. **The course.** [`content/course.py`](content/course.py) lists the units in order: required and optional lessons, the idea boards as move paths with arrows, and the checkpoint positions. [`build_course.py`](pipeline/build_course.py) resolves every path against its book (a path that leaves the repertoire fails the build) and writes `data/build/data_course.json`. The threat positions in [`data/course_threats.json`](data/course_threats.json) come from a Stockfish scan of all 200 games: moves that lost at least 20 points of win chance to a tactic, the moves that would have held, and the engine's answer to every other legal move.
-8. **Caches.** Every Stockfish and Maia result is cached in [`data/cache`](data/cache) and committed. That makes the build reproducible byte for byte with nothing but python-chess, in a few seconds and without any engine.
+7. **The course.** [`content/course.py`](content/course.py) lists the units in order: required and optional lessons, the idea boards as move paths with arrows, and the checkpoint positions. [`build_course.py`](pipeline/build_course.py) resolves every path against its book (a path that leaves the repertoire fails the build) and writes `data/build/data_course.json`. The skill positions come from a Stockfish scan of all 200 games. [`data/course_threats.json`](data/course_threats.json) holds moves that lost at least 20 points of win chance to a tactic, with the moves that would have held and the engine's answer to every other legal move. [`course_finish.json`](data/course_finish.json) and [`course_endings.json`](data/course_endings.json) use the same format. The first has positions where I had at least a 78% win chance and my move gave up 15 points or more; the second has endgame moves that cost 12 points or more. In both, a move counts as right when it stays within 7 points of the best one.
+8. **Plans.** [`content/plans.py`](content/plans.py) has one plan per lesson for the position its main line ends in, written from the engine's top lines there and kept to six kinds of bullet: king, pawns, pieces, target, their plan, watch for. `assemble.py` attaches them and checks them for notation.
+9. **Caches.** Every Stockfish and Maia result is cached in [`data/cache`](data/cache) and committed. That makes the build reproducible byte for byte with nothing but python-chess, in a few seconds and without any engine.
 
 ## Under the hood
 
-- **One file.** The app is one HTML file of about 1.7 MB with both books inline: plain HTML, CSS and JavaScript, with no framework or bundler. The only third-party script is supabase-js, and only on the website when accounts are set up. Fonts come from Google Fonts (Bodoni Moda, Instrument Sans, JetBrains Mono); offline, the app falls back to system fonts.
-- **Board.** The board is SVG, drawn with an original piece set ([`app/pieces.py`](app/pieces.py)). It supports drag and tap input, legal-move hints, arrows, circles and a flipped view for Black. Legal moves are precomputed for every position where you move, so the page needs no chess library.
+- **One file.** The app is one HTML file of about 2 MB with both books inline: plain HTML, CSS and JavaScript, with no framework or bundler. [chess.js](https://github.com/jhlywa/chess.js) is inlined for the explore board. The only scripts loaded from elsewhere are the engine, when you ask for it, and supabase-js, on the website when accounts are set up. Fonts come from Google Fonts (Bodoni Moda, Instrument Sans, JetBrains Mono); offline, the app falls back to system fonts.
+- **Board.** The board is SVG, drawn with an original piece set ([`app/pieces.py`](app/pieces.py)). It supports drag and tap input, legal-move hints, arrows, circles and a flipped view for Black. Legal moves are precomputed for every book position where you move, so lessons, drills and the sandbox need no chess library.
+- **Engine.** [`docs/engine`](docs/engine) holds the lite single-threaded build of [Stockfish.js](https://github.com/nmrugg/stockfish.js) 19: a 28 KB script and a 1.8 MB WebAssembly file, fetched the first time the engine is switched on and run in a web worker. The page talks to it in plain UCI text. Each position gets two searches: a short one with the move handed to the other side (their idea), then the three best moves to depth 22 or seven seconds. Results are kept for the session, so stepping back and forth is instant. The engine's moves are put into words by a small JavaScript twin of `label2.py`. The single-threaded build needs no special server headers, so it runs on GitHub Pages; it can't start from a page opened as a file, and the card says so.
 - **Two books, one engine.** `loadBook()` swaps every index (nodes, lines, lessons, chapters, whose move is whose, board orientation) when you flip the switch. Line ids never collide between the books (the build checks this), so one progress store holds both.
 - **Progress and accounts.** Progress is always saved in the browser first. On the website, an account (email and password through [Supabase](https://supabase.com)) keeps a copy in the cloud, so the same progress shows up on every device. Sync pulls and merges on sign-in, on load and whenever the tab comes back into view: the newest record wins for each drill line and puzzle, and course steps keep the best result. The project URL and publishable key live in [`app/site.json`](app/site.json), the tables and row-level security in [`supabase/schema.sql`](supabase/schema.sql). When the page runs as a Claude artifact, it syncs to the artifact's own per-user storage instead.
-- **Deep links.** `#course` and `#unit.<unit-id>` open the course and a unit (a unit brings its own book). `#learn`, `#sandbox`, `#drill`, `#games`, `#cheat`, `#learn.<chapter>` and `#line.<line-id>` open the matching view. Add a `b.` prefix for the Black book, for example [`#b.learn.london`](https://vladapl21.github.io/chess-opening-playbook/#b.learn.london) or [`#b.line.bs-mieses`](https://vladapl21.github.io/chess-opening-playbook/#b.line.bs-mieses).
+- **Deep links.** `#course` and `#unit.<unit-id>` open the course and a unit (a unit brings its own book). `#learn`, `#sandbox`, `#drill`, `#games`, `#cheat`, `#learn.<chapter>` and `#line.<line-id>` open the matching view. Add a `b.` prefix for the Black book, for example [`#b.learn.london`](https://vladapl21.github.io/chess-opening-playbook/#b.learn.london) or [`#b.line.bs-classical`](https://vladapl21.github.io/chess-opening-playbook/#b.line.bs-classical).
 
 <details>
 <summary><b>Data model</b></summary>
@@ -198,7 +227,7 @@ Each book is one JSON object. Its `nodes` form a tree of positions, and everythi
 | --- | --- |
 | `nodes` | The move tree (fields below) |
 | `lines` | A named path through the tree: `{id, lesson, title, main, n: [node indexes]}` |
-| `lessons` | `{id, part, title, sub, why, pri: core/common/rare, outcome, lines}` |
+| `lessons` | `{id, part, title, sub, why, pri: core/common/rare, outcome, lines, plan}` |
 | `parts`, `chapters` | Grouping, chapter text, hero boards, facts and per-chapter game stats |
 | `games` | Reviews: opponent, ratings, result, date, story, key moments, replay lines |
 | `puzzles` | Missed shots: game, position, accepted answers, title, note |
@@ -249,10 +278,12 @@ app/
   template.html            the whole app: markup, styles and script for both books
   pieces.py                the original SVG piece set
   site.json                Supabase project URL and publishable key for the website build
+  vendor/chess.js          chess.js 0.10.3 (BSD-2-Clause), inlined into the page for the explore board
 supabase/
   schema.sql               accounts: profiles and progress tables, row-level security
 content/
   course.py                the course: units, idea boards, checkpoint positions
+  plans.py                 the plan shown where each lesson's main line ends
   white/                   White book: lessons, labels and notes, chapter text, game reviews
   black/                   Black book: bcontent (lessons), bnotes + bnotes2 (labels, notes, arrows),
                            bmeta (chapters, game reviews, puzzles, cheat sheet, insights)
@@ -260,7 +291,7 @@ pipeline/
   build_white.py           build the White book    -> data/build/data_white.json
   build_black.py           build the Black book    -> data/build/data_black.json
   build_course.py          build the course        -> data/build/data_course.json
-  assemble.py              inject the books and the course into the template -> docs/index.html
+  assemble.py              inject the books, the course and the plans into the template -> docs/index.html
   tree.py, label2.py       move tree; context-aware plain-English labels
   maia.py, expand.py       human move odds (Maia, NumPy only) and the coverage walk
   human_odds.py, sf.py     command-line helpers: Maia odds and Stockfish top moves for any line
@@ -274,27 +305,30 @@ data/
   games/                   PGN exports of both accounts (July to October 2026)
   cache/                   Stockfish and Maia results, so builds need no engine
   black_*.json             Black games, per-move scans, candidate shots
-  course_threats.json      threat-spotting positions from all 200 games, with the engine's answers
+  course_threats.json, course_finish.json, course_endings.json
+                           skill-unit positions from all 200 games, with the engine's answers
   build/                   data_white.json, data_black.json, data_course.json, playbook.html
 docs/
   index.html               the built app, served by GitHub Pages
+  engine/                  Stockfish.js 19 (GPL-3.0): the script, the WebAssembly file and the license
   img/                     the images in this README
 tests/
-  e2e_white.py, e2e_black.py, e2e_sandbox_switch.py, e2e_course.py, e2e_accounts.py
+  e2e_white.py, e2e_black.py, e2e_sandbox_switch.py, e2e_course.py, e2e_accounts.py, e2e_engine.py
                            end-to-end browser tests (Playwright)
+  serve.py                 serves the built page over local HTTP for the engine test and screenshots
   fake_supabase.js         stand-in for supabase-js so account tests run offline
   readme_shots.py          regenerates docs/img
 ```
 
 ## Build it yourself
 
-The built app is committed, so [`docs/index.html`](docs/index.html) opens straight from disk. To rebuild it:
+The built app is committed, so [`docs/index.html`](docs/index.html) opens straight from disk. Everything works that way except the engine, which needs the page served over HTTP: run `python3 -m http.server` inside `docs/` and open `http://localhost:8000`. To rebuild the app:
 
 ```bash
 git clone https://github.com/vladapl21/chess-opening-playbook.git
 cd chess-opening-playbook
 python3 -m pip install -r requirements.txt     # python-chess (+ numpy for Maia)
-make build                                     # or run the three scripts below
+make build                                     # or run the four scripts below
 ```
 
 ```bash
@@ -321,7 +355,7 @@ Some useful commands while writing:
 ```bash
 python3 pipeline/human_odds.py "e4 e5 Nf3 Nc6 Bc4"     # what club players play here, with odds
 python3 pipeline/sf.py -d 18 "e4 e5 Nf3 Nc6 Bc4 Bc5"   # Stockfish's top three moves
-python3 pipeline/check_black.py 16 bi-main,bs-mieses   # check lessons (or all, without ids)
+python3 pipeline/check_black.py 16 bi-main,bs-classical  # check lessons (or all, without ids)
 python3 pipeline/lint_notes.py                         # notes that contradict their position
 ```
 
@@ -333,11 +367,13 @@ python3 -m playwright install chromium
 make test
 ```
 
-The tests drive the real page in Chromium. They visit every chapter in both books, step through lessons, and play drills by dragging and tapping (correct moves, slips, castling). They solve every puzzle and play sandbox games across every opening and odds setting, including a regression test for changing the opening mid-game. They also follow deep links, switch books back and forth with state kept, and check that the phone layout never scrolls sideways, in light and dark mode. The course test works through the first units the way a person would: the idea boards, a lesson, a drill line, a checkpoint with a deliberate miss, practice games against a unit's lines, and a threat set where wrong moves get played out and punished. The accounts test runs two browsers against a fake Supabase server as two devices on one account: sign-up carrying local progress along, sync both ways, an outage and recovery, a second account on the same device, and the email confirmation, password reset and expired-link flows. Screenshots land in `tests/out/`. To regenerate the images in this README, run `make shots`.
+The tests drive the real page in Chromium. They visit every chapter in both books, step through lessons, and play drills by dragging and tapping (correct moves, slips, castling). They solve every puzzle and play sandbox games across every opening and odds setting, including a regression test for changing the opening mid-game. They also follow deep links, switch books back and forth with state kept, and check that the phone layout never scrolls sideways, in light and dark mode. The course test works through the first units the way a person would: the idea boards, a lesson, a drill line, a checkpoint with a deliberate miss, practice games against a unit's lines, and a threat set where wrong moves get played out and punished. The engine test serves the page over local HTTP and runs the real engine: the switch in Study, three different best moves with their arrows, the plan at the end of a line, moves for both sides on the explore board by tap and by drag, the engine answering, its line played out, a reload that keeps the position, and the note shown when the page is opened as a file. The accounts test runs two browsers against a fake Supabase server as two devices on one account: sign-up carrying local progress along, sync both ways, an outage and recovery, a second account on the same device, and the email confirmation, password reset and expired-link flows. Screenshots land in `tests/out/`. To regenerate the images in this README, run `make shots`.
 
 ## Credits
 
-- **[Stockfish](https://stockfishchess.org)** 17.1 produced every evaluation and move check (GPL-3.0; not included).
+- **[Stockfish](https://stockfishchess.org)** 17.1 produced every evaluation and move check in the books (GPL-3.0; not included).
+- **[Stockfish.js](https://github.com/nmrugg/stockfish.js)** 19 by Nathan Rugg and Chess.com, a WebAssembly port of Stockfish, is the engine in the app (GPL-3.0; unchanged release files in [`docs/engine`](docs/engine) with their license and a link to the source).
+- **[chess.js](https://github.com/jhlywa/chess.js)** 0.10.3 by Jeff Hlywa supplies the rules on the explore board (BSD-2-Clause; inlined with its notice).
 - **[Maia Chess](https://maiachess.com)** by the University of Toronto's Computational Social Science Lab supplied the human move odds. See McIlroy-Young, Sen, Kleinberg and Anderson, *Aligning Superhuman AI with Human Behavior: Chess as a Model System*, KDD 2020. Weights are not included.
 - **[lczero-training](https://github.com/LeelaChessZero/lczero-training)** provided the policy index used to read Maia's output.
 - **[python-chess](https://github.com/niklasf/python-chess)** by Niklas Fiekas handles move generation, PGN parsing and engine communication in the pipeline (GPL-3.0).
@@ -347,4 +383,4 @@ The tests drive the real page in Chromium. They visit every chapter in both book
 
 ## License
 
-The code and the written content are released under the [MIT License](LICENSE). Stockfish, Maia, lczero-training and python-chess keep their own licenses.
+The code and the written content are released under the [MIT License](LICENSE). Stockfish, Maia, lczero-training and python-chess keep their own licenses. The two engine files in [`docs/engine`](docs/engine) are Stockfish.js under the GPL-3.0; the app runs them as a separate program in a web worker and talks to them over the UCI text protocol. chess.js keeps its BSD-2-Clause license.
