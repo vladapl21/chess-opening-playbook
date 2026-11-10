@@ -7,10 +7,11 @@ Every move path is resolved against the unit's book, so a path that leaves the r
 import json, datetime
 import paths
 import chess
-from course import UNITS, THREAT_IDEA, QUIZ
+from course import UNITS, QUIZ, SKILL_IDEAS
 
 BOOK = {s: json.load(open(paths.BUILD / f'data_{n}.json')) for s, n in (('w', 'white'), ('b', 'black'))}
-THREATS = json.load(open(paths.DATA / 'course_threats.json'))
+# skill units: positions from your own games (data/course_<skill>.json, picked by the scripts in the README)
+SKILL_SRC = {'threats': 'course_threats.json', 'finish': 'course_finish.json', 'endings': 'course_endings.json'}
 ME = {'w': 1, 'b': 0}
 
 
@@ -61,10 +62,10 @@ def quiz_item(side, path, main_lines):
 
 
 def threat_item(t):
-    return dict(id=t['id'], fen=t['fen'].split()[0], me=t['me'], last=t['last'], lastLabel=t['lastLabel'], safe=t['safe'], legal=t['legal'],
+    return dict(id=t['id'], fen=t['fen'].split()[0], ff=t['fen'], me=t['me'], last=t['last'], lastLabel=t['lastLabel'], safe=t['safe'], legal=t['legal'],
                 played=t['played'], playedLabel=t['playedLabel'], reply=t['reply'], replyLabel=t['replyLabel'],
                 threat=t['threat'], threatLabel=t['threatLabel'], refute={u: r[:2] for u, r in t['refute'].items()},
-                opp=t['opp'], date=short_date(t['date']))
+                opp=t['opp'], date=short_date(t['date']), **({'best': t['best']} if 'best' in t else {}))
 
 
 units, seen_lessons = [], {}
@@ -79,13 +80,18 @@ for U in UNITS:
             u['chapter'] = U['chapter']
         units.append(u); continue
     if u['kind'] == 'skill':
-        ex = THREATS['examples']
-        u['idea'] = [dict(fen=e['fen'].split()[0], me=e['me'], last=e['last'], h=c['h'], t=c['t'],
-                          arrows=[e['played'][:4] + 'b', e['reply'][:4] + 'r'] if c.get('show') == 'move' else [(e['threat'] or e['reply'])[:4] + 'r'],
+        sk = u['skill'] = U.get('skill', 'threats')
+        T = json.load(open(paths.DATA / SKILL_SRC[sk])); ex = T['examples']; cards = SKILL_IDEAS[sk]
+        assert len(ex) == len(cards), (sk, len(ex), len(cards))
+        def card_arrows(e, c):
+            if c.get('show') == 'move': return [e['played'][:4] + 'b', e['reply'][:4] + 'r']
+            if c.get('show') == 'keep': return [e['safe'][0][:4] + 'g', e['played'][:4] + 'b']
+            return [(e['threat'] or e['reply'])[:4] + 'r']
+        u['idea'] = [dict(fen=e['fen'].split()[0], me=e['me'], last=e['last'], h=c['h'], t=c['t'], arrows=card_arrows(e, c),
                           game=f"vs {e['opp']}, {short_date(e['date'])}")
-                     for e, c in zip(ex, THREAT_IDEA)]
-        u['sets'] = [[threat_item(t) for t in s] for s in THREATS['sets']]
-        u['check'] = [threat_item(t) for t in THREATS['check']]
+                     for e, c in zip(ex, cards)]
+        u['sets'] = [[threat_item(t) for t in s] for s in T['sets']]
+        u['check'] = [threat_item(t) for t in T['check']]
         u['passSet'], u['passCheck'] = U['pass_set'], U['pass_check']
         units.append(u); continue
     side = U['side']; D = BOOK[side]; L = {l['id']: l for l in D['lessons']}; LN = {l['id']: l for l in D['lines']}

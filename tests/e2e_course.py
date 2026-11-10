@@ -146,12 +146,40 @@ with sync_playwright() as p:
     print('stored course progress:', {k: v for k, v in stored['u'].items()}, '| lessons seen', list(stored['seen']))
     ctx.close()
 
+    # ---- the rebuilt Black units and the two newer skill units (a fresh browser, nothing passed yet)
+    ctx2 = b.new_context(viewport={'width': 1280, 'height': 900}); n2 = ctx2.new_page(); hook(n2)
+    n2.goto(URL + '#course'); n2.wait_for_timeout(900)
+    assert n2.locator('.ucard.soon').count() == 0 and 'coming soon' not in n2.inner_text('.cmeter')
+    for uid, ideas in (('b-scotch', 4), ('b-vienna', 5)):
+        n2.evaluate(f"openUnit('{uid}')"); n2.wait_for_timeout(400)
+        assert n2.evaluate('[S.view, SIDE, FLIP]') == ['unit', 'b', True] and n2.locator('#ideaBoard').count() == 1
+        assert n2.evaluate(f"UNIT['{uid}'].idea.length") == ideas
+        n2.screenshot(path=out + f'c_unit_{uid}.png', full_page=True)
+        n2.evaluate(f"startQuiz('{uid}', 'cp')"); n2.wait_for_timeout(400)
+        r = quiz(n2); print(uid, 'checkpoint:', r); assert r['res'].count(True) == 6
+    for uid, word in (('finish', 'winning'), ('endings', 'ending')):
+        n2.evaluate(f"openUnit('{uid}')"); n2.wait_for_timeout(400)
+        assert n2.evaluate(f"UNIT['{uid}'].skill") == uid and n2.locator('.step').count() == 4
+        n2.screenshot(path=out + f'c_unit_{uid}.png', full_page=True)
+        n2.evaluate(f"startQuiz('{uid}', 's1')"); n2.wait_for_timeout(400)
+        ask = n2.inner_text('#qpanel .ask'); print(uid, 'asks:', ask)
+        assert word in ask.lower()
+        n2.screenshot(path=out + f'c_{uid}_q1.png')
+        r = quiz(n2, wrong_first=(0,)); print(uid, 'set 1:', r)
+        assert r['state'] == 'done' and r['res'][0] is False and all(r['res'][1:])
+        # a missed position can be played on with the engine (the board opens on that position)
+        n2.click('#qpanel [data-miss="0"]'); n2.wait_for_timeout(500)
+        assert n2.evaluate('S.view') == 'explore' and n2.evaluate('S.ex.start') == n2.evaluate('S.quizState.items[0].ff')
+        n2.click('#exBack'); n2.wait_for_timeout(400)
+        assert n2.evaluate('S.view') == 'quiz'
+    ctx2.close()
+
     # ---- phone, light and dark: no sideways scroll on the path, a unit page or a quiz
     for scheme in ['light', 'dark']:
         ph = b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=2, color_scheme=scheme, is_mobile=True, has_touch=True)
         q = ph.new_page(); hook(q)
         q.goto(URL + '#course'); q.wait_for_timeout(900)
-        for what, js in [('course', None), ('unit', "openUnit('w-italian')"), ('quiz', "startQuiz('w-italian', 'cp')"), ('threat', "startQuiz('threats', 's2')")]:
+        for what, js in [('course', None), ('unit', "openUnit('w-italian')"), ('quiz', "startQuiz('w-italian', 'cp')"), ('threat', "startQuiz('threats', 's2')"), ('ending', "startQuiz('endings', 'cp')")]:
             if js: q.evaluate(js); q.wait_for_timeout(500)
             ow = q.evaluate('document.documentElement.scrollWidth'); assert ow <= 390, (scheme, what, ow)
             q.screenshot(path=out + f'c_phone_{what}_{scheme}.png', full_page=what in ('course', 'unit'))

@@ -120,10 +120,14 @@ with sync_playwright() as p:
     pg.click('.sidesw [data-side="b"]'); pg.wait_for_timeout(400)
     print('black again view:', pg.evaluate('S.view'), '| due badge W:', pg.inner_text('#dueW'), pg.is_hidden('#dueW'))
     # ---- deep links
-    for h in ['#b.learn.london', '#b.line.bs-mieses', '#b.games', '#learn.sic', '#line.setup']:
+    for h in ['#b.learn.london', '#b.line.bs-classical', '#b.games', '#learn.sic', '#line.setup']:
         pg2 = ctx.new_page(); hook(pg2)
         pg2.goto(URL + h); pg2.wait_for_timeout(700)
-        print('  link', h, '->', pg2.evaluate('[SIDE, S.view, S.chapter, S.line]'))
+        got = pg2.evaluate('[SIDE, S.view, S.chapter, S.line]')
+        print('  link', h, '->', got)
+        if h == '#b.line.bs-classical':
+            where = pg2.inner_text('.crumbs .where'); print('    where:', where)
+            assert got[:2] == ['b', 'study'] and got[3] == 'bs-classical' and where.startswith('Scotch'), (got, where)
         pg2.close()
     # ---- phone + dark
     for scheme in ['light', 'dark']:
@@ -134,7 +138,7 @@ with sync_playwright() as p:
         print(f'phone {scheme}: scrollWidth', ow)
         assert ow <= 390
         q.screenshot(path=out + f'b_phone_learn_{scheme}.png')
-        q.evaluate("openLine('bs-mieses')"); q.wait_for_timeout(400)
+        q.evaluate("openLine('bs-classical')"); q.wait_for_timeout(400)
         for _ in range(5): q.keyboard.press('ArrowRight'); q.wait_for_timeout(100)
         q.screenshot(path=out + f'b_phone_study_{scheme}.png')
         for v in ['drill', 'sandbox', 'games', 'cheat']:

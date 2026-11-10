@@ -16,6 +16,7 @@
 | Bringing in games | chess.com or Lichess username (public APIs), PGN upload as a fallback | No files to export for most people |
 | Where analysis runs | In the browser (a Web Worker, Stockfish compiled to WebAssembly), results saved to the account | No server costs, and games never leave the device unprocessed |
 | The claude.ai artifact | Stays as a personal build with its own storage | Its sandbox blocks network calls, so it can't reach Supabase. The site is the main app |
+| Engine in the app (November 10) | Stockfish.js 19, lite single-threaded build, in a web worker; hidden while you are being tested | Runs on a plain static host with no special headers, and the same worker will do the game analysis in Phase 3 |
 
 Facts that shape the design:
 
@@ -36,6 +37,14 @@ Facts that shape the design:
 - Sync is local-first. Every save goes to the browser at once and to the account a second later. Progress is pulled and merged on sign-in, on load, and whenever the tab comes back into view. Merge rules: the newest record wins for each drill line and puzzle; course steps keep the best score and any completion; sandbox counters keep the higher number. Progress made without an account is adopted by the first account that signs in on that device. A different account signing in on the same device starts from its own saved progress instead.
 - Tested in Playwright against a fake Supabase that keeps one in-memory server across two browsers ("two devices").
 
+## Phase 1.5: the engine, plans and the rest of the course (done)
+
+- **Sign-in after signing out.** The account sheet opens on "Sign in" with the last email filled in, with tabs for both forms.
+- **A built-in engine.** Stockfish.js runs in the browser: the three best moves in words, the other side's idea (a search with the move handed to them), and the line it expects. It is off during drills, practice games and checkpoints and comes on when they end.
+- **The explore board.** "Play on from here" at the end of any line, drill, puzzle, practice game or missed checkpoint position: moves for both sides, or the engine answers.
+- **Plans.** One card per lesson for the position its main line ends in: king, pawns, pieces, target, their plan, watch for (`content/plans.py`).
+- **The four units that were "coming soon".** The Black Scotch, Vienna and King's Gambit lines rebuilt around the bishop-to-c5 setup, and two skill units from my own games: Finish the job and Endings.
+
 ## Phase 2: onboarding
 
 - **Welcome.** An original mascot (a knight), with "Get started" and "I already have an account".
@@ -49,7 +58,8 @@ Facts that shape the design:
 
 - **In a worker.** Parse the PGNs, walk each game through the system packs' move trees, and count frequency and score for each opponent first move and each system. Note where you leave the book.
 - **Toss-ups.** Two systems that are close in frequency and score, a first move none of your systems answers, or a system you score badly in that has a natural alternative.
-- **Blunder mining** with Stockfish WebAssembly on your own moves. This produces personal "Spot the threat" sets in the same format as `data/course_threats.json`.
+- **Blunder mining** with Stockfish WebAssembly on your own moves (the engine worker from Phase 1.5). This produces personal "Spot the threat", "Finish the job" and "Endings" sets in the same format as `data/course_threats.json`.
+- **Plans for any position.** The plan cards are hand-written today. For generated repertoires they need a template filled from the position: pawn structure, king placement, open files and the engine's top lines.
 - **Course generator.** Units come from the chosen systems, ordered by how often you face them and how badly you score, with skill units mixed in.
 
 ## Phase 4: gamification
@@ -63,7 +73,6 @@ Facts that shape the design:
 - **Split today's two books into packs.** For White: Italian, Two Knights, the Sicilian with c3, the Caro-Kann main line, the French advance, Scandinavian, Pirc, Philidor and Petrov, and the rare first moves. For Black: the e-pawn setup with the bishop on c5, the Slav setup, and the answers to the English and Réti.
 - **Add alternatives so toss-ups have real choices.** Against 1.e4, a Caro-Kann setup. Against 1.d4, a King's Indian setup. For White, a London system for d-pawn players.
 - **Each pack** gets lines, opponent odds at 1200 to 1800, engine checks, and notes with no notation, built by the existing pipeline.
-- **Finish the "coming soon" units:** the Black Scotch, Vienna and early-attack units around the bishop-to-c5 setup, Finish the job, and Endings.
 
 ## Phase 6: open it to friends
 
