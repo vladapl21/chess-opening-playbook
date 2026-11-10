@@ -451,6 +451,10 @@ button.ucard:hover{border-color:var(--accent);transform:translateY(-1px)}
 .field small{font-weight:500;color:var(--muted)}
 .sheet .btn.primary{width:100%;justify-content:center;min-height:46px;font-size:15px}
 .sheet .alt{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:space-between;font-size:13.5px}
+.atabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:12px;background:var(--surface-2);margin-right:46px}
+.atabs button{border:0;border-radius:9px;padding:9px 8px;background:none;color:var(--muted);font:600 14px var(--f-body);cursor:pointer}
+.atabs button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px var(--line)}
+.atabs button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .formmsg{font-size:14px;border-radius:10px;padding:10px 12px;background:var(--accent-soft);color:var(--ink)}
 .formmsg.bad{background:var(--rosso-soft)}
 .syncline{display:flex;align-items:center;gap:8px;font-size:14px}
@@ -459,6 +463,7 @@ button.ucard:hover{border-color:var(--accent);transform:translateY(-1px)}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;max-width:calc(100% - 32px);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:var(--shadow)}
 .nudge{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 14px;border-radius:14px;background:var(--surface);border:1px solid var(--line);margin:0 0 22px}
 .nudge span{flex:1 1 260px;min-width:0;font-size:14.5px}
+.nudge .nbtns{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
 @media (max-width:560px){
   .toast{top:calc(12px + env(safe-area-inset-top,0px));bottom:auto}
   .scrim{place-items:end center;padding-bottom:0}
@@ -821,6 +826,7 @@ const Cloud = {
     }
     if (ev === 'PASSWORD_RECOVERY' && u) Acct.open('newpass');
     if (!u){ this.state = 'out'; renderAcct(); return; }
+    if (u.email) keepEmail(u.email);
     if (u.id !== was) await this.pull();
     renderAcct();
   },
@@ -873,7 +879,27 @@ function renderAcct(){
     b.setAttribute('aria-label', `Your account, ${u.email}. Progress ${word.toLowerCase().replace('…', '')}.`);
   } else { b.className = 'acct out'; b.textContent = 'Sign in'; b.setAttribute('aria-label', 'Sign in to save your progress'); }
   if (Acct.mode) Acct.render();
-  const n = document.getElementById('nudge'); if (n) n.hidden = !!u;
+  renderNudge();
+}
+// the email last used to sign in on this device, so signing back in is one password away
+const EKEY = 'playbook-acct-email';
+function lastEmail(){ try { return localStorage.getItem(EKEY) || ''; } catch(e){ return ''; } }
+function keepEmail(e){ try { if (e) localStorage.setItem(EKEY, e); } catch(e2){} }
+const returning = () => !!(lastEmail() || Prog.d.owner);
+// the course banner: new players are asked to make an account, players who signed out are asked to sign back in
+function renderNudge(){
+  const n = document.getElementById('nudge'); if (!n) return;
+  let off = false; try { off = sessionStorage.getItem('nudge-off') === '1'; } catch(e){}
+  if (Cloud.user || off || !Cloud.on()){ n.hidden = true; return; }
+  n.hidden = false;
+  const back = returning();
+  n.innerHTML = back
+    ? `<span><b>You're signed out.</b> New progress is only kept in this browser until you sign back in.</span><span class="nbtns"><button class="btn primary small" type="button" data-nudge="signin">Sign in</button><button class="linkish" type="button" data-nudge="off">Not now</button></span>`
+    : `<span><b>Your progress is only saved in this browser.</b> Make a free account to keep it on every device.</span><span class="nbtns"><button class="btn primary small" type="button" data-nudge="signup">Make an account</button><button class="btn ghost small" type="button" data-nudge="signin">Sign in</button><button class="linkish" type="button" data-nudge="off">Not now</button></span>`;
+  n.querySelectorAll('[data-nudge]').forEach(x => x.onclick = () => {
+    if (x.dataset.nudge === 'off'){ try { sessionStorage.setItem('nudge-off', '1'); } catch(e){} n.hidden = true; return; }
+    Acct.open(x.dataset.nudge);
+  });
 }
 // the sign-in sheet: modes signup, signin, forgot, newpass, check, in
 const Acct = {
@@ -881,9 +907,12 @@ const Acct = {
   open(mode, msg, bad){
     if (!Cloud.on()) return;
     if (!this.mode) this.back = document.activeElement;
-    this.mode = mode || (Cloud.user ? 'in' : 'signup'); this.msg = msg || ''; this.bad = !!bad; this.busy = false;
+    // the header button says "Sign in", so signed-out players land on sign-in; making an account is the tab beside it
+    this.mode = mode || (Cloud.user ? 'in' : 'signin'); this.msg = msg || ''; this.bad = !!bad; this.busy = false;
+    if (!this.email) this.email = lastEmail();
     document.getElementById('acctSheet').hidden = false; this.render();
-    const f = document.querySelector('#acctPanel input, #acctPanel .btn.primary'); if (f) f.focus();
+    const ins = [...document.querySelectorAll('#acctPanel input')], f = ins.find(i => !i.value) || ins[0] || document.querySelector('#acctPanel .btn.primary');
+    if (f) f.focus();
   },
   close(){
     this.mode = null; document.getElementById('acctSheet').hidden = true;
@@ -896,11 +925,12 @@ const Acct = {
     const email = `<label class="field">Email<input name="email" type="email" autocomplete="email" required value="${em}"></label>`;
     const pass = (ac, hint) => `<label class="field">Password<input name="password" type="password" autocomplete="${ac}" required minlength="8">${hint ? '<small>At least 8 characters.</small>' : ''}</label>`;
     const go = t => `<button class="btn primary" type="submit" ${this.busy ? 'disabled' : ''}>${this.busy ? 'One moment…' : t}</button>`;
+    const tabs = `<div class="atabs" role="group" aria-label="Sign in or make an account"><button type="button" data-mode="signin" aria-pressed="${m === 'signin'}">Sign in</button><button type="button" data-mode="signup" aria-pressed="${m === 'signup'}">Create account</button></div>`;
     let h;
-    if (m === 'signup') h = `<h2 id="acctTitle">Save your progress</h2><p>Make an account to keep your drills, course and practice games on every device. What you've done on this device comes with you.</p>${msg}
-      <form data-act="signup">${email}${pass('new-password', true)}${go('Create account')}</form><div class="alt"><button class="linkish" data-mode="signin" type="button">I already have an account</button></div>`;
-    else if (m === 'signin') h = `<h2 id="acctTitle">Welcome back</h2><p>Sign in to pick up where you left off.</p>${msg}
-      <form data-act="signin">${email}${pass('current-password')}${go('Sign in')}</form><div class="alt"><button class="linkish" data-mode="forgot" type="button">Forgot your password?</button><button class="linkish" data-mode="signup" type="button">New here? Make an account</button></div>`;
+    if (m === 'signup') h = `${tabs}<h2 id="acctTitle">Save your progress</h2><p>Make an account to keep your drills, course and practice games on every device. What you've done on this device comes with you.</p>${msg}
+      <form data-act="signup">${email}${pass('new-password', true)}${go('Create account')}</form>`;
+    else if (m === 'signin') h = `${tabs}<h2 id="acctTitle">Welcome back</h2><p>Sign in to pick up where you left off. What you've done on this device while signed out comes with you.</p>${msg}
+      <form data-act="signin">${email}${pass('current-password')}${go('Sign in')}</form><div class="alt"><button class="linkish" data-mode="forgot" type="button">Forgot your password?</button></div>`;
     else if (m === 'forgot') h = `<h2 id="acctTitle">Reset your password</h2><p>We'll email you a link. Open it in this browser to choose a new password.</p>${msg}
       <form data-act="forgot">${email}${go('Send the link')}</form><div class="alt"><button class="linkish" data-mode="signin" type="button">Back to sign in</button></div>`;
     else if (m === 'newpass') h = `<h2 id="acctTitle">Choose a new password</h2>${msg}<form data-act="newpass">${pass('new-password', true)}${go('Save the password')}</form>`;
@@ -914,7 +944,11 @@ const Acct = {
     }
     P.innerHTML = `<button class="x" type="button" aria-label="Close" data-act="close">×</button>${h}`;
     const F = P.querySelector('form'); if (F) F.onsubmit = e => { e.preventDefault(); this.submit(F.dataset.act, new FormData(F)); };
-    P.querySelectorAll('[data-mode]').forEach(x => x.onclick = () => { const i = P.querySelector('input[name=email]'); if (i) this.email = i.value; this.open(x.dataset.mode); });
+    P.querySelectorAll('[data-mode]').forEach(x => x.onclick = () => {
+      const i = P.querySelector('input[name=email]'); if (i) this.email = i.value;
+      const tab = x.closest('.atabs'); this.open(x.dataset.mode);
+      if (tab){ const t = P.querySelector(`.atabs [data-mode="${x.dataset.mode}"]`); if (t) t.focus(); }
+    });
     P.querySelectorAll('button[data-act]').forEach(x => x.onclick = () => this.submit(x.dataset.act));
   },
   async submit(act, fd){
@@ -926,11 +960,11 @@ const Acct = {
     try {
       if (act === 'signup'){
         r = await A.signUp({email, password, options: {emailRedirectTo: SITE.home}});
-        if (!r.error){ if (r.data && r.data.session){ this.close(); toast('Account made. Your progress is saved to it now.'); return; } this.busy = false; this.mode = 'check'; this.render(); return; }
+        if (!r.error){ keepEmail(email); if (r.data && r.data.session){ this.close(); toast('Account made. Your progress is saved to it now.'); return; } this.busy = false; this.mode = 'check'; this.render(); return; }
       }
       else if (act === 'signin'){
         r = await A.signInWithPassword({email, password});
-        if (!r.error){ this.close(); toast('Signed in. Your progress is saved to your account.'); return; }
+        if (!r.error){ keepEmail(email); this.close(); toast('Signed in. Your progress is saved to your account.'); return; }
       }
       else if (act === 'forgot'){
         r = await A.resetPasswordForEmail(email, {redirectTo: SITE.home + '?reset=1'});
@@ -1905,15 +1939,12 @@ function renderCourse(){
         <ol class="ministeps" aria-label="Steps in this unit">${steps.map(s => `<li class="${s.done ? 'done' : s === nx ? 'next' : ''}">${s.done ? ICON.check : ''}${esc(s.title)}</li>`).join('')}</ol>
         <div class="cta"><button class="btn primary" id="cGo">${esc(stepCta(cur, nx))}</button><button class="btn" data-unit="${cur.id}">See the whole unit</button></div></div></section>`;
   } else hero = `<section class="chero done"><div><p class="kicker">Every open unit passed</p><h3>Now keep it fresh.</h3><p class="lede">Lines you've learned come back for review in the Drill tab, and the units marked "coming soon" open as they're built.</p></div></section>`;
-  let nudgeOff = false; try { nudgeOff = sessionStorage.getItem('nudge-off') === '1'; } catch(e){}
-  const nudge = Cloud.on() && !nudgeOff ? `<div class="nudge" id="nudge" ${Cloud.user ? 'hidden' : ''}><span><b>Your progress is only saved in this browser.</b> Make a free account to keep it on every device.</span><button class="btn primary small" id="nudgeGo" type="button">Make an account</button><button class="btn ghost small" id="nudgeOff" type="button">Not now</button></div>` : '';
-  view.innerHTML = `${nudge}<div class="chead"><div><p class="kicker">Your course · White and Black together</p><h2>One path, in the order that matters</h2>
+  view.innerHTML = `<div class="nudge" id="nudge" hidden></div><div class="chead"><div><p class="kicker">Your course · White and Black together</p><h2>One path, in the order that matters</h2>
       <p>Units are ordered by how often each system comes up in your games and how you score in it. Each unit: the idea, the lines, a drill, ${SPAR} practice games, then a checkpoint. Pass the checkpoint and the next unit opens. Finished units keep coming back for review, and every line is still in Learn if you want to look ahead.</p></div>
     <div class="cmeter"><div class="bar" aria-hidden="true">${bar}</div><span>${passedN} of ${open.length} units passed${COURSE.length > open.length ? ` · ${COURSE.length - open.length} coming soon` : ''}</span></div></div>
     ${hero}<ol class="path" aria-label="Course units">${COURSE.map(U => unitRow(U, cur)).join('')}</ol>`;
   const g = document.getElementById('cGo'); if (g) g.onclick = () => { const nx = unitSteps(cur).find(s => !s.done); if (nx) doStep(cur, nx.key); else openUnit(cur.id); };
-  const ng = document.getElementById('nudgeGo'); if (ng) ng.onclick = () => Acct.open('signup');
-  const no = document.getElementById('nudgeOff'); if (no) no.onclick = () => { try { sessionStorage.setItem('nudge-off', '1'); } catch(e){} document.getElementById('nudge').hidden = true; };
+  renderNudge();
 }
 function unitRow(U, cur){
   const open = unitOpen(U), passed = unitPassed(U), isCur = U === cur, steps = U.soon ? [] : unitSteps(U), done = steps.filter(s => s.done).length, due = passed ? unitDue(U) : 0;
