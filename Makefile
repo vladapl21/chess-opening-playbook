@@ -20,6 +20,7 @@ test: build
 	$(PY) tests/e2e_versions.py
 	$(PY) tests/e2e_shell.py
 	$(PY) tests/e2e_onboarding.py
+	$(PY) tests/e2e_skills.py
 	node tests/analyze_check.js
 
 # Engine and wording checks for the Black book

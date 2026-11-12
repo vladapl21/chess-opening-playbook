@@ -95,7 +95,7 @@ if __name__ == '__main__':
         play_sandbox(pg, 0.3, 'all/real')
         pg.screenshot(path=out + 'v2_sb_report.png', full_page=True)
         for scope, odds in [('sic', 'real'), ('caro', 'even'), ('e5x', 'weak'), ('italian', 'real'), ('pirc', 'even'), ('rare', 'even'), ('scandi', 'real'), ('french', 'real')]:
-            pg.click(f'[data-sbf="scope:{scope}"]'); pg.click(f'[data-sbf="odds:{odds}"]'); pg.wait_for_timeout(100)
+            pg.click('[data-sbf="scope:all"]'); pg.click(f'[data-sbf="pick:{scope}"]'); pg.click(f'[data-sbf="odds:{odds}"]'); pg.wait_for_timeout(100)
             pg.click('#sbAgain'); pg.wait_for_timeout(200)
             r = play_sandbox(pg, 0.15, f'{scope}/{odds}')
             assert r['state'] == 'done'

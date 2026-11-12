@@ -64,7 +64,7 @@ def quiz_item(side, path, main_lines):
 def threat_item(t):
     return dict(id=t['id'], fen=t['fen'].split()[0], ff=t['fen'], me=t['me'], last=t['last'], lastLabel=t['lastLabel'], safe=t['safe'], legal=t['legal'],
                 played=t['played'], playedLabel=t['playedLabel'], reply=t['reply'], replyLabel=t['replyLabel'],
-                threat=t['threat'], threatLabel=t['threatLabel'], refute={u: r[:2] for u, r in t['refute'].items()},
+                threat=t['threat'], threatLabel=t['threatLabel'], refute=t['refute'], fine=t.get('fine', []),
                 opp=t['opp'], date=short_date(t['date']), **({'best': t['best']} if 'best' in t else {}))
 
 

@@ -539,7 +539,8 @@ button.ucard:hover{border-color:var(--accent);transform:translateY(-1px)}
 .eline li span{min-width:0}
 .eline .pico{width:18px;height:18px;flex:none}
 .eline li.b{color:var(--muted)}
-.enote{font-size:14px;color:var(--muted)}
+.enote{font-size:14px;color:var(--muted)} .ekey{font-size:12.5px;color:var(--muted)}
+.qline{margin:8px 0} .qlook{display:block;margin-top:8px;color:var(--muted)}
 .enote a{color:var(--accent);font-weight:600}
 .plan{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px}
 .plan h4{font-family:var(--f-display);font-size:21px;font-weight:700;line-height:1.15}
@@ -807,11 +808,13 @@ function pieceIcon(pc, white){ return `<svg class="pico ${white ? 'w' : 'b'}" vi
 function thumb(idx, o = {}){ return `<div class="thumb">${boardSVG(N[idx].f, Object.assign({mini: true}, o))}</div>`; }
 
 /* ------------------------------------------------------------------ evals */
-// centipawns from your side as pawns with a sign; nothing in front of a flat 0.0
-const signedPawns = my => { const a = Math.round(Math.abs(my) / 10) / 10; return (a === 0 ? '' : my > 0 ? '+' : '−') + a.toFixed(1); };
+// Engine numbers are shown the way every chess site shows them: in pawns, plus when White is better, minus when Black is,
+// whichever colour you play. The words next to the number ("better for you") are the part that is turned to your side.
+const signedPawns = cp => { const a = Math.round(Math.abs(cp) / 10) / 10; return (a === 0 ? '' : cp > 0 ? '+' : '−') + a.toFixed(1); };
+const NUMHINT = 'In pawns. Plus: White is better. Minus: Black is better.';
 function evalInfo(e){
   if (e === undefined || e === null) return null;
-  // engine values are from White's side; words and numbers are turned to your side
+  // engine values are from White's side; the words are turned to your side, the number is not
   const meW = ME === 1;
   if (typeof e === 'string'){
     if (e === '#W') return {pct: 100, txt: meW ? 'Checkmate' : 'White checkmates', num: ''};
@@ -823,7 +826,7 @@ function evalInfo(e){
   const cp = e, pct = 50 + 50 * (2 / (1 + Math.exp(-cp / 260)) - 1), a = Math.abs(cp), my = meW ? cp : -cp;
   let txt = a < 45 ? 'Equal' : a < 120 ? 'Slightly better for ' : a < 300 ? 'Clearly better for ' : 'Winning for ';
   if (a >= 45) txt += my > 0 ? 'you' : OPP;
-  return {pct, txt, num: signedPawns(my)};
+  return {pct, txt, num: signedPawns(cp)};
 }
 function evalBarHTML(idx, id){ const ei = evalInfo(N[idx].e) || {pct: 50}, h = FLIP ? 100 - ei.pct : ei.pct; return `<div class="evalbar ${FLIP ? 'flip' : ''}" ${id ? `id="${id}"` : ''} aria-hidden="true"><div class="fill" style="height:${h.toFixed(1)}%"></div><div class="mid"></div></div>`; }
 
@@ -1463,7 +1466,7 @@ function renderStudy(){
         <button class="ctl" id="cNext" aria-label="Forward one move" ${S.i >= line.n.length - 1 ? 'disabled' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
         <button class="ctl" id="cLast" aria-label="To the end" ${S.i >= line.n.length - 1 ? 'disabled' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 5v14M6 6l8 6-8 6V6z"/></svg></button>
       </div>
-      <div class="engrow"><button class="eswitch" id="cEng" type="button" aria-pressed="${engOn}"><i aria-hidden="true"></i>Engine</button><p class="evaltext" id="stext">${curEval ? `Engine: <b>${esc(curEval.txt)}</b>${curEval.num ? ` <span class="tnum">(${curEval.num})</span>` : ''}` : ''}</p></div>
+      <div class="engrow"><button class="eswitch" id="cEng" type="button" aria-pressed="${engOn}"><i aria-hidden="true"></i>Engine</button><p class="evaltext" id="stext">${curEval ? `Engine: <b>${esc(curEval.txt)}</b>${curEval.num ? ` <span class="tnum" title="${NUMHINT}">(${curEval.num})</span>` : ''}` : ''}</p></div>
     </div>
     <div class="ccol">
       ${mcard}${engOn ? '<div id="engcard"></div>' : ''}${optHTML}${linesHTML}
@@ -1753,7 +1756,7 @@ function wireBoardInput(){
 const SBK = s => s === 'w' ? 'e4-playbook-sandbox-v1' : 'playbook-b-sandbox-v1';
 const SB_STATE = {};
 for (const s of ['w', 'b']){ const st = SB_STATE[s] = {scope: 'all', odds: 'real'};
-  try { const v = JSON.parse(localStorage.getItem(SBK(s)) || '{}'); if (v.scope && (v.scope === 'all' || BOOKS[s].chapters.some(c => c.id === v.scope))) st.scope = v.scope; if (['real', 'even', 'weak'].includes(v.odds)) st.odds = v.odds; } catch(e){} }
+  try { const v = JSON.parse(localStorage.getItem(SBK(s)) || '{}'); if (v.scope && (v.scope === 'all' || String(v.scope).replace(/^m:/, '').split(',').every(x => BOOKS[s].chapters.some(c => c.id === x)))) st.scope = v.scope; if (['real', 'even', 'weak'].includes(v.odds)) st.odds = v.odds; } catch(e){} }
 let SBS = SB_STATE.w;
 function sbSave(){ try { localStorage.setItem(SBK(SIDE), JSON.stringify({scope: SBS.scope, odds: SBS.odds})); } catch(e){} }
 const isWarnNode = c => (N[c].g || []).includes('warn');
@@ -1766,9 +1769,16 @@ function scopeAncestors(chId){ // nodes on the way to a chapter's roots
 // a running game keeps the opening and odds it started with; the chips only set up the next game
 function gameScope(){ const D = S.drill; return D && D.kind === 'sb' ? D.scope : SBS.scope; }
 function gameOdds(){ const D = S.drill; return D && D.kind === 'sb' ? D.odds : SBS.odds; }
+// the openings a scope names: 'all' and course scopes name none; 'caro' names one; 'm:caro,french' names several
+const scopeChs = sc => !sc || sc === 'all' || sc.startsWith('u:') ? [] : sc.replace(/^m:/, '').split(',').filter(x => CHAPTERS[x]);
+function scopeToggle(sc, id){
+  const all = DATA.chapters.map(C => C.id), cur = scopeChs(sc), nx = cur.includes(id) ? cur.filter(x => x !== id) : cur.concat([id]);
+  const pick = all.filter(x => nx.includes(x)); return !pick.length || pick.length === all.length ? 'all' : pick.length === 1 ? pick[0] : 'm:' + pick.join(',');
+}
 function inScope(c, scope){
   scope = scope || gameScope();
   if (scope === 'all') return true;
+  if (scope.startsWith('m:')) return scopeChs(scope).some(x => inScope(c, x));
   if (scope.startsWith('u:')){ const set = unitSparSet(scope.slice(2)); return sbLinesThrough(c).some(id => set.has(id)); }
   const C = CHAPTERS[scope]; if (!C) return true;
   if (scopeAncestors(C.id).has(c)) return true;
@@ -1791,7 +1801,8 @@ function inScopeLine(id, scope){
 }
 const _spar = {};
 function unitSparSet(uid){ return _spar[uid] || (_spar[uid] = new Set((UNIT[uid] && UNIT[uid].spar) || [])); }
-function scopeLabel(sc){ return sc === 'all' ? 'Every opening' : sc.startsWith('u:') ? 'Course: ' + ((UNIT[sc.slice(2)] || {}).title || '') : (CHAPTERS[sc] || {}).name || ''; }
+function scopeLabel(sc){ if (sc === 'all') return 'Every opening'; if (sc.startsWith('u:')) return 'Course: ' + ((UNIT[sc.slice(2)] || {}).title || '');
+  const ns = scopeChs(sc).map(x => CHAPTERS[x].name); return ns.length <= 2 ? ns.join(' and ') : ns.slice(0, -1).join(', ') + ' and ' + ns[ns.length - 1]; }
 function pickWeighted(kids, ws){ const tot = ws.reduce((a, b) => a + b, 0); let r = Math.random() * tot; for (let i = 0; i < kids.length; i++){ r -= ws[i]; if (r <= 0) return kids[i]; } return kids[kids.length - 1]; }
 function myTurnAt(idx){ return (ply(idx) % 2 === 0) === (ME === 1); }
 // scope/odds override the chips for one game: a course unit's practice games use 'u:<unit>' and the weak-spot odds
@@ -1903,7 +1914,7 @@ function sbReport(){
 }
 function sbPanelHTML(){
   const D = S.drill;
-  const scopeName = SBS.scope === 'all' ? 'Every opening' : CHAPTERS[SBS.scope].name;
+  const scopeName = scopeLabel(SBS.scope);
   if (!D){
     return `<div class="dpanel sbintro"><p class="kicker">Sandbox · ${esc(scopeName)}</p><h3>Play a game against your prep</h3>
       <ol>${ME === 1 ? '<li>You play White. Black answers instantly, picking from the moves in your prep.</li><li>Black\'s choices follow real odds: your own games for the first reply, then how players around your rating actually move.</li>' : '<li>You play Black. White moves first and answers instantly, picking from the moves in your prep.</li><li>White\'s choices follow real odds: your own games for the first move, then how players around your rating actually move.</li>'}<li>The game runs down one branch until the prep runs out. Then you get a report: slips, Black's choices and how rare the line is.</li></ol>
@@ -1940,7 +1951,8 @@ function sbSideHTML(){
   const D = S.drill, CU = D && D.kind === 'sb' && D.scope.startsWith('u:') ? UNIT[D.scope.slice(2)] : null;
   const ban = CU ? `<div class="cban"><span><b>Course · ${unitNo(CU)}:</b> ${esc(CU.title)}. ${Math.min(up(CU.id).spar || 0, SPAR)} of ${SPAR} clean practice games. ${OPP} only plays moves from this unit and picks the lines you know least.</span><button class="btn small" data-unit="${CU.id}">Back to the unit</button></div>` : '';
   return `${ban}<div class="dpanel">
-      <div><p class="kicker" style="margin-bottom:6px">Openings</p><div class="seg">${segBtn('scope', 'all', 'Every opening')}${DATA.chapters.map(C => segBtn('scope', C.id, esc(C.name))).join('')}</div></div>
+      <div><p class="kicker" style="margin-bottom:6px">Openings</p><div class="seg">${segBtn('scope', 'all', 'Every opening')}${DATA.chapters.map(C => `<button data-sbf="pick:${C.id}" aria-pressed="${scopeChs(SBS.scope).includes(C.id)}">${esc(C.name)}</button>`).join('')}</div>
+        <p class="evaltext" style="text-align:left;margin-top:8px">${scopeChs(SBS.scope).length > 1 ? `Mixing ${scopeChs(SBS.scope).length} openings. Tap one again to take it out.` : 'Tap more than one to mix them in the same session.'}</p></div>
       <div><p class="kicker" style="margin-bottom:6px">${OPP}'s odds</p><div class="seg">${segBtn('odds', 'real', 'Like real games')}${segBtn('odds', 'even', 'Even spread')}${segBtn('odds', 'weak', 'My weak spots')}</div>
       <p class="evaltext" style="text-align:left;margin-top:8px">${SBS.odds === 'real' ? 'Common replies come up often, rare ones rarely, just like your games.' : SBS.odds === 'even' ? 'Every line in your prep is equally likely, so rare branches get their turn.' : 'Lines you haven\'t played, are due, or slipped on come up more.'}</p>${sbPendingHTML()}</div>
       <div class="queue"><div><b class="tnum">${ses ? ses.games : 0}</b><span>games this session</span></div><div><b class="tnum">${ses ? ses.slips : 0}</b><span>slips this session</span></div><div><b class="tnum">${seen}<small style="font-size:.5em;color:var(--muted)">/${pool.length}</small></b><span>lines met in the sandbox</span></div></div>
@@ -1955,7 +1967,7 @@ function sbPendingHTML(){
 }
 function renderSbSide(){ const el = document.getElementById('sbside'); if (el){ el.innerHTML = sbSideHTML(); wireSbSide(); } }
 function wireSbSide(){
-  view.querySelectorAll('[data-sbf]').forEach(b => b.onclick = () => { const [k, v] = b.dataset.sbf.split(':'); SBS[k] = v; sbSave(); renderSbSide(); if (!S.drill) renderSbPanel(); });
+  view.querySelectorAll('[data-sbf]').forEach(b => b.onclick = () => { const [k, v] = b.dataset.sbf.split(':'); if (k === 'pick') SBS.scope = scopeToggle(SBS.scope, v); else SBS[k] = v; sbSave(); renderSbSide(); if (!S.drill) renderSbPanel(); });
   const now = document.getElementById('sbNow'); if (now) now.onclick = () => { sbStart(); renderSbSide(); };
 }
 function renderSandbox(){
@@ -2236,8 +2248,9 @@ function startQuiz(uid, set){
 function quizTry(u, to){
   const Q = S.drill, it = Q.items[Q.k], threat = !!it.fen;
   Q.sel = null;
-  if ((it.ok || it.safe).includes(u)){
-    const first = Q.tries === 0; Q.res[Q.k] = first; Q.state = 'shown'; Q.flash = {sq: to, ok: true}; Q.hint = null;
+  const fine = threat && (it.fine || []).includes(u);
+  if ((it.ok || it.safe).includes(u) || fine){
+    const first = Q.tries === 0 && !Q.peeked; Q.res[Q.k] = first; Q.state = 'shown'; Q.flash = {sq: to, ok: true}; Q.hint = null;
     if (!threat){
       Q.view = applyMove(dFen(), u); Q.lastU = u; Q.arrows = null;
       Q.msg = `<b>${first ? 'Right' : 'That\'s it'}: ${esc(it.rule)}.</b> ${esc(it.note || '')}`;
@@ -2245,14 +2258,14 @@ function quizTry(u, to){
     } else {
       const danger = it.threat || it.reply;
       Q.arrows = [u.slice(0, 4) + 'g'].concat(danger ? [danger.slice(0, 4) + 'r'] : []);
-      const K = skillOf(UNIT[Q.unit]);
-      Q.msg = `<b>${K.ok[first ? 0 : 1]}</b> ${it.threat ? `The danger (red): ${esc(lc(it.threatLabel))}. ` : ''}In the game you played ${esc(lc(it.playedLabel))}, and ${esc(it.opp)} answered: ${esc(lc(it.replyLabel))}.`;
+      const K = skillOf(UNIT[Q.unit]); Q.lastTry = u;
+      Q.msg = `<b>${K.ok[first ? 0 : 1]}</b> ${it.threat ? `The danger (red): ${esc(lc(it.threatLabel))}. ` : ''}${fine ? `Your move loses nothing. The engine's own choice was: ${esc(lc(wordsAt(it.ff, it.safe[0])))}. ` : ''}In the game ${PERSONA === 'house' ? 'you played' : 'the move was'} ${esc(lc(it.playedLabel))}, and ${esc(it.opp)} answered: ${esc(lc(it.replyLabel))}.`;
       renderDrillBoard();
     }
     renderQuizPanel(); return;
   }
   if (Q.tries === 0) Q.res[Q.k] = false;
-  Q.tries++;
+  Q.tries++; Q.lastTry = u;
   if (!threat){
     Q.flash = {sq: to, ok: false};
     Q.msg = Q.tries >= 2 ? 'Not that one. The arrow shows your move; play it to continue.' : 'Not your move here. Try again.';
@@ -2270,9 +2283,46 @@ function quizTry(u, to){
   setTimeout(() => {
     if (S.drill !== Q || Q.state !== 'refuted') return;
     Q.view = applyMove(after, r[0]); Q.lastU = r[0]; Q.flash = null; Q.arrows = [r[0].slice(0, 4) + 'r']; Q.busy = false;
-    Q.msg = `<b>${esc(OPP)} answers: ${esc(lc(r[1]))}.</b> ${game ? 'That\'s what happened in the game. ' : ''}${skillOf(UNIT[Q.unit]).look}`;
+    Q.msg = `<b>${esc(OPP)} answers: ${esc(lc(r[1]))}.</b> ${game ? 'That\'s what happened in the game. ' : ''}${refuteWhy(it, u, r)}<span class="qlook">${skillOf(UNIT[Q.unit]).look}</span>`;
     renderDrillBoard({u: r[0], meta: {}}); renderQuizPanel();
   }, 750);
+}
+// why a move in a skill position is wrong, in words: what the reply wins, or the longer line that shows the point.
+// r = [reply, its label, material the reply wins at once, the moves after it, material lost by the end, engine number]
+const LOSTW = n => n >= 9 ? 'a queen\'s worth of material' : n >= 6 ? 'more than a rook' : n === 5 ? 'a rook\'s worth of material' : n === 4 ? 'a piece and a pawn' : n === 3 ? 'a piece' : n === 2 ? 'two pawns' : 'a pawn';
+function fenAfter(fen, us){ const ch = new Chess(fen); for (const u of us) if (!ch.move(uciObj(u))) break; return ch.fen(); }
+function wordsAt(fen, u){ const ch = new Chess(fen), mv = ch.move(uciObj(u)); if (!mv) return ''; ch.undo(); return moveWords(ch, mv, null); }
+function refuteWhy(it, u, r){
+  const tail = r[3] || [], lost = r[4] || 0, ei = r[5] !== undefined ? evalInfo(r[5]) : null, mated = /checkmate/.test(r[1]);
+  const verdict = ei && !mated ? ` The engine now calls it: <b>${esc(lc(ei.txt))}</b>.` : '';
+  const cost = mated ? '' : lost ? `That costs you ${LOSTW(lost)}.` : 'Nothing is lost on the board.';
+  if (!tail.length) return `${cost}${lost && skillOf(UNIT[S.quizState.unit]) === SKILL.threats ? '' : verdict} `;
+  const ws = lineWords(fenAfter(it.ff, [u, r[0]]), tail, 7);
+  return `${r[2] > 0 ? 'And it goes on:' : lost ? 'Nothing falls at once. The point comes a few moves later:' : 'The line it expects:'}
+    <ol class="eline qline">${ws.map(w => `<li class="${w.white ? 'w' : 'b'}">${pieceIcon(w.pc, w.white)}<span>${esc(w.label)}</span></li>`).join('')}</ol>${cost}${verdict} `;
+}
+// play the wrong move, the reply and the rest of the line on the quiz board, one move at a time
+function quizPlayOut(){
+  const Q = S.quizState, it = Q.items[Q.k], u = Q.lastTry, r = it.refute && it.refute[u]; if (!r || Q.busy) return;
+  const us = [u, r[0]].concat(r[3] || []); let fen = it.fen, k = 0; Q.busy = true; Q.arrows = null; renderQuizPanel();
+  const step = () => {
+    if (S.quizState !== Q || S.view !== 'quiz' || Q.state !== 'refuted') return;
+    if (k >= us.length){ Q.busy = false; Q.arrows = [us[us.length - 1].slice(0, 4) + 'r']; renderDrillBoard(); renderQuizPanel(); return; }
+    fen = applyMove(fen, us[k]); Q.view = fen; Q.lastU = us[k]; renderDrillBoard({u: us[k], meta: {}}); k++; setTimeout(step, reduced ? 250 : 850);
+  };
+  Q.view = it.fen; Q.lastU = null; renderDrillBoard(); setTimeout(step, 350);
+}
+// the engine on a skill position, once it has been answered: the try and its line are on the explore board
+function quizEngine(){
+  const Q = S.quizState, it = Q.items[Q.k], U = UNIT[Q.unit], u = Q.lastTry, r = Q.state === 'refuted' && it.refute ? it.refute[u] : null;
+  exploreFrom(it.ff, {moves: u ? [u].concat(r ? [r[0]].concat(r[3] || []) : []) : [], i: u ? (r ? 2 : 1) : 0, title: `${U.title} · vs ${it.opp}, ${it.date}`, side: it.me || SIDE, flip: it.me === 'b'});
+}
+// "show me the danger": the red arrow before answering. The position then no longer counts as right first time.
+function quizPeek(){
+  const Q = S.quizState, it = Q.items[Q.k], d = it.threat || it.reply; if (!d || Q.state !== 'play') return;
+  Q.peeked = true; if (Q.res[Q.k] === undefined) Q.res[Q.k] = false; Q.arrows = [d.slice(0, 4) + 'r'];
+  Q.msg = `<b>The danger:</b> ${esc(lc(it.threat ? it.threatLabel : it.replyLabel))}. Now find a move that deals with it.`;
+  renderDrillBoard(); renderQuizPanel();
 }
 function quizRetry(){
   const Q = S.quizState, it = Q.items[Q.k];
@@ -2283,7 +2333,7 @@ function quizRetry(){
 function quizNext(){
   const Q = S.quizState;
   if (Q.k >= Q.items.length - 1){ quizFinish(); return; }
-  Object.assign(Q, {k: Q.k + 1, tries: 0, state: 'play', sel: null, busy: false, flash: null, hint: null, msg: '', view: null, lastU: null, arrows: null});
+  Object.assign(Q, {k: Q.k + 1, tries: 0, state: 'play', sel: null, busy: false, flash: null, hint: null, msg: '', view: null, lastU: null, arrows: null, peeked: false, lastTry: null});
   render();
 }
 function quizFinish(){
@@ -2329,19 +2379,25 @@ function quizPanelHTML(){
     : `${esc(OPP)} just played: <b>${esc(lc(N[it.node].l))}</b>. What's your move?`;
   const status = Q.state === 'play' ? `<div class="status ${Q.tries ? 'bad' : ''}"><span class="bub"></span>${Q.tries ? 'Try again' : 'Your move'}</div>`
     : Q.state === 'shown' ? `<div class="status"><span class="bub"></span>${Q.res[Q.k] ? 'Right first time' : 'Solved'}</div>` : `<div class="status bad"><span class="bub"></span>${Q.busy ? `${esc(OPP)} replies…` : 'Not safe'}</div>`;
-  const act = Q.state === 'shown' ? `<div class="lesson-actions"><button class="btn primary" id="qNext">${Q.k < n - 1 ? 'Next position' : 'See your score'}</button></div>`
-    : Q.state === 'refuted' ? `<div class="lesson-actions"><button class="btn primary" id="qRetry" ${Q.busy ? 'disabled' : ''}>Try again</button></div>` : '';
+  const eng = threat && Q.set !== 'cp' && it.ff ? `<button class="btn ghost" id="qEngine" ${Q.busy ? 'disabled' : ''}>See it with the engine</button>` : '';
+  const rr = threat && Q.state === 'refuted' && it.refute ? it.refute[Q.lastTry] : null;
+  const act = Q.state === 'shown' ? `<div class="lesson-actions"><button class="btn primary" id="qNext">${Q.k < n - 1 ? 'Next position' : 'See your score'}</button>${eng}</div>`
+    : Q.state === 'refuted' ? `<div class="lesson-actions"><button class="btn primary" id="qRetry" ${Q.busy ? 'disabled' : ''}>Try again</button>${rr && (rr[3] || []).length ? `<button class="btn" id="qPlay" ${Q.busy ? 'disabled' : ''}>Play it out on the board</button>` : ''}${eng}</div>`
+    : threat && Q.state === 'play' && !Q.peeked && U.skill !== 'finish' && U.skill !== 'endings' && (it.threat || it.reply) ? `<div class="lesson-actions"><button class="btn ghost" id="qPeek">Show me the danger</button></div>` : '';
   return `<div class="dpanel"><p class="kicker">${esc(U.title)} · ${quizName(Q.set)}${threat ? ` · vs ${esc(it.opp)}, ${esc(it.date)}` : ''}</p>
     <h3>${threat ? K.h : 'Find your move'}</h3>
     <div class="qhead">${dots}<span class="evaltext">${Q.k + 1} of ${n} · ${need} right to pass</span></div>
     <p class="ask">${ask}</p>${status}
-    <p class="feedback">${Q.msg || (Q.state === 'play' && Q.k === 0 && !Q.tries ? 'Drag a piece or tap it, then tap where it goes. Only your first try counts toward the score.' : '&nbsp;')}</p>${act}</div>`;
+    <div class="feedback">${Q.msg || (Q.state === 'play' && Q.k === 0 && !Q.tries ? 'Drag a piece or tap it, then tap where it goes. Only your first try counts toward the score.' : '&nbsp;')}</div>${act}</div>`;
 }
 function renderQuizPanel(){ const el = document.getElementById('qpanel'); if (el){ el.innerHTML = quizPanelHTML(); wireQuizPanel(); } }
 function wireQuizPanel(){
   const Q = S.quizState; if (!Q) return;
   const nx = document.getElementById('qNext'); if (nx) nx.onclick = quizNext;
   const rt = document.getElementById('qRetry'); if (rt) rt.onclick = quizRetry;
+  const pl = document.getElementById('qPlay'); if (pl) pl.onclick = quizPlayOut;
+  const en = document.getElementById('qEngine'); if (en) en.onclick = quizEngine;
+  const pk = document.getElementById('qPeek'); if (pk) pk.onclick = quizPeek;
   const ag = document.getElementById('qAgain'); if (ag) ag.onclick = () => startQuiz(Q.unit, Q.set);
   document.querySelectorAll('#qpanel [data-miss]').forEach(b => b.onclick = () => missExplore(+b.dataset.miss));
 }
@@ -2374,9 +2430,9 @@ function nodeFen(idx){
 // the same position with the other side to move: what would they do if they could move twice?
 function nullFen(fen){ const p = fen.split(' '); p[1] = p[1] === 'w' ? 'b' : 'w'; p[3] = '-'; return p.join(' '); }
 const scoreNum = s => typeof s === 'string' ? (parseInt(s.slice(1), 10) > 0 ? 1 : -1) * (100000 - 100 * Math.abs(parseInt(s.slice(1), 10))) : s;
-function evalShort(s){ // a candidate's value from your side
+function evalShort(s){ // a candidate's value: the number from White's side, the colour (good or bad) from yours
   if (typeof s === 'string'){ const m = parseInt(s.slice(1), 10), mine = (m > 0) === (ME === 1); return {t: `${mine ? 'You mate' : OPP + ' mates'} in ${Math.abs(m)}`, good: mine}; }
-  const my = ME === 1 ? s : -s; return {t: signedPawns(my), good: my > -45};
+  const my = ME === 1 ? s : -s; return {t: signedPawns(s), good: my > -45};
 }
 
 const Engine = {
@@ -2613,7 +2669,7 @@ const EngineUI = {
     const f = h.bar && document.querySelector(`#${h.bar} .fill`);
     if (f && ei) f.style.height = (h.flip ? 100 - ei.pct : ei.pct).toFixed(1) + '%';
     const t = h.text && document.getElementById(h.text);
-    if (t && ei) t.innerHTML = `Engine, depth ${this.r.d}: <b>${esc(ei.txt)}</b>${ei.num ? ` <span class="tnum">(${ei.num})</span>` : ''}`;
+    if (t && ei) t.innerHTML = `Engine, depth ${this.r.d}: <b>${esc(ei.txt)}</b>${ei.num ? ` <span class="tnum" title="${NUMHINT}">(${ei.num})</span>` : ''}`;
   }
 };
 function engineCardHTML(r, h){
@@ -2627,7 +2683,7 @@ function engineCardHTML(r, h){
   const L = r ? r.lines.filter(l => l && l.pv && l.pv[0]) : [], top = L[0], ei = top ? evalInfo(top.s) : null;
   const spin = !r || !r.done ? '<i class="spin" aria-hidden="true"></i>' : '';
   const depth = `${spin}${r && r.d ? `depth ${r.d}` : 'starting…'}`;
-  let h2 = ei ? `<p class="eeval"><b>${esc(ei.txt)}</b>${ei.num ? ` <span class="tnum">${ei.num}</span>` : ''}</p>` : `<p class="eeval wait">Thinking…</p>`;
+  let h2 = ei ? `<p class="eeval"><b>${esc(ei.txt)}</b>${ei.num ? ` <span class="tnum" title="${NUMHINT}">${ei.num}</span>` : ''}</p>` : `<p class="eeval wait">Thinking…</p>`;
   if (L.length){
     const ws = L.map(l => lineWords(h.fen, l.pv, 1)[0]), extra = ws.map(() => '');
     ws.forEach((w, k) => { if (!w || extra[k]) return;
@@ -2645,7 +2701,7 @@ function engineCardHTML(r, h){
     h2 += `<div class="eplan"><p class="ewho">The line it expects</p><ol class="eline">${ws.map(w => `<li class="${w.white ? 'w' : 'b'}">${pieceIcon(w.pc, w.white)}<span>${esc(w.label)}</span></li>`).join('')}</ol></div>`;
   }
   const acts = (h.acts || []).filter(a => a.id !== 'eLine' || (top && top.pv.length > 1)).map(a => `<button class="btn small ${a.primary ? 'primary' : ''}" type="button" id="${a.id}">${esc(a.t)}</button>`).join('');
-  return `<div class="eng">${head(depth)}${h2}${acts ? `<div class="lesson-actions">${acts}</div>` : ''}</div>`;
+  return `<div class="eng">${head(depth)}${h2}${acts ? `<div class="lesson-actions">${acts}</div>` : ''}${ei ? '<p class="ekey">Numbers are in pawns: plus means White is better, minus means Black is better.</p>' : ''}</div>`;
 }
 function wireEngineCard(card, h){
   card.querySelectorAll('[data-ek]').forEach(b => {

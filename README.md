@@ -51,7 +51,7 @@ Everything above was built by hand for one player. The site now has the first ve
 
 **What it cannot do yet.** The library holds one repertoire: the e-pawn as White, and the e-pawn reply and the Slav setup as Black. A player who prefers something else is told that their system is still being written. Writing those systems is the next piece of work ([ROADMAP](ROADMAP.md)), and personal playbooks are not announced until it is done. The puzzles from a player's own mistakes need the engine to run over their games, which is also still to come; until then the skill units use positions from real club games.
 
-A **coach**, a knight called Gambit, says the short things in a speech bubble at the bottom right: what a tab is for the first time it is opened, a word after a drill, why a section is locked. It never speaks during a drill or a checkpoint, and it can be switched off in **Settings**, which also has light and dark mode, text size, five board colours and the letters on the board.
+A **coach**, a knight called Pip, says the short things in a speech bubble at the bottom right: what a tab is for the first time it is opened, a word after a drill, why a section is locked. It never speaks during a drill or a checkpoint, and it can be switched off in **Settings**, which also has light and dark mode, text size, five board colours and the letters on the board.
 
 ## At a glance
 
@@ -90,11 +90,11 @@ Optional "go deeper" lessons sit under each unit, finished units come back throu
 
 Three skill units sit between the opening units, each built from positions in my own games at the move where it went wrong:
 
-- **Spot the threat.** My next move lost material. Play a losing move and the opponent's real answer is played out on the board; find a safe one and you see the danger in red next to what happened in the game.
+- **Spot the threat.** My next move lost material. Any move that loses nothing counts, not only the engine's favourite. Play a losing move and the opponent's answer is played out on the board with the reason in words: what it costs, or, when the point is a few moves deep, the line move by move with a button that plays it out. **Show me the danger** draws the threat first, at the price of the first-try point.
 - **Finish the job.** I was winning by a lot and my next move let it go, which is how 21 of my 91 losses happened. Find the move that keeps the win.
 - **Endings.** Endings I reached level or better and then lost: back ranks, pawn endings and active rooks. Find the move that holds the result.
 
-Any position I get wrong opens on the explore board with one click, so I can try my move against the engine and see why it fails.
+In a practice set, every position opens on the explore board with the engine as soon as it is answered, right or wrong, with the move I tried already on the board. In a checkpoint the engine waits until the end, and the reasons are still given in words.
 
 ### Learn: two books, one switch
 
@@ -120,7 +120,7 @@ A line in a book has to stop somewhere, and the position it stops in can still l
 
 **The engine.** Stockfish runs in the browser. Switch it on under the board in Study, or press **Play on with the engine** when a drill, puzzle or practice game ends. It stays out of the way while you are being tested. The card shows:
 
-- the three best moves for the side to move, in words, each with a purple arrow and its value;
+- the three best moves for the side to move, in words, each with a purple arrow and its value. Numbers follow the usual convention whichever colour you play (plus: White is better, minus: Black is better); the words beside them are from your side;
 - the other side's idea, found by asking the engine what they would play if it were their move again: a red dashed arrow, marked **Threat** when it wins something;
 - the line it expects, as a row of plain-English moves that can be played out on the board.
 
@@ -141,6 +141,8 @@ The sandbox plays one branch of the book as a full game. The opponent only plays
 - **Like real games.** Each reply is weighted by how often club players choose it.
 - **Even spread.** Every line in the book is equally likely.
 - **My weak spots.** Lines you have never played or that are due count more, and solid ones count less.
+
+The opening chips are a multi-select: pick the French and the Caro-Kann and the session mixes just those two.
 
 At the end you get a slip report. Each mistake is shown on a mini board (red for what you tried, green for your prep), along with the chain of the opponent's choices and their odds and how rare the exact line was (*"under 1 in 2,000 games"*). Any line you slipped on goes straight back into today's drill. Changing the opening or the odds mid-game applies to the next game, with a button to start it right away, so the current game is never cut off.
 
@@ -355,6 +357,7 @@ pipeline/
   eng.py                   Stockfish wrapper
   black_games.py, black_chapters.py, scan_games.py, find_shots.py
                            game import, sorting by opening, engine scans, missed shots
+  explain_skills.py        the reason for every wrong move in the skill units: the engine's line, cut where the loss is on the board
   check_black.py, lint_notes.py
                            engine and wording checks
   lint_claims.py           one position, one move; pins, guards and attacks in the text must be on the board
@@ -373,7 +376,7 @@ docs/
   img/                     the images in this README
 tests/
   e2e_white.py, e2e_black.py, e2e_sandbox_switch.py, e2e_course.py, e2e_accounts.py, e2e_engine.py,
-  e2e_versions.py, e2e_shell.py, e2e_onboarding.py
+  e2e_versions.py, e2e_shell.py, e2e_onboarding.py, e2e_skills.py
                            end-to-end browser tests (Playwright)
   analyze_check.js         the analysis run under Node on data/games, checked against known facts
   serve.py                 serves the built page over local HTTP for the engine test and screenshots

@@ -11,7 +11,7 @@ const ME_RANK = {house: 3, ready: 2, 'new': 1};
 function mergeMe(a, b){ const x = meOf(a), y = meOf(b); if (!x || !y) return x || y; const rx = ME_RANK[x.state] || 0, ry = ME_RANK[y.state] || 0; return rx !== ry ? (rx > ry ? x : y) : (y.updated || 0) > (x.updated || 0) ? y : x; }
 let PERSONA = 'house';
 const PVIEWS = ['start', 'setup', 'reading', 'findings', 'choices', 'built'], OPEN_NEW = PVIEWS.concat(['sandbox', 'explore']);
-const TARGET = 150, MINIMUM = 50, COACH_NAME = 'Gambit';
+const TARGET = 150, MINIMUM = 50, COACH_NAME = 'Pip';
 const pc = (a, b) => b ? Math.round(100 * a / b) : 0, rec = t => `${t.w}–${t.l}${t.d ? '–' + t.d : ''}`, scoreOf = t => t.n ? (t.w + t.d / 2) / t.n : 0;
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 
