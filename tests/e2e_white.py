@@ -7,7 +7,21 @@ URL = (ROOT / 'docs' / 'index.html').as_uri()
 OUT = ROOT / 'tests' / 'out'; OUT.mkdir(exist_ok=True)
 out = str(OUT) + '/'
 CH = os.environ.get('CHROMIUM')  # optional path to a Chromium binary; default: Playwright's own
-def launch(p): return p.chromium.launch(executable_path=CH, args=['--no-sandbox']) if CH else p.chromium.launch()
+# The site build starts a visitor without games on the welcome screen. These suites test the hand-built playbook, so every
+# context they open is marked as that player; tests/e2e_onboarding.py uses launch(p, house=False) to start as a new visitor.
+HOUSE = """(() => { const K = 'italian-playbook-progress-v1'; if (!localStorage.getItem(K)) localStorage.setItem(K, JSON.stringify({lines: {}, puz: {}, updated: 0, me: {state: 'house'}})); })()"""
+
+
+def launch(p, house=True):
+    b = p.chromium.launch(executable_path=CH, args=['--no-sandbox']) if CH else p.chromium.launch()
+    if house:
+        new_context, new_page = b.new_context, b.new_page
+        def ctx(**kw):
+            c = new_context(**kw); c.add_init_script(HOUSE); return c
+        def page(**kw):
+            pg = new_page(**kw); pg.add_init_script(HOUSE); return pg
+        b.new_context, b.new_page = ctx, page
+    return b
 errors = []
 
 def sq_xy(pg, sq):

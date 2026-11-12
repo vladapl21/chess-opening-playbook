@@ -622,6 +622,7 @@ footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);fo
   .lrow{grid-template-columns:40px minmax(0,1fr) auto}
 }
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+/*__PRODUCT_CSS__*/
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><!--__PIECES__--></defs></svg>
@@ -658,6 +659,7 @@ footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);fo
 
 <script>
 /*__CHESSJS__*/
+/*__ANALYZE__*/
 </script>
 <script>
 const DATA_W = /*__DATA_W__*/;
@@ -896,6 +898,7 @@ function mergeProg(a, b){
     for (const k in (r.course.seen || {})) c.seen[k] = Math.max(c.seen[k] || 0, r.course.seen[k] || 0);
   }
   o.updated = Math.max(o.updated || 0, r.updated || 0);
+  const me = mergeMe(a, r); if (me) o.me = JSON.parse(JSON.stringify(me)); else delete o.me;   // whose playbook this is (app/product.js)
   return o;
 }
 const Cloud = {
@@ -944,6 +947,7 @@ const Cloud = {
       merged.owner = this.user.id;
       const before = canon(Prog.d);
       Prog.d = merged; Prog.saveLocal();
+      if (Product.afterMerge()) return;   // the account holds a different kind of playbook: the page starts over with it
       if (canon(merged) !== before) refresh();
       if (!remote || canon(merged) !== canon(remote)) await this.write();
       this.state = 'ok'; this.at = Date.now(); this.err = '';
@@ -980,6 +984,8 @@ function renderAcct(){
   } else { b.className = 'acct out'; b.textContent = 'Sign in'; b.setAttribute('aria-label', 'Sign in to save your progress'); }
   if (Acct.mode) Acct.render();
   renderNudge();
+  const who = Cloud.user ? Cloud.user.id : ''; // signing in or out changes what a player without games is offered
+  if (Product.authK !== who){ const first = Product.authK === undefined; Product.authK = who; if (!first && PERSONA === 'new' && S.view !== 'reading') render(); }
 }
 // the email last used to sign in on this device, so signing back in is one password away
 const EKEY = 'playbook-acct-email';
@@ -1082,7 +1088,8 @@ const Acct = {
 };
 
 /* ------------------------------------------------------------------ app state + routing */
-const S = {view: 'course', unit: null, slide: 0, quizState: null, chapter: 'italian', line: null, i: 0, playing: null, drill: null, drillState: null, sbState: null, dfilter: {ch: 'all', pri: 'all', from: 'branch'}, dmode: 'smart', showPre: false};
+var DF_PRI = 'all'; // which lines a drill starts with; a personal playbook can ask for the core lines only
+const S = {view: 'course', unit: null, slide: 0, quizState: null, chapter: 'italian', line: null, i: 0, playing: null, drill: null, drillState: null, sbState: null, dfilter: {ch: 'all', pri: DF_PRI, from: 'branch'}, dmode: 'smart', showPre: false};
 const CH_KEY = s => s === 'w' ? 'e4-playbook-chapter' : 'playbook-b-chapter';
 function savedChapter(s){ try { const c = localStorage.getItem(CH_KEY(s)); if (c && BOOKS[s].chapters.some(x => x.id === c)) return c; } catch(e){} return BOOKS[s].chapters[0].id; }
 const TXT = {
@@ -1116,7 +1123,7 @@ function switchSide(side){
   stopPlay(); clearTimeout(heroTimer); stashSide();
   loadBook(side);
   const tab = inCourse ? 'course' : tabOf(S.view, S.studyFrom);
-  Object.assign(S, STASH[side] || {view: tab, chapter: savedChapter(side), line: null, i: 0, studyFrom: 'learn', drillState: null, sbState: null, dfilter: {ch: 'all', pri: 'all', from: 'branch'}, sbSession: null});
+  Object.assign(S, STASH[side] || {view: tab, chapter: savedChapter(side), line: null, i: 0, studyFrom: 'learn', drillState: null, sbState: null, dfilter: {ch: 'all', pri: DF_PRI, from: 'branch'}, sbSession: null});
   // the switch changes the book, not the tab: stay on the tab you were on, at the place that book was left within it
   if (inCourse || tabOf(S.view, S.studyFrom) !== tab || (S.view === 'study' && !LINES[S.line])) S.view = tab;
   S.drill = null; S.renderedLine = null; S.showPre = false;
@@ -1129,7 +1136,7 @@ function useSide(side){
   const keep = {view: S.view, unit: S.unit, slide: S.slide, studyFrom: S.studyFrom, quizState: S.quizState};
   stopPlay(); clearTimeout(heroTimer); stashSide();
   loadBook(side);
-  Object.assign(S, STASH[side] || {chapter: savedChapter(side), line: null, i: 0, drillState: null, sbState: null, dfilter: {ch: 'all', pri: 'all', from: 'branch'}, sbSession: null}, keep);
+  Object.assign(S, STASH[side] || {chapter: savedChapter(side), line: null, i: 0, drillState: null, sbState: null, dfilter: {ch: 'all', pri: DF_PRI, from: 'branch'}, sbSession: null}, keep);
   S.drill = null; S.renderedLine = null; S.showPre = false;
   try { localStorage.setItem(SIDE_KEY, side); } catch(e){}
 }
@@ -1235,7 +1242,7 @@ document.addEventListener('click', e => {
   if (t.dataset.lesson){ const L = LESSONS[t.dataset.lesson]; openLine(L.lines[0], undefined, S.view === 'study' ? S.studyFrom : S.view); return; }
   if (t.dataset.line){ openLine(t.dataset.line, t.dataset.i !== undefined ? +t.dataset.i : undefined, S.view === 'study' ? S.studyFrom : S.view); return; }
   const g = t.dataset.go;
-  if (VIEWS.includes(g)) go(g);
+  if (VIEWS.includes(g)) go(PERSONA === 'new' ? 'start' : g);
 });
 
 /* ------------------------------------------------------------------ LEARN */
@@ -1299,7 +1306,7 @@ function renderLearn(){
   const st = DATA.stats, C = CHAPTERS[S.chapter] || DATA.chapters[0];
   let html = `<section class="reps"><div class="sechead"><div><p class="kicker">${keepHyph(esc(TXT[SIDE].learnKick(st)))}</p><h2>${keepHyph(esc(TXT[SIDE].learnH))}</h2></div><p>Pick an opening. The bar shows how often it came up in your games; the numbers are your wins and losses.</p></div>
     <div class="rgrid ${DATA.chapters.length === 9 ? 'n9' : ''}">${replyTiles()}</div></section><div id="chapter" class="chapter">`;
-  if (SIDE !== 'w' || C.id !== 'italian'){
+  if (SIDE !== 'w' || C.id !== 'italian' || PERSONA !== 'house'){ // the Italian's own page tells the story of the house player's study
     html += chapterHero(C) + partsHTML(C) + chapterNotes(C) + '</div>';
     view.innerHTML = html; return;
   }
@@ -2830,9 +2837,11 @@ function wireExInput(){
   el.addEventListener('pointercancel', () => { if (drag){ drag.ghost.remove(); drag.use.style.opacity = ''; drag = null; } });
 }
 
+/*__PRODUCT_JS__*/
+
 /* ------------------------------------------------------------------ boot */
 function start(saved){
-  Prog.load(); Cloud.init();
+  Prog.load(); Cloud.init(); Product.boot();
   let h = (location.hash || '').slice(1), side = 'w';
   try { const v = localStorage.getItem(SIDE_KEY); if (v && BOOKS[v]) side = v; } catch(e){}
   const hu = h.startsWith('unit.') ? UNIT[h.slice(5)] : null; // course hashes carry no colour: a unit brings its own book
@@ -2853,6 +2862,7 @@ function start(saved){
   else if (h.startsWith('learn.') && CHAPTERS[h.slice(6)]){ S.chapter = h.slice(6); S.view = 'learn'; }
   else if (h === 'explore' && exLoad()){ if (S.ex.side && BOOKS[S.ex.side] && S.ex.side !== SIDE){ loadBook(S.ex.side); S.chapter = savedChapter(SIDE); } S.view = 'explore'; }
   else if (VIEWS.includes(h)) S.view = h;
+  Product.landing(h);
   render();
   Prog.connect(); renderAcct();
   try { window.claude && window.claude.hot && window.claude.hot.snapshot && window.claude.hot.snapshot(() => ({side: SIDE, view: S.view, unit: S.unit, slide: S.slide, line: S.line, i: S.i, studyFrom: S.studyFrom, chapter: S.chapter})); } catch(e){}
