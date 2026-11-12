@@ -73,7 +73,7 @@ L('pt-main', 'e5x-pet', 'Take the pawn, then build', 'Grab first, chase the knig
   J(PT, "Nxe5 d6 Nf3 Nxe4 d4 d5 Bd3 Bd6 O-O O-O c4"),
   alts=[('pt-main-nc6', 'Knight to the center', J(PT, "Nxe5 d6 Nf3 Nxe4 d4 d5 Bd3 Nc6 O-O Be7 c4")),
         ('pt-main-bf5', 'Bishop offers a trade', J(PT, "Nxe5 d6 Nf3 Nxe4 d4 d5 Bd3 Bf5 O-O")),
-        ('pt-main-qe7', 'Queen pins the knight', J(PT, "Nxe5 d6 Nf3 Nxe4 d4 Qe7 Be2")),
+        ('pt-main-qe7', 'Queen lines up behind the knight', J(PT, "Nxe5 d6 Nf3 Nxe4 d4 Qe7 Be2")),
         ('pt-main-bg4', 'Bishop pins your knight', J(PT, "Nxe5 d6 Nf3 Nxe4 d4 Bg4 Bd3")),
         ('pt-main-be7', 'Bishop to the quiet square', J(PT, "Nxe5 d6 Nf3 Nxe4 d4 Be7 Bd3"))],
   why='The normal Petrov. Calm, but your pieces come out faster.', outcome='A small, safe edge')
@@ -334,7 +334,7 @@ L('fr-other5', 'french-adv', 'Black develops instead', 'Bishop out and castle', 
   alts=[('fr-other5-ne7b', 'Bishop, then the knight', J(FC, "Bd7 Be2 Nge7 O-O")),
         ('fr-other5-ne7', 'Knight first', J(FC, "Nge7 Bd3 Nf5 dxc5")),
         ('fr-other5-cxd4', 'Black trades and checks', J(FC, "cxd4 cxd4 Bb4+ Nc3")),
-        ('fr-other5-cxne7', 'Black trades, knight out', J(FC, "cxd4 cxd4 Nge7 Nc3 Nf5 a3"))],
+        ('fr-other5-cxne7', 'Black trades, knight out', J(FC, "cxd4 cxd4 Nge7 a3 Nf5 Nc3"))],
   why='Calm development. Keep your pawn chain and finish your setup.', outcome='A space edge')
 L('fr-early', 'french-adv', 'Black skips the knight', 'Same structure, same ideas', 'common',
   J(FR, "c5 c3 Qb6 Nf3 Nc6 a3"),

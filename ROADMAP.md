@@ -16,6 +16,8 @@
 | Bringing in games | chess.com or Lichess username (public APIs), PGN upload as a fallback | No files to export for most people |
 | Where analysis runs | In the browser (a Web Worker, Stockfish compiled to WebAssembly), results saved to the account | No server costs, and games never leave the device unprocessed |
 | The claude.ai artifact | Stays as a personal build with its own storage | Its sandbox blocks network calls, so it can't reach Supabase. The site is the main app |
+| One position, one move (November 12) | The build fails when two move orders reach one position and the book answers differently, or when a label claims a pin, a guard or an attack that is not on the board. Each setup has one order, with a stated reason wherever it changes | A drill that asks for two different moves in one position can't be memorised, and a label that is wrong once makes every label suspect |
+| Changed lines (November 12) | Every line carries a version that goes up when its moves change; an older progress record counts as due and is marked Changed | Lines get rewritten, and nobody should be told they have mastered moves the line no longer has |
 | Engine in the app (November 10) | Stockfish.js 19, lite single-threaded build, in a web worker; hidden while you are being tested | Runs on a plain static host with no special headers, and the same worker will do the game analysis in Phase 3 |
 
 Facts that shape the design:
@@ -45,6 +47,14 @@ Facts that shape the design:
 - **Plans.** One card per lesson for the position its main line ends in: king, pawns, pieces, target, their plan, watch for (`content/plans.py`).
 - **The four units that were "coming soon".** The Black Scotch, Vienna and King's Gambit lines rebuilt around the bishop-to-c5 setup, and two skill units from my own games: Finish the job and Endings.
 
+## Phase 1.6: one move per position (done)
+
+- **The complaint.** Two Slav lines reached the same position by different move orders and then asked for different moves, and one of them called a bishop sortie a pin when nothing was pinned.
+- **One order for the Slav setup,** used in the Queen's Gambit, London, Colle, Torre, Veresov and Réti lessons, with the reason written at each place where the order has to change (README, "One setup, one order").
+- **The same sweep over both books.** 43 lines changed, 18 added, 10 removed. Along the way the engine found a real hole: in the Colle, closing the chain with the e-pawn before the c-pawn let White's queen check and win the b-pawn.
+- **`pipeline/lint_claims.py`** checks repeats, pin claims and labels that say a move guards or hits a piece; `assemble.py` runs it and stops on a finding.
+- **Line versions** (`data/line_versions.json`), so the changed lines came back into review marked Changed.
+
 ## Phase 2: onboarding
 
 - **Welcome.** An original mascot (a knight), with "Get started" and "I already have an account".
@@ -73,6 +83,7 @@ Facts that shape the design:
 - **Split today's two books into packs.** For White: Italian, Two Knights, the Sicilian with c3, the Caro-Kann main line, the French advance, Scandinavian, Pirc, Philidor and Petrov, and the rare first moves. For Black: the e-pawn setup with the bishop on c5, the Slav setup, and the answers to the English and Réti.
 - **Add alternatives so toss-ups have real choices.** Against 1.e4, a Caro-Kann setup. Against 1.d4, a King's Indian setup. For White, a London system for d-pawn players.
 - **Each pack** gets lines, opponent odds at 1200 to 1800, engine checks, and notes with no notation, built by the existing pipeline.
+- **The repeat check has to run across packs.** Two packs chosen together can transpose into each other (a Vienna that becomes an Italian), so the one-move-per-position check runs on the combined repertoire a player ends up with, not on each pack alone.
 
 ## Phase 6: open it to friends
 

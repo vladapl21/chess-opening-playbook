@@ -641,6 +641,8 @@ const _reach = new Map(), _sbl = new Map(); let _anc = {};
 function drillableOf(D){ const les = new Set(D.lessons.map(l => l.id)), me = D.side === 'b' ? 0 : 1;
   return D.lines.filter(l => les.has(l.lesson) && !l.n.some(i => (D.nodes[i].g || []).includes('warn') && D.nodes[i].w === me)).map(l => l.id); }
 for (const s of ['w', 'b']){ BOOKS[s].side = s; BOOKS[s].drillable = drillableOf(BOOKS[s]); }
+// A line's version goes up when its moves change (pipeline/assemble.py). Lines still on their first version carry none.
+const VER = {}; for (const s of ['w', 'b']) for (const l of BOOKS[s].lines) if (l.v) VER[l.id] = l.v;
 function loadBook(side){
   SIDE = BOOKS[side] ? side : 'w'; DATA = BOOKS[SIDE];
   N = DATA.nodes; LINES = {}; LESSONS = {}; PARTS = {}; GAMES = {}; CHAPTERS = {};
@@ -815,9 +817,15 @@ const Prog = {
     this.saving = false;
     if (this.again){ this.again = false; this.push(); }
   },
-  rec(id){ return this.d.lines[id] || null; },
+  // A record made before a line's moves changed describes other moves. It reads as seen, never clean and due now,
+  // so the line comes back in review and in its unit's counts; the next attempt writes a fresh record.
+  stale(id){ const r = this.d.lines[id]; return !!r && (r.v || 1) !== (VER[id] || 1); },
+  rec(id){ const r = this.d.lines[id]; if (!r) return null; return this.stale(id) ? {box: 0, seen: r.seen || 1, clean: 0, due: 0, last: r.last, changed: true} : r; },
+  staleCount(side){ return (side ? BOOKS[side].drillable : BOOKS.w.drillable.concat(BOOKS.b.drillable)).filter(id => this.stale(id)).length; },
   record(id, clean){
-    const r = this.d.lines[id] || {box: 0, seen: 0, clean: 0};
+    let r = this.d.lines[id];
+    if (!r || this.stale(id)) r = {box: 0, seen: 0, clean: 0};
+    if (VER[id]) r.v = VER[id];
     r.seen++; r.last = Date.now();
     if (clean){ r.clean++; r.box = Math.min(5, (r.box || 0) + 1); } else r.box = 0;
     r.due = Date.now() + INTERVALS[r.box] * DAY - 60e3;
@@ -834,7 +842,7 @@ const Prog = {
 // Progress stays local-first: every save lands in this browser at once and in the account a moment later.
 const SITE = /*__SITE__*/null;
 const canon = o => JSON.stringify(o, (k, v) => v && typeof v === 'object' && !Array.isArray(v) ? Object.keys(v).sort().reduce((a, x) => (a[x] = v[x], a), {}) : v);
-const newer = (x, y) => !x ? y : !y ? x : (y.last || 0) > (x.last || 0) ? y : x;
+const newer = (x, y) => !x ? y : !y ? x : (y.v || 1) !== (x.v || 1) ? ((y.v || 1) > (x.v || 1) ? y : x) : (y.last || 0) > (x.last || 0) ? y : x;
 // two copies of the progress object -> one: newest record per line and puzzle, best of everything else
 function mergeProg(a, b){
   const o = JSON.parse(JSON.stringify(a || {})), r = b || {};
@@ -1443,7 +1451,7 @@ function eligibleLines(){
 function nextSmart(exclude){
   const now = Date.now(), el = eligibleLines().filter(id => id !== exclude);
   const due = el.filter(id => { const r = Prog.rec(id); return r && r.due <= now; }).sort((a, b) => (Prog.rec(a).box - Prog.rec(b).box) || (Prog.rec(a).due - Prog.rec(b).due));
-  if (due.length) return {id: due[0], why: 'Due for review'};
+  if (due.length) return {id: due[0], why: Prog.stale(due[0]) ? 'Changed line' : 'Due for review'};
   const pr = {core: 0, common: 1, rare: 2};
   const fresh = el.filter(id => !Prog.rec(id)).sort((a, b) => (pr[lessonOf(a).pri] - pr[lessonOf(b).pri]) || (lineReach(b) - lineReach(a)) || (DRILLABLE.indexOf(a) - DRILLABLE.indexOf(b)));
   if (fresh.length) return {id: fresh[0], why: 'New line'};
@@ -1453,6 +1461,7 @@ function nextSmart(exclude){
 function startDrillLine(id, why, unit){
   const line = LINES[id];
   const s0 = S.dfilter.from === 'start' ? 0 : lineStart(id);
+  if (!why && Prog.stale(id)) why = 'This line has changed since you last drilled it. If a move is new to you, two tries and the arrow shows it.';
   S.drill = S.drillState = {kind: 'line', id, i: s0, s0, mistakes: 0, tries: 0, sel: null, busy: false, msg: why || '', state: 'play', hint: null, flash: null, unit: unit || null};
   S.view = 'drill'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
   setTimeout(drillAdvance, 450);
@@ -1582,7 +1591,7 @@ function wireDrillPanel(){
     exploreFrom(nodeFen(idx), {title: `${L.title} · end of the ${line.main ? 'main line' : 'line'}`, plan: line.main && planFor(L.id) ? {side: SIDE, lesson: L.id} : null}); };
   const pe = document.getElementById('pExplore'); if (pe) pe.onclick = () => { const P = DATA.puzzles[D.k]; exploreFrom(nodeFen(P.node), {moves: D.after ? [D.after.u] : [], title: `Missed shot · ${P.title}`}); };
 }
-function fmtDue(r){ if (!r) return 'new'; const d = r.due - Date.now(); if (d <= 0) return 'due'; const days = Math.ceil(d / DAY); return `in ${days}d`; }
+function fmtDue(r){ if (!r) return 'new'; if (r.changed) return 'changed'; const d = r.due - Date.now(); if (d <= 0) return 'due'; const days = Math.ceil(d / DAY); return `in ${days}d`; }
 function renderDrill(){
   const f = S.dfilter, now = Date.now();
   const el = eligibleLines();
@@ -1593,7 +1602,7 @@ function renderDrill(){
   const rows = DATA.lessons.filter(L => (f.ch === 'all' || chapterOf(L).id === f.ch) && (f.pri === 'all' || L.pri === f.pri)).map(L => {
     const ls = L.lines.filter(x => DRILLABLE.includes(x)); if (!ls.length) return '';
     return `<div class="mgroup"><p class="mhead">${esc(L.title)}</p>${ls.map(id => { const r = Prog.rec(id), dd = fmtDue(r);
-      return `<button class="mrow" data-drill="${id}"><span>${LINES[id].main ? 'Main line' : esc(LINES[id].title)}</span><span class="pips">${[1,2,3,4,5].map(k => `<i class="${k <= ((r || {}).box || 0) ? 'on' : ''}"></i>`).join('')}</span><span class="due ${dd === 'due' ? 'now' : ''}">${dd}</span></button>`; }).join('')}</div>`;
+      return `<button class="mrow" data-drill="${id}"><span>${LINES[id].main ? 'Main line' : esc(LINES[id].title)}</span><span class="pips">${[1,2,3,4,5].map(k => `<i class="${k <= ((r || {}).box || 0) ? 'on' : ''}"></i>`).join('')}</span><span class="due ${dd === 'due' || dd === 'changed' ? 'now' : ''}">${dd}</span></button>`; }).join('')}</div>`;
   }).join('');
   const D = S.drill;
   const boardHTML = D ? '' : boardSVG(N[0].f, {coords: true});
@@ -1946,13 +1955,13 @@ const cprog = () => Prog.d.course || {u: {}, seen: {}};
 const up = id => (cprog().u || {})[id] || {};
 function upW(id){ const c = Prog.d.course || (Prog.d.course = {u: {}, seen: {}}); c.u = c.u || {}; return c.u[id] || (c.u[id] = {}); }
 function markSeen(lid){ const c = Prog.d.course || (Prog.d.course = {u: {}, seen: {}}); c.seen = c.seen || {}; if (c.seen[lid]) return; c.seen[lid] = Date.now(); Prog.save(); }
-function lessonSeen(side, lid){ if ((cprog().seen || {})[lid]) return true; const L = LIDX[side][lid], r = L && Prog.d.lines[L.lines[0]]; return !!(r && r.clean); }
-const lineClean = id => !!((Prog.d.lines[id] || {}).clean);
+function lessonSeen(side, lid){ if ((cprog().seen || {})[lid]) return true; const L = LIDX[side][lid], r = L && Prog.rec(L.lines[0]); return !!(r && r.clean); }
+const lineClean = id => !!((Prog.rec(id) || {}).clean);
 const lc = s => s ? s[0].toLowerCase() + s.slice(1) : '';
 const unitNo = U => `Unit ${U.k + 1}`;
 const sideChip = U => U.kind === 'skill' ? '<span class="chip skill">Skill</span>' : `<span class="chip sw-${U.side}"><i class="disc" aria-hidden="true"></i>${U.side === 'w' ? 'White' : 'Black'}</span>`;
 function unitAllLines(U){ if (U.soon || !U.lessons) return []; const ds = BOOKS[U.side].drillSet; return U.lessons.concat(U.deeper).flatMap(lid => LIDX[U.side][lid].lines.filter(id => ds.has(id))); }
-function unitDue(U){ const now = Date.now(); return unitAllLines(U).filter(id => { const r = Prog.d.lines[id]; return r && r.due <= now; }).length; }
+function unitDue(U){ const now = Date.now(); return unitAllLines(U).filter(id => { const r = Prog.rec(id); return r && r.due <= now; }).length; }
 function unitSteps(U){
   const p = up(U.id);
   if (U.kind === 'skill') return [
@@ -1974,7 +1983,7 @@ const currentUnit = () => COURSE.find(U => !U.soon && !unitPassed(U)) || null;
 const nextUnitAfter = U => COURSE.slice(U.k + 1).find(V => !V.soon) || null;
 function unitNextLine(U, exclude){
   const fresh = U.lines.find(id => id !== exclude && !lineClean(id)); if (fresh) return fresh;
-  const now = Date.now(); return unitAllLines(U).find(id => id !== exclude && Prog.d.lines[id] && Prog.d.lines[id].due <= now) || null;
+  const now = Date.now(); return unitAllLines(U).find(id => id !== exclude && Prog.rec(id) && Prog.rec(id).due <= now) || null;
 }
 function stepCta(U, s){
   if (!s) return 'Open the unit';
@@ -2022,12 +2031,19 @@ function renderCourse(){
         <ol class="ministeps" aria-label="Steps in this unit">${steps.map(s => `<li class="${s.done ? 'done' : s === nx ? 'next' : ''}">${s.done ? ICON.check : ''}${esc(s.title)}</li>`).join('')}</ol>
         <div class="cta"><button class="btn primary" id="cGo">${esc(stepCta(cur, nx))}</button><button class="btn" data-unit="${cur.id}">See the whole unit</button></div></div></section>`;
   } else hero = `<section class="chero done"><div><p class="kicker">Every open unit passed</p><h3>Now keep it fresh.</h3><p class="lede">Lines you've learned come back for review in the Drill tab. Every lesson can be played on with the engine, and the practice sets are open any time.</p></div></section>`;
-  view.innerHTML = `<div class="nudge" id="nudge" hidden></div><div class="chead"><div><p class="kicker">Your course · White and Black together</p><h2>One path, in the order that matters</h2>
+  view.innerHTML = `<div class="nudge" id="nudge" hidden></div>${changedNote()}<div class="chead"><div><p class="kicker">Your course · White and Black together</p><h2>One path, in the order that matters</h2>
       <p>Units are ordered by how often each system comes up in your games and how you score in it. Each unit: the idea, the lines, a drill, ${SPAR} practice games, then a checkpoint. Pass the checkpoint and the next unit opens. Finished units keep coming back for review, and every line is still in Learn if you want to look ahead.</p></div>
     <div class="cmeter"><div class="bar" aria-hidden="true">${bar}</div><span>${passedN} of ${open.length} units passed${COURSE.length > open.length ? ` · ${COURSE.length - open.length} coming soon` : ''}</span></div></div>
     ${hero}<ol class="path" aria-label="Course units">${COURSE.map(U => unitRow(U, cur)).join('')}</ol>`;
   const g = document.getElementById('cGo'); if (g) g.onclick = () => { const nx = unitSteps(cur).find(s => !s.done); if (nx) doStep(cur, nx.key); else openUnit(cur.id); };
   renderNudge();
+  const cg = document.getElementById('changedGo'); if (cg) cg.onclick = () => { const side = ['b', 'w'].find(x => Prog.staleCount(x)); if (!side) return;
+    useSide(side); startDrillLine(BOOKS[side].drillable.find(id => Prog.stale(id))); S.drill.msgWhy = 'Changed line'; renderDrillPanel(); };
+}
+// Lines whose moves changed after you drilled them (the build gives each line a version). They sit in review until redone.
+function changedNote(){
+  const n = Prog.staleCount(); if (!n) return '';
+  return `<div class="nudge" id="changed"><span><b>${n} ${n === 1 ? 'line you drilled has' : 'lines you drilled have'} changed.</b> The same position now always gets the same move, whichever order it arrives in, and each setup comes out in one order. ${n === 1 ? 'It is' : 'They are'} back in review, marked Changed.</span><span class="nbtns"><button class="btn primary small" type="button" id="changedGo">Drill ${n === 1 ? 'it' : 'them'}</button></span></div>`;
 }
 function unitRow(U, cur){
   const open = unitOpen(U), passed = unitPassed(U), isCur = U === cur, steps = U.soon ? [] : unitSteps(U), done = steps.filter(s => s.done).length, due = passed ? unitDue(U) : 0;
@@ -2048,7 +2064,7 @@ function lessonRow(U, lid){
   return `<button class="lrow" data-ulesson="${lid}">${thumb(idx, o)}<span><b>${esc(L.title)}</b><span class="s">${esc(L.sub)}</span></span><span class="tick ${seen ? '' : 'no'}">${seen ? ICON.check + 'Studied' : 'Not yet'}</span></button>`;
 }
 function drillRow(U, id){
-  const r = Prog.rec(id), L = lessonOf(id), now = Date.now(), st = !r ? ['no', 'Not yet'] : r.due <= now ? ['due', r.clean ? 'Review now' : 'Again today'] : r.clean ? ['', 'Clean'] : ['due', 'Again today'];
+  const r = Prog.rec(id), L = lessonOf(id), now = Date.now(), st = !r ? ['no', 'Not yet'] : r.changed ? ['due', 'Changed'] : r.due <= now ? ['due', r.clean ? 'Review now' : 'Again today'] : r.clean ? ['', 'Clean'] : ['due', 'Again today'];
   return `<button class="mrow" data-udrill="${id}"><span>${esc(L.title)}</span><span class="pips">${[1,2,3,4,5].map(k => `<i class="${k <= ((r || {}).box || 0) ? 'on' : ''}"></i>`).join('')}</span><span class="tick ${st[0]}">${st[0] === '' ? ICON.check : ''}${st[1]}</span></button>`;
 }
 function stepHTML(U, s, k, nx, open){

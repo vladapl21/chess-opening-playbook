@@ -17,11 +17,13 @@ test: build
 	$(PY) tests/e2e_course.py
 	$(PY) tests/e2e_accounts.py
 	$(PY) tests/e2e_engine.py
+	$(PY) tests/e2e_versions.py
 
 # Engine and wording checks for the Black book
 check:
 	$(PY) pipeline/check_black.py 14
 	$(PY) pipeline/lint_notes.py
+	$(PY) pipeline/lint_claims.py
 
 # Regenerate the README images in docs/img
 shots: build
