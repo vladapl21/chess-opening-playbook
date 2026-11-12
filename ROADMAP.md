@@ -16,6 +16,11 @@
 | Bringing in games | chess.com or Lichess username (public APIs), PGN upload as a fallback | No files to export for most people |
 | Where analysis runs | In the browser (a Web Worker, Stockfish compiled to WebAssembly), results saved to the account | No server costs, and games never leave the device unprocessed |
 | The claude.ai artifact | Stays as a personal build with its own storage | Its sandbox blocks network calls, so it can't reach Supabase. The site is the main app |
+| What comes first (November 12) | The systems library. Personal playbooks stay unannounced until players who prefer other openings have real lessons to choose | A playbook that tells half its players "your opening is not written yet" is not a product |
+| Visitors without an account | The welcome screen and the Sandbox. Same tabs, the rest locked until games are in | The site is the product now, not a showcase of one player's book |
+| Games in | Username first (chess.com and Lichess public APIs, called from the page), PGN file as the fallback. 150 is the target, 50 the minimum | No export step for most players |
+| The analysis | A script in the page: rules and counting, no language model, no engine (`app/analyze.js`) | Instant, free, the same answer every time, and it runs under Node for tests |
+| The coach | A knight called Gambit, bottom right, speech bubbles. Says something the first time a tab is opened and after a drill; never during a test; can be switched off | Short things read better in a bubble than in a block of text |
 | One position, one move (November 12) | The build fails when two move orders reach one position and the book answers differently, or when a label claims a pin, a guard or an attack that is not on the board. Each setup has one order, with a stated reason wherever it changes | A drill that asks for two different moves in one position can't be memorised, and a label that is wrong once makes every label suspect |
 | Changed lines (November 12) | Every line carries a version that goes up when its moves change; an older progress record counts as due and is marked Changed | Lines get rewritten, and nobody should be told they have mastered moves the line no longer has |
 | Engine in the app (November 10) | Stockfish.js 19, lite single-threaded build, in a web worker; hidden while you are being tested | Runs on a plain static host with no special headers, and the same worker will do the game analysis in Phase 3 |
@@ -55,7 +60,25 @@ Facts that shape the design:
 - **`pipeline/lint_claims.py`** checks repeats, pin claims and labels that say a move guards or hits a piece; `assemble.py` runs it and stops on a finding.
 - **Line versions** (`data/line_versions.json`), so the changed lines came back into review marked Changed.
 
-## Phase 2: onboarding
+## Phase 2: onboarding (first version built, November 12)
+
+Built (see README, "Where it is going"):
+
+- The shell: Sandbox first, the colour switch keeps its tab, Settings (theme, text size, board colour, board letters, coach).
+- Three states of the page: house playbook, new player (locked tabs, Sandbox open), personal playbook. Kept as `me` in the progress record and merged across devices.
+- Welcome, account first, games by username or PGN file, the reading screen, findings, would-you-rather cards, the "ready" screen.
+- The personal playbook: course order and unit text from the profile, chapter numbers, Your games (results by opening, where you leave the book, recent games).
+- The coach.
+
+Still to do in this phase:
+
+- **More systems, first** (Phase 5 below). Order suggested by what club players at this level play: for Black against the e-pawn the Sicilian and the Caro-Kann; against the d-pawn the classical defence and a fianchetto setup; for White a d-pawn system. The would-you-rather cards already list them as "being written" (`CATALOG` in `app/product.js`); a system becomes selectable by adding its lessons and setting `ready`.
+- The questions from the old plan that are not asked yet: rating and time control are read from the games, but there is no daily goal.
+- Sentences about the house player's games are cut at start-up by a pattern (`PERS` in `app/product.js`). Better: mark them in the content so they can be replaced by the player's own.
+- "Update from new games" re-reads everything. It should add to what is there.
+- The real chess.com and Lichess calls have only been run against a stand-in. Check both in a browser with a real username, and add the Edge Function fallback if chess.com refuses the page.
+
+The original plan for this phase, for reference:
 
 - **Welcome.** An original mascot (a knight), with "Get started" and "I already have an account".
 - **A few quick questions.** Which colours you want to work on, your rating and time control, and a daily goal (5, 10, 15 or 20 minutes).

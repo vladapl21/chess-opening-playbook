@@ -222,6 +222,32 @@ with sync_playwright() as p:
     d = D.new_page(); hook(d, 'D'); d.goto(APP); d.wait_for_timeout(800)
     assert d.locator('#acctBtn').is_hidden() and d.locator('#nudge').is_hidden() and not d.evaluate('Cloud.on()')
     print('unconfigured build: no account button, no nudge')
+    # ---- a visitor without games: the account comes first, then the games. An account that already holds the hand-built
+    # playbook keeps it when it is opened on a new device.
+    nb = launch(p, house=False); S.confirm = False
+    N1 = nb.new_context(viewport={'width': 1280, 'height': 860}); wire(N1); n1 = N1.new_page(); hook(n1, 'N1')
+    n1.goto(APP); n1.wait_for_timeout(900)
+    assert n1.evaluate('[PERSONA, S.view]') == ['new', 'start'] and n1.locator('.whero [data-acct="signup"]').count() == 1 and n1.locator('[data-pgo="setup"]').count() == 0
+    n1.evaluate("go('setup')"); n1.wait_for_timeout(200); assert n1.locator('#uform').count() == 0 and 'First, an account' in n1.inner_text('#view')
+    n1.evaluate("go('start')"); n1.wait_for_timeout(200)
+    n1.click('.whero [data-acct="signup"]'); n1.wait_for_timeout(200); assert n1.evaluate('Acct.mode') == 'signup'
+    sheet(n1, 'signup', 'player@example.com', 'a long password'); assert synced(n1), n1.evaluate('[!!Cloud.user, Cloud.state, Cloud.err, Cloud.writing, Cloud.pulling, Acct.mode, Acct.msg]')
+    if n1.evaluate('!!Acct.mode'): n1.evaluate('Acct.close()')
+    n1.wait_for_timeout(300)
+    assert n1.locator('.whero [data-pgo="setup"]').count() == 1 and n1.locator('.steps3 li.done').count() == 1, 'signed in: the next step is the games'
+    row = S.rows[S.users['player@example.com']['id']]['data']; assert row['me']['state'] == 'new', row.get('me')
+    n1.click('.whero [data-pgo="setup"]'); n1.wait_for_timeout(200); assert n1.locator('#uform').count() == 1
+    print('new player: account first, then', n1.inner_text('.chead h2'))
+    N2 = nb.new_context(viewport={'width': 1280, 'height': 860}); wire(N2); n2 = N2.new_page(); hook(n2, 'N2')
+    n2.goto(APP); n2.wait_for_timeout(900); assert n2.evaluate('PERSONA') == 'new'
+    n2.click('.whero [data-acct="signin"]'); n2.wait_for_timeout(200)
+    sheet(n2, 'signin', 'vlad@example.com', 'correct horse'); n2.wait_for_timeout(1500)
+    assert n2.evaluate('PERSONA') == 'house' and n2.locator('.tabs button.lock').count() == 0, n2.evaluate('[PERSONA, JSON.stringify(Prog.d.me)]')
+    print('the hand-built playbook follows its account to a new device:', n2.evaluate('[PERSONA, S.view]'))
+    m = n2.evaluate("""[mergeProg({lines: {}, me: {state: 'new'}}, {lines: {x: {box: 1}}}).me.state, mergeProg({lines: {}, me: {state: 'new', updated: 9}}, {lines: {}, me: {state: 'ready', updated: 1}}).me.state,
+        mergeProg({lines: {}}, {lines: {}}).me === undefined]""")
+    assert m == ['house', 'ready', True], m
+    nb.close()
     print('ERRORS:', errors[:8])
     assert not errors
     b.close()

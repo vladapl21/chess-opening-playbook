@@ -57,7 +57,7 @@ print('claims: bishop at the knight with the pawn behind it is no pin; both book
 vers = json.load(open(paths.DATA / 'line_versions.json'))
 CHANGED, SAME = 'bsl-slow2', 'bsl-slow'
 assert vers[CHANGED][0] == 2 and vers[SAME][0] == 1, (vers[CHANGED], vers[SAME])
-SEED = """(() => { const K = 'italian-playbook-progress-v1'; if (localStorage.getItem(K)) return;
+SEED = """(() => { const K = 'italian-playbook-progress-v1'; if (sessionStorage.getItem('seeded')) return; sessionStorage.setItem('seeded', '1');
   const now = Date.now(), day = 864e5, old = {box: 4, seen: 5, clean: 4, last: now - 3 * day, due: now + 20 * day};
   localStorage.setItem(K, JSON.stringify({lines: {'%s': old, '%s': old}, puz: {}, updated: now - 3 * day,
     course: {u: {'w-italian': {idea: 1, cp: 6, pass: 1}}, seen: {}}})); })()""" % (CHANGED, SAME)

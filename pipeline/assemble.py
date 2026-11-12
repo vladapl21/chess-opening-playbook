@@ -94,6 +94,10 @@ def main():
     assert '</script' not in chessjs
     body = tpl.replace('<!--__PIECES__-->', syms).replace('/*__DATA_W__*/', dump(W)).replace('/*__DATA_B__*/', dump(B)).replace('/*__DATA_C__*/', dump(C))
     body = body.replace('/*__CHESSJS__*/', chessjs).replace("/*__HOME__*/''", json.dumps(site.get('home', '')))
+    # the game analysis and the product shell (welcome, games in, choices, the coach) live in their own files
+    for mark, name in (('/*__ANALYZE__*/', 'analyze.js'), ('/*__PRODUCT_JS__*/', 'product.js'), ('/*__PRODUCT_CSS__*/', 'product.css')):
+        assert body.count(mark) == 1, mark
+        body = body.replace(mark, (paths.APP / name).read_text().replace("if (typeof module !== 'undefined') module.exports = Analyze;", '').replace('</', '<\\/'))
     assert '/*__DATA' not in body and '/*__CHESSJS__*/' not in body and '/*__HOME__*/' not in body
     (paths.BUILD / 'playbook.html').write_text(body)
     page = site_html(body, site)
