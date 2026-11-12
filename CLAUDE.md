@@ -8,9 +8,11 @@ The plan for the next phases is in [ROADMAP.md](ROADMAP.md). Read it first.
 - `pipeline/assemble.py` writes two pages from `app/template.html`:
   - `data/build/playbook.html` for the claude.ai artifact (no accounts, uses the artifact's own database);
   - `docs/index.html` for GitHub Pages (accounts through Supabase when `app/site.json` has a URL and key).
-- Tests drive the real page in Chromium (Playwright, pre-installed): `tests/e2e_white.py`, `e2e_black.py`, `e2e_sandbox_switch.py`, `e2e_course.py`, `e2e_accounts.py`, `e2e_engine.py`. Screenshots go to `tests/out/` (ignored). Console errors that mention `ERR_TUNNEL_CONNECTION_FAILED` are the proxy blocking Google Fonts and the supabase-js CDN, not the app.
+- Tests drive the real page in Chromium (Playwright, pre-installed): `tests/e2e_white.py`, `e2e_black.py`, `e2e_sandbox_switch.py`, `e2e_course.py`, `e2e_accounts.py`, `e2e_engine.py`, `e2e_versions.py`. Screenshots go to `tests/out/` (ignored). Console errors that mention `ERR_TUNNEL_CONNECTION_FAILED` are the proxy blocking Google Fonts and the supabase-js CDN, not the app.
 - The engine is a web worker, so it can't start from a `file://` page. `tests/serve.py` serves the build over local HTTP with `engine/` beside it; `e2e_engine.py` and the engine screenshot use it.
-- `make check` runs the engine and wording checks on the Black book. `W-RARE` and `W-MISS` lines are information, not failures; `B-LOSS`, `ILLEGAL` and `ENDS-ON-WHITE` need a look.
+- `make check` runs the engine and wording checks on the Black book. `W-RARE` and `W-MISS` lines are information, not failures; `B-LOSS`, `ILLEGAL` and `ENDS-ON-WHITE` need a look. `B-LOSS bv-ponziani-d5` is a known depth-14 artifact (the book's move is also the engine's best; the two searches disagree on the number).
+- `pipeline/lint_claims.py` checks both books for the same position answered with two different moves, for pin wording with no pin on the board, and for labels that say a move guards or hits a piece when it doesn't. `assemble.py` runs it and stops on any finding, so fix the content, never the check.
+- `data/line_versions.json` holds `{line id: [version, hash of its moves]}` and is committed. `assemble.py` bumps a version when a line's moves change; the page then treats older progress on that line as due ("Changed"). A rebuild that changes no moves must leave the file untouched. Ids of removed lines stay in it, so a reused id starts on a new version.
 - README images: `FONTS_DIR=<google/fonts ofl folder> python3 tests/readme_shots.py`.
 
 ## Deploy
@@ -28,6 +30,9 @@ The plan for the next phases is in [ROADMAP.md](ROADMAP.md). Read it first.
 
 ## House rules for the app
 
+- One position, one move. If two move orders reach the same position, the book plays the same move in both. Before changing a line, look for the position in the other lessons (`lint_claims.py` reports the conflicting paths).
+- One order per setup. The d-pawn setup comes out in the order given in the README ("One setup, one order"). Where a line has to leave that order, the note at that move says why.
+- A label says only what is on the board. "Pin" needs a piece that can't or shouldn't move because of what is behind it; a bishop coming at a knight with a pawn behind it is "Bishop comes at your knight". "Guards" and "hits" are checked the same way.
 - No chess notation in anything the user reads. The squares f7 and f2 are the only exception. Arrow and move data inside the code is fine. This covers what the engine says too: its moves go through `moveWords`.
 - The engine never shows during a drill, a practice game or a checkpoint. It comes on when they end, and it is always available in lessons and game reviews.
 - Every colour is a CSS token defined for both light and dark themes. Check phone width (390px) for sideways scrolling.

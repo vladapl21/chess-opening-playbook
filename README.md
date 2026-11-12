@@ -28,6 +28,7 @@ Most opening courses are written for everyone. They give long lines in algebraic
 - **The opponent plays like a real opponent.** Every opponent move in the book carries the odds that a club player at this level would choose it. The first move's odds come from the games themselves. After that they come from [Maia](https://maiachess.com), a neural network trained to predict human moves at a given rating. The drills, the sandbox and every "how often" figure use these odds, so preparation goes where the games actually go.
 - **Words instead of notation.** Moves are described the way you would explain them over a board: *Bishop aims at f7*, *Knight takes back*, *Queen breaks the pin*. Positions that matter get a short note explaining why.
 - **Checked by an engine, built for a human.** Every move in both books was checked with Stockfish 17.1. Lines were chosen to be easy to remember, such as one setup against a whole family of move orders, rather than to squeeze out the last hundredth of a pawn.
+- **One position, one move.** However a position is reached, the answer is the same, and each setup brings its pieces out in one order with a stated reason wherever the order has to change. The build stops if two lines disagree about a position, or if a label speaks of a pin, a guard or an attack that is not on the board.
 - **One path, unlocked as you go.** The course mixes White and Black units by how often each system comes up and how I score in it. Passing a unit's checkpoint opens the next one, so there is never everything at once.
 - **A line ends, the game doesn't.** Where a lesson's main line stops, a plan takes over in a few lines: where the king goes, which pawns move, what to aim at and what the opponent wants. A built-in engine shows the best moves and the other side's threat in words, and plays the position on from there.
 - **The games feed back in.** Missed tactics become puzzles. Habits that cost games become "insights" with a button that drills the real positions. Notes point back to the games they came from: *"Against ZhoskaStreezh in July you pushed the d-pawn first and the e-pawn took your knight. Knight first, every time."*
@@ -40,14 +41,14 @@ Most opening courses are written for everyone. They give long lines in algebraic
 | Record in those games             | 48–28                     | 37–35–1                          |
 | Chapters (openings)               | 8                         | 9                                |
 | Lessons                           | 79                        | 62                               |
-| Lines you can drill               | 274                       | 474                              |
-| Positions in the tree             | 2,233                     | 2,517                            |
-| Positions with a written note     | 826                       | 718                              |
+| Lines you can drill               | 274                       | 482                              |
+| Positions in the tree             | 2,233                     | 2,577                            |
+| Positions with a written note     | 827                       | 794                              |
 | Lessons that end with a plan      | 76                        | 62                               |
 | Game reviews                      | 10                        | 11                               |
 | Missed-shot puzzles               | 12                        | 13                               |
 | Patterns across games             | 4                         | 4                                |
-| Cheat-sheet cards                 | 47                        | 65                               |
+| Cheat-sheet cards                 | 47                        | 71                               |
 
 The course on top of both books has **17 units**. Fourteen are opening units: 55 core lessons, 86 optional ones and 84 checkpoint positions. Three are skill units made of positions from my own games: 26 threats I walked into, 18 winning positions I let slip and 16 endings.
 
@@ -59,7 +60,7 @@ The course on top of both books has **17 units**. Fourteen are opening units: 55
 
 The course is the front page. Units alternate between White, Black and skills in the order that matters for my games: the Italian first (my main weapon, and only 5 wins in the last 12), then the Slav setup against the d-pawn (a third of my Black games), then threat-spotting. Every lesson unit has five steps:
 
-1. **The idea.** Three or four boards with arrows and one sentence each.
+1. **The idea.** A few boards with arrows and one sentence each.
 2. **Learn the lines.** The core lessons, studied to their last move.
 3. **Drill.** Each main line played once from memory without a slip.
 4. **Practice games.** Three clean sandbox games where the opponent only plays this unit's lines and picks the ones I know least.
@@ -167,14 +168,45 @@ The layout collapses to one column on phones and follows the system's light or d
 | **The Italian** | 1.e4 e5 2.Nf3 Nc6 3.Bc4 | 14 | 9–5 | Giuoco Piano. Against c3 and d4: take, check, trade bishops, strike with …d5. Against the slow Italian, one setup every time, castling before the knight can jump at f7. |
 | **Ruy Lopez** | 3.Bb5 | 7 | 5–2 | The knight hits the e-pawn, then the bishop goes to its Italian diagonal and you castle. Against the exchange, take back toward the center. |
 | **Scotch & center gambits** | 2.d4 or 3.d4 | 9 | 3–6 | The bishop goes to c5 at once, as in the Italian. After a knight trade the queen comes to f6 with a threat on f2, the d-pawn takes back and you castle long. Against the Scotch Gambit the same bishop, then …d5; against the Danish and Göring, …d5 straight away; against the Center Game, kick the queen, pin and castle. |
-| **Four Knights & Vienna** | 2.Nc3 or 3.Nc3 | 8 | 3–5 | Copy the bishop or slide into the Italian setup. Against the Vienna bishop: knight out, …Bc5, …d6, and …h6 against the pin. Against the Vienna Gambit, leave the pawn, play …Bc5 and …d6, then the knight jumps at White's bishop. |
-| **Early attacks** | 2.Qh5, 2.Qf3, 2.f4, 2.Bc4 | 6 | 3–3 | Against the queen: block f7, tuck the bishop beside the king, then castle or jump into the center. Against the King's Gambit, leave the pawn and play …Bc5, which stops White castling, then …d6, knight out and castle. |
-| **Queen's Gambit** | 1.d4 d5 2.c4 | 8 | 5–3 | The Slav: …c6, the light bishop out before …e6, then trade it for White's. Against the pin, the knight jumps to the middle and a queen check on the edge wins the bishop. |
-| **London System** | 1.d4 d5 2.Bf4 | 5 | 2–3 | Copy the bishop, …e6, trade the light bishops, then offer the dark ones. |
-| **Other d-pawn systems** | Colle, Torre, Veresov, Jobava, gambits | 11 | 5–5–1 | The same setup: bishop out before White's bishop, …e6, then …c5 against the Colle. When the knight is taken, take back with the e-pawn. |
+| **Four Knights & Vienna** | 2.Nc3 or 3.Nc3 | 8 | 3–5 | Knights first, then the bishop to its usual diagonal: against the Spanish bishop that is the Ruy Lopez lesson, against the Italian bishop the Italian one. Against the Vienna bishop: knight out, …Bc5, …d6, and …h6 against the pin. Against the Vienna Gambit, leave the pawn, play …Bc5 and …d6, then the knight jumps at White's bishop. |
+| **Early attacks** | 2.Qh5, 2.Qf3, 2.f4, 2.Bc4 | 6 | 3–3 | Against the queen: block f7, tuck the bishop beside the king, then castle or jump into the center. Against the King's Gambit, leave the pawn and play …Bc5, which stops White castling, then …d6, both knights out, and the knight jumps at White's bishop, the same move as against the Vienna Gambit. |
+| **Queen's Gambit** | 1.d4 d5 2.c4 | 8 | 5–3 | The Slav: …c6, the light bishop out before …e6, trade it for White's, then always queen's knight, dark bishop to d6, castle. When White's bishop comes at your knight, the knight jumps to the middle and a queen check on the edge wins the bishop. |
+| **London System** | 1.d4 d5 2.Bf4 | 5 | 2–3 | Copy the bishop, …e6, trade the light bishops, then offer the dark ones. The queen always takes back. |
+| **Other d-pawn systems** | Colle, Torre, Veresov, Jobava, gambits | 11 | 5–5–1 | The same setup in the same order: bishop out before White's bishop and trade it. When White's queen takes back, …c6 comes before …e6, which shuts out a queen check that wins the b-pawn. When the knight is taken, take back with the e-pawn. |
 | **Other first moves** | 1.c4, 1.Nf3, 1.g3, 1.e3 | 4 | 2–2 | …e5 against the c-pawn, and the Slav setup against 1.Nf3. |
 
 72 of the 73 Black games fall into a chapter. The remaining one, an experiment with 1…b6, sits outside the book.
+
+### One setup, one order
+
+The Slav setup covers the Queen's Gambit, the London, the Colle and the other d-pawn systems, so it has to come out the same way every time. A drill should never ask for two different moves in one position, and it should never ask for the same moves in a different order without saying why. The order is:
+
+1. **d-pawn** two squares.
+2. **c-pawn** one square, as soon as something asks for it (the table below). Otherwise it waits.
+3. **King's knight.**
+4. **Light bishop** out to f5, then the **e-pawn** one square behind it. If White offers the light bishops, trade.
+5. **Queen's knight** to d7.
+6. **Dark bishop** to d6.
+7. **Castle.** If White's e-pawn then pushes into the middle, take it and trade knights.
+
+The places where the order changes, each with the reason the lesson gives:
+
+| When | What changes | Why |
+| --- | --- | --- |
+| White's c-pawn attacks the d-pawn | …c6 on move two | It guards the d-pawn with a pawn and keeps the bishop's diagonal open. |
+| White plays the small e-pawn move with no piece out | Bishop before the king's knight; the knight comes after …Nd7 | From home the queen still guards the edge square, so White's knight can't chase the bishop, and the knight on d7 blocks the queen check. |
+| White trades the c-pawn for your d-pawn | Both knights before the bishop, and the queen's knight goes to c6 | With the c-pawns gone, White's queen can hit the b-pawn the moment the bishop leaves. The knight on c6 answers that by jumping to the edge at the queen. |
+| White's queen has taken back on d3 after the bishop trade | …c6 before …e6 | Without it the queen checks on the queenside and wins the b-pawn. Club players find that check about one game in six. |
+| London bishop on f4 | Dark bishop to d6 straight after …e6, and the queen takes back | Trading the London bishop is the point; taking back with a pawn loses a pawn in the c-pawn lines. |
+| Both White knights out in the Queen's Gambit | Take the c-pawn and hold it with the b-pawn | The bishop can't come out safely yet, and White needs several moves to win the pawn back. |
+| White's bishop comes at the king's knight | The knight jumps to the middle if that square is free | It hits the bishop, and the queen check on the edge wins it if White takes the knight. |
+| White fianchettoes, or the c-pawn pushes past | Dark bishop one square shorter, to e7 | On d6 it would be hit by the pawn or stare at a guarded pawn. |
+
+Three checks keep it that way ([`pipeline/lint_claims.py`](pipeline/lint_claims.py)), and the build stops when any of them finds something:
+
+- **Repeats.** Every position where it is your move is collected across all lines of a book. If two move orders reach the same position and the book answers with different moves, that is an error.
+- **Pins.** A label or note that speaks of a pin needs a real one on the board: a piece attacked by a bishop, rook or queen with its king or a more valuable piece right behind it. A bishop that comes at a knight while the e-pawn is still at home pins nothing, and the text may not say it does.
+- **Guards and hits.** A label that says the move guards a piece, or hits one, is compared with the board: after the move, that piece must have a new guard or a new attacker.
 
 ## How it was made
 
@@ -207,7 +239,9 @@ flowchart LR
 6. **Build.** [`build_white.py`](pipeline/build_white.py) and [`build_black.py`](pipeline/build_black.py) merge all lines into one tree per book ([`tree.py`](pipeline/tree.py)). They attach labels, notes, arrows, odds and evaluations, precompute the legal moves wherever you are to move, and write `data/build/data_*.json`. [`assemble.py`](pipeline/assemble.py) injects both books and the piece set into [`app/template.html`](app/template.html) and writes [`docs/index.html`](docs/index.html).
 7. **The course.** [`content/course.py`](content/course.py) lists the units in order: required and optional lessons, the idea boards as move paths with arrows, and the checkpoint positions. [`build_course.py`](pipeline/build_course.py) resolves every path against its book (a path that leaves the repertoire fails the build) and writes `data/build/data_course.json`. The skill positions come from a Stockfish scan of all 200 games. [`data/course_threats.json`](data/course_threats.json) holds moves that lost at least 20 points of win chance to a tactic, with the moves that would have held and the engine's answer to every other legal move. [`course_finish.json`](data/course_finish.json) and [`course_endings.json`](data/course_endings.json) use the same format. The first has positions where I had at least a 78% win chance and my move gave up 15 points or more; the second has endgame moves that cost 12 points or more. In both, a move counts as right when it stays within 7 points of the best one.
 8. **Plans.** [`content/plans.py`](content/plans.py) has one plan per lesson for the position its main line ends in, written from the engine's top lines there and kept to six kinds of bullet: king, pawns, pieces, target, their plan, watch for. `assemble.py` attaches them and checks them for notation.
-9. **Caches.** Every Stockfish and Maia result is cached in [`data/cache`](data/cache) and committed. That makes the build reproducible byte for byte with nothing but python-chess, in a few seconds and without any engine.
+9. **Checks.** `assemble.py` refuses to build a page in which one position gets two different answers, or a label claims a pin, a guard or an attack that is not there ([`lint_claims.py`](pipeline/lint_claims.py)). `make check` adds an engine pass over every Black line ([`check_black.py`](pipeline/check_black.py)) and a wording pass that compares notes with their positions ([`lint_notes.py`](pipeline/lint_notes.py)).
+10. **Line versions.** Progress is stored per line. [`data/line_versions.json`](data/line_versions.json) keeps a fingerprint of every line's moves, and `assemble.py` raises a line's version when the moves change. The page then treats an older record of that line as due again and marks it **Changed**, so a rewritten line is never shown as mastered on the strength of moves it no longer has.
+11. **Caches.** Every Stockfish and Maia result is cached in [`data/cache`](data/cache) and committed. That makes the build reproducible byte for byte with nothing but python-chess, in a few seconds and without any engine.
 
 ## Under the hood
 
@@ -215,7 +249,7 @@ flowchart LR
 - **Board.** The board is SVG, drawn with an original piece set ([`app/pieces.py`](app/pieces.py)). It supports drag and tap input, legal-move hints, arrows, circles and a flipped view for Black. Legal moves are precomputed for every book position where you move, so lessons, drills and the sandbox need no chess library.
 - **Engine.** [`docs/engine`](docs/engine) holds the lite single-threaded build of [Stockfish.js](https://github.com/nmrugg/stockfish.js) 19: a 28 KB script and a 1.8 MB WebAssembly file, fetched the first time the engine is switched on and run in a web worker. The page talks to it in plain UCI text. Each position gets two searches: a short one with the move handed to the other side (their idea), then the three best moves to depth 22 or seven seconds. Results are kept for the session, so stepping back and forth is instant. The engine's moves are put into words by a small JavaScript twin of `label2.py`. The single-threaded build needs no special server headers, so it runs on GitHub Pages; it can't start from a page opened as a file, and the card says so.
 - **Two books, one engine.** `loadBook()` swaps every index (nodes, lines, lessons, chapters, whose move is whose, board orientation) when you flip the switch. Line ids never collide between the books (the build checks this), so one progress store holds both.
-- **Progress and accounts.** Progress is always saved in the browser first. On the website, an account (email and password through [Supabase](https://supabase.com)) keeps a copy in the cloud, so the same progress shows up on every device. Sync pulls and merges on sign-in, on load and whenever the tab comes back into view: the newest record wins for each drill line and puzzle, and course steps keep the best result. The project URL and publishable key live in [`app/site.json`](app/site.json), the tables and row-level security in [`supabase/schema.sql`](supabase/schema.sql). When the page runs as a Claude artifact, it syncs to the artifact's own per-user storage instead.
+- **Progress and accounts.** Progress is always saved in the browser first. On the website, an account (email and password through [Supabase](https://supabase.com)) keeps a copy in the cloud, so the same progress shows up on every device. Sync pulls and merges on sign-in, on load and whenever the tab comes back into view: the newest record wins for each drill line and puzzle (for a line whose moves have changed, the record made on the current moves wins over a newer one made on the old moves), and course steps keep the best result. The project URL and publishable key live in [`app/site.json`](app/site.json), the tables and row-level security in [`supabase/schema.sql`](supabase/schema.sql). When the page runs as a Claude artifact, it syncs to the artifact's own per-user storage instead.
 - **Deep links.** `#course` and `#unit.<unit-id>` open the course and a unit (a unit brings its own book). `#learn`, `#sandbox`, `#drill`, `#games`, `#cheat`, `#learn.<chapter>` and `#line.<line-id>` open the matching view. Add a `b.` prefix for the Black book, for example [`#b.learn.london`](https://vladapl21.github.io/chess-opening-playbook/#b.learn.london) or [`#b.line.bs-classical`](https://vladapl21.github.io/chess-opening-playbook/#b.line.bs-classical).
 
 <details>
@@ -300,11 +334,13 @@ pipeline/
                            game import, sorting by opening, engine scans, missed shots
   check_black.py, lint_notes.py
                            engine and wording checks
+  lint_claims.py           one position, one move; pins, guards and attacks in the text must be on the board
   paths.py, common.py      paths, environment variables, shared imports
 data/
   games/                   PGN exports of both accounts (July to October 2026)
   cache/                   Stockfish and Maia results, so builds need no engine
   black_*.json             Black games, per-move scans, candidate shots
+  line_versions.json       a fingerprint of every line's moves; a line's version goes up when they change
   course_threats.json, course_finish.json, course_endings.json
                            skill-unit positions from all 200 games, with the engine's answers
   build/                   data_white.json, data_black.json, data_course.json, playbook.html
@@ -313,8 +349,8 @@ docs/
   engine/                  Stockfish.js 19 (GPL-3.0): the script, the WebAssembly file and the license
   img/                     the images in this README
 tests/
-  e2e_white.py, e2e_black.py, e2e_sandbox_switch.py, e2e_course.py, e2e_accounts.py, e2e_engine.py
-                           end-to-end browser tests (Playwright)
+  e2e_white.py, e2e_black.py, e2e_sandbox_switch.py, e2e_course.py, e2e_accounts.py, e2e_engine.py,
+  e2e_versions.py          end-to-end browser tests (Playwright)
   serve.py                 serves the built page over local HTTP for the engine test and screenshots
   fake_supabase.js         stand-in for supabase-js so account tests run offline
   readme_shots.py          regenerates docs/img
@@ -357,6 +393,7 @@ python3 pipeline/human_odds.py "e4 e5 Nf3 Nc6 Bc4"     # what club players play 
 python3 pipeline/sf.py -d 18 "e4 e5 Nf3 Nc6 Bc4 Bc5"   # Stockfish's top three moves
 python3 pipeline/check_black.py 16 bi-main,bs-classical  # check lessons (or all, without ids)
 python3 pipeline/lint_notes.py                         # notes that contradict their position
+python3 pipeline/lint_claims.py                        # same position, different move; pins, guards, attacks not on the board
 ```
 
 ### Tests
@@ -367,7 +404,7 @@ python3 -m playwright install chromium
 make test
 ```
 
-The tests drive the real page in Chromium. They visit every chapter in both books, step through lessons, and play drills by dragging and tapping (correct moves, slips, castling). They solve every puzzle and play sandbox games across every opening and odds setting, including a regression test for changing the opening mid-game. They also follow deep links, switch books back and forth with state kept, and check that the phone layout never scrolls sideways, in light and dark mode. The course test works through the first units the way a person would: the idea boards, a lesson, a drill line, a checkpoint with a deliberate miss, practice games against a unit's lines, and a threat set where wrong moves get played out and punished. The engine test serves the page over local HTTP and runs the real engine: the switch in Study, three different best moves with their arrows, the plan at the end of a line, moves for both sides on the explore board by tap and by drag, the engine answering, its line played out, a reload that keeps the position, and the note shown when the page is opened as a file. The accounts test runs two browsers against a fake Supabase server as two devices on one account: sign-up carrying local progress along, sync both ways, an outage and recovery, a second account on the same device, and the email confirmation, password reset and expired-link flows. Screenshots land in `tests/out/`. To regenerate the images in this README, run `make shots`.
+The tests drive the real page in Chromium. They visit every chapter in both books, step through lessons, and play drills by dragging and tapping (correct moves, slips, castling). They solve every puzzle and play sandbox games across every opening and odds setting, including a regression test for changing the opening mid-game. They also follow deep links, switch books back and forth with state kept, and check that the phone layout never scrolls sideways, in light and dark mode. The course test works through the first units the way a person would: the idea boards, a lesson, a drill line, a checkpoint with a deliberate miss, practice games against a unit's lines, and a threat set where wrong moves get played out and punished. The engine test serves the page over local HTTP and runs the real engine: the switch in Study, three different best moves with their arrows, the plan at the end of a line, moves for both sides on the explore board by tap and by drag, the engine answering, its line played out, a reload that keeps the position, and the note shown when the page is opened as a file. The accounts test runs two browsers against a fake Supabase server as two devices on one account: sign-up carrying local progress along, sync both ways, an outage and recovery, a second account on the same device, and the email confirmation, password reset and expired-link flows. The versions test runs the claims check on boards with a known answer, then loads the page with a record made before a line changed and checks that the line comes back as due and marked Changed, that a clean run on the new moves replaces the record, and that two devices merge to the newer version. Screenshots land in `tests/out/`. To regenerate the images in this README, run `make shots`.
 
 ## Credits
 

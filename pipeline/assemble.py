@@ -3,9 +3,31 @@
 Writes data/build/playbook.html (the page body, as published to Claude artifacts; no accounts) and
 docs/index.html (a complete standalone page for GitHub Pages; accounts through Supabase when
 app/site.json has a project URL and publishable key)."""
-import json
+import hashlib, json
 import paths
 from pieces import piece_svg_inner
+from lint_claims import lint_labels, lint_pins, lint_repeats
+
+VERSIONS = paths.DATA / 'line_versions.json'
+
+
+def stamp_versions(books):
+    """Give every line a version that goes up whenever its moves change.
+
+    Progress is stored per line id. When a line's moves change, a record made on the old moves says nothing about
+    the new ones, so the page treats it as due again. data/line_versions.json remembers {id: [version, hash of moves]}
+    between builds; it is committed, and a rebuild that changes no moves leaves it untouched."""
+    vers = json.load(open(VERSIONS)) if VERSIONS.exists() else {}
+    for D in books:
+        for l in D['lines']:
+            h = hashlib.sha1(' '.join(D['nodes'][i].get('u', '') for i in l['n']).encode()).hexdigest()[:10]
+            v = vers.get(l['id'])
+            if v is None: vers[l['id']] = [1, h]
+            elif v[1] != h: vers[l['id']] = [v[0] + 1, h]
+            if vers[l['id']][0] > 1: l['v'] = vers[l['id']][0]
+            else: l.pop('v', None)
+    VERSIONS.write_text(json.dumps(vers, sort_keys=True, separators=(',', ':')).replace('],', '],\n') + '\n')
+    return sum(1 for D in books for l in D['lines'] if l.get('v'))
 
 SUPABASE_JS = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.105.4'
 HEAD = ('<!doctype html><html lang="en"><head><meta charset="utf-8">'
@@ -54,6 +76,11 @@ def main():
             bad = [m for m in re.findall(r'\b[a-h][1-8]\b', t) if m not in ('f7', 'f2')] + re.findall(r'\b[KQRBN]x?[a-h][1-8]\b|O-O', t)
             assert not bad, (k, t, bad)
         assert all(x[0] in ('king', 'pawns', 'pieces', 'target', 'them', 'watch') for x in pl['b']), k
+    # the same position must get the same move whatever the move order; a pin, a guard or an attack that a label
+    # speaks of must be on the board
+    problems = [x for side in ('white', 'black') for x in lint_repeats(side) + lint_pins(side) + lint_labels(side)]
+    assert not problems, '\n' + '\n'.join(problems)
+    changed = stamp_versions((W, B))
     # progress records are shared between the books, so ids must never collide
     wl, bl = {l['id'] for l in W['lines']}, {l['id'] for l in B['lines']}
     assert not (wl & bl), sorted(wl & bl)[:10]
@@ -71,7 +98,7 @@ def main():
     (paths.BUILD / 'playbook.html').write_text(body)
     page = site_html(body, site)
     (paths.DOCS / 'index.html').write_text(page)
-    print('playbook.html', len(body), '| docs/index.html', len(page), '| accounts', 'on' if site.get('supabaseUrl') and site.get('supabaseKey') else 'off (app/site.json has no project yet)')
+    print('playbook.html', len(body), '| docs/index.html', len(page), '| lines changed since first release', changed, '| accounts', 'on' if site.get('supabaseUrl') and site.get('supabaseKey') else 'off (app/site.json has no project yet)')
 
 
 if __name__ == '__main__':

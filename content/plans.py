@@ -46,8 +46,8 @@ W = {
     ('king', 'Black\'s king is in the open. Keep checking with the queen.'),
     ('them', 'With perfect defence it is a draw by repeated checks. One wrong king step and your rook joins with mate.'),
     ('watch', 'Don\'t stop checking to grab material: Black\'s queen and rooks are waiting to come back.')]),
-  'moller-ne5': dict(h='Pin the knight, use the space', b=[
-    ('pieces', 'Your dark bishop pins the knight to the rook. The knight in the middle jumps forward when it hits something.'),
+  'moller-ne5': dict(h='Press on the knight, use the space', b=[
+    ('pieces', 'Your dark bishop presses on the knight, with Black\'s pawn and rook lined up behind it. The knight in the middle jumps forward when it hits something.'),
     ('pawns', 'Your advanced d-pawn cramps Black. Support it with the c-pawn.'),
     ('them', 'Black wants to push the f-pawn and open lines toward your king.'),
     ('watch', 'Keep your queen guarded: Black\'s pieces line up on it quickly.')]),
@@ -163,7 +163,7 @@ W = {
   'x-bc5': dict(h='A pawn up with the center', b=[
     ('pawns', 'You are a pawn up with two pawns in the middle.'),
     ('pieces', 'Knight jumps to the hole in the middle, bishop out, castle.'),
-    ('watch', 'Black\'s queen on the e-file pins your knight to the king. Castle soon.')]),
+    ('watch', 'Black\'s queen sits opposite your king on the e-file. Castle soon.')]),
   'x-f6': dict(h='Get the queen out, keep the rook', b=[
     ('target', 'You are a rook up. Get the queen out of the corner before it is trapped.'),
     ('watch', 'Black will try to shut your queen in with the knight and bishop. Keep a way out.'),
@@ -427,10 +427,10 @@ B = {
     ('pawns', 'Take back toward the middle with the d-pawn after any trade.'),
     ('king', 'Castle long or short when ready.')]),
   # ---------------------------------------------------------------- Four Knights, Vienna & quiet lines
-  'bv-spanish': dict(h='Symmetry, then break', b=[
-    ('pieces', 'Knight round to the king side; bishop trade when White\'s knight jumps.'),
-    ('pawns', 'The c-pawn and d-pawn prepare a center break.'),
-    ('them', 'White wants the knight jump to the middle and the pin on your knight.')]),
+  'bv-spanish': dict(h='Your Spanish setup again', b=[
+    ('pieces', 'Bishop steps back if the knight jumps at it. Light bishop out.'),
+    ('pawns', 'Later the d-pawn break.'),
+    ('them', 'White wants the pin on your knight. Ask the bishop with the edge pawn.')]),
   'bv-scotch4n': dict(h='Free pieces, equal center', b=[
     ('pieces', 'Light bishop out, rook to the e-file.'),
     ('pawns', 'Your c-pawn can join to make a strong center.'),
@@ -451,10 +451,10 @@ B = {
     ('pieces', 'Your knight takes White\'s Italian bishop; then castle.'),
     ('king', 'White\'s king can\'t castle short while your bishop eyes its path.'),
     ('pawns', 'Later the d-pawn break opens the center against the uncastled king.')]),
-  'bv-vmisc': dict(h='Copy, then break', b=[
+  'bv-vmisc': dict(h='Back in your Spanish lesson', b=[
     ('king', 'Castle next.'),
-    ('pieces', 'Knight jumps to the middle to trade, bishop stays on its diagonal.'),
-    ('pawns', 'The d-pawn break later.')]),
+    ('pawns', 'Then the small d-pawn move guards your e-pawn.'),
+    ('pieces', 'Bishop steps back if a knight jumps at it.')]),
   'bv-ponziani': dict(h='Equal and free', b=[
     ('pieces', 'Bishop out, castle; your knight in the middle is strong.'),
     ('target', 'White\'s far-advanced e-pawn.')]),
@@ -473,10 +473,11 @@ B = {
     ('king', 'Castle next.'),
     ('pieces', 'Every move that hits White\'s queen gains time.'),
     ('pawns', 'The d-pawn strike in the center.')]),
-  'ba-kgd': dict(h='White\'s king is stuck', b=[
-    ('king', 'You are castled; White can\'t castle short while your bishop covers its path.'),
-    ('pieces', 'Queen\'s knight out, light bishop pins the knight.'),
-    ('pawns', 'If White takes on your e-pawn, the f-file opens for your rook too.')]),
+  'ba-kgd': dict(h='Trade the bishop, then castle', b=[
+    ('pieces', 'Your knight takes White\'s Italian bishop; then castle.'),
+    ('king', 'White\'s king can\'t castle short while your bishop eyes its path.'),
+    ('pawns', 'Later the d-pawn break opens the center against the uncastled king.'),
+    ('watch', 'If White plays the small c-pawn move, the knight jump loses to a queen check. Castle instead.')]),
   'ba-bc4': dict(h='Your Italian setup', b=[
     ('pieces', 'Small d-pawn move, castle; the knight jumps at the bishop later.'),
     ('pawns', 'The d-pawn break when White commits.')]),
@@ -498,21 +499,27 @@ B = {
     ('pieces', 'Knight out, bishop out, castle.')]),
   'bo-b3': dict(h='Take the center', b=[
     ('pieces', 'Knight out, castle; guard the e-pawn against the long bishop.')]),
-  'bo-f4': dict(h='Fianchetto and castle', b=[
-    ('pieces', 'King\'s bishop to the long diagonal, castle.'),
-    ('pawns', 'The c-pawn and d-pawn hold the center.')]),
+  'bo-f4': dict(h='The Slav setup against the f-pawn', b=[
+    ('king', 'Castle next.'),
+    ('pieces', 'Queen\'s knight out. Your bishop outside the chain watches the middle squares.'),
+    ('pawns', 'Later the c-pawn goes two squares.'),
+    ('them', 'White wants a knight on the middle square in front of the f-pawn. Challenge it with your queen\'s knight.')]),
   'bo-misc': dict(h='Develop and castle', b=[
     ('king', 'Castle next.'),
     ('pawns', 'The d-pawn and c-pawn take the center.')]),
   # ---------------------------------------------------------------- Queen's Gambit
   'bsl-slow': dict(h='Castle, then the e-pawn or c-pawn break', b=[
     ('king', 'Castle next.'),
-    ('pawns', 'Then the e-pawn break, or the c-pawn break if White pushes the e-pawn first.'),
-    ('pieces', 'Your knights guard each other; the queen can go to the c-file side.')]),
-  'bsl-slow2': dict(h='Castle, then the e-pawn break', b=[
+    ('pawns', 'Then your e-pawn break, or the c-pawn break, frees your game.'),
+    ('pieces', 'Your knights guard each other; the queen can go to the c-file side.'),
+    ('them', 'White wants the e-pawn push into the middle. Take it at once and trade knights.'),
+    ('watch', 'If the c-pawn pushes at your bishop, step back one square on the same diagonal.')]),
+  'bsl-slow2': dict(h='Castle, then the e-pawn or c-pawn break', b=[
     ('king', 'Castle next.'),
-    ('pawns', 'Then the e-pawn break.'),
-    ('pieces', 'Bishop trades on the knight if White lets it.')]),
+    ('pawns', 'Then your e-pawn break, or the c-pawn break, frees your game.'),
+    ('pieces', 'Your knights guard each other; the queen can go to the c-file side.'),
+    ('them', 'White wants the e-pawn push into the middle. Take it at once and trade knights.'),
+    ('watch', 'If the c-pawn pushes at your bishop, step back one square on the same diagonal.')]),
   'bsl-main': dict(h='Hold the pawn, develop', b=[
     ('pawns', 'You are a pawn up for now. Keep the queenside pawns together.'),
     ('pieces', 'Knight back out, bishop out, castle.'),
@@ -531,19 +538,22 @@ B = {
     ('pawns', 'Next the c-pawn hits the center.'),
     ('pieces', 'Queen\'s knight out, rooks to the c-file and the d-file.'),
     ('them', 'White wants the knight jump to the middle and the e-pawn push.')]),
-  'bln-c4': dict(h='Pressure on the c-pawns', b=[
-    ('target', 'White\'s doubled c-pawns.'),
-    ('pieces', 'Knight out, queen to the side to hit the pawns.')]),
+  'bln-c4': dict(h='The Slav triangle against the London', b=[
+    ('king', 'Castle next.'),
+    ('pieces', 'Queen\'s knight out; the queen is safe in the middle of your triangle.'),
+    ('pawns', 'Later your e-pawn break frees your game.'),
+    ('them', 'White wants the queen move at your b-pawn or the c-pawn push. The triangle holds both.')]),
   'bln-nf3': dict(h='Trade the bishops, castle', b=[
     ('pieces', 'Offer the dark bishop trade, then castle.'),
     ('pawns', 'Then the c-pawn break.')]),
   'bln-jobava': dict(h='Castle, then the c-pawn break', b=[
     ('king', 'Castle next.'),
     ('pawns', 'Then the c-pawn or e-pawn break.')]),
-  'bdx-colle': dict(h='Your bishop is outside the chain', b=[
+  'bdx-colle': dict(h='Castle; your pieces stand as in the Slav', b=[
     ('king', 'Castle next.'),
-    ('pieces', 'Rook to the c-file; keep the tension in the center.'),
-    ('them', 'White wants the e-pawn push. Meet it with trades.')]),
+    ('pieces', 'The knight comes to the king\'s side and hits the queen; rooks to the middle files.'),
+    ('pawns', 'Once you are castled, the c-pawn goes one more square and hits the center.'),
+    ('them', 'White has the queen in the middle but no attacking bishop left. Trades favour you.')]),
   'bdx-torre': dict(h='Trade the bishop, castle', b=[
     ('pieces', 'Your knight in the middle is strong; trade the dark bishops.'),
     ('king', 'Castle next.')]),
