@@ -31,6 +31,20 @@
   --sq-light:#CFD8CC; --sq-dark:#6F8D7B; --hl:rgba(240,201,64,.5); --sel:rgba(67,192,143,.42);
   --arr-g:#1FA155; --arr-r:#E8463D; --arr-b:#4F82E6; --arr-y:#F0B92A; --arr-e:#A78BF5;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35); --pico-b:drop-shadow(0 0 1px rgba(214,226,219,.95)) drop-shadow(0 0 .6px rgba(214,226,219,.95)); --scrim:rgba(0,0,0,.62); color-scheme:dark}
+/* board colours (Settings): each palette has its own light and dark values */
+:root[data-board="wood"]{--sq-light:#F0DDBD;--sq-dark:#B98B63}
+:root[data-board="blue"]{--sq-light:#E3EAF1;--sq-dark:#7C9CBF}
+:root[data-board="slate"]{--sq-light:#E7E8EA;--sq-dark:#8E969E}
+:root[data-board="plum"]{--sq-light:#ECE5F3;--sq-dark:#9C88BF}
+@media (prefers-color-scheme: dark){
+  :root[data-board="wood"]:not([data-theme="light"]){--sq-light:#DCC7A4;--sq-dark:#9C7551}
+  :root[data-board="blue"]:not([data-theme="light"]){--sq-light:#C9D5E1;--sq-dark:#6282A8}
+  :root[data-board="slate"]:not([data-theme="light"]){--sq-light:#CDD0D4;--sq-dark:#707982}
+  :root[data-board="plum"]:not([data-theme="light"]){--sq-light:#D5CBE4;--sq-dark:#7E6CA4}}
+:root[data-theme="dark"][data-board="wood"]{--sq-light:#DCC7A4;--sq-dark:#9C7551}
+:root[data-theme="dark"][data-board="blue"]{--sq-light:#C9D5E1;--sq-dark:#6282A8}
+:root[data-theme="dark"][data-board="slate"]{--sq-light:#CDD0D4;--sq-dark:#707982}
+:root[data-theme="dark"][data-board="plum"]{--sq-light:#D5CBE4;--sq-dark:#7E6CA4}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit}
@@ -442,6 +456,25 @@ button.ucard:hover{border-color:var(--accent);transform:translateY(-1px)}
 .acct .av::after{content:"";position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:50%;border:2px solid var(--surface);background:var(--muted)}
 .acct.ok .av::after{background:var(--accent)} .acct.sync .av::after{background:var(--oro)} .acct.err .av::after{background:var(--rosso)}
 .acct .acctx{font-size:13px;color:var(--muted);font-weight:600}
+.gear{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--muted);display:grid;place-items:center;cursor:pointer;flex:none}
+.gear:hover{color:var(--ink);border-color:var(--accent)} .gear svg{width:19px;height:19px}
+.setsheet{width:min(480px,100%);gap:18px}
+.setrow{display:grid;gap:8px}
+.setrow > b{font-size:13px;letter-spacing:.02em} .setrow > span{font-size:13px;color:var(--muted)}
+.setseg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:3px;background:var(--surface-2);padding:3px;border-radius:11px}
+.setseg button{border:0;background:none;border-radius:8px;padding:8px 6px;font-weight:650;font-size:13.5px;color:var(--muted);cursor:pointer;min-height:38px;display:grid;place-items:center}
+.setseg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.setseg .aa{font-family:var(--f-display);font-weight:700;line-height:1}
+.swatches{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.swatch{border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:7px 4px 6px;display:grid;justify-items:center;gap:5px;cursor:pointer;font-size:12px;font-weight:600;color:var(--muted);min-width:0}
+.swatch i{display:grid;grid-template-columns:1fr 1fr;width:100%;max-width:44px;aspect-ratio:1;border-radius:6px;overflow:hidden}
+.swatch i b{display:block}
+.swatch[aria-pressed="true"]{border-color:var(--accent);color:var(--ink);box-shadow:0 0 0 2px var(--accent-soft)}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:14px;border:0;background:none;padding:0;text-align:left;cursor:pointer;width:100%}
+.switch .knob{flex:none;width:42px;height:24px;border-radius:12px;background:var(--line);position:relative;transition:background .15s}
+.switch .knob::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--surface);transition:transform .15s;box-shadow:var(--shadow)}
+.switch[aria-checked="true"] .knob{background:var(--accent)} .switch[aria-checked="true"] .knob::after{transform:translateX(18px)}
+.switch span b{display:block;font-size:14px} .switch span span{font-size:13px;color:var(--muted)}
 .scrim{position:fixed;inset:0;z-index:50;background:var(--scrim);display:grid;place-items:center;padding:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .sheet{width:min(440px,100%);max-height:calc(100dvh - 32px);overflow:auto;background:var(--surface);color:var(--ink);border-radius:20px;box-shadow:var(--shadow);padding:22px 22px 20px;display:grid;gap:14px;position:relative}
 .sheet h2{font-family:var(--f-display);font-size:30px;font-weight:700;line-height:1.1;letter-spacing:-.01em;padding-right:36px}
@@ -604,12 +637,13 @@ footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);fo
         <button data-side="w" aria-pressed="true"><i class="sw w" aria-hidden="true"></i>White<span class="badge" id="dueW" hidden>0</span></button>
         <button data-side="b" aria-pressed="false"><i class="sw b" aria-hidden="true"></i>Black<span class="badge" id="dueB" hidden>0</span></button>
       </div>
+      <button class="gear" id="setBtn" type="button" aria-haspopup="dialog" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.5-2.4 1a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.5A7.6 7.6 0 0 0 7 6.5l-2.4-1-2 3.5 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.5 2.4-1a7.6 7.6 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.6 7.6 0 0 0 2.6-1.5l2.4 1 2-3.5z"/></svg></button>
       <button class="acct out" id="acctBtn" type="button" aria-haspopup="dialog" hidden>Sign in</button>
     </div>
     <nav class="tabs" role="tablist" aria-label="Sections">
+      <button role="tab" data-view="sandbox" aria-selected="false">Sandbox</button>
       <button role="tab" data-view="course" aria-selected="true">Course</button>
       <button role="tab" data-view="learn" aria-selected="false">Learn</button>
-      <button role="tab" data-view="sandbox" aria-selected="false">Sandbox</button>
       <button role="tab" data-view="drill" aria-selected="false">Drill<span class="badge" id="dueBadge" hidden>0</span></button>
       <button role="tab" data-view="games" aria-selected="false"><span class="lg">Your games</span><span class="sm">Games</span></button>
       <button role="tab" data-view="cheat" aria-selected="false"><span class="lg">Cheat sheet</span><span class="sm">Cheats</span></button>
@@ -619,6 +653,7 @@ footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);fo
   <footer class="foot" id="foot"></footer>
 </div>
 <div class="scrim" id="acctSheet" hidden><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="acctTitle" id="acctPanel"></div></div>
+<div class="scrim" id="setSheet" hidden><div class="sheet setsheet" role="dialog" aria-modal="true" aria-labelledby="setTitle" id="setPanel"></div></div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <script>
@@ -726,6 +761,7 @@ function arrowSVG(a, b, col, w = 17, extra = ''){
   return `<g class="arr ${col} ${extra}"><path d="M${sx.toFixed(1)},${sy.toFixed(1)} L${bx.toFixed(1)},${by.toFixed(1)}" stroke-width="${w}"/><polygon points="${ex.toFixed(1)},${ey.toFixed(1)} ${(bx+px*hw).toFixed(1)},${(by+py*hw).toFixed(1)} ${(bx-px*hw).toFixed(1)},${(by-py*hw).toFixed(1)}"/></g>`;
 }
 function boardSVG(fen, o = {}){
+  if (o.coords && !SET.coords) o = Object.assign({}, o, {coords: false});
   const prev = FLIPX; if (o.flip !== undefined) FLIPX = !!o.flip;
   try { return boardSVGInner(fen, o); } finally { FLIPX = prev; }
 }
@@ -1079,8 +1115,10 @@ function switchSide(side){
   const inCourse = CVIEWS.includes(S.view) || (S.view === 'study' && S.studyFrom === 'unit');
   stopPlay(); clearTimeout(heroTimer); stashSide();
   loadBook(side);
-  Object.assign(S, STASH[side] || {view: S.view === 'study' ? 'learn' : S.view, chapter: savedChapter(side), line: null, i: 0, studyFrom: 'learn', drillState: null, sbState: null, dfilter: {ch: 'all', pri: 'all', from: 'branch'}, sbSession: null});
-  if (inCourse) S.view = 'course'; // the course spans both books; switching colour just goes back to the path
+  const tab = inCourse ? 'course' : tabOf(S.view, S.studyFrom);
+  Object.assign(S, STASH[side] || {view: tab, chapter: savedChapter(side), line: null, i: 0, studyFrom: 'learn', drillState: null, sbState: null, dfilter: {ch: 'all', pri: 'all', from: 'branch'}, sbSession: null});
+  // the switch changes the book, not the tab: stay on the tab you were on, at the place that book was left within it
+  if (inCourse || tabOf(S.view, S.studyFrom) !== tab || (S.view === 'study' && !LINES[S.line])) S.view = tab;
   S.drill = null; S.renderedLine = null; S.showPre = false;
   try { localStorage.setItem(SIDE_KEY, side); } catch(e){}
   render(); setHash(); window.scrollTo({top: 0, behavior: 'auto'});
@@ -1095,9 +1133,48 @@ function useSide(side){
   S.drill = null; S.renderedLine = null; S.showPre = false;
   try { localStorage.setItem(SIDE_KEY, side); } catch(e){}
 }
+/* ------------------------------------------------------------------ settings (kept on this device) */
+const SET_KEY = 'playbook-settings', HOST_THEME = document.documentElement.dataset.theme || '';
+const SET = {theme: 'system', size: 'm', board: 'green', coords: true, coach: true};
+try { Object.assign(SET, JSON.parse(localStorage.getItem(SET_KEY) || '{}')); } catch(e){}
+const SIZES = {s: .92, m: 1, l: 1.08, xl: 1.16};
+const BOARDS = [['green', 'Green', '#E6ECE2', '#84A390'], ['wood', 'Wood', '#F0DDBD', '#B98B63'], ['blue', 'Blue', '#E3EAF1', '#7C9CBF'], ['slate', 'Slate', '#E7E8EA', '#8E969E'], ['plum', 'Plum', '#ECE5F3', '#9C88BF']];
+function applySettings(){
+  const r = document.documentElement, t = SET.theme === 'system' ? HOST_THEME : SET.theme;
+  if (t) r.dataset.theme = t; else delete r.dataset.theme;
+  if (SET.board && SET.board !== 'green') r.dataset.board = SET.board; else delete r.dataset.board;
+  const app = document.getElementById('app'); if (app) app.style.zoom = SIZES[SET.size] === 1 ? '' : String(SIZES[SET.size] || 1);
+}
+function setSetting(k, v){ SET[k] = v; try { localStorage.setItem(SET_KEY, JSON.stringify(SET)); } catch(e){} applySettings(); }
+const Settings = {
+  open(){ document.getElementById('setSheet').hidden = false; this.render(); document.getElementById('setPanel').querySelector('.x').focus(); },
+  close(){ document.getElementById('setSheet').hidden = true; document.getElementById('setBtn').focus(); },
+  render(){
+    const seg = (k, opts) => `<div class="setseg" role="group">${opts.map(([v, label]) => `<button type="button" data-set="${k}:${v}" aria-pressed="${SET[k] === v}">${label}</button>`).join('')}</div>`;
+    const sw = (k, h, p) => `<button type="button" class="switch" role="switch" aria-checked="${!!SET[k]}" data-set="${k}:${SET[k] ? 0 : 1}"><span><b>${h}</b><span>${p}</span></span><i class="knob" aria-hidden="true"></i></button>`;
+    document.getElementById('setPanel').innerHTML = `<button class="x" type="button" aria-label="Close" data-setx>×</button>
+      <div><p class="kicker">On this device</p><h2 id="setTitle">Settings</h2></div>
+      <div class="setrow"><b>Appearance</b>${seg('theme', [['system', 'Match device'], ['light', 'Light'], ['dark', 'Dark']])}</div>
+      <div class="setrow"><b>Text size</b>${seg('size', [['s', '<span class="aa" style="font-size:13px">A</span>'], ['m', '<span class="aa" style="font-size:16px">A</span>'], ['l', '<span class="aa" style="font-size:19px">A</span>'], ['xl', '<span class="aa" style="font-size:22px">A</span>']])}<span>Boards grow with the text.</span></div>
+      <div class="setrow"><b>Board colour</b><div class="swatches" role="group">${BOARDS.map(([v, label, l, d]) => `<button type="button" class="swatch" data-set="board:${v}" aria-pressed="${SET.board === v}"><i aria-hidden="true"><b style="background:${l}"></b><b style="background:${d}"></b><b style="background:${d}"></b><b style="background:${l}"></b></i>${label}</button>`).join('')}</div></div>
+      ${sw('coords', 'Letters and numbers on the board', 'The small file and rank marks along the edge.')}
+      ${sw('coach', 'Coach', 'A few words from your coach at the moments that matter.')}`;
+  }
+};
+document.getElementById('setBtn').addEventListener('click', () => Settings.open());
+document.getElementById('setSheet').addEventListener('click', e => {
+  if (e.target.id === 'setSheet' || e.target.closest('[data-setx]')){ Settings.close(); return; }
+  const t = e.target.closest('[data-set]'); if (!t) return;
+  const [k, v] = t.dataset.set.split(':'); setSetting(k, k === 'coords' || k === 'coach' ? v === '1' : v);
+  Settings.render(); if (k === 'coords') render(); if (k === 'coach' && typeof Coach !== 'undefined') Coach.refresh();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !document.getElementById('setSheet').hidden) Settings.close(); });
+applySettings();
+
 const view = document.getElementById('view');
-const VIEWS = ['course', 'learn', 'sandbox', 'drill', 'games', 'cheat'];
+const VIEWS = ['sandbox', 'course', 'learn', 'drill', 'games', 'cheat'];
 const CVIEWS = ['course', 'unit', 'quiz'];
+const tabOf = (v, from) => CVIEWS.includes(v) || (v === 'study' && from === 'unit') ? 'course' : v === 'study' ? (from || 'learn') : VIEWS.includes(v) ? v : 'course';
 function setTab(v){
   const b = v === 'explore' && S.ex && S.ex.back; if (b){ v = b.view === 'explore' ? 'course' : b.view; }
   const from = b ? b.studyFrom : S.studyFrom;
