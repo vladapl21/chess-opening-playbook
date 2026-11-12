@@ -122,5 +122,6 @@
 @media (max-width:620px){
   .steps3{grid-template-columns:minmax(0,1fr)} .duo{grid-template-columns:minmax(0,1fr)} .duo .or{justify-self:center} .wopt .board{max-width:210px}
   .leak{grid-template-columns:92px minmax(0,1fr)} .cav{width:52px;height:52px} .plocked .ghost3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .tabs button.lock::after{display:none}   /* six tabs have to fit on a phone: locked ones are greyed, without the padlock */
 }
 body:has(.coach:not([hidden])) .foot{padding-right:84px}

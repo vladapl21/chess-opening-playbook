@@ -142,6 +142,7 @@ with sync_playwright() as p:
     assert 'opens when you pass' in pg.inner_text('.lockednote')
     pg.click('.sidesw [data-side="w"]'); pg.wait_for_timeout(400)
     assert pg.evaluate('[S.view, SIDE]') == ['course', 'w']
+    print('stored keys:', pg.evaluate("[PERSONA, Object.keys(JSON.parse(localStorage.getItem('italian-playbook-progress-v1'))), Object.keys(Prog.d), JSON.stringify(Prog.d.me)]"))
     stored = pg.evaluate("JSON.parse(localStorage.getItem('italian-playbook-progress-v1')).course")
     print('stored course progress:', {k: v for k, v in stored['u'].items()}, '| lessons seen', list(stored['seen']))
     ctx.close()

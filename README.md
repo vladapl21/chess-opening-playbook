@@ -33,6 +33,26 @@ Most opening courses are written for everyone. They give long lines in algebraic
 - **A line ends, the game doesn't.** Where a lesson's main line stops, a plan takes over in a few lines: where the king goes, which pawns move, what to aim at and what the opponent wants. A built-in engine shows the best moves and the other side's threat in words, and plays the position on from there.
 - **The games feed back in.** Missed tactics become puzzles. Habits that cost games become "insights" with a button that drills the real positions. Notes point back to the games they came from: *"Against ZhoskaStreezh in July you pushed the d-pawn first and the e-pawn took your knight. Knight first, every time."*
 
+## Where it is going: a playbook for any player
+
+<img src="docs/img/welcome.png" alt="The welcome screen: bring 150 games, get your playbook; three steps, the sections that open with your games, and the coach" width="100%">
+
+Everything above was built by hand for one player. The site now has the first version of the same thing for anyone:
+
+1. **Welcome.** A new visitor sees the same tabs, with only the Sandbox open. The rest is locked until their games are in.
+2. **Bring 150 games.** A chess.com or Lichess username is enough: the page fetches the latest games itself from the sites' public APIs. A PGN file works too. Fifty games is the least that works.
+3. **The reading screen.** A script reads every game while the board plays through them: what the player opens with, what they meet, how each opening scores, which kinds of game they win (kings on the same side or opposite sides, queens on or off, short or long games), and the exact positions where they leave the playbook. It is rules and counting ([`app/analyze.js`](app/analyze.js)): no language model and no engine.
+4. **Would you rather.** Where the player's own habit differs from what the library teaches, a card puts the two side by side with their record in each. Two more cards set the order of the course and how wide the drills go.
+5. **Their playbook.** The course is reordered by their games, every chapter shows their own record, and Your games lists where they leave the book, each with a button into the lesson.
+
+<img src="docs/img/findings.png" alt="What the games say: rating, record, what the player already plays, where they score, and the two positions where they leave the book most" width="100%">
+
+<img src="docs/img/choices.png" alt="A would-you-rather card: the classical defence the player uses now, marked as being written, or the Slav setup, marked ready" width="100%">
+
+**What it cannot do yet.** The library holds one repertoire: the e-pawn as White, and the e-pawn reply and the Slav setup as Black. A player who prefers something else is told that their system is still being written. Writing those systems is the next piece of work ([ROADMAP](ROADMAP.md)), and personal playbooks are not announced until it is done. The puzzles from a player's own mistakes need the engine to run over their games, which is also still to come; until then the skill units use positions from real club games.
+
+A **coach**, a knight called Gambit, says the short things in a speech bubble at the bottom right: what a tab is for the first time it is opened, a word after a drill, why a section is locked. It never speaks during a drill or a checkpoint, and it can be switched off in **Settings**, which also has light and dark mode, text size, five board colours and the letters on the board.
+
 ## At a glance
 
 |                                   | White book                | Black book                       |
@@ -249,6 +269,7 @@ flowchart LR
 - **Board.** The board is SVG, drawn with an original piece set ([`app/pieces.py`](app/pieces.py)). It supports drag and tap input, legal-move hints, arrows, circles and a flipped view for Black. Legal moves are precomputed for every book position where you move, so lessons, drills and the sandbox need no chess library.
 - **Engine.** [`docs/engine`](docs/engine) holds the lite single-threaded build of [Stockfish.js](https://github.com/nmrugg/stockfish.js) 19: a 28 KB script and a 1.8 MB WebAssembly file, fetched the first time the engine is switched on and run in a web worker. The page talks to it in plain UCI text. Each position gets two searches: a short one with the move handed to the other side (their idea), then the three best moves to depth 22 or seven seconds. Results are kept for the session, so stepping back and forth is instant. The engine's moves are put into words by a small JavaScript twin of `label2.py`. The single-threaded build needs no special server headers, so it runs on GitHub Pages; it can't start from a page opened as a file, and the card says so.
 - **Two books, one engine.** `loadBook()` swaps every index (nodes, lines, lessons, chapters, whose move is whose, board orientation) when you flip the switch. Line ids never collide between the books (the build checks this), so one progress store holds both.
+- **Who is looking.** The page shows one of three things ([`app/product.js`](app/product.js)): the hand-built playbook (the personal build, and any account that had progress before personal playbooks existed), the welcome state for a player without games, or a personal playbook. The profile from the analysis is saved with the progress record, so it follows the account. For anyone but the house player, sentences about my own games are removed from the lesson notes when the page starts.
 - **Progress and accounts.** Progress is always saved in the browser first. On the website, an account (email and password through [Supabase](https://supabase.com)) keeps a copy in the cloud, so the same progress shows up on every device. Sync pulls and merges on sign-in, on load and whenever the tab comes back into view: the newest record wins for each drill line and puzzle (for a line whose moves have changed, the record made on the current moves wins over a newer one made on the old moves), and course steps keep the best result. The project URL and publishable key live in [`app/site.json`](app/site.json), the tables and row-level security in [`supabase/schema.sql`](supabase/schema.sql). When the page runs as a Claude artifact, it syncs to the artifact's own per-user storage instead.
 - **Deep links.** `#course` and `#unit.<unit-id>` open the course and a unit (a unit brings its own book). `#learn`, `#sandbox`, `#drill`, `#games`, `#cheat`, `#learn.<chapter>` and `#line.<line-id>` open the matching view. Add a `b.` prefix for the Black book, for example [`#b.learn.london`](https://vladapl21.github.io/chess-opening-playbook/#b.learn.london) or [`#b.line.bs-classical`](https://vladapl21.github.io/chess-opening-playbook/#b.line.bs-classical).
 
@@ -312,6 +333,8 @@ app/
   template.html            the whole app: markup, styles and script for both books
   pieces.py                the original SVG piece set
   site.json                Supabase project URL and publishable key for the website build
+  analyze.js               game analysis for a personal playbook: PGN in, profile out; rules and counting only
+  product.js, product.css  welcome, locked sections, bringing games in, the reading screen, findings, choices, the coach
   vendor/chess.js          chess.js 0.10.3 (BSD-2-Clause), inlined into the page for the explore board
 supabase/
   schema.sql               accounts: profiles and progress tables, row-level security
@@ -350,7 +373,9 @@ docs/
   img/                     the images in this README
 tests/
   e2e_white.py, e2e_black.py, e2e_sandbox_switch.py, e2e_course.py, e2e_accounts.py, e2e_engine.py,
-  e2e_versions.py          end-to-end browser tests (Playwright)
+  e2e_versions.py, e2e_shell.py, e2e_onboarding.py
+                           end-to-end browser tests (Playwright)
+  analyze_check.js         the analysis run under Node on data/games, checked against known facts
   serve.py                 serves the built page over local HTTP for the engine test and screenshots
   fake_supabase.js         stand-in for supabase-js so account tests run offline
   readme_shots.py          regenerates docs/img
@@ -404,7 +429,7 @@ python3 -m playwright install chromium
 make test
 ```
 
-The tests drive the real page in Chromium. They visit every chapter in both books, step through lessons, and play drills by dragging and tapping (correct moves, slips, castling). They solve every puzzle and play sandbox games across every opening and odds setting, including a regression test for changing the opening mid-game. They also follow deep links, switch books back and forth with state kept, and check that the phone layout never scrolls sideways, in light and dark mode. The course test works through the first units the way a person would: the idea boards, a lesson, a drill line, a checkpoint with a deliberate miss, practice games against a unit's lines, and a threat set where wrong moves get played out and punished. The engine test serves the page over local HTTP and runs the real engine: the switch in Study, three different best moves with their arrows, the plan at the end of a line, moves for both sides on the explore board by tap and by drag, the engine answering, its line played out, a reload that keeps the position, and the note shown when the page is opened as a file. The accounts test runs two browsers against a fake Supabase server as two devices on one account: sign-up carrying local progress along, sync both ways, an outage and recovery, a second account on the same device, and the email confirmation, password reset and expired-link flows. The versions test runs the claims check on boards with a known answer, then loads the page with a record made before a line changed and checks that the line comes back as due and marked Changed, that a clean run on the new moves replaces the record, and that two devices merge to the newer version. Screenshots land in `tests/out/`. To regenerate the images in this README, run `make shots`.
+The tests drive the real page in Chromium. They visit every chapter in both books, step through lessons, and play drills by dragging and tapping (correct moves, slips, castling). They solve every puzzle and play sandbox games across every opening and odds setting, including a regression test for changing the opening mid-game. They also follow deep links, switch books back and forth with state kept, and check that the phone layout never scrolls sideways, in light and dark mode. The course test works through the first units the way a person would: the idea boards, a lesson, a drill line, a checkpoint with a deliberate miss, practice games against a unit's lines, and a threat set where wrong moves get played out and punished. The engine test serves the page over local HTTP and runs the real engine: the switch in Study, three different best moves with their arrows, the plan at the end of a line, moves for both sides on the explore board by tap and by drag, the engine answering, its line played out, a reload that keeps the position, and the note shown when the page is opened as a file. The accounts test runs two browsers against a fake Supabase server as two devices on one account: sign-up carrying local progress along, sync both ways, an outage and recovery, a second account on the same device, and the email confirmation, password reset and expired-link flows. The versions test runs the claims check on boards with a known answer, then loads the page with a record made before a line changed and checks that the line comes back as due and marked Changed, that a clean run on the new moves replaces the record, and that two devices merge to the newer version. The shell test covers the tab order, the colour switch keeping its tab, and Settings. The onboarding test is a new visitor from the welcome screen to a personal playbook, with the games in `data/games` fetched through a stand-in for chess.com and again as a PGN file on a phone. Screenshots land in `tests/out/`. To regenerate the images in this README, run `make shots`.
 
 ## Credits
 

@@ -746,6 +746,7 @@ footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);fo
 @media (max-width:620px){
   .steps3{grid-template-columns:minmax(0,1fr)} .duo{grid-template-columns:minmax(0,1fr)} .duo .or{justify-self:center} .wopt .board{max-width:210px}
   .leak{grid-template-columns:92px minmax(0,1fr)} .cav{width:52px;height:52px} .plocked .ghost3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .tabs button.lock::after{display:none}   /* six tabs have to fit on a phone: locked ones are greyed, without the padlock */
 }
 body:has(.coach:not([hidden])) .foot{padding-right:84px}
 
@@ -5301,7 +5302,8 @@ const Coach = {
   el(){ let e = document.getElementById('coach'); if (!e){ e = document.createElement('div'); e.id = 'coach'; e.className = 'coach'; document.body.appendChild(e);
       e.addEventListener('click', ev => { if (ev.target.closest('.cx')) return this.hush(); const a = ev.target.closest('[data-cgo]'); if (a){ this.hush(); return go(a.dataset.cgo); } if (ev.target.closest('.cav')) this.last && !e.querySelector('.cbub') ? this.say(this.last.t, this.last.o) : e.querySelector('.cbub') ? this.hush() : this.say(this.tip()); }); }
     return e; },
-  draw(bub){ const e = this.el(); e.hidden = !SET.coach; e.classList.toggle('quiet', ['drill', 'quiz', 'sandbox', 'study', 'explore'].includes(S.view));
+  // on the welcome, reading, findings and choice screens the coach is part of the page, so the corner one stays away
+  draw(bub){ const e = this.el(); e.hidden = !SET.coach || (PVIEWS.includes(S.view) && S.view !== 'setup'); e.classList.toggle('quiet', ['drill', 'quiz', 'sandbox', 'study', 'explore'].includes(S.view));
     e.innerHTML = (bub || '') + `<button class="cav" type="button" aria-label="${COACH_NAME}, your coach">${knightSVG(this.mood)}<\/button>`; },
   say(t, o = {}){
     if (!SET.coach) return; clearTimeout(this.timer); this.last = {t, o}; this.mood = o.mood;
@@ -5321,6 +5323,7 @@ const Coach = {
   onView(){
     const v = S.view, e = this.el(); if (e.querySelector('.cbub') && this.lastView === v) return this.draw(e.querySelector('.cbub').outerHTML); this.lastView = v;
     if (v === 'reading' || v === 'choices' || v === 'built' || v === 'findings') return this.hush(); // the coach is already on the page there
+    if (S.drill && S.drill.state === 'play') return this.hush(); // never while a drill, a practice game or a checkpoint is being played
     if (PERSONA === 'new'){
       if (v === 'start') return this.hush();
       if (v === 'setup') return this.once('setup', this.tip()) || this.hush();
