@@ -87,7 +87,7 @@ with sync_playwright() as p:
     roots = pg.evaluate("S.drill.choices.filter(c => c.at === 0).length"); print('choices at the start position:', roots); assert roots == 1
     pg.screenshot(path=out + 'b_sb_report.png', full_page=True)
     for scope, odds in [('london', 'real'), ('slav', 'even'), ('scotch', 'weak'), ('attacks', 'real'), ('other', 'even'), ('vienna', 'real'), ('d4x', 'even'), ('ruy', 'real')]:
-        pg.click(f'[data-sbf="scope:{scope}"]'); pg.click(f'[data-sbf="odds:{odds}"]'); pg.wait_for_timeout(100)
+        pg.click('[data-sbf="scope:all"]'); pg.click(f'[data-sbf="pick:{scope}"]'); pg.click(f'[data-sbf="odds:{odds}"]'); pg.wait_for_timeout(100)
         pg.click('#sbAgain'); pg.wait_for_timeout(200)
         r = play_sandbox(pg, 0.1, f'b {scope}/{odds}'); assert r['state'] == 'done'
         first = pg.evaluate("N[S.drill.hist[1]].l")

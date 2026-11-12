@@ -8,7 +8,7 @@ The plan for the next phases is in [ROADMAP.md](ROADMAP.md). Read it first.
 - `pipeline/assemble.py` writes two pages from `app/template.html`:
   - `data/build/playbook.html` for the claude.ai artifact (no accounts, uses the artifact's own database);
   - `docs/index.html` for GitHub Pages (accounts through Supabase when `app/site.json` has a URL and key).
-- Tests drive the real page in Chromium (Playwright, pre-installed): `tests/e2e_white.py`, `e2e_black.py`, `e2e_sandbox_switch.py`, `e2e_course.py`, `e2e_accounts.py`, `e2e_engine.py`, `e2e_versions.py`. `tests/e2e_shell.py` and `tests/e2e_onboarding.py` cover the shell and a new visitor. Screenshots go to `tests/out/` (ignored). Console errors that mention `ERR_TUNNEL_CONNECTION_FAILED` are the proxy blocking Google Fonts and the supabase-js CDN, not the app.
+- Tests drive the real page in Chromium (Playwright, pre-installed): `tests/e2e_white.py`, `e2e_black.py`, `e2e_sandbox_switch.py`, `e2e_course.py`, `e2e_accounts.py`, `e2e_engine.py`, `e2e_versions.py`. `tests/e2e_shell.py` and `tests/e2e_onboarding.py` cover the shell and a new visitor, `tests/e2e_skills.py` the skill units and the engine's numbers. Run the suites one at a time and with no engine job beside them: they are timing-sensitive on two CPUs. Screenshots go to `tests/out/` (ignored). Console errors that mention `ERR_TUNNEL_CONNECTION_FAILED` are the proxy blocking Google Fonts and the supabase-js CDN, not the app.
 - The engine is a web worker, so it can't start from a `file://` page. `tests/serve.py` serves the build over local HTTP with `engine/` beside it; `e2e_engine.py` and the engine screenshot use it.
 - `make check` runs the engine and wording checks on the Black book. `W-RARE` and `W-MISS` lines are information, not failures; `B-LOSS`, `ILLEGAL` and `ENDS-ON-WHITE` need a look. `B-LOSS bv-ponziani-d5` is a known depth-14 artifact (the book's move is also the engine's best; the two searches disagree on the number).
 - `pipeline/lint_claims.py` checks both books for the same position answered with two different moves, for pin wording with no pin on the board, and for labels that say a move guards or hits a piece when it doesn't. `assemble.py` runs it and stops on any finding, so fix the content, never the check.
@@ -31,7 +31,7 @@ The plan for the next phases is in [ROADMAP.md](ROADMAP.md). Read it first.
 - New class names in `product.css` must not exist in the template's styles: `.opt`, `.locked`, `.ring`, `.field`, `.dots`, `.big` and `.who` were all taken. Check with grep before adding one.
 - `content/plans.py` holds the plan shown where each lesson's main line ends. `assemble.py` attaches the plans and checks them for notation.
 - `docs/engine/` is Stockfish.js 19 (GPL-3.0), unchanged release files. Keep its README and license next to it. `app/vendor/chess.js` (BSD-2) is inlined by `assemble.py`.
-- Skill units (`threats`, `finish`, `endings`) share one item format in `data/course_*.json`; their wording is the `SKILL` table in the template.
+- Skill units (`threats`, `finish`, `endings`) share one item format in `data/course_*.json`; their wording is the `SKILL` table in the template. `pipeline/explain_skills.py` (needs Stockfish, not part of `make build`) fills `refute[move] = [reply, label, material won at once, the moves after it, material lost, engine number]` for every wrong move and `fine` (accepted moves that lose nothing) for the threat positions. `recut` and `regrade` redo the cutting and the grading without a full engine pass.
 
 ## House rules for the app
 
@@ -41,7 +41,8 @@ The plan for the next phases is in [ROADMAP.md](ROADMAP.md). Read it first.
 - One order per setup. The d-pawn setup comes out in the order given in the README ("One setup, one order"). Where a line has to leave that order, the note at that move says why.
 - A label says only what is on the board. "Pin" needs a piece that can't or shouldn't move because of what is behind it; a bishop coming at a knight with a pawn behind it is "Bishop comes at your knight". "Guards" and "hits" are checked the same way.
 - No chess notation in anything the user reads. The squares f7 and f2 are the only exception. Arrow and move data inside the code is fine. This covers what the engine says too: its moves go through `moveWords`.
-- The engine never shows during a drill, a practice game or a checkpoint. It comes on when they end, and it is always available in lessons and game reviews.
+- The engine never shows during a drill, a practice game or a checkpoint. It comes on when they end, and it is always available in lessons and game reviews. In a skill unit's practice sets it opens per position once that position is answered.
+- Engine numbers are from White's side for both colours (plus: White is better). Only the words are turned to the player's side.
 - Every colour is a CSS token defined for both light and dark themes. Check phone width (390px) for sideways scrolling.
 - Progress records are shared between the books, so line, puzzle and lesson ids must never collide (`assemble.py` asserts this).
 - Record counts quoted in the course text come from all 200 games; the books' own stats come from the original 149.
