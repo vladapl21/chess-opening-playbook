@@ -10,6 +10,7 @@ CHAPTERS = [
   dict(id='vienna', name='Four Knights & Vienna', move='queen\'s knight comes out', parts=['bv-4n', 'bv-vienna', 'bv-quiet']),
   dict(id='attacks', name='Early attacks', move='queen, f-pawn or bishop rush', parts=['ba-queen', 'ba-kg', 'ba-bishop']),
   dict(id='caro', name='Caro-Kann', move='your c-pawn first, then the d-pawn', parts=['bck-adv', 'bck-exch', 'bck-main', 'bck-knights', 'bck-other']),
+  dict(id='sicilian', name='Sicilian', move='your c-pawn two squares', parts=['bsi-open', 'bsi-bc4', 'bsi-c3', 'bsi-other']),
   dict(id='slav', name='Queen\'s Gambit', move='d-pawn, then the c-pawn', parts=['bsl-quiet', 'bsl-knights', 'bsl-exch', 'bsl-bishop']),
   dict(id='london', name='London System', move='d-pawn, then the bishop', parts=['bln-main', 'bln-jobava']),
   dict(id='d4x', name='Other d-pawn systems', move='Colle, Torre, Veresov, gambits', parts=['bdx-colle', 'bdx-pins', 'bdx-gambits', 'bdx-misc']),
@@ -20,7 +21,7 @@ CHAPTERS = [
 # A player has exactly one pack per slot, so two packs of a slot may answer the same position differently; inside the
 # packs a player can hold together, one position still gets one move. Chapters in no pack are always in.
 PACKS = dict(
-  blackE4=dict(default='e5', packs=dict(e5=['italian', 'ruy', 'scotch', 'vienna', 'attacks'], caro=['caro'])),
+  blackE4=dict(default='e5', packs=dict(e5=['italian', 'ruy', 'scotch', 'vienna', 'attacks'], caro=['caro'], sicilian=['sicilian'])),
   blackD4=dict(default='slav', packs=dict(slav=['slav', 'london', 'd4x'])),
 )
 
@@ -116,6 +117,16 @@ CH_META = {
     notes=[dict(b='Jul 16 vs DEOSVULT:', t='White\'s bishop sat unguarded for four moves and your queen could take it three times. You were winning anyway until a check on your back rank.', line='gb-deosvult'),
            dict(b='Jul 9 vs youssefdabbech:', t='you took back with the g-pawn, castled behind the broken pawns, and White\'s h-pawn and rook broke through. Take with the e-pawn.', lesson='bdx-veresov'),
            dict(b='Jul 10 vs CamiloS8:', t='in the Colle you pushed the c-pawn past and shut your own pieces in. One square is enough: it belongs in the triangle.', lesson='bdx-colle')]),
+  'sicilian': dict(tile='e4 c5 Nf3 e6', first='bsi-open',
+    roots=['e4 c5'],
+    hero='e4 c5 Nf3 e6 d4 cxd4 Nxd4 a6', arrows=['d8c7g', 'b7b5g'], circles=['a6g', 'e6g'], cap='Two small pawn moves, then queen, knight and the b-pawn.',
+    kicker='A third answer to the e-pawn',
+    headline='Fight for the middle <em>from the side</em>.',
+    lede='C-pawn two squares, e-pawn one, and take the d-pawn when it comes. Then the a-pawn one square, the queen beside the bishop, the king\'s knight and the b-pawn two squares. Against a bishop that comes out early, the e-pawn blocks it and the d-pawn hits it. Against the small c-pawn move, your d-pawn goes two squares at once.',
+    facts=[dict(big='6', text='moves answer every version of the open game, in the same order'),
+           dict(big='1 in 6', text='opponents bring the Italian bishop out on move two, and lose a move to your d-pawn', alert=True),
+           dict(big='2', text='middle pawns against one once the d-pawn is traded')],
+    notes=[]),
   'caro': dict(tile='e4 c6 d4 d5', first='bck-adv',
     roots=['e4 c6'],
     hero='e4 c6 d4 d5 e5 Bf5', arrows=['e7e6g', 'c6c5g'], circles=['f5g'], cap='The bishop is out before the e-pawn closes the door.',
@@ -141,6 +152,15 @@ CH_META = {
 }
 
 CHEAT = [
+  ('e4', 'c5', 'C-pawn two squares, then the e-pawn one', 'bsi-open'),
+  ('e4 c5 Nf3 e6 d4', 'cxd4', 'Take the d-pawn', 'bsi-open'),
+  ('e4 c5 Nf3 e6 d4 cxd4 Nxd4', 'a6', 'A-pawn one square', 'bsi-open'),
+  ('e4 c5 Nf3 e6 d4 cxd4 Nxd4 a6 Nc3', 'Qc7', 'Queen beside the bishop, then the knight', 'bsi-open'),
+  ('e4 c5 Nf3 e6 d4 cxd4 Nxd4 a6 Bc4', 'b5', 'Bishop comes out: b-pawn hits it', 'bsi-open'),
+  ('e4 c5 Bc4 e6 Nf3', 'd5', 'Early bishop: e-pawn blocks, d-pawn hits', 'bsi-bc4'),
+  ('e4 c5 c3 e6 d4', 'd5', 'Small c-pawn: d-pawn two squares', 'bsi-c3'),
+  ('e4 c5 d4 cxd4 Qxd4', 'Nc6', 'Queen out early: knight hits her', 'bsi-d4'),
+  ('e4 c5 d4 cxd4 c3', 'Nf6', 'Pawn offer: decline and hit the e-pawn', 'bsi-c3'),
   ('e4', 'c6', 'C-pawn one square, then the d-pawn two', 'bck-adv'),
   ('e4 c6 d4 d5 e5', 'Bf5', 'Bishop out before the e-pawn', 'bck-adv'),
   ('e4 c6 d4 d5 e5 Bf5 Nf3 e6 Be2', 'c5', 'C-pawn hits the chain', 'bck-adv'),

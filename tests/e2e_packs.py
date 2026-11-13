@@ -5,7 +5,10 @@
 - Progress in the other system is kept, and switching back brings everything back.
 - A new player who already plays the Caro-Kann is offered it, and gets it."""
 from playwright.sync_api import sync_playwright
-from e2e_white import click_move, drag, launch, URL, out
+from e2e_white import click_move, drag, launch, out
+from serve import Site
+# over local HTTP: headless Chromium sometimes drops a file:// page's storage across a scripted reload
+site = Site(); URL = site.start()
 errors = []
 E5 = ['italian', 'ruy', 'scotch', 'vienna', 'attacks']
 
@@ -38,14 +41,14 @@ with sync_playwright() as p:
     ctx = b.new_context(viewport={'width': 1280, 'height': 900}); pg = ctx.new_page(); hook(pg)
     pg.goto(URL); pg.wait_for_timeout(1000)
     a = shape(pg); print('default:', {k: (v if k != 'units' else len(v)) for k, v in a.items()})
-    assert 'caro' not in a['chapters'] and a['chapters'][:5] == E5 and a['all'] == len(a['chapters']) + 1
+    assert 'caro' not in a['chapters'] and a['chapters'][:5] == E5 and a['all'] == len(a['chapters']) + 2
     assert 'b-caro' not in a['units'] and len(a['units']) == 17 and a['first'] == ['e7e5']
     assert pg.evaluate("Object.keys(LIDX.b).some(l => l.startsWith('bck-'))") is False
 
     # some progress in the first system, then switch
     pg.evaluate("useSide('b'); startDrillLine('bi-main')"); pg.wait_for_timeout(600); assert drill_clean(pg) == 'done'
     pg.click('#setBtn'); pg.wait_for_timeout(300)
-    rows = pg.locator('#setPanel [data-pack]').all_inner_texts(); print('settings:', rows); assert len(rows) == 2
+    rows = pg.locator('#setPanel [data-pack]').all_inner_texts(); print('settings:', rows); assert len(rows) == 3
     pg.evaluate("window.__before = 1"); pg.click('#setPanel [data-pack="blackE4:caro"]')
     pg.wait_for_function("typeof __before === 'undefined' && typeof COURSE !== 'undefined' && typeof PERSONA !== 'undefined'"); pg.wait_for_timeout(900)
     print('after the switch:', pg.evaluate("[localStorage.getItem('playbook-packs'), JSON.stringify(Prog.d.packs), JSON.stringify(PICKS), PERSONA, performance.getEntriesByType('navigation')[0].type]"))
@@ -96,9 +99,20 @@ with sync_playwright() as p:
     # a new player who already plays the Caro-Kann is offered it first, as ready
     cards = pg.evaluate("""makeChoices({slots: {blackE4: {n: 20, opts: {caro: {n: 15, w: 8, l: 6, d: 1}, e5: {n: 5, w: 2, l: 3, d: 0}}},
         blackD4: {n: 12, opts: {slav: {n: 12, w: 6, l: 5, d: 1}}}}}).map(c => [c.id, (c.opts || []).map(o => [o.id, !!o.ready])])""")
-    print('cards for a Caro-Kann player:', cards[:2]); assert cards[0] == ['blackE4', [['caro', True], ['e5', True]]] and cards[1][0] == 'order'
+    print('cards for a Caro-Kann player:', cards[:2]); assert cards[0] == ['blackE4', [['caro', True], ['e5', True], ['sicilian', True]]] and cards[1][0] == 'order'
     three = pg.evaluate("""makeChoices({slots: {blackE4: {n: 20, opts: {sicilian: {n: 16, w: 8, l: 7, d: 1}, e5: {n: 4, w: 2, l: 2, d: 0}}}}})[0].opts.map(o => o.id)""")
     assert three == ['sicilian', 'e5', 'caro'], three
+
+    # the Sicilian is a pack too
+    pg.evaluate("Prog.d.packs = {blackE4: 'sicilian', updated: Date.now()}; Prog.save(); window.__before = 1; syncPacks()")
+    pg.wait_for_function("typeof __before === 'undefined' && typeof COURSE !== 'undefined' && typeof PERSONA !== 'undefined'"); pg.wait_for_timeout(900)
+    s3 = shape(pg); print('sicilian:', s3['chapters'], s3['first'])
+    assert 'sicilian' in s3['chapters'] and 'caro' not in s3['chapters'] and not set(E5) & set(s3['chapters']) and s3['first'] == ['c7c5'] and 'b-sicilian' in s3['units']
+    pg.evaluate("useSide('b'); startDrillLine('bsi-open')"); pg.wait_for_timeout(600); assert drill_clean(pg) == 'done'
+    pg.evaluate("openLine('bsi-open')"); pg.wait_for_timeout(400); pg.keyboard.press('End'); pg.wait_for_timeout(400); pg.screenshot(path=out + 'p_sicilian.png')
+    pg.evaluate("Prog.d.packs = {blackE4: 'e5', updated: Date.now()}; Prog.save(); window.__before = 1; syncPacks()")
+    pg.wait_for_function("typeof __before === 'undefined' && typeof COURSE !== 'undefined' && typeof PERSONA !== 'undefined'"); pg.wait_for_timeout(900)
+    assert shape(pg)['chapters'] == a['chapters']
 
     # phone width with the Caro-Kann on
     ph = b.new_context(viewport={'width': 390, 'height': 844}); ph.add_init_script("localStorage.setItem('playbook-packs', JSON.stringify({blackE4: 'caro'}))")
@@ -106,6 +120,7 @@ with sync_playwright() as p:
     q.evaluate("Prog.d.packs = {blackE4: 'caro', updated: Date.now()}; Prog.save(); useSide('b'); S.chapter = 'caro'; go('learn')"); q.wait_for_timeout(500)
     w = q.evaluate('document.documentElement.scrollWidth'); print('phone scrollWidth', w); assert w <= 390
     b.close()
+site.stop()
 
 print('ERRORS:', errors); assert not errors
 print('pack checks passed')
