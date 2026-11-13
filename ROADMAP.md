@@ -20,7 +20,7 @@
 | Visitors without an account | The welcome screen and the Sandbox. Same tabs, the rest locked until games are in | The site is the product now, not a showcase of one player's book |
 | Games in | Username first (chess.com and Lichess public APIs, called from the page), PGN file as the fallback. 150 is the target, 50 the minimum | No export step for most players |
 | The analysis | A script in the page: rules and counting, no language model, no engine (`app/analyze.js`) | Instant, free, the same answer every time, and it runs under Node for tests |
-| The coach | A knight called Pip (one constant, `COACH_NAME`), bottom right, speech bubbles. Says something the first time a tab is opened and after a drill; never during a test; can be switched off | Short things read better in a bubble than in a block of text |
+| The coach | Three faces to choose from in Settings and on the bring-your-games screen (Pip the knight, Rocco the rook, Dot the pawn; `COACHES` and `FACES` in `product.js`), bottom right, speech bubbles. Says something the first time a tab is opened and after a drill; never during a test; can be switched off | Short things read better in a bubble than in a block of text |
 | One position, one move (November 12) | The build fails when two move orders reach one position and the book answers differently, or when a label claims a pin, a guard or an attack that is not on the board. Each setup has one order, with a stated reason wherever it changes | A drill that asks for two different moves in one position can't be memorised, and a label that is wrong once makes every label suspect |
 | Changed lines (November 12) | Every line carries a version that goes up when its moves change; an older progress record counts as due and is marked Changed | Lines get rewritten, and nobody should be told they have mastered moves the line no longer has |
 | Engine in the app (November 10) | Stockfish.js 19, lite single-threaded build, in a web worker; hidden while you are being tested | Runs on a plain static host with no special headers, and the same worker will do the game analysis in Phase 3 |
@@ -65,7 +65,9 @@ Facts that shape the design:
 - Engine numbers follow the usual convention for both colours (plus: White is better); a key under the engine card says so.
 - Skill units: every wrong move has a reason (`pipeline/explain_skills.py`), longer tricks are listed and can be played out, safe moves that are not the engine's first choice count, "Show me the danger", and the engine per position in practice sets.
 - Sandbox: several openings at once.
-- The coach is called Pip.
+- Three coaches to choose from: Pip, Rocco and Dot. Bigger face, narrower bubble.
+- Settings and the account button moved out of the header into the corner of the screen; the header fits one row on an ordinary monitor and centres its rows when it has to wrap.
+- A lesson opened from a course unit has "Next lesson" at the top. The Sandbox has "Free play: pick openings" to leave a course practice game.
 
 ## Phase 2: onboarding (first version built, November 12)
 

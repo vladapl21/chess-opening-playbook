@@ -100,18 +100,25 @@
 .pop{animation:pop .5s cubic-bezier(.2,1.4,.4,1) both} @keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
 
 /* the coach, bottom right */
-.coach{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:40;display:grid;justify-items:end;gap:8px;pointer-events:none;max-width:min(330px,calc(100vw - 28px))}
+.coach{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:40;display:grid;justify-items:end;gap:8px;pointer-events:none;max-width:min(232px,calc(100vw - 28px))}
 .coach > *{pointer-events:auto}
 .cbub{position:relative;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:18px 18px 4px 18px;padding:13px 38px 13px 15px;box-shadow:var(--shadow);font-size:14.5px;font-weight:550;line-height:1.45;animation:pop .35s cubic-bezier(.2,1.3,.4,1) both;transform-origin:bottom right}
 .cbub .cwho{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:3px}
 .cbub .cacts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .cbub .cx{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;border:0;background:none;color:var(--muted);font-size:18px;line-height:1;cursor:pointer}
 .cbub .cx:hover{background:var(--surface-2);color:var(--ink)}
-.cav{width:62px;height:62px;border-radius:50%;border:2px solid var(--surface);background:var(--accent-soft);padding:5px 3px 0;cursor:pointer;box-shadow:var(--shadow);overflow:hidden;transition:transform .15s,width .2s,height .2s}
+.cav{width:78px;height:78px;border-radius:50%;border:2px solid var(--surface);background:var(--accent-soft);padding:5px 3px 0;cursor:pointer;box-shadow:var(--shadow);overflow:hidden;transition:transform .15s,width .2s,height .2s}
 .cav:hover{transform:translateY(-2px) rotate(-4deg)} .cav svg{display:block;width:100%;height:100%}
-.coach.quiet .cav{width:44px;height:44px;opacity:.85}
+.coach.quiet .cav{width:54px;height:54px;opacity:.85}
 .cface svg{display:block;width:100%;height:auto}
-.kn-body{fill:var(--accent)} .kn-mane{fill:var(--ink)} .kn-muzzle{fill:var(--accent-soft)} .kn-eye{fill:var(--surface)} .kn-pupil{fill:var(--ink)} .kn-line{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round} .kn-blush{fill:var(--rosso);opacity:.35} .kn-base{fill:var(--ink)}
+.kn-body{fill:var(--accent)} .kn-mane{fill:var(--ink)} .kn-muzzle{fill:var(--accent-soft)} .kn-eye{fill:var(--surface)} .kn-pupil{fill:var(--ink)} .kn-line{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round} .kn-blush{fill:var(--rosso);opacity:.35} .kn-base{fill:var(--ink)} .kn-crown{fill:var(--oro)}
+.coachpick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.coachpick button{display:grid;justify-items:center;gap:2px;padding:12px 6px 10px;border-radius:16px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font:inherit;min-width:0}
+.coachpick button:hover{border-color:var(--accent)} .coachpick button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.coachpick .cface{width:62px;height:62px;border-radius:50%;background:var(--accent-soft);padding:5px 3px 0;overflow:hidden;margin-bottom:4px} .coachpick button[aria-pressed="true"] .cface{background:var(--surface)}
+.coachpick b{font-size:15px} .coachpick span:last-child{font-size:12px;color:var(--muted);text-align:center}
+.pickc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:14px 22px;align-items:center;margin-bottom:16px} .pickc p{color:var(--muted);font-size:14px;margin-top:4px}
+@media (max-width:640px){ .pickc{grid-template-columns:minmax(0,1fr)} }
 @media (prefers-reduced-motion: no-preference){ .cav svg{animation:bob 3.4s ease-in-out infinite} @keyframes bob{50%{transform:translateY(-2px)}} }
 
 @media (max-width:860px){
@@ -121,7 +128,7 @@
 }
 @media (max-width:620px){
   .steps3{grid-template-columns:minmax(0,1fr)} .duo{grid-template-columns:minmax(0,1fr)} .duo .or{justify-self:center} .wopt .board{max-width:210px}
-  .leak{grid-template-columns:92px minmax(0,1fr)} .cav{width:52px;height:52px} .plocked .ghost3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .leak{grid-template-columns:92px minmax(0,1fr)} .cav{width:64px;height:64px} .plocked .ghost3{grid-template-columns:repeat(3,minmax(0,1fr))}
   .tabs button.lock::after{display:none}   /* six tabs have to fit on a phone: locked ones are greyed, without the padlock */
 }
-body:has(.coach:not([hidden])) .foot{padding-right:84px}
+body:has(.coach:not([hidden])) .foot{padding-right:100px}

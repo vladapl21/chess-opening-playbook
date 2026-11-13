@@ -11,19 +11,44 @@ const ME_RANK = {house: 3, ready: 2, 'new': 1};
 function mergeMe(a, b){ const x = meOf(a), y = meOf(b); if (!x || !y) return x || y; const rx = ME_RANK[x.state] || 0, ry = ME_RANK[y.state] || 0; return rx !== ry ? (rx > ry ? x : y) : (y.updated || 0) > (x.updated || 0) ? y : x; }
 let PERSONA = 'house';
 const PVIEWS = ['start', 'setup', 'reading', 'findings', 'choices', 'built'], OPEN_NEW = PVIEWS.concat(['sandbox', 'explore']);
-const TARGET = 150, MINIMUM = 50, COACH_NAME = 'Pip';
+const TARGET = 150, MINIMUM = 50;
 const pc = (a, b) => b ? Math.round(100 * a / b) : 0, rec = t => `${t.w}–${t.l}${t.d ? '–' + t.d : ''}`, scoreOf = t => t.n ? (t.w + t.d / 2) / t.n : 0;
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 
-/* the coach's face: an original knight, drawn here */
-function knightSVG(mood){
-  const eye = mood === 'cheer' ? '<path class="kn-line" d="M25 22q3.5-4.5 7 0"/>' : `<circle class="kn-eye" cx="28.5" cy="21" r="5"/><circle class="kn-pupil" cx="${mood === 'think' ? 29.6 : 27.6}" cy="${mood === 'think' ? 19.4 : 21.4}" r="2.5"/><circle class="kn-eye" cx="${mood === 'think' ? 30.4 : 28.4}" cy="${mood === 'think' ? 18.6 : 20.4}" r=".9"/>`;
-  return `<svg viewBox="0 0 64 64" aria-hidden="true"><path class="kn-mane" d="M33 6c12 1 22 11 23 26l1 26H44c4-16 2-34-11-52z"/>
+/* the coaches: three original characters drawn here. They say the same things; the player picks the face and the name comes with it. */
+const COACHES = [{id: 'knight', name: 'Pip', what: 'the knight'}, {id: 'rook', name: 'Rocco', what: 'the rook'}, {id: 'pawn', name: 'Dot', what: 'the pawn with plans'}];
+const coachWho = () => COACHES.find(c => c.id === SET.who) || COACHES[0], coachName = () => coachWho().name;
+// two eyes for the characters that face you: round and looking at you, looking up when thinking, shut and smiling when pleased
+const eyes2 = (x1, x2, y, r, mood) => mood === 'cheer' ? `<path class="kn-line" d="M${x1 - r + 1} ${y + 1}q${r - 1}-${r} ${2 * r - 2} 0M${x2 - r + 1} ${y + 1}q${r - 1}-${r} ${2 * r - 2} 0"/>`
+  : [x1, x2].map(x => `<circle class="kn-eye" cx="${x}" cy="${y}" r="${r}"/><circle class="kn-pupil" cx="${x + (mood === 'think' ? 1.1 : 0)}" cy="${y + (mood === 'think' ? -1.5 : .5)}" r="${r / 2}"/><circle class="kn-eye" cx="${x + (mood === 'think' ? 1.9 : .9)}" cy="${y - (mood === 'think' ? 2.3 : .5)}" r=".9"/>`).join('');
+const FACES = {
+  knight(mood){
+    const eye = mood === 'cheer' ? '<path class="kn-line" d="M25 22q3.5-4.5 7 0"/>' : `<circle class="kn-eye" cx="28.5" cy="21" r="5"/><circle class="kn-pupil" cx="${mood === 'think' ? 29.6 : 27.6}" cy="${mood === 'think' ? 19.4 : 21.4}" r="2.5"/><circle class="kn-eye" cx="${mood === 'think' ? 30.4 : 28.4}" cy="${mood === 'think' ? 18.6 : 20.4}" r=".9"/>`;
+    return `<path class="kn-mane" d="M33 6c12 1 22 11 23 26l1 26H44c4-16 2-34-11-52z"/>
     <path class="kn-body" d="M22 58c-2-12 1-19 8-25l-5-3c-4 5-11 9-15 5-4-5 1-15 12-21l1-10 8 6c13 0 22 11 22 26v22z"/>
     <path class="kn-muzzle" d="M10 35c-3-4 0-11 7-16 2 4 6 7 10 8-5 6-12 11-17 8z"/>${eye}
     <ellipse class="kn-pupil" cx="13.2" cy="29.6" rx="1.3" ry="1.7"/><path class="kn-line" d="M13.5 34.5q3.6 2.6 7.4-.6"/><circle class="kn-blush" cx="24" cy="29.5" r="2.6"/>
-    <rect class="kn-base" x="16" y="56" width="42" height="7" rx="3.5"/></svg>`;
-}
+    <rect class="kn-base" x="16" y="56" width="42" height="7" rx="3.5"/>`;
+  },
+  rook(mood){
+    return `<path class="kn-mane" d="M13 7h9v6h5V7h10v6h5V7h9v15H13z"/><path class="kn-body" d="M17 21h30l4 37H13z"/><rect class="kn-muzzle" x="15" y="20" width="34" height="5.5" rx="2.2"/>
+    ${eyes2(25, 39, 35.5, 5.2, mood)}<path class="kn-line" d="M${mood === 'think' ? '28 46q4 1.6 8 0' : '26.5 45q5.5 5 11 0'}"/><circle class="kn-blush" cx="19.5" cy="43" r="2.6"/><circle class="kn-blush" cx="44.5" cy="43" r="2.6"/>
+    <rect class="kn-base" x="9" y="56" width="46" height="7" rx="3.5"/>`;
+  },
+  pawn(mood){
+    return `<path class="kn-crown" d="M22.5 13.5 21 4l6.2 4.6L32 2.5l4.8 6.1L43 4l-1.5 9.5z"/><path class="kn-body" d="M17 58c0-10 5-16 15-16s15 6 15 16z"/><circle class="kn-body" cx="32" cy="26" r="15.5"/>
+    <rect class="kn-mane" x="19" y="39.5" width="26" height="5.6" rx="2.8"/>${eyes2(26, 38, 25, 4.8, mood)}<path class="kn-line" d="M${mood === 'think' ? '29 33.5q3 1.4 6 0' : '27.5 32.5q4.5 4.4 9 0'}"/>
+    <circle class="kn-blush" cx="20.5" cy="31" r="2.4"/><circle class="kn-blush" cx="43.5" cy="31" r="2.4"/><rect class="kn-base" x="12" y="56" width="40" height="7" rx="3.5"/>`;
+  }
+};
+function knightSVG(mood, who){ return `<svg viewBox="0 0 64 64" aria-hidden="true">${(FACES[who || coachWho().id] || FACES.knight)(mood)}</svg>`; }
+// the three faces to choose from (Settings, and the first screen after an account is made)
+function coachPickHTML(){ return `<div class="coachpick" role="group" aria-label="Your coach">${COACHES.map(c => `<button type="button" data-coachwho="${c.id}" aria-pressed="${coachWho().id === c.id}"><span class="cface">${knightSVG('', c.id)}</span><b>${c.name}</b><span>${c.what}</span></button>`).join('')}</div>`; }
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-coachwho]'); if (!b) return;
+  setSetting('who', b.dataset.coachwho); if (!document.getElementById('setSheet').hidden) Settings.render();
+  render(); Coach.say(`${coachName()} here. Same advice, new face.`, {mood: 'cheer', ms: 5000});
+});
 
 /* ---- the systems the library has, and the ones being written. `keys` are the analysis names for what a player already plays. */
 const CATALOG = [
@@ -176,7 +201,7 @@ const Product = {
         <h2>Bring ${TARGET} games.<br>Get <em>your</em> playbook.</h2>
         <p class="lede" style="margin-top:14px">It reads what you already play, where you score and where you leave the book, asks you a few would-you-rather questions, and builds a course in that order. No notation anywhere.</p>
         <div class="cta">${cta}<button class="btn ghost" data-view="sandbox">Try the sandbox first</button></div></div>
-      <div class="wart"><div class="board">${boardSVG(w.fen, {coords: false, last: w.last, arrows: ['c4f7r'], flip: false})}</div><p class="wbub">Hi, I'm ${COACH_NAME}. Show me your games and I'll show you your openings.</p><div class="wcoach cface">${knightSVG()}</div></div></section>
+      <div class="wart"><div class="board">${boardSVG(w.fen, {coords: false, last: w.last, arrows: ['c4f7r'], flip: false})}</div><p class="wbub">Hi, I'm ${coachName()}. Show me your games and I'll show you your openings.</p><div class="wcoach cface">${knightSVG()}</div></div></section>
       <ol class="steps3">${li(1, 'Make an account', 'So your playbook follows you to every device.')}${li(2, `Bring ${TARGET} games`, 'A chess.com or Lichess username is enough. A file works too.')}${li(3, 'Pick your lines', 'A few would-you-rather questions, then your course opens.')}</ol>
       <div><p class="kicker" style="margin-bottom:10px">Opens with your games</p><div class="lockgrid">${lock('course', 'Course', 'One path, ordered by what your games say matters most.')}${lock('learn', 'Learn', 'Every line as a board you step through, in plain words.')}${lock('drill', 'Drill', 'Your moves from memory, on a schedule that brings slips back.')}${lock('games', 'Your games', 'Results by opening and where you leave the book.')}${lock('cheat', 'Cheat sheet', 'One card per decision.')}</div></div>`;
   },
@@ -199,6 +224,7 @@ const Product = {
     return `<div class="chead"><div><p class="kicker">Step 2 of 3</p><h2 style="font-size:clamp(30px,4vw,46px)">Bring your games</h2><p>${TARGET} recent games is the target: enough to see what you really play. ${MINIMUM} is the least that works, and the picture sharpens as you add more.</p></div>
         <div class="meter"><div class="pring" style="--p:${Math.min(100, pc(n, TARGET))}"><i>${n}<small>of ${TARGET}</small></i></div></div></div>
       ${this.msg ? `<p class="pmsg ${this.msg.bad ? 'bad' : 'ok'}" role="status">${esc(this.msg.t)}</p>` : ''}
+      <div class="pcard pickc"><div><h3>Pick your coach</h3><p>They say the same things. Change your mind any time in Settings.</p></div>${coachPickHTML()}</div>
       ${this.names ? `<div class="pcard"><b>Which one is you?</b><div class="pwho" style="margin-top:10px">${this.names.map(x => `<button class="btn" data-who="${esc(x)}">${esc(x)}</button>`).join('')}</div></div>` : ''}
       <div class="setup"><form class="pcard" id="uform"><h3>Fetch them by username</h3>
           <div class="setseg" role="group" aria-label="Where you play">${seg('chess.com', 'chess.com')}${seg('lichess', 'Lichess')}</div>
@@ -371,10 +397,10 @@ const Coach = {
     return e; },
   // on the welcome, reading, findings and choice screens the coach is part of the page, so the corner one stays away
   draw(bub){ const e = this.el(); e.hidden = !SET.coach || (PVIEWS.includes(S.view) && S.view !== 'setup'); e.classList.toggle('quiet', ['drill', 'quiz', 'sandbox', 'study', 'explore'].includes(S.view));
-    e.innerHTML = (bub || '') + `<button class="cav" type="button" aria-label="${COACH_NAME}, your coach">${knightSVG(this.mood)}</button>`; },
+    e.innerHTML = (bub || '') + `<button class="cav" type="button" aria-label="${coachName()}, your coach">${knightSVG(this.mood)}</button>`; },
   say(t, o = {}){
     if (!SET.coach) return; clearTimeout(this.timer); this.last = {t, o}; this.mood = o.mood;
-    this.draw(`<div class="cbub" role="status"><button class="cx" type="button" aria-label="Close">×</button><span class="cwho">${COACH_NAME}</span>${esc(t)}${o.cta ? `<div class="cacts"><button class="btn small primary" data-cgo="${o.cta[0]}">${esc(o.cta[1])}</button></div>` : ''}</div>`);
+    this.draw(`<div class="cbub" role="status"><button class="cx" type="button" aria-label="Close">×</button><span class="cwho">${coachName()}</span>${esc(t)}${o.cta ? `<div class="cacts"><button class="btn small primary" data-cgo="${o.cta[0]}">${esc(o.cta[1])}</button></div>` : ''}</div>`);
     if (!o.stay) this.timer = setTimeout(() => this.hush(), 9000 + t.length * 45);
   },
   hush(){ clearTimeout(this.timer); this.mood = null; this.draw(''); },

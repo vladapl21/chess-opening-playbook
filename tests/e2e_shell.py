@@ -79,6 +79,52 @@ with sync_playwright() as p:
         w = ph.evaluate('document.documentElement.scrollWidth'); print('  phone xl', v, w); assert w <= 390, (v, w)
     ph.click('#setBtn'); ph.wait_for_timeout(300); ph.screenshot(path=out + 's_settings_phone.png')
     assert ph.evaluate("document.getElementById('setPanel').scrollWidth <= document.getElementById('setPanel').clientWidth + 1")
+
+    # ---- layout: one header row on an ordinary monitor, settings and account out of the way, rows centred when they wrap
+    for w, one in ((1280, True), (1440, True), (1000, False)):
+        lp = b.new_page(viewport={'width': w, 'height': 800}); hook(lp); lp.goto(URL); lp.wait_for_timeout(800)
+        m = lp.evaluate("(() => { const r = x => document.querySelector(x).getBoundingClientRect(), t = r('.tabs'), br = r('.brandrow'), c = r('#setBtn'), h = r('.top'); return {one: Math.abs(t.top + t.height / 2 - (br.top + br.height / 2)) < 12, gearAbove: c.bottom <= h.top + 1, gearRight: c.right, mid: Math.abs((t.left + t.right) / 2 - innerWidth / 2), tabsRight: t.right, inHeader: !!document.querySelector('.top #setBtn, .top #acctBtn')}; })()")
+        print('header at', w, m); assert m['one'] == one and m['gearAbove'] and not m['inHeader'] and m['gearRight'] >= (m['tabsRight'] if one else w - 60) - 2
+        if not one: assert m['mid'] < 4, 'a wrapped header is centred'
+        lp.close()
+    wide = b.new_page(viewport={'width': 1700, 'height': 800}); hook(wide); wide.goto(URL); wide.wait_for_timeout(800)
+    g = wide.evaluate("(() => { const c = document.querySelector('#setBtn').getBoundingClientRect(), a = document.querySelector('.top').getBoundingClientRect(); return [c.left > a.right, c.top < 30]; })()")
+    print('wide screen: gear in the corner', g); assert g == [True, True]; wide.close()
+
+    # ---- three coaches: the face and the name change, the words do not
+    cp = ctx.new_page(); hook(cp); cp.goto(URL); cp.wait_for_timeout(900)
+    cp.evaluate("setSetting('who', 'knight'); setSetting('coach', true); setSetting('size', 'm'); setSetting('theme', 'light'); Coach.say('One tip.')"); cp.wait_for_timeout(300)
+    box = cp.evaluate("(() => { const b = document.querySelector('.cbub').getBoundingClientRect(), a = document.querySelector('.cav').getBoundingClientRect(); return [Math.round(b.width), Math.round(a.width), document.querySelector('.cwho').innerText]; })()")
+    print('coach bubble, face, name:', box); assert box[0] <= 232 and box[1] >= 76 and box[2].upper() == 'PIP'
+    cp.click('#setBtn'); cp.wait_for_timeout(250)
+    assert cp.locator('#setPanel [data-coachwho]').count() == 3
+    names = []
+    for who in ('rook', 'pawn', 'knight'):
+        cp.click(f'#setPanel [data-coachwho="{who}"]'); cp.wait_for_timeout(250)
+        names.append(cp.evaluate("[SET.who, coachName(), document.querySelector('#setPanel [data-coachwho][aria-pressed=\"true\"]').dataset.coachwho, document.querySelector('.cav svg').innerHTML.length]"))
+    print('coaches:', names); assert [n[:3] for n in names] == [['rook', 'Rocco', 'rook'], ['pawn', 'Dot', 'pawn'], ['knight', 'Pip', 'knight']] and len({n[3] for n in names}) == 3
+    cp.screenshot(path=out + 's_coaches.png'); cp.keyboard.press('Escape')
+
+    # ---- a lesson opened from a unit: the way forward is at the top
+    cp.evaluate("openUnitLesson(UNIT['w-italian'], UNIT['w-italian'].lessons[0])"); cp.wait_for_timeout(500)
+    first = cp.evaluate("UNIT['w-italian'].lessons")
+    assert cp.inner_text('#topNext').startswith('Next lesson') and cp.evaluate("document.getElementById('topNext').getBoundingClientRect().top") < 260
+    assert not cp.evaluate(f"lessonSeen('w', '{first[0]}')")
+    cp.click('#topNext'); cp.wait_for_timeout(500)
+    assert cp.evaluate(f"[lessonSeen('w', '{first[0]}'), LINES[S.line].lesson, S.studyFrom]") == [True, first[1], 'unit']
+    for _ in range(len(first) - 2): cp.click('#topNext'); cp.wait_for_timeout(350)
+    assert cp.inner_text('#topNext').startswith('Done'); cp.click('#topNext'); cp.wait_for_timeout(400)
+    assert cp.evaluate("[S.view, S.unit]") == ['unit', 'w-italian'] and cp.evaluate("UNIT['w-italian'].lessons.every(l => lessonSeen('w', l))")
+
+    # ---- a practice game from the course, then free play in the Sandbox
+    cp.evaluate("doStep(UNIT['w-italian'], 'spar')"); cp.wait_for_timeout(700)
+    assert cp.evaluate("[S.view, S.drill.scope]") == ['sandbox', 'u:w-italian'] and cp.locator('.cban').count() == 1
+    cp.evaluate("go('course')"); cp.wait_for_timeout(300); cp.evaluate("go('sandbox')"); cp.wait_for_timeout(400)
+    assert cp.locator('.cban').count() == 1, 'the course game is still there when you come back'
+    cp.click('#sbFree'); cp.wait_for_timeout(400)
+    st = cp.evaluate("[S.view, S.drill, S.sbState, document.querySelectorAll('.cban').length, document.querySelectorAll('[data-sbf^=\"pick:\"]').length > 3, !!document.getElementById('sbGo')]")
+    print('free play:', st); assert st == ['sandbox', None, None, 0, True, True]
+    cp.click('#sbGo'); cp.wait_for_timeout(600); assert cp.evaluate("S.drill.scope") == cp.evaluate("SBS.scope") and cp.locator('.cban').count() == 0
     b.close()
 print('ERRORS:', errors); assert not errors
 print('shell checks passed')
