@@ -38,6 +38,7 @@ const A = ctx.Analyze, assert = (c, m) => { if (!c){ console.error('FAILED:', m)
   console.log('\n== newbie:', Q.n, 'games | slots', JSON.stringify(Object.fromEntries(Object.entries(Q.slots).map(([k, s]) => [k, Object.keys(s.opts)]))), '| outside the book', Q.white.off, Q.black.off);
   assert(Q.user === 'newbie' && Q.n === 60 && Q.tc === 'rapid', 'newbie basics');
   assert(Q.slots.white.opts.d4.n === 30 && Q.slots.whiteD4.opts.london.n === 30 && Q.slots.blackE4.opts.sicilian.n === 30, 'named what they play');
-  assert(Q.white.off === 30 && Q.black.off === 30, 'none of it is in the library: ' + Q.white.off + ' ' + Q.black.off);
+  // the d-pawn games with White are outside the library; the Sicilian games with Black are in it since the Sicilian pack
+  assert(Q.white.off === 30 && Q.black.off === 0, 'White outside the library, Black inside: ' + Q.white.off + ' ' + Q.black.off);
   console.log(process.exitCode ? '\nanalysis checks FAILED' : '\nanalysis checks passed');
 })();
