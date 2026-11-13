@@ -7,7 +7,7 @@
   repeats  the same position reached by two move orders must get the same move from you
 
 Exit code 1 if anything is found, so the build can stop on it."""
-import sys, json, re, collections
+import sys, json, re, collections, itertools
 import paths
 from common import *
 
@@ -103,19 +103,33 @@ def lint_labels(side):
     return bad
 
 
+def combos(D):
+    """Every repertoire a player can hold: one pack per slot (see PACKS in the content). Returns sets of chapter ids left out."""
+    slots = list((D.get('packs') or {}).values())
+    if not slots: return [frozenset()]
+    out = []
+    for pick in itertools.product(*[list(s['packs']) for s in slots]):
+        out.append(frozenset(c for s, p in zip(slots, pick) for q, chs in s['packs'].items() if q != p for c in chs))
+    return out
+
+
 def lint_repeats(side):
     D, N, board, path = book(side); me = chess.WHITE if side == 'white' else chess.BLACK
-    lessons = {l['id'] for l in D['lessons']}; on = set()
-    for l in D['lines']:
-        if l['lesson'] in lessons: on.update(l['n'])
-    pos = collections.defaultdict(dict)
-    for i in on:
-        if board(i).turn != me: continue
-        for k in N[i]['k']:
-            if k in on and 'warn' not in (N[k].get('g') or []): pos[board(i).epd()].setdefault(N[k]['u'], k)
+    part_ch = {p: c['id'] for c in D['chapters'] for p in c['parts']}; les_ch = {l['id']: part_ch[l['part']] for l in D['lessons']}
     bad = []
-    for key, mv in pos.items():
-        if len(mv) > 1: bad.append(f'{side}: same position, different moves | ' + ' || '.join(path(k) for k in mv.values()))
+    for off in combos(D):
+        on = set()
+        for l in D['lines']:
+            if l['lesson'] in les_ch and les_ch[l['lesson']] not in off: on.update(l['n'])
+        pos = collections.defaultdict(dict)
+        for i in on:
+            if board(i).turn != me: continue
+            for k in N[i]['k']:
+                if k in on and 'warn' not in (N[k].get('g') or []): pos[board(i).epd()].setdefault(N[k]['u'], k)
+        for key, mv in pos.items():
+            if len(mv) > 1:
+                msg = f'{side}: same position, different moves | ' + ' || '.join(path(k) for k in mv.values())
+                if msg not in bad: bad.append(msg)
     return bad
 
 

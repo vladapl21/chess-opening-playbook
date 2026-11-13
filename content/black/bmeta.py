@@ -13,7 +13,16 @@ CHAPTERS = [
   dict(id='london', name='London System', move='d-pawn, then the bishop', parts=['bln-main', 'bln-jobava']),
   dict(id='d4x', name='Other d-pawn systems', move='Colle, Torre, Veresov, gambits', parts=['bdx-colle', 'bdx-pins', 'bdx-gambits', 'bdx-misc']),
   dict(id='other', name='Other first moves', move='c-pawn, knight, flank pawns', parts=['bo-english', 'bo-flank', 'bo-rare']),
+  dict(id='caro', name='Caro-Kann', move='your c-pawn first, then the d-pawn', parts=['bck-adv', 'bck-exch', 'bck-main', 'bck-knights', 'bck-other']),
 ]
+
+# Systems. A slot is one decision in a repertoire ("what do I play against the e-pawn?") and a pack is one answer to it.
+# A player has exactly one pack per slot, so two packs of a slot may answer the same position differently; inside the
+# packs a player can hold together, one position still gets one move. Chapters in no pack are always in.
+PACKS = dict(
+  blackE4=dict(default='e5', packs=dict(e5=['italian', 'ruy', 'scotch', 'vienna', 'attacks'], caro=['caro'])),
+  blackD4=dict(default='slav', packs=dict(slav=['slav', 'london', 'd4x'])),
+)
 
 CH_META = {
   'italian': dict(tile=IT, first='bi-main', roots=[J(KN, 'Bc4'), J(E, 'Bc4 Nc6 Nf3')],
@@ -107,6 +116,16 @@ CH_META = {
     notes=[dict(b='Jul 16 vs DEOSVULT:', t='White\'s bishop sat unguarded for four moves and your queen could take it three times. You were winning anyway until a check on your back rank.', line='gb-deosvult'),
            dict(b='Jul 9 vs youssefdabbech:', t='you took back with the g-pawn, castled behind the broken pawns, and White\'s h-pawn and rook broke through. Take with the e-pawn.', lesson='bdx-veresov'),
            dict(b='Jul 10 vs CamiloS8:', t='in the Colle you pushed the c-pawn past and shut your own pieces in. One square is enough: it belongs in the triangle.', lesson='bdx-colle')]),
+  'caro': dict(tile='e4 c6 d4 d5', first='bck-adv',
+    roots=['e4 c6'],
+    hero='e4 c6 d4 d5 e5 Bf5', arrows=['e7e6g', 'c6c5g'], circles=['f5g'], cap='The bishop is out before the e-pawn closes the door.',
+    kicker='A second answer to the e-pawn',
+    headline='The Slav setup, <em>against the e-pawn</em>.',
+    lede='C-pawn one square, d-pawn two, and the light bishop out before the e-pawn moves: the same idea as your setup against the d-pawn. If White pushes past, the bishop goes out and the c-pawn hits the chain. If White trades, take back with the c-pawn and bring both knights out first. If White guards the pawn, take it and bring the bishop out with a hit on the knight.',
+    facts=[dict(big='53%', text='of club players push the e-pawn past your d-pawn. Bishop out, e-pawn, c-pawn.'),
+           dict(big='1 in 3', text='guard the knight with the bishop in the main line and lose the d-pawn to your queen', alert=True),
+           dict(big='2', text='pawn moves start every game, whatever White plays on move two')],
+    notes=[]),
   'other': dict(tile='c4 e5', first='bo-english',
     roots=['c4', 'Nf3', 'g3', 'e3', 'b3', 'f4', 'b4', 'Nc3', 'd3', 'g4', 'a3', 'h3', 'c3'],
     hero='c4 e5 Nc3 Nf6 Nf3 Nc6 g3 Bb4', arrows=['b4c3g', 'e5e4g'], circles=[], cap='Bishop hits the knight; the e-pawn push comes next.',
@@ -122,6 +141,18 @@ CH_META = {
 }
 
 CHEAT = [
+  ('e4', 'c6', 'C-pawn one square, then the d-pawn two', 'bck-adv'),
+  ('e4 c6 d4 d5 e5', 'Bf5', 'Bishop out before the e-pawn', 'bck-adv'),
+  ('e4 c6 d4 d5 e5 Bf5 Nf3 e6 Be2', 'c5', 'C-pawn hits the chain', 'bck-adv'),
+  ('e4 c6 d4 d5 e5 Bf5 Bd3', 'Bxd3', 'Trade the bishops', 'bck-adv'),
+  ('e4 c6 d4 d5 exd5', 'cxd5', 'Take back with the c-pawn; knights before the bishop', 'bck-exch'),
+  ('e4 c6 d4 d5 exd5 cxd5 c4 Nf6 Nc3', 'e6', 'C-pawn attack: guard with the e-pawn', 'bck-panov'),
+  ('e4 c6 d4 d5 Nc3', 'dxe4', 'Take, then the bishop out at the knight', 'bck-main'),
+  ('e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5 Ng3', 'Bg6', 'Step back, then the queen\'s knight', 'bck-main'),
+  ('e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5 Bd3', 'Qxd4', 'Bishop guards the knight: take the d-pawn', 'bck-main'),
+  ('e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5 Ng3 Bg6 h4', 'h6', 'H-pawn comes: make room for the bishop', 'bck-main'),
+  ('e4 c6 Nf3 d5 Nc3', 'Bg4', 'Both knights out: bishop to the other side', 'bck-2kn'),
+  ('e4 c6 Nf3 d5 Nc3 Bg4 h3', 'Bxf3', 'Asked by the edge pawn: take the knight', 'bck-2kn'),
   (J(KN, 'Bc4'), 'Bc5', 'Mirror the bishop', 'bi-main'),
   (J(IT, 'c3'), 'Nf6', 'Hit the e-pawn', 'bi-main'),
   (J(IT, 'c3 Nf6 d4 exd4 cxd4'), 'Bb4+', 'Check, then trade bishops', 'bi-main'),
