@@ -70,6 +70,11 @@ p{margin:0}
 .tabs button .sm{display:none}
 .tabs button .badge,.sidesw .badge{display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:9px;background:var(--rosso);color:#fff;font-size:11px;margin-left:6px;padding:0 5px;font-family:var(--f-mono)}
 .brandrow{display:flex;align-items:center;gap:10px 18px;flex-wrap:wrap;min-width:0}
+/* settings and the account sit in the corner of the screen, away from the chess: in the margin on a wide screen, in a slim row above the header otherwise */
+.corner{display:flex;justify-content:flex-end;align-items:center;gap:8px;min-height:36px;margin-bottom:8px}
+@media (min-width:1480px){ .corner{position:absolute;top:14px;right:max(18px,env(safe-area-inset-right,0px));margin:0;z-index:5} }
+/* when the header has to wrap, its rows are centred instead of hugging the left edge */
+@media (max-width:1180px){ .top{justify-content:center} .brandrow{justify-content:center} }
 .sidesw{display:inline-flex;gap:2px;background:var(--surface-2);padding:3px;border-radius:11px}
 .sidesw button{display:inline-flex;align-items:center;gap:7px;border:0;background:none;padding:6px 12px;border-radius:8px;font-weight:650;font-size:13.5px;color:var(--muted);cursor:pointer;white-space:nowrap}
 .sidesw button:hover{color:var(--ink)}
@@ -441,7 +446,7 @@ button.ucard:hover{border-color:var(--accent);transform:translateY(-1px)}
 .tick.no{color:var(--muted);font-weight:500}
 .tick.due{color:var(--rosso)}
 .cban{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 12px;border-radius:10px;background:var(--viola-soft);font-size:13.5px}
-.cban span{flex:1 1 200px;min-width:0}
+.cban span{flex:1 1 200px;min-width:0} .cban .cbtns{flex:0 0 auto;display:flex;flex-wrap:wrap;gap:8px}
 .lockednote{padding:12px 14px;border-radius:12px;background:var(--surface-2);color:var(--muted);font-size:14px}
 .qhead{display:flex;justify-content:space-between;align-items:center;gap:8px 12px;flex-wrap:wrap}
 .qhead .evaltext{margin:0}
@@ -449,14 +454,14 @@ button.ucard:hover{border-color:var(--accent);transform:translateY(-1px)}
 .ask b{font-weight:650}
 
 /* accounts (site build): header button, sign-in sheet, toast */
-.acct{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:4px 14px 4px 4px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 14px var(--f-body);cursor:pointer}
+.acct{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:4px 14px 4px 4px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 14px var(--f-body);cursor:pointer}
 .acct.out{padding:6px 16px;background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .acct:hover{border-color:var(--accent)}
-.acct .av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:14px;position:relative}
+.acct .av{width:27px;height:27px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:14px;position:relative}
 .acct .av::after{content:"";position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:50%;border:2px solid var(--surface);background:var(--muted)}
 .acct.ok .av::after{background:var(--accent)} .acct.sync .av::after{background:var(--oro)} .acct.err .av::after{background:var(--rosso)}
 .acct .acctx{font-size:13px;color:var(--muted);font-weight:600}
-.gear{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--muted);display:grid;place-items:center;cursor:pointer;flex:none}
+.gear{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--muted);display:grid;place-items:center;cursor:pointer;flex:none}
 .gear:hover{color:var(--ink);border-color:var(--accent)} .gear svg{width:19px;height:19px}
 .setsheet{width:min(480px,100%);gap:18px}
 .setrow{display:grid;gap:8px}
@@ -629,6 +634,10 @@ footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);fo
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><!--__PIECES__--></defs></svg>
 
 <div class="app" id="app">
+  <div class="corner">
+    <button class="gear" id="setBtn" type="button" aria-haspopup="dialog" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.5-2.4 1a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.5A7.6 7.6 0 0 0 7 6.5l-2.4-1-2 3.5 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.5 2.4-1a7.6 7.6 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.6 7.6 0 0 0 2.6-1.5l2.4 1 2-3.5z"/></svg></button>
+    <button class="acct out" id="acctBtn" type="button" aria-haspopup="dialog" hidden>Sign in</button>
+  </div>
   <header class="top">
     <div class="brandrow">
       <button class="brand" data-go="course" aria-label="Opening Playbook home">
@@ -639,8 +648,6 @@ footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);fo
         <button data-side="w" aria-pressed="true"><i class="sw w" aria-hidden="true"></i>White<span class="badge" id="dueW" hidden>0</span></button>
         <button data-side="b" aria-pressed="false"><i class="sw b" aria-hidden="true"></i>Black<span class="badge" id="dueB" hidden>0</span></button>
       </div>
-      <button class="gear" id="setBtn" type="button" aria-haspopup="dialog" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.5-2.4 1a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.5A7.6 7.6 0 0 0 7 6.5l-2.4-1-2 3.5 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.5 2.4-1a7.6 7.6 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.6 7.6 0 0 0 2.6-1.5l2.4 1 2-3.5z"/></svg></button>
-      <button class="acct out" id="acctBtn" type="button" aria-haspopup="dialog" hidden>Sign in</button>
     </div>
     <nav class="tabs" role="tablist" aria-label="Sections">
       <button role="tab" data-view="sandbox" aria-selected="false">Sandbox</button>
@@ -1145,7 +1152,7 @@ function useSide(side){
 }
 /* ------------------------------------------------------------------ settings (kept on this device) */
 const SET_KEY = 'playbook-settings', HOST_THEME = document.documentElement.dataset.theme || '';
-const SET = {theme: 'system', size: 'm', board: 'green', coords: true, coach: true};
+const SET = {theme: 'system', size: 'm', board: 'green', coords: true, coach: true, who: 'knight'};
 try { Object.assign(SET, JSON.parse(localStorage.getItem(SET_KEY) || '{}')); } catch(e){}
 const SIZES = {s: .92, m: 1, l: 1.08, xl: 1.16};
 const BOARDS = [['green', 'Green', '#E6ECE2', '#84A390'], ['wood', 'Wood', '#F0DDBD', '#B98B63'], ['blue', 'Blue', '#E3EAF1', '#7C9CBF'], ['slate', 'Slate', '#E7E8EA', '#8E969E'], ['plum', 'Plum', '#ECE5F3', '#9C88BF']];
@@ -1168,7 +1175,8 @@ const Settings = {
       <div class="setrow"><b>Text size</b>${seg('size', [['s', '<span class="aa" style="font-size:13px">A</span>'], ['m', '<span class="aa" style="font-size:16px">A</span>'], ['l', '<span class="aa" style="font-size:19px">A</span>'], ['xl', '<span class="aa" style="font-size:22px">A</span>']])}<span>Boards grow with the text.</span></div>
       <div class="setrow"><b>Board colour</b><div class="swatches" role="group">${BOARDS.map(([v, label, l, d]) => `<button type="button" class="swatch" data-set="board:${v}" aria-pressed="${SET.board === v}"><i aria-hidden="true"><b style="background:${l}"></b><b style="background:${d}"></b><b style="background:${d}"></b><b style="background:${l}"></b></i>${label}</button>`).join('')}</div></div>
       ${sw('coords', 'Letters and numbers on the board', 'The small file and rank marks along the edge.')}
-      ${sw('coach', 'Coach', 'A few words from your coach at the moments that matter.')}`;
+      ${sw('coach', 'Coach', 'A few words from your coach at the moments that matter.')}
+      ${typeof coachPickHTML === 'function' ? `<div class="setrow"><b>Your coach</b>${coachPickHTML()}</div>` : ''}`;
   }
 };
 document.getElementById('setBtn').addEventListener('click', () => Settings.open());
@@ -1391,6 +1399,8 @@ function renderStudy(){
   if (les){ const k = order.indexOf(les.id);
     if (k > 0) navPrev = `<button class="btn small" data-lesson="${order[k-1]}" aria-label="Previous lesson: ${esc(LESSONS[order[k-1]].title)}">‹<span class="navtxt"> ${esc(LESSONS[order[k-1]].title)}</span></button>`;
     if (k < order.length - 1) navNext = `<button class="btn small" data-lesson="${order[k+1]}" aria-label="Next lesson: ${esc(LESSONS[order[k+1]].title)}"><span class="navtxt">${esc(LESSONS[order[k+1]].title)} </span>›</button>`; }
+  if (CU && les && CU.lessons.includes(les.id)){ const nx = CU.lessons[CU.lessons.indexOf(les.id) + 1];
+    navNext = nx ? `<button class="btn small primary" id="topNext" data-lesson="${nx}" title="${esc(LESSONS[nx].title)}">Next lesson ›</button>` : `<button class="btn small primary" id="topNext" data-unit="${CU.id}">Done · back to the unit ›</button>`; }
   const back = CU ? `<button class="btn small" data-unit="${CU.id}">← ${esc(CU.title)}</button>` : S.studyFrom === 'games' ? '<button class="btn small" data-go="games">← Your games</button>' : S.studyFrom === 'cheat' ? '<button class="btn small" data-go="cheat">← Cheat sheet</button>' : S.studyFrom === 'sandbox' ? '<button class="btn small" data-go="sandbox">← Sandbox</button>' : '<button class="btn small" data-go="learn">← All lessons</button>';
   // reaching the last move of a lesson's main line counts as studying it
   const atEnd = !!les && !!line.main && S.i === line.n.length - 1;
@@ -1484,6 +1494,7 @@ function renderStudy(){
   const sp = document.getElementById('showPre'); if (sp) sp.onclick = () => { S.showPre = true; renderStudy(); };
   view.querySelectorAll('[data-step]').forEach(b => b.onclick = () => jump(+b.dataset.step));
   const dt = document.getElementById('drillThis'); if (dt) dt.onclick = () => startDrillLine(S.line, '', CU ? CU.id : null);
+  const tn = document.getElementById('topNext'); if (tn) tn.onclick = () => markSeen(les.id);   // moving on from the top counts as having studied it
   document.getElementById('exHere').onclick = () => exploreFrom(nodeFen(idx), exOpts({}));
   document.getElementById('cEng').onclick = () => { EngineUI.set(!engOn); renderStudy(); };
   if (engOn) EngineUI.attach({fen: nodeFen(idx), card: 'engcard', board: 'sb', bar: 'sbar', text: 'stext', flip: FLIP,
@@ -1949,7 +1960,7 @@ function sbSideHTML(){
   const ses = S.sbSession, all = Prog.d.sb;
   const pool = DRILLABLE.filter(id => inScopeLine(id, SBS.scope)), seen = all ? pool.filter(id => all.seen[id]).length : 0;
   const D = S.drill, CU = D && D.kind === 'sb' && D.scope.startsWith('u:') ? UNIT[D.scope.slice(2)] : null;
-  const ban = CU ? `<div class="cban"><span><b>Course · ${unitNo(CU)}:</b> ${esc(CU.title)}. ${Math.min(up(CU.id).spar || 0, SPAR)} of ${SPAR} clean practice games. ${OPP} only plays moves from this unit and picks the lines you know least.</span><button class="btn small" data-unit="${CU.id}">Back to the unit</button></div>` : '';
+  const ban = CU ? `<div class="cban"><span><b>Course · ${unitNo(CU)}:</b> ${esc(CU.title)}. ${Math.min(up(CU.id).spar || 0, SPAR)} of ${SPAR} clean practice games. ${OPP} only plays moves from this unit and picks the lines you know least.</span><span class="cbtns"><button class="btn small" data-unit="${CU.id}">Back to the unit</button><button class="btn small primary" id="sbFree">Free play: pick openings</button></span></div>` : '';
   return `${ban}<div class="dpanel">
       <div><p class="kicker" style="margin-bottom:6px">Openings</p><div class="seg">${segBtn('scope', 'all', 'Every opening')}${DATA.chapters.map(C => `<button data-sbf="pick:${C.id}" aria-pressed="${scopeChs(SBS.scope).includes(C.id)}">${esc(C.name)}</button>`).join('')}</div>
         <p class="evaltext" style="text-align:left;margin-top:8px">${scopeChs(SBS.scope).length > 1 ? `Mixing ${scopeChs(SBS.scope).length} openings. Tap one again to take it out.` : 'Tap more than one to mix them in the same session.'}</p></div>
@@ -1967,6 +1978,8 @@ function sbPendingHTML(){
 }
 function renderSbSide(){ const el = document.getElementById('sbside'); if (el){ el.innerHTML = sbSideHTML(); wireSbSide(); } }
 function wireSbSide(){
+  // leave a course practice game: the Sandbox goes back to its own state, where you choose the openings
+  const fr = document.getElementById('sbFree'); if (fr) fr.onclick = () => { S.sbState = S.drill = null; S.sbSession = null; render(); };
   view.querySelectorAll('[data-sbf]').forEach(b => b.onclick = () => { const [k, v] = b.dataset.sbf.split(':'); if (k === 'pick') SBS.scope = scopeToggle(SBS.scope, v); else SBS[k] = v; sbSave(); renderSbSide(); if (!S.drill) renderSbPanel(); });
   const now = document.getElementById('sbNow'); if (now) now.onclick = () => { sbStart(); renderSbSide(); };
 }

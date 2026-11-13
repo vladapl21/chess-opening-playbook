@@ -70,6 +70,11 @@ p{margin:0}
 .tabs button .sm{display:none}
 .tabs button .badge,.sidesw .badge{display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:9px;background:var(--rosso);color:#fff;font-size:11px;margin-left:6px;padding:0 5px;font-family:var(--f-mono)}
 .brandrow{display:flex;align-items:center;gap:10px 18px;flex-wrap:wrap;min-width:0}
+/* settings and the account sit in the corner of the screen, away from the chess: in the margin on a wide screen, in a slim row above the header otherwise */
+.corner{display:flex;justify-content:flex-end;align-items:center;gap:8px;min-height:36px;margin-bottom:8px}
+@media (min-width:1480px){ .corner{position:absolute;top:14px;right:max(18px,env(safe-area-inset-right,0px));margin:0;z-index:5} }
+/* when the header has to wrap, its rows are centred instead of hugging the left edge */
+@media (max-width:1180px){ .top{justify-content:center} .brandrow{justify-content:center} }
 .sidesw{display:inline-flex;gap:2px;background:var(--surface-2);padding:3px;border-radius:11px}
 .sidesw button{display:inline-flex;align-items:center;gap:7px;border:0;background:none;padding:6px 12px;border-radius:8px;font-weight:650;font-size:13.5px;color:var(--muted);cursor:pointer;white-space:nowrap}
 .sidesw button:hover{color:var(--ink)}
@@ -441,7 +446,7 @@ button.ucard:hover{border-color:var(--accent);transform:translateY(-1px)}
 .tick.no{color:var(--muted);font-weight:500}
 .tick.due{color:var(--rosso)}
 .cban{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 12px;border-radius:10px;background:var(--viola-soft);font-size:13.5px}
-.cban span{flex:1 1 200px;min-width:0}
+.cban span{flex:1 1 200px;min-width:0} .cban .cbtns{flex:0 0 auto;display:flex;flex-wrap:wrap;gap:8px}
 .lockednote{padding:12px 14px;border-radius:12px;background:var(--surface-2);color:var(--muted);font-size:14px}
 .qhead{display:flex;justify-content:space-between;align-items:center;gap:8px 12px;flex-wrap:wrap}
 .qhead .evaltext{margin:0}
@@ -449,14 +454,14 @@ button.ucard:hover{border-color:var(--accent);transform:translateY(-1px)}
 .ask b{font-weight:650}
 
 /* accounts (site build): header button, sign-in sheet, toast */
-.acct{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:4px 14px 4px 4px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 14px var(--f-body);cursor:pointer}
+.acct{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:4px 14px 4px 4px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 14px var(--f-body);cursor:pointer}
 .acct.out{padding:6px 16px;background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .acct:hover{border-color:var(--accent)}
-.acct .av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:14px;position:relative}
+.acct .av{width:27px;height:27px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:14px;position:relative}
 .acct .av::after{content:"";position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:50%;border:2px solid var(--surface);background:var(--muted)}
 .acct.ok .av::after{background:var(--accent)} .acct.sync .av::after{background:var(--oro)} .acct.err .av::after{background:var(--rosso)}
 .acct .acctx{font-size:13px;color:var(--muted);font-weight:600}
-.gear{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--muted);display:grid;place-items:center;cursor:pointer;flex:none}
+.gear{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--muted);display:grid;place-items:center;cursor:pointer;flex:none}
 .gear:hover{color:var(--ink);border-color:var(--accent)} .gear svg{width:19px;height:19px}
 .setsheet{width:min(480px,100%);gap:18px}
 .setrow{display:grid;gap:8px}
@@ -725,18 +730,25 @@ footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);fo
 .pop{animation:pop .5s cubic-bezier(.2,1.4,.4,1) both} @keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
 
 /* the coach, bottom right */
-.coach{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:40;display:grid;justify-items:end;gap:8px;pointer-events:none;max-width:min(330px,calc(100vw - 28px))}
+.coach{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:40;display:grid;justify-items:end;gap:8px;pointer-events:none;max-width:min(232px,calc(100vw - 28px))}
 .coach > *{pointer-events:auto}
 .cbub{position:relative;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:18px 18px 4px 18px;padding:13px 38px 13px 15px;box-shadow:var(--shadow);font-size:14.5px;font-weight:550;line-height:1.45;animation:pop .35s cubic-bezier(.2,1.3,.4,1) both;transform-origin:bottom right}
 .cbub .cwho{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:3px}
 .cbub .cacts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .cbub .cx{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;border:0;background:none;color:var(--muted);font-size:18px;line-height:1;cursor:pointer}
 .cbub .cx:hover{background:var(--surface-2);color:var(--ink)}
-.cav{width:62px;height:62px;border-radius:50%;border:2px solid var(--surface);background:var(--accent-soft);padding:5px 3px 0;cursor:pointer;box-shadow:var(--shadow);overflow:hidden;transition:transform .15s,width .2s,height .2s}
+.cav{width:78px;height:78px;border-radius:50%;border:2px solid var(--surface);background:var(--accent-soft);padding:5px 3px 0;cursor:pointer;box-shadow:var(--shadow);overflow:hidden;transition:transform .15s,width .2s,height .2s}
 .cav:hover{transform:translateY(-2px) rotate(-4deg)} .cav svg{display:block;width:100%;height:100%}
-.coach.quiet .cav{width:44px;height:44px;opacity:.85}
+.coach.quiet .cav{width:54px;height:54px;opacity:.85}
 .cface svg{display:block;width:100%;height:auto}
-.kn-body{fill:var(--accent)} .kn-mane{fill:var(--ink)} .kn-muzzle{fill:var(--accent-soft)} .kn-eye{fill:var(--surface)} .kn-pupil{fill:var(--ink)} .kn-line{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round} .kn-blush{fill:var(--rosso);opacity:.35} .kn-base{fill:var(--ink)}
+.kn-body{fill:var(--accent)} .kn-mane{fill:var(--ink)} .kn-muzzle{fill:var(--accent-soft)} .kn-eye{fill:var(--surface)} .kn-pupil{fill:var(--ink)} .kn-line{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round} .kn-blush{fill:var(--rosso);opacity:.35} .kn-base{fill:var(--ink)} .kn-crown{fill:var(--oro)}
+.coachpick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.coachpick button{display:grid;justify-items:center;gap:2px;padding:12px 6px 10px;border-radius:16px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font:inherit;min-width:0}
+.coachpick button:hover{border-color:var(--accent)} .coachpick button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.coachpick .cface{width:62px;height:62px;border-radius:50%;background:var(--accent-soft);padding:5px 3px 0;overflow:hidden;margin-bottom:4px} .coachpick button[aria-pressed="true"] .cface{background:var(--surface)}
+.coachpick b{font-size:15px} .coachpick span:last-child{font-size:12px;color:var(--muted);text-align:center}
+.pickc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:14px 22px;align-items:center;margin-bottom:16px} .pickc p{color:var(--muted);font-size:14px;margin-top:4px}
+@media (max-width:640px){ .pickc{grid-template-columns:minmax(0,1fr)} }
 @media (prefers-reduced-motion: no-preference){ .cav svg{animation:bob 3.4s ease-in-out infinite} @keyframes bob{50%{transform:translateY(-2px)}} }
 
 @media (max-width:860px){
@@ -746,16 +758,20 @@ footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);fo
 }
 @media (max-width:620px){
   .steps3{grid-template-columns:minmax(0,1fr)} .duo{grid-template-columns:minmax(0,1fr)} .duo .or{justify-self:center} .wopt .board{max-width:210px}
-  .leak{grid-template-columns:92px minmax(0,1fr)} .cav{width:52px;height:52px} .plocked .ghost3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .leak{grid-template-columns:92px minmax(0,1fr)} .cav{width:64px;height:64px} .plocked .ghost3{grid-template-columns:repeat(3,minmax(0,1fr))}
   .tabs button.lock::after{display:none}   /* six tabs have to fit on a phone: locked ones are greyed, without the padlock */
 }
-body:has(.coach:not([hidden])) .foot{padding-right:84px}
+body:has(.coach:not([hidden])) .foot{padding-right:100px}
 
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><symbol id="p-wk" viewBox="0 0 45 45"><path d="M21.2,19.6 L21.2,11.2 L17.8,11.2 L17.8,8.4 L21.2,8.4 L21.2,4.6 L23.8,4.6 L23.8,8.4 L27.2,8.4 L27.2,11.2 L23.8,11.2 L23.8,19.6 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M13.2,36 C14.2,33.2 15.4,31.6 16,29.8 L29,29.8 C29.6,31.6 30.8,33.2 31.8,36 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M10,40.2 L35,40.2 L35,37.8 Q35,36 33.2,36 L11.8,36 Q10,36 10,37.8 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M15.2,30 L29.8,30 L30.4,27 L14.6,27 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M14.6,27.2 C10.6,23.6 9.8,18.6 12.9,16.1 C16.0,13.6 20.2,15.4 22.5,19.2 C24.8,15.4 29.0,13.6 32.1,16.1 C35.2,18.6 34.4,23.6 30.4,27.2 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/></symbol><symbol id="p-wq" viewBox="0 0 45 45"><path d="M13.2,36 C14.2,33.2 15.2,31.6 15.8,30.2 L29.2,30.2 C29.8,31.6 30.8,33.2 31.8,36 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M10,40.2 L35,40.2 L35,37.8 Q35,36 33.2,36 L11.8,36 Q10,36 10,37.8 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M15.2,30.4 L29.8,30.4 L30.6,27.2 L14.4,27.2 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M14.4,27.4 L9.4,15.6 L16.6,21.8 L15.8,11.4 L20.5,20.2 L22.5,9.4 L24.5,20.2 L29.2,11.4 L28.4,21.8 L35.6,15.6 L30.6,27.4 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><circle cx="9.2" cy="14.2" r="2.0" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35"/><circle cx="15.7" cy="9.9" r="2.0" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35"/><circle cx="22.5" cy="7.8" r="2.1" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35"/><circle cx="29.3" cy="9.9" r="2.0" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35"/><circle cx="35.8" cy="14.2" r="2.0" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35"/></symbol><symbol id="p-wr" viewBox="0 0 45 45"><path d="M14.6,33 L15.8,17.4 L29.2,17.4 L30.4,33 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M9.6,40.2 L35.4,40.2 L35.4,37.6 Q35.4,35.8 33.6,35.8 L11.4,35.8 Q9.6,35.8 9.6,37.6 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M12.4,35.8 L32.6,35.8 L31.6,32.4 L13.4,32.4 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M12.6,17.6 L32.4,17.6 L32.4,14.4 L12.6,14.4 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M12.6,14.6 L12.6,7.6 L16.9,7.6 L16.9,10.4 L20.4,10.4 L20.4,7.6 L24.6,7.6 L24.6,10.4 L28.1,10.4 L28.1,7.6 L32.4,7.6 L32.4,14.6 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M15.4,21.2 L29.6,21.2" fill="none" stroke="#1E2226" stroke-width="1.215" stroke-linecap="round"/></symbol><symbol id="p-wb" viewBox="0 0 45 45"><path d="M15.2,36 C16.6,33 19.2,31.4 19.6,28.6 L25.4,28.6 C25.8,31.4 28.4,33 29.8,36 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M10.5,40.2 L34.5,40.2 L34.5,37.8 Q34.5,36 32.6,36 L12.4,36 Q10.5,36 10.5,37.8 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M16.4,28.9 C16.4,26.6 28.6,26.6 28.6,28.9 C28.6,30.5 16.4,30.5 16.4,28.9 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M22.5,8.8 C27.6,12.4 30.8,16.8 30.4,20.6 C30.1,24.4 27,26.8 22.5,26.8 C18,26.8 14.9,24.4 14.6,20.6 C14.2,16.8 17.4,12.4 22.5,8.8 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M22.5,4.9 A2.35,2.35 0 1 1 22.49,4.9 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M24.3,13.6 L19.9,19.4" fill="none" stroke="#1E2226" stroke-width="1.215" stroke-linecap="round"/></symbol><symbol id="p-wn" viewBox="0 0 45 45"><path d="M13.4,36 C13.0,31.2 16.4,27.8 20.2,25.4 C18.4,24.9 16.8,24.3 15.4,24.0 C13.6,24.9 11.9,25.3 10.4,24.7 C8.8,24.0 8.5,22.4 9.2,20.9 C10.3,18.4 13.5,14.3 16.5,11.2 C17.1,10.5 17.5,9.9 17.7,9.1 L18.9,5.0 L21.6,8.7 C27.8,8.9 33.6,13.9 33.8,22.2 C33.9,27.4 32.6,31.6 32.4,36 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M10.5,40.2 L34.5,40.2 L34.5,37.8 Q34.5,36 32.6,36 L12.4,36 Q10.5,36 10.5,37.8 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><circle cx="17.0" cy="14.9" r="1.05" fill="#1E2226"/><circle cx="11.4" cy="21.7" r="0.7" fill="#1E2226"/><path d="M22.4,9.6 C28.4,10.6 32.0,15.6 32.0,22.4 C32.0,27.6 30.9,31.2 30.7,35" fill="none" stroke="#1E2226" stroke-width="1.215" stroke-linecap="round"/></symbol><symbol id="p-wp" viewBox="0 0 45 45"><path d="M14.2,36 C14.2,31.2 17.8,27.8 19.6,24.8 L25.4,24.8 C27.2,27.8 30.8,31.2 30.8,36 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M10.5,40.2 L34.5,40.2 L34.5,37.8 Q34.5,36 32.6,36 L12.4,36 Q10.5,36 10.5,37.8 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M16.6,24.6 C16.6,22.4 28.4,22.4 28.4,24.6 C28.4,26.2 16.6,26.2 16.6,24.6 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M22.5,10.6 A5.8,5.8 0 1 1 22.49,10.6 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/></symbol><symbol id="p-bk" viewBox="0 0 45 45"><path d="M21.2,19.6 L21.2,11.2 L17.8,11.2 L17.8,8.4 L21.2,8.4 L21.2,4.6 L23.8,4.6 L23.8,8.4 L27.2,8.4 L27.2,11.2 L23.8,11.2 L23.8,19.6 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M13.2,36 C14.2,33.2 15.4,31.6 16,29.8 L29,29.8 C29.6,31.6 30.8,33.2 31.8,36 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M10,40.2 L35,40.2 L35,37.8 Q35,36 33.2,36 L11.8,36 Q10,36 10,37.8 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M15.2,30 L29.8,30 L30.4,27 L14.6,27 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M14.6,27.2 C10.6,23.6 9.8,18.6 12.9,16.1 C16.0,13.6 20.2,15.4 22.5,19.2 C24.8,15.4 29.0,13.6 32.1,16.1 C35.2,18.6 34.4,23.6 30.4,27.2 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/></symbol><symbol id="p-bq" viewBox="0 0 45 45"><path d="M13.2,36 C14.2,33.2 15.2,31.6 15.8,30.2 L29.2,30.2 C29.8,31.6 30.8,33.2 31.8,36 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M10,40.2 L35,40.2 L35,37.8 Q35,36 33.2,36 L11.8,36 Q10,36 10,37.8 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M15.2,30.4 L29.8,30.4 L30.6,27.2 L14.4,27.2 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M14.4,27.4 L9.4,15.6 L16.6,21.8 L15.8,11.4 L20.5,20.2 L22.5,9.4 L24.5,20.2 L29.2,11.4 L28.4,21.8 L35.6,15.6 L30.6,27.4 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><circle cx="9.2" cy="14.2" r="2.0" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35"/><circle cx="15.7" cy="9.9" r="2.0" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35"/><circle cx="22.5" cy="7.8" r="2.1" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35"/><circle cx="29.3" cy="9.9" r="2.0" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35"/><circle cx="35.8" cy="14.2" r="2.0" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35"/></symbol><symbol id="p-br" viewBox="0 0 45 45"><path d="M14.6,33 L15.8,17.4 L29.2,17.4 L30.4,33 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M9.6,40.2 L35.4,40.2 L35.4,37.6 Q35.4,35.8 33.6,35.8 L11.4,35.8 Q9.6,35.8 9.6,37.6 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M12.4,35.8 L32.6,35.8 L31.6,32.4 L13.4,32.4 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M12.6,17.6 L32.4,17.6 L32.4,14.4 L12.6,14.4 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M12.6,14.6 L12.6,7.6 L16.9,7.6 L16.9,10.4 L20.4,10.4 L20.4,7.6 L24.6,7.6 L24.6,10.4 L28.1,10.4 L28.1,7.6 L32.4,7.6 L32.4,14.6 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M15.4,21.2 L29.6,21.2" fill="none" stroke="#D8CFBD" stroke-width="1.215" stroke-linecap="round"/></symbol><symbol id="p-bb" viewBox="0 0 45 45"><path d="M15.2,36 C16.6,33 19.2,31.4 19.6,28.6 L25.4,28.6 C25.8,31.4 28.4,33 29.8,36 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M10.5,40.2 L34.5,40.2 L34.5,37.8 Q34.5,36 32.6,36 L12.4,36 Q10.5,36 10.5,37.8 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M16.4,28.9 C16.4,26.6 28.6,26.6 28.6,28.9 C28.6,30.5 16.4,30.5 16.4,28.9 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M22.5,8.8 C27.6,12.4 30.8,16.8 30.4,20.6 C30.1,24.4 27,26.8 22.5,26.8 C18,26.8 14.9,24.4 14.6,20.6 C14.2,16.8 17.4,12.4 22.5,8.8 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M22.5,4.9 A2.35,2.35 0 1 1 22.49,4.9 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M24.3,13.6 L19.9,19.4" fill="none" stroke="#D8CFBD" stroke-width="1.215" stroke-linecap="round"/></symbol><symbol id="p-bn" viewBox="0 0 45 45"><path d="M13.4,36 C13.0,31.2 16.4,27.8 20.2,25.4 C18.4,24.9 16.8,24.3 15.4,24.0 C13.6,24.9 11.9,25.3 10.4,24.7 C8.8,24.0 8.5,22.4 9.2,20.9 C10.3,18.4 13.5,14.3 16.5,11.2 C17.1,10.5 17.5,9.9 17.7,9.1 L18.9,5.0 L21.6,8.7 C27.8,8.9 33.6,13.9 33.8,22.2 C33.9,27.4 32.6,31.6 32.4,36 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M10.5,40.2 L34.5,40.2 L34.5,37.8 Q34.5,36 32.6,36 L12.4,36 Q10.5,36 10.5,37.8 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><circle cx="17.0" cy="14.9" r="1.05" fill="#D8CFBD"/><circle cx="11.4" cy="21.7" r="0.7" fill="#D8CFBD"/><path d="M22.4,9.6 C28.4,10.6 32.0,15.6 32.0,22.4 C32.0,27.6 30.9,31.2 30.7,35" fill="none" stroke="#D8CFBD" stroke-width="1.215" stroke-linecap="round"/></symbol><symbol id="p-bp" viewBox="0 0 45 45"><path d="M14.2,36 C14.2,31.2 17.8,27.8 19.6,24.8 L25.4,24.8 C27.2,27.8 30.8,31.2 30.8,36 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M10.5,40.2 L34.5,40.2 L34.5,37.8 Q34.5,36 32.6,36 L12.4,36 Q10.5,36 10.5,37.8 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M16.6,24.6 C16.6,22.4 28.4,22.4 28.4,24.6 C28.4,26.2 16.6,26.2 16.6,24.6 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M22.5,10.6 A5.8,5.8 0 1 1 22.49,10.6 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/></symbol></defs></svg>
 
 <div class="app" id="app">
+  <div class="corner">
+    <button class="gear" id="setBtn" type="button" aria-haspopup="dialog" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.5-2.4 1a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.5A7.6 7.6 0 0 0 7 6.5l-2.4-1-2 3.5 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.5 2.4-1a7.6 7.6 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.6 7.6 0 0 0 2.6-1.5l2.4 1 2-3.5z"/></svg></button>
+    <button class="acct out" id="acctBtn" type="button" aria-haspopup="dialog" hidden>Sign in</button>
+  </div>
   <header class="top">
     <div class="brandrow">
       <button class="brand" data-go="course" aria-label="Opening Playbook home">
@@ -766,8 +782,6 @@ body:has(.coach:not([hidden])) .foot{padding-right:84px}
         <button data-side="w" aria-pressed="true"><i class="sw w" aria-hidden="true"></i>White<span class="badge" id="dueW" hidden>0</span></button>
         <button data-side="b" aria-pressed="false"><i class="sw b" aria-hidden="true"></i>Black<span class="badge" id="dueB" hidden>0</span></button>
       </div>
-      <button class="gear" id="setBtn" type="button" aria-haspopup="dialog" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.5-2.4 1a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.5A7.6 7.6 0 0 0 7 6.5l-2.4-1-2 3.5 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.5 2.4-1a7.6 7.6 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.6 7.6 0 0 0 2.6-1.5l2.4 1 2-3.5z"/></svg></button>
-      <button class="acct out" id="acctBtn" type="button" aria-haspopup="dialog" hidden>Sign in</button>
     </div>
     <nav class="tabs" role="tablist" aria-label="Sections">
       <button role="tab" data-view="sandbox" aria-selected="false">Sandbox</button>
@@ -3238,7 +3252,7 @@ function useSide(side){
 }
 /* ------------------------------------------------------------------ settings (kept on this device) */
 const SET_KEY = 'playbook-settings', HOST_THEME = document.documentElement.dataset.theme || '';
-const SET = {theme: 'system', size: 'm', board: 'green', coords: true, coach: true};
+const SET = {theme: 'system', size: 'm', board: 'green', coords: true, coach: true, who: 'knight'};
 try { Object.assign(SET, JSON.parse(localStorage.getItem(SET_KEY) || '{}')); } catch(e){}
 const SIZES = {s: .92, m: 1, l: 1.08, xl: 1.16};
 const BOARDS = [['green', 'Green', '#E6ECE2', '#84A390'], ['wood', 'Wood', '#F0DDBD', '#B98B63'], ['blue', 'Blue', '#E3EAF1', '#7C9CBF'], ['slate', 'Slate', '#E7E8EA', '#8E969E'], ['plum', 'Plum', '#ECE5F3', '#9C88BF']];
@@ -3261,7 +3275,8 @@ const Settings = {
       <div class="setrow"><b>Text size</b>${seg('size', [['s', '<span class="aa" style="font-size:13px">A</span>'], ['m', '<span class="aa" style="font-size:16px">A</span>'], ['l', '<span class="aa" style="font-size:19px">A</span>'], ['xl', '<span class="aa" style="font-size:22px">A</span>']])}<span>Boards grow with the text.</span></div>
       <div class="setrow"><b>Board colour</b><div class="swatches" role="group">${BOARDS.map(([v, label, l, d]) => `<button type="button" class="swatch" data-set="board:${v}" aria-pressed="${SET.board === v}"><i aria-hidden="true"><b style="background:${l}"></b><b style="background:${d}"></b><b style="background:${d}"></b><b style="background:${l}"></b></i>${label}</button>`).join('')}</div></div>
       ${sw('coords', 'Letters and numbers on the board', 'The small file and rank marks along the edge.')}
-      ${sw('coach', 'Coach', 'A few words from your coach at the moments that matter.')}`;
+      ${sw('coach', 'Coach', 'A few words from your coach at the moments that matter.')}
+      ${typeof coachPickHTML === 'function' ? `<div class="setrow"><b>Your coach</b>${coachPickHTML()}</div>` : ''}`;
   }
 };
 document.getElementById('setBtn').addEventListener('click', () => Settings.open());
@@ -3484,6 +3499,8 @@ function renderStudy(){
   if (les){ const k = order.indexOf(les.id);
     if (k > 0) navPrev = `<button class="btn small" data-lesson="${order[k-1]}" aria-label="Previous lesson: ${esc(LESSONS[order[k-1]].title)}">‹<span class="navtxt"> ${esc(LESSONS[order[k-1]].title)}</span></button>`;
     if (k < order.length - 1) navNext = `<button class="btn small" data-lesson="${order[k+1]}" aria-label="Next lesson: ${esc(LESSONS[order[k+1]].title)}"><span class="navtxt">${esc(LESSONS[order[k+1]].title)} </span>›</button>`; }
+  if (CU && les && CU.lessons.includes(les.id)){ const nx = CU.lessons[CU.lessons.indexOf(les.id) + 1];
+    navNext = nx ? `<button class="btn small primary" id="topNext" data-lesson="${nx}" title="${esc(LESSONS[nx].title)}">Next lesson ›</button>` : `<button class="btn small primary" id="topNext" data-unit="${CU.id}">Done · back to the unit ›</button>`; }
   const back = CU ? `<button class="btn small" data-unit="${CU.id}">← ${esc(CU.title)}</button>` : S.studyFrom === 'games' ? '<button class="btn small" data-go="games">← Your games</button>' : S.studyFrom === 'cheat' ? '<button class="btn small" data-go="cheat">← Cheat sheet</button>' : S.studyFrom === 'sandbox' ? '<button class="btn small" data-go="sandbox">← Sandbox</button>' : '<button class="btn small" data-go="learn">← All lessons</button>';
   // reaching the last move of a lesson's main line counts as studying it
   const atEnd = !!les && !!line.main && S.i === line.n.length - 1;
@@ -3577,6 +3594,7 @@ function renderStudy(){
   const sp = document.getElementById('showPre'); if (sp) sp.onclick = () => { S.showPre = true; renderStudy(); };
   view.querySelectorAll('[data-step]').forEach(b => b.onclick = () => jump(+b.dataset.step));
   const dt = document.getElementById('drillThis'); if (dt) dt.onclick = () => startDrillLine(S.line, '', CU ? CU.id : null);
+  const tn = document.getElementById('topNext'); if (tn) tn.onclick = () => markSeen(les.id);   // moving on from the top counts as having studied it
   document.getElementById('exHere').onclick = () => exploreFrom(nodeFen(idx), exOpts({}));
   document.getElementById('cEng').onclick = () => { EngineUI.set(!engOn); renderStudy(); };
   if (engOn) EngineUI.attach({fen: nodeFen(idx), card: 'engcard', board: 'sb', bar: 'sbar', text: 'stext', flip: FLIP,
@@ -4042,7 +4060,7 @@ function sbSideHTML(){
   const ses = S.sbSession, all = Prog.d.sb;
   const pool = DRILLABLE.filter(id => inScopeLine(id, SBS.scope)), seen = all ? pool.filter(id => all.seen[id]).length : 0;
   const D = S.drill, CU = D && D.kind === 'sb' && D.scope.startsWith('u:') ? UNIT[D.scope.slice(2)] : null;
-  const ban = CU ? `<div class="cban"><span><b>Course · ${unitNo(CU)}:</b> ${esc(CU.title)}. ${Math.min(up(CU.id).spar || 0, SPAR)} of ${SPAR} clean practice games. ${OPP} only plays moves from this unit and picks the lines you know least.</span><button class="btn small" data-unit="${CU.id}">Back to the unit</button></div>` : '';
+  const ban = CU ? `<div class="cban"><span><b>Course · ${unitNo(CU)}:</b> ${esc(CU.title)}. ${Math.min(up(CU.id).spar || 0, SPAR)} of ${SPAR} clean practice games. ${OPP} only plays moves from this unit and picks the lines you know least.</span><span class="cbtns"><button class="btn small" data-unit="${CU.id}">Back to the unit</button><button class="btn small primary" id="sbFree">Free play: pick openings</button></span></div>` : '';
   return `${ban}<div class="dpanel">
       <div><p class="kicker" style="margin-bottom:6px">Openings</p><div class="seg">${segBtn('scope', 'all', 'Every opening')}${DATA.chapters.map(C => `<button data-sbf="pick:${C.id}" aria-pressed="${scopeChs(SBS.scope).includes(C.id)}">${esc(C.name)}</button>`).join('')}</div>
         <p class="evaltext" style="text-align:left;margin-top:8px">${scopeChs(SBS.scope).length > 1 ? `Mixing ${scopeChs(SBS.scope).length} openings. Tap one again to take it out.` : 'Tap more than one to mix them in the same session.'}</p></div>
@@ -4060,6 +4078,8 @@ function sbPendingHTML(){
 }
 function renderSbSide(){ const el = document.getElementById('sbside'); if (el){ el.innerHTML = sbSideHTML(); wireSbSide(); } }
 function wireSbSide(){
+  // leave a course practice game: the Sandbox goes back to its own state, where you choose the openings
+  const fr = document.getElementById('sbFree'); if (fr) fr.onclick = () => { S.sbState = S.drill = null; S.sbSession = null; render(); };
   view.querySelectorAll('[data-sbf]').forEach(b => b.onclick = () => { const [k, v] = b.dataset.sbf.split(':'); if (k === 'pick') SBS.scope = scopeToggle(SBS.scope, v); else SBS[k] = v; sbSave(); renderSbSide(); if (!S.drill) renderSbPanel(); });
   const now = document.getElementById('sbNow'); if (now) now.onclick = () => { sbStart(); renderSbSide(); };
 }
@@ -4999,19 +5019,44 @@ const ME_RANK = {house: 3, ready: 2, 'new': 1};
 function mergeMe(a, b){ const x = meOf(a), y = meOf(b); if (!x || !y) return x || y; const rx = ME_RANK[x.state] || 0, ry = ME_RANK[y.state] || 0; return rx !== ry ? (rx > ry ? x : y) : (y.updated || 0) > (x.updated || 0) ? y : x; }
 let PERSONA = 'house';
 const PVIEWS = ['start', 'setup', 'reading', 'findings', 'choices', 'built'], OPEN_NEW = PVIEWS.concat(['sandbox', 'explore']);
-const TARGET = 150, MINIMUM = 50, COACH_NAME = 'Pip';
+const TARGET = 150, MINIMUM = 50;
 const pc = (a, b) => b ? Math.round(100 * a / b) : 0, rec = t => `${t.w}–${t.l}${t.d ? '–' + t.d : ''}`, scoreOf = t => t.n ? (t.w + t.d / 2) / t.n : 0;
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 
-/* the coach's face: an original knight, drawn here */
-function knightSVG(mood){
-  const eye = mood === 'cheer' ? '<path class="kn-line" d="M25 22q3.5-4.5 7 0"/>' : `<circle class="kn-eye" cx="28.5" cy="21" r="5"/><circle class="kn-pupil" cx="${mood === 'think' ? 29.6 : 27.6}" cy="${mood === 'think' ? 19.4 : 21.4}" r="2.5"/><circle class="kn-eye" cx="${mood === 'think' ? 30.4 : 28.4}" cy="${mood === 'think' ? 18.6 : 20.4}" r=".9"/>`;
-  return `<svg viewBox="0 0 64 64" aria-hidden="true"><path class="kn-mane" d="M33 6c12 1 22 11 23 26l1 26H44c4-16 2-34-11-52z"/>
+/* the coaches: three original characters drawn here. They say the same things; the player picks the face and the name comes with it. */
+const COACHES = [{id: 'knight', name: 'Pip', what: 'the knight'}, {id: 'rook', name: 'Rocco', what: 'the rook'}, {id: 'pawn', name: 'Dot', what: 'the pawn with plans'}];
+const coachWho = () => COACHES.find(c => c.id === SET.who) || COACHES[0], coachName = () => coachWho().name;
+// two eyes for the characters that face you: round and looking at you, looking up when thinking, shut and smiling when pleased
+const eyes2 = (x1, x2, y, r, mood) => mood === 'cheer' ? `<path class="kn-line" d="M${x1 - r + 1} ${y + 1}q${r - 1}-${r} ${2 * r - 2} 0M${x2 - r + 1} ${y + 1}q${r - 1}-${r} ${2 * r - 2} 0"/>`
+  : [x1, x2].map(x => `<circle class="kn-eye" cx="${x}" cy="${y}" r="${r}"/><circle class="kn-pupil" cx="${x + (mood === 'think' ? 1.1 : 0)}" cy="${y + (mood === 'think' ? -1.5 : .5)}" r="${r / 2}"/><circle class="kn-eye" cx="${x + (mood === 'think' ? 1.9 : .9)}" cy="${y - (mood === 'think' ? 2.3 : .5)}" r=".9"/>`).join('');
+const FACES = {
+  knight(mood){
+    const eye = mood === 'cheer' ? '<path class="kn-line" d="M25 22q3.5-4.5 7 0"/>' : `<circle class="kn-eye" cx="28.5" cy="21" r="5"/><circle class="kn-pupil" cx="${mood === 'think' ? 29.6 : 27.6}" cy="${mood === 'think' ? 19.4 : 21.4}" r="2.5"/><circle class="kn-eye" cx="${mood === 'think' ? 30.4 : 28.4}" cy="${mood === 'think' ? 18.6 : 20.4}" r=".9"/>`;
+    return `<path class="kn-mane" d="M33 6c12 1 22 11 23 26l1 26H44c4-16 2-34-11-52z"/>
     <path class="kn-body" d="M22 58c-2-12 1-19 8-25l-5-3c-4 5-11 9-15 5-4-5 1-15 12-21l1-10 8 6c13 0 22 11 22 26v22z"/>
     <path class="kn-muzzle" d="M10 35c-3-4 0-11 7-16 2 4 6 7 10 8-5 6-12 11-17 8z"/>${eye}
     <ellipse class="kn-pupil" cx="13.2" cy="29.6" rx="1.3" ry="1.7"/><path class="kn-line" d="M13.5 34.5q3.6 2.6 7.4-.6"/><circle class="kn-blush" cx="24" cy="29.5" r="2.6"/>
-    <rect class="kn-base" x="16" y="56" width="42" height="7" rx="3.5"/><\/svg>`;
-}
+    <rect class="kn-base" x="16" y="56" width="42" height="7" rx="3.5"/>`;
+  },
+  rook(mood){
+    return `<path class="kn-mane" d="M13 7h9v6h5V7h10v6h5V7h9v15H13z"/><path class="kn-body" d="M17 21h30l4 37H13z"/><rect class="kn-muzzle" x="15" y="20" width="34" height="5.5" rx="2.2"/>
+    ${eyes2(25, 39, 35.5, 5.2, mood)}<path class="kn-line" d="M${mood === 'think' ? '28 46q4 1.6 8 0' : '26.5 45q5.5 5 11 0'}"/><circle class="kn-blush" cx="19.5" cy="43" r="2.6"/><circle class="kn-blush" cx="44.5" cy="43" r="2.6"/>
+    <rect class="kn-base" x="9" y="56" width="46" height="7" rx="3.5"/>`;
+  },
+  pawn(mood){
+    return `<path class="kn-crown" d="M22.5 13.5 21 4l6.2 4.6L32 2.5l4.8 6.1L43 4l-1.5 9.5z"/><path class="kn-body" d="M17 58c0-10 5-16 15-16s15 6 15 16z"/><circle class="kn-body" cx="32" cy="26" r="15.5"/>
+    <rect class="kn-mane" x="19" y="39.5" width="26" height="5.6" rx="2.8"/>${eyes2(26, 38, 25, 4.8, mood)}<path class="kn-line" d="M${mood === 'think' ? '29 33.5q3 1.4 6 0' : '27.5 32.5q4.5 4.4 9 0'}"/>
+    <circle class="kn-blush" cx="20.5" cy="31" r="2.4"/><circle class="kn-blush" cx="43.5" cy="31" r="2.4"/><rect class="kn-base" x="12" y="56" width="40" height="7" rx="3.5"/>`;
+  }
+};
+function knightSVG(mood, who){ return `<svg viewBox="0 0 64 64" aria-hidden="true">${(FACES[who || coachWho().id] || FACES.knight)(mood)}<\/svg>`; }
+// the three faces to choose from (Settings, and the first screen after an account is made)
+function coachPickHTML(){ return `<div class="coachpick" role="group" aria-label="Your coach">${COACHES.map(c => `<button type="button" data-coachwho="${c.id}" aria-pressed="${coachWho().id === c.id}"><span class="cface">${knightSVG('', c.id)}<\/span><b>${c.name}<\/b><span>${c.what}<\/span><\/button>`).join('')}<\/div>`; }
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-coachwho]'); if (!b) return;
+  setSetting('who', b.dataset.coachwho); if (!document.getElementById('setSheet').hidden) Settings.render();
+  render(); Coach.say(`${coachName()} here. Same advice, new face.`, {mood: 'cheer', ms: 5000});
+});
 
 /* ---- the systems the library has, and the ones being written. `keys` are the analysis names for what a player already plays. */
 const CATALOG = [
@@ -5164,7 +5209,7 @@ const Product = {
         <h2>Bring ${TARGET} games.<br>Get <em>your<\/em> playbook.<\/h2>
         <p class="lede" style="margin-top:14px">It reads what you already play, where you score and where you leave the book, asks you a few would-you-rather questions, and builds a course in that order. No notation anywhere.<\/p>
         <div class="cta">${cta}<button class="btn ghost" data-view="sandbox">Try the sandbox first<\/button><\/div><\/div>
-      <div class="wart"><div class="board">${boardSVG(w.fen, {coords: false, last: w.last, arrows: ['c4f7r'], flip: false})}<\/div><p class="wbub">Hi, I'm ${COACH_NAME}. Show me your games and I'll show you your openings.<\/p><div class="wcoach cface">${knightSVG()}<\/div><\/div><\/section>
+      <div class="wart"><div class="board">${boardSVG(w.fen, {coords: false, last: w.last, arrows: ['c4f7r'], flip: false})}<\/div><p class="wbub">Hi, I'm ${coachName()}. Show me your games and I'll show you your openings.<\/p><div class="wcoach cface">${knightSVG()}<\/div><\/div><\/section>
       <ol class="steps3">${li(1, 'Make an account', 'So your playbook follows you to every device.')}${li(2, `Bring ${TARGET} games`, 'A chess.com or Lichess username is enough. A file works too.')}${li(3, 'Pick your lines', 'A few would-you-rather questions, then your course opens.')}<\/ol>
       <div><p class="kicker" style="margin-bottom:10px">Opens with your games<\/p><div class="lockgrid">${lock('course', 'Course', 'One path, ordered by what your games say matters most.')}${lock('learn', 'Learn', 'Every line as a board you step through, in plain words.')}${lock('drill', 'Drill', 'Your moves from memory, on a schedule that brings slips back.')}${lock('games', 'Your games', 'Results by opening and where you leave the book.')}${lock('cheat', 'Cheat sheet', 'One card per decision.')}<\/div><\/div>`;
   },
@@ -5187,6 +5232,7 @@ const Product = {
     return `<div class="chead"><div><p class="kicker">Step 2 of 3<\/p><h2 style="font-size:clamp(30px,4vw,46px)">Bring your games<\/h2><p>${TARGET} recent games is the target: enough to see what you really play. ${MINIMUM} is the least that works, and the picture sharpens as you add more.<\/p><\/div>
         <div class="meter"><div class="pring" style="--p:${Math.min(100, pc(n, TARGET))}"><i>${n}<small>of ${TARGET}<\/small><\/i><\/div><\/div><\/div>
       ${this.msg ? `<p class="pmsg ${this.msg.bad ? 'bad' : 'ok'}" role="status">${esc(this.msg.t)}<\/p>` : ''}
+      <div class="pcard pickc"><div><h3>Pick your coach<\/h3><p>They say the same things. Change your mind any time in Settings.<\/p><\/div>${coachPickHTML()}<\/div>
       ${this.names ? `<div class="pcard"><b>Which one is you?<\/b><div class="pwho" style="margin-top:10px">${this.names.map(x => `<button class="btn" data-who="${esc(x)}">${esc(x)}<\/button>`).join('')}<\/div><\/div>` : ''}
       <div class="setup"><form class="pcard" id="uform"><h3>Fetch them by username<\/h3>
           <div class="setseg" role="group" aria-label="Where you play">${seg('chess.com', 'chess.com')}${seg('lichess', 'Lichess')}<\/div>
@@ -5359,10 +5405,10 @@ const Coach = {
     return e; },
   // on the welcome, reading, findings and choice screens the coach is part of the page, so the corner one stays away
   draw(bub){ const e = this.el(); e.hidden = !SET.coach || (PVIEWS.includes(S.view) && S.view !== 'setup'); e.classList.toggle('quiet', ['drill', 'quiz', 'sandbox', 'study', 'explore'].includes(S.view));
-    e.innerHTML = (bub || '') + `<button class="cav" type="button" aria-label="${COACH_NAME}, your coach">${knightSVG(this.mood)}<\/button>`; },
+    e.innerHTML = (bub || '') + `<button class="cav" type="button" aria-label="${coachName()}, your coach">${knightSVG(this.mood)}<\/button>`; },
   say(t, o = {}){
     if (!SET.coach) return; clearTimeout(this.timer); this.last = {t, o}; this.mood = o.mood;
-    this.draw(`<div class="cbub" role="status"><button class="cx" type="button" aria-label="Close">×<\/button><span class="cwho">${COACH_NAME}<\/span>${esc(t)}${o.cta ? `<div class="cacts"><button class="btn small primary" data-cgo="${o.cta[0]}">${esc(o.cta[1])}<\/button><\/div>` : ''}<\/div>`);
+    this.draw(`<div class="cbub" role="status"><button class="cx" type="button" aria-label="Close">×<\/button><span class="cwho">${coachName()}<\/span>${esc(t)}${o.cta ? `<div class="cacts"><button class="btn small primary" data-cgo="${o.cta[0]}">${esc(o.cta[1])}<\/button><\/div>` : ''}<\/div>`);
     if (!o.stay) this.timer = setTimeout(() => this.hush(), 9000 + t.length * 45);
   },
   hush(){ clearTimeout(this.timer); this.mood = null; this.draw(''); },

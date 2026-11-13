@@ -51,7 +51,7 @@ Everything above was built by hand for one player. The site now has the first ve
 
 **What it cannot do yet.** The library holds one repertoire: the e-pawn as White, and the e-pawn reply and the Slav setup as Black. A player who prefers something else is told that their system is still being written. Writing those systems is the next piece of work ([ROADMAP](ROADMAP.md)), and personal playbooks are not announced until it is done. The puzzles from a player's own mistakes need the engine to run over their games, which is also still to come; until then the skill units use positions from real club games.
 
-A **coach**, a knight called Pip, says the short things in a speech bubble at the bottom right: what a tab is for the first time it is opened, a word after a drill, why a section is locked. It never speaks during a drill or a checkpoint, and it can be switched off in **Settings**, which also has light and dark mode, text size, five board colours and the letters on the board.
+A **coach**, one of three characters to pick from (Pip the knight, Rocco the rook, Dot the pawn), says the short things in a speech bubble at the bottom right: what a tab is for the first time it is opened, a word after a drill, why a section is locked. It never speaks during a drill or a checkpoint, and it can be switched off in **Settings**, which also has light and dark mode, text size, five board colours and the letters on the board.
 
 ## At a glance
 
