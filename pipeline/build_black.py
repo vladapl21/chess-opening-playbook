@@ -235,7 +235,8 @@ for C in BM.CHAPTERS:
     M = BM.CH_META[C['id']]; st = dict(chstats[C['id']])
     for pid in C['parts']: assert any(P['id'] == pid and P['ch'] == C['id'] for P in BC.PARTS), pid
     fmt = lambda t: t.format(**st)
-    d = dict(id=C['id'], name=C['name'], move=C['move'], parts=C['parts'], stats=st, tile=pidx(M['tile']),
+    slot, pack = next(((s, p) for s, v in BM.PACKS.items() for p, chs in v['packs'].items() if C['id'] in chs), (None, None))
+    d = dict(id=C['id'], name=C['name'], move=C['move'], parts=C['parts'], stats=st, tile=pidx(M['tile']), slot=slot, pack=pack,
              roots=[pidx(r) for r in M['roots']], first=M['first'], hero=pidx(M['hero']), arrows=M['arrows'], circles=M['circles'],
              cap=M['cap'], kicker=M['kicker'], headline=M['headline'], lede=M['lede'],
              facts=[dict(big=fmt(f['big']), text=fmt(f['text']), alert=f.get('alert', False)) for f in M['facts']], notes=M['notes'])
@@ -262,7 +263,7 @@ print('chapters', [(c['id'], c['stats']) for c in chapters_out])
 print('stats', {k: v for k, v in stats.items() if k != 'first'}, sorted(stats['first'].items(), key=lambda kv: -kv[1]))
 out = dict(side='b', nodes=nodes, lines=lines, lessons=lesson_out, parts=BC.PARTS, games=games_out, puzzles=puzzles,
            legal={str(k): v for k, v in legal.items()}, cheat=cheat, stats=stats, repCount=REP_COUNT, e4=0, oddsRoot=0,
-           chapters=chapters_out, insights=insights)
+           chapters=chapters_out, insights=insights, packs=BM.PACKS)
 json.dump(out, open(OUT, 'w'), separators=(',', ':'))
 print(f"nodes={len(nodes)} rep={REP_COUNT} lines={len(lines)} lessons={len(lesson_out)} games={len(games_out)} puzzles={len(puzzles)} cheat={len(cheat)} legal={len(legal)}")
 print('size', os.path.getsize(OUT))

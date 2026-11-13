@@ -49,7 +49,7 @@ Everything above was built by hand for one player. The site now has the first ve
 
 <img src="docs/img/choices.png" alt="A would-you-rather card: the classical defence the player uses now, marked as being written, or the Slav setup, marked ready" width="100%">
 
-**What it cannot do yet.** The library holds one repertoire: the e-pawn as White, and the e-pawn reply and the Slav setup as Black. A player who prefers something else is told that their system is still being written. Writing those systems is the next piece of work ([ROADMAP](ROADMAP.md)), and personal playbooks are not announced until it is done. The puzzles from a player's own mistakes need the engine to run over their games, which is also still to come; until then the skill units use positions from real club games.
+**What it cannot do yet.** The library is small: the e-pawn as White; the e-pawn reply or the Caro-Kann against the e-pawn; the Slav setup against the d-pawn. A player who prefers something else is told that their system is still being written, and that part of their course waits. The Sicilian, a d-pawn system for White and the English are next. Puzzles from a player's own mistakes need the engine run over their games, which is not built yet.
 
 A **coach**, one of three characters to pick from (Pip the knight, Rocco the rook, Dot the pawn), says the short things in a speech bubble at the bottom right: what a tab is for the first time it is opened, a word after a drill, why a section is locked. It never speaks during a drill or a checkpoint, and it can be switched off in **Settings**, which also has light and dark mode, text size, five board colours and the letters on the board.
 
@@ -198,6 +198,20 @@ The layout collapses to one column on phones and follows the system's light or d
 | **Other first moves** | 1.c4, 1.Nf3, 1.g3, 1.e3 | 4 | 2–2 | …e5 against the c-pawn, and the Slav setup against 1.Nf3. |
 
 72 of the 73 Black games fall into a chapter. The remaining one, an experiment with 1…b6, sits outside the book.
+
+### Systems
+
+The library can hold more than one answer to the same question. A **slot** is one decision in a repertoire ("what do I play against the e-pawn?") and a **pack** is one answer to it. A player has one pack per slot, chosen in the would-you-rather cards or later in Settings, and the page cuts both books down to the packs in play before anything else is built: chapters, course units, drills, the cheat sheet and the Sandbox all follow. Progress in the other pack is kept.
+
+| Slot | Packs | |
+| --- | --- | --- |
+| Against the e-pawn | **Meet it head-on** (1…e5): Italian, Ruy Lopez, Scotch, Four Knights and Vienna, early attacks | the first system; 5 chapters |
+| | **Caro-Kann** (1…c6): the push past, the pawn trade and the c-pawn attack, the main line, both knights, sidelines | 7 lessons, 59 lines |
+| Against the d-pawn | **The Slav setup** | 3 chapters |
+
+The Caro-Kann is written as the Slav setup's twin: c-pawn one square, d-pawn two, light bishop out before the e-pawn moves. It reuses the Slav's rules where the positions are alike (after a pawn trade, both knights come out before the bishop; in the main line the queen's knight goes first). Two of its lines win a pawn against a move a third of club players make.
+
+Inside the packs a player can hold together, one position still gets one move. Two packs of the same slot may answer a position differently, so the repeat check runs once for every combination of one pack per slot.
 
 ### One setup, one order
 
@@ -376,7 +390,7 @@ docs/
   img/                     the images in this README
 tests/
   e2e_white.py, e2e_black.py, e2e_sandbox_switch.py, e2e_course.py, e2e_accounts.py, e2e_engine.py,
-  e2e_versions.py, e2e_shell.py, e2e_onboarding.py, e2e_skills.py
+  e2e_versions.py, e2e_shell.py, e2e_onboarding.py, e2e_skills.py, e2e_packs.py
                            end-to-end browser tests (Playwright)
   analyze_check.js         the analysis run under Node on data/games, checked against known facts
   serve.py                 serves the built page over local HTTP for the engine test and screenshots

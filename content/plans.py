@@ -507,6 +507,24 @@ B = {
   'bo-misc': dict(h='Develop and castle', b=[
     ('king', 'Castle next.'),
     ('pawns', 'The d-pawn and c-pawn take the center.')]),
+  # ---------------------------------------------------------------- Caro-Kann
+  'bck-adv': dict(h='Pile up on the d-pawn', b=[
+    ('pieces', 'The knight goes to the square beside your bishop, and the queen comes out to the queenside: three pieces on White\'s d-pawn.'),
+    ('king', 'Castle short once the dark bishop has moved.'),
+    ('pawns', 'The c-file is open. A rook belongs on it.'),
+    ('them', 'White wants to attack on the kingside behind the pawn chain. Keep hitting the base of the chain and the attack has nothing to stand on.'),
+    ('watch', 'If the g-pawn and h-pawn come at your bishop, give it a way back with your own h-pawn.')]),
+  'bck-exch': dict(h='E-pawn, dark bishop, castle', b=[
+    ('pawns', 'Now the e-pawn one square: the bishop is already outside.'),
+    ('pieces', 'Dark bishop out, then castle. Rooks to the open c-file.'),
+    ('them', 'White often chases your bishop with the edge pawn. Take the knight and carry on.'),
+    ('watch', 'If the queen comes out at your b-pawn, the knight on the queenside can jump to the edge and hit her.')]),
+  'bck-main': dict(h='Dark bishop, castle, then the c-pawn', b=[
+    ('pieces', 'Dark bishop out one or two squares, then castle short.'),
+    ('pawns', 'Later the c-pawn two squares hits White\'s d-pawn.'),
+    ('king', 'Your king is safe: no weak pawns in front of it.'),
+    ('them', 'White has a little more room and nothing to attack. Trade pieces when you can.'),
+    ('watch', 'Before the bishop steps back, look whether a knight can hit it again.')]),
   # ---------------------------------------------------------------- Queen's Gambit
   'bsl-slow': dict(h='Castle, then the e-pawn or c-pawn break', b=[
     ('king', 'Castle next.'),

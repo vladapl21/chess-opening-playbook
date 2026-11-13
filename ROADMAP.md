@@ -112,6 +112,18 @@ The original plan for this phase, for reference:
 
 ## Phase 5: the systems library (ongoing)
 
+**Done so far (November 12):**
+
+- **Packs.** `PACKS` in `content/black/bmeta.py` names the slots and their packs; the build writes `slot` and `pack` on every chapter and `packs` on the book. The page cuts the books to the packs in play (`applyPacks` in the template; the choice lives in `Prog.d.packs` for the house playbook and in the picks of a personal one, with a copy on the device). Settings has a row per slot with more than one pack. The would-you-rather cards offer every ready system. `lint_repeats` runs per combination of packs.
+- **The Caro-Kann** for Black (`content/black/bcaro.py`, lessons and notes in one file): 7 lessons, 59 lines, a course unit (`b-caro`), plans for the three core lessons, 12 cheat-sheet rows. Engine-checked at depth 14 with no line losing ground.
+
+**Next, in this order:**
+
+1. **The Sicilian for Black** (slot `blackE4`, pack `sicilian`). Same recipe as the Caro-Kann: explore with Maia odds, write `content/black/bsicilian.py`, add the chapter to `CHAPTERS`, `CH_META`, `PACKS`, `CHEAT`, a course unit and plans. The catalogue entry in `product.js` becomes ready by itself once the pack exists.
+2. **A d-pawn system for White** (slot `white`). The White build (`pipeline/build_white.py`, `content/white/`) has no packs yet: give its chapters `slot`/`pack` the way `build_black.py` does and write `packs` into the book. The White book's root has one first move today; the chapter stats, `e4` and `oddsRoot` fields assume it.
+3. **The English for White** (slot `white`, pack `flank`).
+4. Coverage gaps in the Caro-Kann that `check_black.py` lists as `W-MISS` (the most common: the Two Knights after the bishop comes out, the pawn trade with the bishop check taken).
+
 - **Split today's two books into packs.** For White: Italian, Two Knights, the Sicilian with c3, the Caro-Kann main line, the French advance, Scandinavian, Pirc, Philidor and Petrov, and the rare first moves. For Black: the e-pawn setup with the bishop on c5, the Slav setup, and the answers to the English and Réti.
 - **Add alternatives so toss-ups have real choices.** Against 1.e4, a Caro-Kann setup. Against 1.d4, a King's Indian setup. For White, a London system for d-pawn players.
 - **Each pack** gets lines, opponent odds at 1200 to 1800, engine checks, and notes with no notation, built by the existing pipeline.
