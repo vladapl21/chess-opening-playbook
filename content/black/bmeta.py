@@ -9,11 +9,11 @@ CHAPTERS = [
   dict(id='scotch', name='Scotch & center gambits', move='d-pawn strikes early', parts=['bs-scotch', 'bs-gambits', 'bs-center']),
   dict(id='vienna', name='Four Knights & Vienna', move='queen\'s knight comes out', parts=['bv-4n', 'bv-vienna', 'bv-quiet']),
   dict(id='attacks', name='Early attacks', move='queen, f-pawn or bishop rush', parts=['ba-queen', 'ba-kg', 'ba-bishop']),
+  dict(id='caro', name='Caro-Kann', move='your c-pawn first, then the d-pawn', parts=['bck-adv', 'bck-exch', 'bck-main', 'bck-knights', 'bck-other']),
   dict(id='slav', name='Queen\'s Gambit', move='d-pawn, then the c-pawn', parts=['bsl-quiet', 'bsl-knights', 'bsl-exch', 'bsl-bishop']),
   dict(id='london', name='London System', move='d-pawn, then the bishop', parts=['bln-main', 'bln-jobava']),
   dict(id='d4x', name='Other d-pawn systems', move='Colle, Torre, Veresov, gambits', parts=['bdx-colle', 'bdx-pins', 'bdx-gambits', 'bdx-misc']),
   dict(id='other', name='Other first moves', move='c-pawn, knight, flank pawns', parts=['bo-english', 'bo-flank', 'bo-rare']),
-  dict(id='caro', name='Caro-Kann', move='your c-pawn first, then the d-pawn', parts=['bck-adv', 'bck-exch', 'bck-main', 'bck-knights', 'bck-other']),
 ]
 
 # Systems. A slot is one decision in a repertoire ("what do I play against the e-pawn?") and a pack is one answer to it.

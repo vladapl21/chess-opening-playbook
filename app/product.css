@@ -90,6 +90,8 @@
 .wyr .pdots{display:flex;gap:6px} .wyr .pdots i{width:26px;height:5px;border-radius:3px;background:var(--surface-2)} .wyr .pdots i.on{background:var(--accent)}
 .wyr .say{margin-top:0;justify-self:center} .wyr .say p{font-size:17px}
 .duo{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:16px;align-items:stretch;width:min(100%,900px)}
+.duo.trio{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr);width:min(100%,1180px);gap:10px}
+@media (max-width:980px){ .duo.trio{grid-template-columns:minmax(0,1fr)} .duo.trio .or{justify-self:center} }
 .duo .or{align-self:center;font-family:var(--f-display);font-style:italic;font-size:22px;color:var(--muted)}
 .wopt{display:grid;gap:12px;align-content:start;text-align:left;padding:16px;border-radius:20px;border:2px solid var(--line);background:var(--surface);cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s;min-width:0}
 .wopt:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:var(--shadow)}
@@ -127,7 +129,7 @@
   .proc .board{max-width:300px;margin:0 auto}
 }
 @media (max-width:620px){
-  .steps3{grid-template-columns:minmax(0,1fr)} .duo{grid-template-columns:minmax(0,1fr)} .duo .or{justify-self:center} .wopt .board{max-width:210px}
+  .steps3{grid-template-columns:minmax(0,1fr)} .duo,.duo.trio{grid-template-columns:minmax(0,1fr)} .duo .or{justify-self:center} .wopt .board{max-width:210px}
   .leak{grid-template-columns:92px minmax(0,1fr)} .cav{width:64px;height:64px} .plocked .ghost3{grid-template-columns:repeat(3,minmax(0,1fr))}
   .tabs button.lock::after{display:none}   /* six tabs have to fit on a phone: locked ones are greyed, without the padlock */
 }

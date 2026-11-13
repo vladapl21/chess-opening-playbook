@@ -75,15 +75,43 @@ const STYLE = [
     {id: 'wide', big: 'p-wq', name: 'See a little of everything', pitch: 'Drills mix in the side lines from the start.'}]}
 ];
 function fenOf(line){ const c = new Chess(); let last = null; for (const s of line.split(' ')){ const m = c.move(s, {sloppy: true}); if (m) last = [m.from, m.to]; } return {fen: c.fen().split(' ')[0], last}; }
-// which cards to show: a system card only where the player's own habit and the library differ; the two style cards always
+// a system is ready when the library has a pack for it (or it is the system the books were first written for)
+for (const C of CATALOG) for (const o of C.opts) o.ready = o.ready || [BOOKS.w, BOOKS.b].some(D => ((D.packs || {})[C.slot] || {packs: {}}).packs[o.id]);
+const packSlots = () => [BOOKS.w, BOOKS.b].flatMap(D => Object.entries(D.packs || {}).filter(([, v]) => Object.keys(v.packs).length > 1).map(([slot, v]) => ({slot, D, v})));
+// the systems this player has chosen, for the slots where the library offers a choice
+function wantPacks(){ const src = PERSONA === 'ready' ? (meOf(Prog.d) || {}).picks : Prog.d.packs, out = {}; for (const {slot, v} of packSlots()) if (src && v.packs[src[slot]] && src[slot] !== v.default) out[slot] = src[slot]; return out; }
+// the books on this page were cut to the packs remembered on this device. If the progress says otherwise, remember that and load again.
+function syncPacks(){
+  if (PVIEWS.includes(S.view) && S.view !== 'start') return;
+  const want = wantPacks(), have = {}; for (const {slot, v} of packSlots()) if (v.packs[PICKS[slot]] && PICKS[slot] !== v.default) have[slot] = PICKS[slot];
+  if (JSON.stringify(want) === JSON.stringify(have)) return;
+  try { localStorage.setItem(PACKS_KEY, JSON.stringify(want)); if (sessionStorage.getItem('packs-reload') === JSON.stringify(want)) return; sessionStorage.setItem('packs-reload', JSON.stringify(want)); } catch(e){ return; }
+  location.reload();
+}
+// Settings: one row for every slot the library has more than one system for
+function packRowsHTML(){
+  if (PERSONA === 'new') return '';
+  return packSlots().map(({slot, D, v}) => { const C = CATALOG.find(x => x.slot === slot), cur = packOf(D, slot);
+    return `<div class="setrow"><b>${slot === 'white' ? 'With White' : slot === 'blackE4' ? 'Against the e-pawn' : 'Against the d-pawn'}</b><div class="setseg" role="group">${Object.keys(v.packs).map(id => `<button type="button" data-pack="${slot}:${id}" aria-pressed="${cur === id}">${esc(((C && C.opts.find(o => o.id === id)) || {name: id}).name)}</button>`).join('')}</div><span>Changing this swaps the lessons, drills and course units for that part. Your progress in the other system is kept.</span></div>`; }).join('');
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-pack]'); if (!b) return; const [slot, id] = b.dataset.pack.split(':');
+  if (PERSONA === 'ready'){ const me = meOf(Prog.d); me.picks = Object.assign({}, me.picks, {[slot]: id}); me.updated = Date.now(); }
+  else Prog.d.packs = Object.assign({}, Prog.d.packs, {[slot]: id, updated: Date.now()});
+  Prog.save(); try { sessionStorage.removeItem('packs-reload'); } catch(e2){} Settings.close(); syncPacks();
+});
+
+// which cards to show: a system card where the player's own habit is not the library's first system, or where the library
+// has more than one system to offer; the two style cards always
 function makeChoices(P){
   const out = [];
   for (const C of CATALOG){
     const s = P.slots[C.slot]; if (!s || s.n < 5) continue;
     const share = o => o.keys.reduce((a, k) => a + ((s.opts[k] || {}).n || 0), 0), tal = o => o.keys.reduce((a, k) => { const t = s.opts[k]; if (t){ a.n += t.n; a.w += t.w; a.l += t.l; a.d += t.d; } return a; }, {n: 0, w: 0, l: 0, d: 0});
-    const own = C.opts.slice().sort((a, b) => share(b) - share(a))[0], ready = C.opts.find(o => o.ready);
-    if (own === ready || share(own) / s.n < 0.3) continue;
-    out.push({id: C.slot, ask: C.ask, kind: 'system', flip: C.flip, opts: [own, ready].map(o => Object.assign({}, o, {t: tal(o), of: s.n}))});
+    const top = C.opts.slice().sort((a, b) => share(b) - share(a))[0], own = share(top) / s.n >= 0.3 ? top : null, ready = C.opts.filter(o => o.ready);
+    const opts = (own ? [own] : []).concat(ready.filter(o => o !== own)).slice(0, 3);
+    if (opts.length < 2) continue;
+    out.push({id: C.slot, ask: C.ask, kind: 'system', flip: C.flip, opts: opts.map(o => Object.assign({}, o, {t: tal(o), of: s.n}))});
   }
   for (const Q of STYLE) out.push(Object.assign({kind: 'style'}, Q));
   return out;
@@ -179,6 +207,7 @@ const Product = {
     if (PERSONA !== 'house') depersonalise();
     if (PERSONA === 'ready' && this.me().P) applyProfile(this.me());
     document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('lock', PERSONA === 'new' && b.dataset.view !== 'sandbox'));
+    syncPacks();
   },
   landing(h){ if (PERSONA === 'ready' && (this.me().picks || {}).depth === 'core' && S.dfilter){ DF_PRI = 'core'; S.dfilter.pri = 'core'; }   // drills start with the core lines
     if (PERSONA === 'new' && !OPEN_NEW.includes(S.view)) S.view = 'start'; if (PERSONA === 'new' && PVIEWS.includes(h) && h !== 'reading' && h !== 'built') S.view = (h === 'findings' || h === 'choices') && !this.me().P ? 'start' : h; },
@@ -284,7 +313,7 @@ const Product = {
       const m = ch.move(uciObj(cur[ci++])); if (m) el.innerHTML = boardSVG(ch.fen().split(' ')[0], {coords: false, last: [m.from, m.to]});
     }, reduced ? 400 : 95);
     const t0 = Date.now();
-    const P = await Analyze.run(raw, user, BOOKS, p => { if (p.last && queue.length < 40) queue.push(p.last.ucis); stage(0, `${p.done} of ${p.of}`); const b = document.getElementById('pbar'); if (b) b.style.width = (p.done / p.of * 20) + '%'; });
+    const P = await Analyze.run(raw, user, {w: BOOKS.w.full, b: BOOKS.b.full}, p => { if (p.last && queue.length < 40) queue.push(p.last.ucis); stage(0, `${p.done} of ${p.of}`); const b = document.getElementById('pbar'); if (b) b.style.width = (p.done / p.of * 20) + '%'; });
     if (S.view !== 'reading'){ clearInterval(anim); return; }
     await wait(Math.max(0, 1500 - (Date.now() - t0)));
     const top = side => Object.entries(side.systems).sort((a, b) => b[1].n - a[1].n)[0], cn = (s, id) => (BOOKS[s].chapters.find(c => c.id === id) || {}).name || id;
@@ -340,7 +369,7 @@ const Product = {
     };
     return `<section class="wyr"><p class="kicker">Step 3 of 3 · would you rather · ${this.ci + 1} of ${this.cards.length}</p><div class="pdots" aria-hidden="true">${dots}</div>
       <div class="say"><div class="cface">${knightSVG()}</div><p>${esc(Q.ask)}</p></div>
-      <div class="duo">${opt(Q.opts[0], 0)}<span class="or">or</span>${opt(Q.opts[1], 1)}</div>
+      <div class="duo${Q.opts.length > 2 ? ' trio' : ''}">${Q.opts.map(opt).join('<span class="or">or</span>')}</div>
       ${this.ci ? `<button class="btn ghost" data-cback>Back</button>` : ''}</section>`;
   },
   pick(id){

@@ -685,7 +685,21 @@ let SIDE = 'w', DATA, N, LINES, LESSONS, PARTS, GAMES, CHAPTERS, E4, REPN, ODDS_
 const _reach = new Map(), _sbl = new Map(); let _anc = {};
 function drillableOf(D){ const les = new Set(D.lessons.map(l => l.id)), me = D.side === 'b' ? 0 : 1;
   return D.lines.filter(l => les.has(l.lesson) && !l.n.some(i => (D.nodes[i].g || []).includes('warn') && D.nodes[i].w === me)).map(l => l.id); }
-for (const s of ['w', 'b']){ BOOKS[s].side = s; BOOKS[s].drillable = drillableOf(BOOKS[s]); }
+// Systems. A slot is one decision ("what do I play against the e-pawn?") and a pack is one answer to it; a player has one
+// pack per slot (PACKS in content/black/bmeta.py). The choice is kept with the progress; a copy on this device lets the
+// books be cut down to the packs in play before anything else is built from them. D.full keeps the whole library.
+const PACKS_KEY = 'playbook-packs'; let PICKS = {};
+try { PICKS = JSON.parse(localStorage.getItem(PACKS_KEY) || '{}') || {}; } catch(e){}
+function packOf(D, slot){ const P = (D.packs || {})[slot]; return P ? (P.packs[PICKS[slot]] ? PICKS[slot] : P.default) : null; }
+function applyPacks(D){
+  D.full = Object.assign({}, D);
+  const off = new Set(D.chapters.filter(c => c.slot && c.pack !== packOf(D, c.slot)).map(c => c.id)); if (!off.size) return;
+  const parts = new Set(D.chapters.filter(c => off.has(c.id)).flatMap(c => c.parts)), les = new Set(D.lessons.filter(l => parts.has(l.part)).map(l => l.id));
+  D.chapters = D.chapters.filter(c => !off.has(c.id)); D.parts = D.parts.filter(q => !parts.has(q.id)); D.lessons = D.lessons.filter(l => !les.has(l.id));
+  D.lines = D.lines.filter(l => !les.has(l.lesson)); D.cheat = D.cheat.filter(r => !les.has(r.lesson));
+  D.games = D.games.map(g => les.has(g.lesson) ? Object.assign({}, g, {lesson: null}) : g);
+}
+for (const s of ['w', 'b']){ BOOKS[s].side = s; applyPacks(BOOKS[s]); BOOKS[s].drillable = drillableOf(BOOKS[s]); }
 // A line's version goes up when its moves change (pipeline/assemble.py). Lines still on their first version carry none.
 const VER = {}; for (const s of ['w', 'b']) for (const l of BOOKS[s].lines) if (l.v) VER[l.id] = l.v;
 function loadBook(side){
@@ -908,6 +922,7 @@ function mergeProg(a, b){
     for (const k in (r.course.seen || {})) c.seen[k] = Math.max(c.seen[k] || 0, r.course.seen[k] || 0);
   }
   o.updated = Math.max(o.updated || 0, r.updated || 0);
+  const pk = [a.packs, r.packs].filter(Boolean).sort((x, y) => (y.updated || 0) - (x.updated || 0))[0]; if (pk) o.packs = Object.assign({}, pk);
   const me = mergeMe(a, r); if (me) o.me = JSON.parse(JSON.stringify(me)); else delete o.me;   // whose playbook this is (app/product.js)
   return o;
 }
@@ -1176,7 +1191,7 @@ const Settings = {
       <div class="setrow"><b>Board colour</b><div class="swatches" role="group">${BOARDS.map(([v, label, l, d]) => `<button type="button" class="swatch" data-set="board:${v}" aria-pressed="${SET.board === v}"><i aria-hidden="true"><b style="background:${l}"></b><b style="background:${d}"></b><b style="background:${d}"></b><b style="background:${l}"></b></i>${label}</button>`).join('')}</div></div>
       ${sw('coords', 'Letters and numbers on the board', 'The small file and rank marks along the edge.')}
       ${sw('coach', 'Coach', 'A few words from your coach at the moments that matter.')}
-      ${typeof coachPickHTML === 'function' ? `<div class="setrow"><b>Your coach</b>${coachPickHTML()}</div>` : ''}`;
+      ${typeof coachPickHTML === 'function' ? `<div class="setrow"><b>Your coach</b>${coachPickHTML()}</div>` : ''}${typeof packRowsHTML === 'function' ? packRowsHTML() : ''}`;
   }
 };
 document.getElementById('setBtn').addEventListener('click', () => Settings.open());
@@ -2015,7 +2030,7 @@ function renderGames(){
     o.arrows = [(better ? N[better.n[at + 1]].u : N[main.n[firstMiss]].u).slice(0, 4) + 'g'];
     const L = LESSONS[G.lesson], C = L ? chapterOf(L) : null;
     return `<article class="gcard">${thumb(idx, o)}<div><div class="chips"><span class="chip ${G.result === 'W' ? 'win' : G.result === 'L' ? 'loss' : ''}">${G.result === 'W' ? 'Win' : G.result === 'L' ? 'Loss' : 'Draw'}</span>${C ? `<span class="chip">${esc(C.name)}</span>` : ''}<span class="chip">${esc(G.date)} · ${esc(G.acct)}</span><span class="chip">vs ${esc(G.opp)} (${G.oppElo})</span></div>
-      <h4>${esc(G.title)}</h4><p>${esc(G.summary)}</p><div class="acts"><button class="btn small primary" data-line="${G.id}" data-i="${at}">Replay from the key moment</button><button class="btn small" data-lesson="${G.lesson}">Related lesson</button></div></div></article>`;
+      <h4>${esc(G.title)}</h4><p>${esc(G.summary)}</p><div class="acts"><button class="btn small primary" data-line="${G.id}" data-i="${at}">Replay from the key moment</button>${G.lesson ? `<button class="btn small" data-lesson="${G.lesson}">Related lesson</button>` : ''}</div></div></article>`;
   }).join('');
   const st = DATA.stats, maxn = Math.max(...DATA.chapters.map(c => c.stats.n));
   const byOpening = DATA.chapters.map(C => { const s = C.stats, pct = Math.round(s.w / Math.max(1, s.n) * 100);
@@ -2050,10 +2065,11 @@ function renderCheat(){
 // One path through both books, ordered by how much each system matters in your games. A lesson unit has five steps
 // (idea, learn, drill, practice games, checkpoint); a skill unit has the habit, two practice sets and a checkpoint.
 // Passing a unit's checkpoint opens the next one. Progress lives in Prog.d.course and syncs with everything else.
-const COURSE = DATA_C.units, UNIT = {};
-COURSE.forEach((U, k) => { U.k = k; UNIT[U.id] = U; });
 const LIDX = {};
 for (const s of ['w', 'b']){ LIDX[s] = {}; BOOKS[s].lessons.forEach(l => LIDX[s][l.id] = l); BOOKS[s].drillSet = new Set(BOOKS[s].drillable); }
+// a unit is in the course when its lessons are in the packs in play
+const COURSE = DATA_C.units.filter(U => !U.lessons || U.lessons.concat(U.deeper || []).every(l => LIDX[U.side][l])), UNIT = {};
+COURSE.forEach((U, k) => { U.k = k; UNIT[U.id] = U; });
 const SPAR = 3;
 const ICON = {
   check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg>',
