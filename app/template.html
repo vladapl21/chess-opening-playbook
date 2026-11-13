@@ -1390,7 +1390,7 @@ function sideBadge(nd){ return isMine(nd) ? '<span class="side you">You</span>' 
 const TAGNAMES = {key: 'Key move', best: "Black's best", mistake: 'Inaccuracy', blunder: 'Blunder', trap: 'Trap', mate: 'Checkmate', draw: 'Equal', fix: 'Changed from study', swap: 'Fixes a habit', new: 'Not in your study', game: 'From your games', warn: 'Avoid', missed: 'You missed this', good: 'Good move'};
 function tagChips(tags){ return (tags || []).map(t => `<span class="chip ${t}">${esc(TAGNAMES[t] || t)}</span>`).join(''); }
 function optionsFor(idx, curLine){
-  const kids = N[idx].k || [];
+  const kids = (N[idx].k || []).filter(c => (linesByNode.get(c) || []).length);   // moves that belong to a system not in play have no lines here
   if (kids.length < 2) return null;
   const les = lessonOf(curLine);
   return kids.map(c => {

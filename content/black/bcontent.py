@@ -521,4 +521,5 @@ L('bo-misc', 'bo-rare', 'Edge moves and the b-pawn', 'Take the center; the b-paw
   why='These come up once in a long while. Take the center and develop.', outcome='Equal or better')
 
 import bslav  # noqa: E402,F401  the Slav setup against the d-pawn (registers its lessons)
+import bsicilian  # noqa: E402,F401  the Sicilian with the small e-pawn and a-pawn moves (its own pack)
 import bcaro  # noqa: E402,F401  the Caro-Kann: a second system against the e-pawn (its own pack)

@@ -508,6 +508,22 @@ B = {
     ('king', 'Castle next.'),
     ('pawns', 'The d-pawn and c-pawn take the center.')]),
   # ---------------------------------------------------------------- Caro-Kann
+  'bsi-open': dict(h='Bishop to the long diagonal, then castle', b=[
+    ('pieces', 'The light bishop goes behind the b-pawn and looks at White\'s e-pawn. The dark bishop one square, then castle short.'),
+    ('pawns', 'The b-pawn can go one more square to chase the knight that guards the e-pawn.'),
+    ('pieces', 'A rook belongs on the open c-file next to your queen.'),
+    ('them', 'White attacks on the kingside with pawns. Your counterplay is on the queenside and against the e-pawn.'),
+    ('watch', 'Before each move, check what a knight landing in the middle or a sacrifice on your e-pawn would do.')]),
+  'bsi-bc4': dict(h='Develop and enjoy the extra move', b=[
+    ('pieces', 'King\'s knight, dark bishop, castle. Nothing fancy.'),
+    ('pawns', 'Your d-pawn stands alone in the middle: keep it guarded, and use the squares beside it for your pieces.'),
+    ('them', 'White has moved one bishop three times and is behind in development.'),
+    ('watch', 'Do not push the d-pawn further until your king is castled.')]),
+  'bsi-c3': dict(h='Three pieces on the d-pawn', b=[
+    ('pieces', 'The king\'s knight goes the short way round and joins the attack on the d-pawn.'),
+    ('pawns', 'Trade your c-pawn for the d-pawn\'s guard when it wins something or opens the file for your rook.'),
+    ('them', 'White has to keep the d-pawn guarded and has little time for anything else.'),
+    ('watch', 'Take the b-pawn with your queen only when you have counted the moves she needs to get out.')]),
   'bck-adv': dict(h='Pile up on the d-pawn', b=[
     ('pieces', 'The knight goes to the square beside your bishop, and the queen comes out to the queenside: three pieces on White\'s d-pawn.'),
     ('king', 'Castle short once the dark bishop has moved.'),

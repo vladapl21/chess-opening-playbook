@@ -119,7 +119,7 @@ The original plan for this phase, for reference:
 
 **Next, in this order:**
 
-1. **The Sicilian for Black** (slot `blackE4`, pack `sicilian`). Same recipe as the Caro-Kann: explore with Maia odds, write `content/black/bsicilian.py`, add the chapter to `CHAPTERS`, `CH_META`, `PACKS`, `CHEAT`, a course unit and plans. The catalogue entry in `product.js` becomes ready by itself once the pack exists.
+1. ~~The Sicilian for Black~~ Done on November 13 (`content/black/bsicilian.py`: the Kan setup, 5 lessons, 31 lines, unit `b-sicilian`). Original note: (slot `blackE4`, pack `sicilian`). Same recipe as the Caro-Kann: explore with Maia odds, write `content/black/bsicilian.py`, add the chapter to `CHAPTERS`, `CH_META`, `PACKS`, `CHEAT`, a course unit and plans. The catalogue entry in `product.js` becomes ready by itself once the pack exists.
 2. **A d-pawn system for White** (slot `white`). The White build (`pipeline/build_white.py`, `content/white/`) has no packs yet: give its chapters `slot`/`pack` the way `build_black.py` does and write `packs` into the book. The White book's root has one first move today; the chapter stats, `e4` and `oddsRoot` fields assume it.
 3. **The English for White** (slot `white`, pack `flank`).
 4. Coverage gaps in the Caro-Kann that `check_black.py` lists as `W-MISS` (the most common: the Two Knights after the bishop comes out, the pawn trade with the bishop check taken).

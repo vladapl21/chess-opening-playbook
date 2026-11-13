@@ -86,7 +86,8 @@ function syncPacks(){
   const want = wantPacks(), have = {}; for (const {slot, v} of packSlots()) if (v.packs[PICKS[slot]] && PICKS[slot] !== v.default) have[slot] = PICKS[slot];
   if (JSON.stringify(want) === JSON.stringify(have)) return;
   try { localStorage.setItem(PACKS_KEY, JSON.stringify(want)); if (sessionStorage.getItem('packs-reload') === JSON.stringify(want)) return; sessionStorage.setItem('packs-reload', JSON.stringify(want)); } catch(e){ return; }
-  location.reload();
+  // give the browser a moment to commit what was just stored: a reload in the same tick can lose it
+  document.documentElement.setAttribute('aria-busy', 'true'); setTimeout(() => location.reload(), 350);
 }
 // Settings: one row for every slot the library has more than one system for
 function packRowsHTML(){

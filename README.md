@@ -49,7 +49,7 @@ Everything above was built by hand for one player. The site now has the first ve
 
 <img src="docs/img/choices.png" alt="A would-you-rather card: the classical defence the player uses now, marked as being written, or the Slav setup, marked ready" width="100%">
 
-**What it cannot do yet.** The library is small: the e-pawn as White; the e-pawn reply or the Caro-Kann against the e-pawn; the Slav setup against the d-pawn. A player who prefers something else is told that their system is still being written, and that part of their course waits. The Sicilian, a d-pawn system for White and the English are next. Puzzles from a player's own mistakes need the engine run over their games, which is not built yet.
+**What it cannot do yet.** The library is small: the e-pawn as White; the e-pawn reply, the Caro-Kann or the Sicilian against the e-pawn; the Slav setup against the d-pawn. A player who prefers something else is told that their system is still being written, and that part of their course waits. A d-pawn system for White and the English are next. Puzzles from a player's own mistakes need the engine run over their games, which is not built yet.
 
 A **coach**, one of three characters to pick from (Pip the knight, Rocco the rook, Dot the pawn), says the short things in a speech bubble at the bottom right: what a tab is for the first time it is opened, a word after a drill, why a section is locked. It never speaks during a drill or a checkpoint, and it can be switched off in **Settings**, which also has light and dark mode, text size, five board colours and the letters on the board.
 
@@ -207,6 +207,7 @@ The library can hold more than one answer to the same question. A **slot** is on
 | --- | --- | --- |
 | Against the e-pawn | **Meet it head-on** (1…e5): Italian, Ruy Lopez, Scotch, Four Knights and Vienna, early attacks | the first system; 5 chapters |
 | | **Caro-Kann** (1…c6): the push past, the pawn trade and the c-pawn attack, the main line, both knights, sidelines | 7 lessons, 59 lines |
+| | **Sicilian** (1…c5, the Kan setup): the open game, the early bishop, the small c-pawn and the pawn offer, sidelines | 5 lessons, 31 lines |
 | Against the d-pawn | **The Slav setup** | 3 chapters |
 
 The Caro-Kann is written as the Slav setup's twin: c-pawn one square, d-pawn two, light bishop out before the e-pawn moves. It reuses the Slav's rules where the positions are alike (after a pawn trade, both knights come out before the bishop; in the main line the queen's knight goes first). Two of its lines win a pawn against a move a third of club players make.
