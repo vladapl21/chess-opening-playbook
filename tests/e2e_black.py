@@ -35,7 +35,7 @@ with sync_playwright() as p:
     pg.click('.sidesw [data-side="b"]'); pg.wait_for_timeout(600)
     assert pg.evaluate('SIDE') == 'b' and pg.evaluate('FLIP') is True
     print('hash after switch', pg.evaluate('location.hash'), '| kicker', pg.inner_text('#brandKick'))
-    print('learn h2:', pg.inner_text('.reps h2'), '| tiles', pg.locator('.rtile').count())
+    print('learn tiles', pg.locator('.rtile').count())
     assert pg.locator('.rtile').count() == 9
     # hero board orientation: black king (e8) drawn below the white king (e1)
     yk = pg.evaluate("""(() => { const s = document.querySelector('.hero-board svg'); const e8 = s.querySelector('use[data-sq="e8"]'), e1 = s.querySelector('use[data-sq="e1"]'); return [e8 && +e8.getAttribute('y'), e1 && +e1.getAttribute('y')]; })()""")
@@ -80,7 +80,6 @@ with sync_playwright() as p:
     assert solved == n
     # ---- sandbox as Black
     pg.click('.tabs button[data-view="sandbox"]'); pg.wait_for_timeout(300)
-    print('sandbox head:', pg.inner_text('.sechead p')[:90])
     pg.click('#sbGo'); pg.wait_for_timeout(300)
     random.seed(7)
     res = play_sandbox(pg, 0.25, 'b all/real'); assert res['state'] == 'done'
@@ -94,7 +93,6 @@ with sync_playwright() as p:
         assert pg.evaluate(f"inScope(S.drill.hist[S.drill.hist.length-1], '{scope}')"), scope
     # ---- games + cheat
     pg.click('.tabs button[data-view="games"]'); pg.wait_for_timeout(400)
-    print('games head:', pg.inner_text('.sechead p'))
     print('insights', pg.locator('.insight').count(), '| cards', pg.locator('.gcard').count(), '| table rows', pg.locator('.orow2').count() - 1)
     assert pg.locator('.insight').count() == 4 and pg.locator('.gcard').count() == 11
     pg.screenshot(path=out + 'b_games.png', full_page=True)

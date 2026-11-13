@@ -16,15 +16,17 @@ from serve import Site  # noqa: E402
 
 IMG = ROOT / 'docs' / 'img'; IMG.mkdir(exist_ok=True)
 FONTS_DIR = os.environ.get('FONTS_DIR')
-FONT_FILES = {
-    'bm.ttf': ('bodonimoda', 'BodoniModa[opsz,wght].ttf'),
-    'bmi.ttf': ('bodonimoda', 'BodoniModa-Italic[opsz,wght].ttf'),
-    'is.ttf': ('instrumentsans', 'InstrumentSans[wdth,wght].ttf'),
-    'jb.ttf': ('jetbrainsmono', 'JetBrainsMono[wght].ttf'),
-}
-FONT_CSS = '''@font-face{font-family:"Bodoni Moda";font-style:normal;font-weight:400 900;src:url(https://fonts.gstatic.com/local/bm.ttf) format("truetype")}
-@font-face{font-family:"Bodoni Moda";font-style:italic;font-weight:400 900;src:url(https://fonts.gstatic.com/local/bmi.ttf) format("truetype")}
-@font-face{font-family:"Instrument Sans";font-style:normal;font-weight:400 700;src:url(https://fonts.gstatic.com/local/is.ttf) format("truetype")}
+FONT_FILES = {'Barlow-Regular.ttf': ('barlow', 'Barlow-Regular.ttf'), 'Barlow-Medium.ttf': ('barlow', 'Barlow-Medium.ttf'), 'Barlow-SemiBold.ttf': ('barlow', 'Barlow-SemiBold.ttf'), 'Barlow-Bold.ttf': ('barlow', 'Barlow-Bold.ttf'), 'Barlow-Italic.ttf': ('barlow', 'Barlow-Italic.ttf'), 'BarlowCondensed-Medium.ttf': ('barlowcondensed', 'BarlowCondensed-Medium.ttf'), 'BarlowCondensed-SemiBold.ttf': ('barlowcondensed', 'BarlowCondensed-SemiBold.ttf'), 'BarlowCondensed-Bold.ttf': ('barlowcondensed', 'BarlowCondensed-Bold.ttf'), 'BarlowCondensed-SemiBoldItalic.ttf': ('barlowcondensed', 'BarlowCondensed-SemiBoldItalic.ttf'), 'BarlowCondensed-BoldItalic.ttf': ('barlowcondensed', 'BarlowCondensed-BoldItalic.ttf'), 'jb.ttf': ('jetbrainsmono', 'JetBrainsMono[wght].ttf')}
+FONT_CSS = '''@font-face{font-family:"Barlow";font-style:normal;font-weight:400;src:url(https://fonts.gstatic.com/local/Barlow-Regular.ttf) format("truetype")}
+@font-face{font-family:"Barlow";font-style:normal;font-weight:500;src:url(https://fonts.gstatic.com/local/Barlow-Medium.ttf) format("truetype")}
+@font-face{font-family:"Barlow";font-style:normal;font-weight:600;src:url(https://fonts.gstatic.com/local/Barlow-SemiBold.ttf) format("truetype")}
+@font-face{font-family:"Barlow";font-style:normal;font-weight:700;src:url(https://fonts.gstatic.com/local/Barlow-Bold.ttf) format("truetype")}
+@font-face{font-family:"Barlow";font-style:italic;font-weight:400;src:url(https://fonts.gstatic.com/local/Barlow-Italic.ttf) format("truetype")}
+@font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:500;src:url(https://fonts.gstatic.com/local/BarlowCondensed-Medium.ttf) format("truetype")}
+@font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:600;src:url(https://fonts.gstatic.com/local/BarlowCondensed-SemiBold.ttf) format("truetype")}
+@font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:700;src:url(https://fonts.gstatic.com/local/BarlowCondensed-Bold.ttf) format("truetype")}
+@font-face{font-family:"Barlow Condensed";font-style:italic;font-weight:600;src:url(https://fonts.gstatic.com/local/BarlowCondensed-SemiBoldItalic.ttf) format("truetype")}
+@font-face{font-family:"Barlow Condensed";font-style:italic;font-weight:700;src:url(https://fonts.gstatic.com/local/BarlowCondensed-BoldItalic.ttf) format("truetype")}
 @font-face{font-family:"JetBrains Mono";font-style:normal;font-weight:100 800;src:url(https://fonts.gstatic.com/local/jb.ttf) format("truetype")}'''
 
 
