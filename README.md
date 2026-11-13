@@ -457,7 +457,7 @@ The tests drive the real page in Chromium. They visit every chapter in both book
 - **[lczero-training](https://github.com/LeelaChessZero/lczero-training)** provided the policy index used to read Maia's output.
 - **[python-chess](https://github.com/niklasf/python-chess)** by Niklas Fiekas handles move generation, PGN parsing and engine communication in the pipeline (GPL-3.0).
 - **The Italian chapter** of the White book is rebuilt from a Lichess study by my coach, Aleks_Ra (2022).
-- **Fonts:** Bodoni Moda, Instrument Sans and JetBrains Mono (SIL Open Font License), served by Google Fonts.
+- **Fonts:** Barlow Condensed, Barlow and JetBrains Mono (SIL Open Font License), served by Google Fonts.
 - **Games:** my own games on chess.com. Opponents appear under their public usernames.
 
 ## License
