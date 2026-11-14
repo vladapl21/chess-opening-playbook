@@ -13,6 +13,8 @@
   --arr-g:#11843F; --arr-r:#D2302A; --arr-b:#2F63C9; --arr-y:#E3A90E; --arr-e:#7646D6;
   --shadow:0 0 0 1px var(--line),0 2px 0 rgba(18,32,26,.05);
   --flame:#D9541E; --flame-2:#F4A21F; --flame-ink:#FFFFFF; --flame-soft:#FBE4D7;
+  --gear-ink:#18211D; --gear-edge:transparent;
+  --sk-mid:#2B4C8C; --sk-mid-2:#C9D7F2; --sk-ruby:#B5302A; --sk-ruby-2:#F4C9C5; --sk-plum:#6B4A9C; --sk-plum-2:#DDD0EF; --sk-tang:#D9661E; --sk-tang-2:#FAD9C2; --sk-gold:#B98A12; --sk-gold-2:#F6E3A6;
   --gold:#B7860F; --gold-2:#F1CF6B; --silver:#7D8B95; --silver-2:#DCE3E8; --bronze:#9A5A2C; --bronze-2:#E3A878; --ribbon-1:#2D5DAA; --ribbon-2:#B93628; --locked:#A9B5AD; --locked-2:#EEF2EF;
   --f-display:"Barlow Condensed","Arial Narrow","Roboto Condensed",Impact,sans-serif;
   --f-body:"Barlow","Segoe UI",system-ui,-apple-system,sans-serif;
@@ -26,6 +28,8 @@
   --sq-light:#CFD8CC; --sq-dark:#6F8D7B; --hl:rgba(240,201,64,.5); --sel:rgba(67,192,143,.42);
   --arr-g:#1FA155; --arr-r:#E8463D; --arr-b:#4F82E6; --arr-y:#F0B92A; --arr-e:#A78BF5;
   --flame:#FF8746; --flame-2:#FFC24A; --flame-ink:#2A1205; --flame-soft:#3B2216;
+  --gear-ink:#1C2420; --gear-edge:rgba(230,240,234,.55);
+  --sk-mid:#6E8FDA; --sk-mid-2:#2A3A5E; --sk-ruby:#E2605A; --sk-ruby-2:#4A2422; --sk-plum:#A78BF5; --sk-plum-2:#3A2E52; --sk-tang:#FF9A57; --sk-tang-2:#4A2E1C; --sk-gold:#E2B54C; --sk-gold-2:#4A3A12;
   --gold:#E2B54C; --gold-2:#F7DF92; --silver:#A9B6BF; --silver-2:#E2E8EC; --bronze:#C9864F; --bronze-2:#EFC29C; --ribbon-1:#5F8BE0; --ribbon-2:#E2614F; --locked:#55665D; --locked-2:#1F2A25;
   --shadow:0 0 0 1px var(--line),0 2px 0 rgba(0,0,0,.35); --pico-b:drop-shadow(0 0 1px rgba(214,226,219,.95)) drop-shadow(0 0 .6px rgba(214,226,219,.95)); --scrim:rgba(0,0,0,.62); color-scheme:dark}}
 :root[data-theme="dark"]{
@@ -35,6 +39,8 @@
   --sq-light:#CFD8CC; --sq-dark:#6F8D7B; --hl:rgba(240,201,64,.5); --sel:rgba(67,192,143,.42);
   --arr-g:#1FA155; --arr-r:#E8463D; --arr-b:#4F82E6; --arr-y:#F0B92A; --arr-e:#A78BF5;
   --flame:#FF8746; --flame-2:#FFC24A; --flame-ink:#2A1205; --flame-soft:#3B2216;
+  --gear-ink:#1C2420; --gear-edge:rgba(230,240,234,.55);
+  --sk-mid:#6E8FDA; --sk-mid-2:#2A3A5E; --sk-ruby:#E2605A; --sk-ruby-2:#4A2422; --sk-plum:#A78BF5; --sk-plum-2:#3A2E52; --sk-tang:#FF9A57; --sk-tang-2:#4A2E1C; --sk-gold:#E2B54C; --sk-gold-2:#4A3A12;
   --gold:#E2B54C; --gold-2:#F7DF92; --silver:#A9B6BF; --silver-2:#E2E8EC; --bronze:#C9864F; --bronze-2:#EFC29C; --ribbon-1:#5F8BE0; --ribbon-2:#E2614F; --locked:#55665D; --locked-2:#1F2A25;
   --shadow:0 0 0 1px var(--line),0 2px 0 rgba(0,0,0,.35); --pico-b:drop-shadow(0 0 1px rgba(214,226,219,.95)) drop-shadow(0 0 .6px rgba(214,226,219,.95)); --scrim:rgba(0,0,0,.62); color-scheme:dark}
 /* board colours (Settings): each palette has its own light and dark values */
@@ -478,6 +484,13 @@ button.ucard:hover{border-color:var(--accent);transform:translateY(-1px)}
 .tick.no{color:var(--muted);font-weight:500}
 .tick.due{color:var(--rosso)}
 .cban{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 12px;border-radius:4px;background:var(--viola-soft);font-size:13.5px}
+/* a course practice game: the unit at the top of the game panel, free play under the board */
+.sbcourse{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--line)}
+.sbcourse .kicker{color:var(--accent)} .sbcl{display:flex;align-items:center;gap:8px;margin:4px 0 0;font-weight:600;font-size:14px}
+.pdots{display:inline-flex;gap:4px} .pdots i{width:10px;height:10px;border-radius:50%;background:var(--surface-2);box-shadow:inset 0 0 0 1.5px var(--line)} .pdots i.on{background:var(--accent);box-shadow:none}
+.btn.freeplay{width:100%;justify-content:center;min-height:50px;margin-top:14px;font-size:15px;gap:10px;border:1.5px solid var(--accent);color:var(--accent);background:var(--surface)}
+.btn.freeplay:hover{background:var(--accent);color:var(--accent-ink)} .btn.freeplay svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.btn.freeplay circle{fill:var(--surface)} .btn.freeplay:hover circle{fill:var(--accent)}
 .cban span{flex:1 1 200px;min-width:0} .cban .cbtns{flex:0 0 auto;display:flex;flex-wrap:wrap;gap:8px}
 .lockednote{padding:12px 14px;border-radius:4px;background:var(--surface-2);color:var(--muted);font-size:14px}
 .qhead{display:flex;justify-content:space-between;align-items:center;gap:8px 12px;flex-wrap:wrap}
@@ -694,6 +707,7 @@ footer.foot .fcopy{margin-left:auto}
       <button role="tab" data-view="drill" aria-selected="false">Drill<span class="todo" id="drillDot" hidden title="Today's five lines are not done yet">!</span></button>
       <button role="tab" data-view="games" aria-selected="false"><span class="lg">Your games</span><span class="sm">Games</span></button>
       <button role="tab" data-view="cheat" aria-selected="false"><span class="lg">Cheat sheet</span><span class="sm">Cheats</span></button>
+      <button role="tab" data-view="shop" aria-selected="false"><span class="lg">Shop</span><span class="sm">Shop</span></button>
     </nav>
   </header>
   <main id="view" aria-live="polite"></main>
@@ -902,10 +916,16 @@ const Prog = {
       if (!db || !user) return;
       const uid = await user.id(); if (!uid) return;
       this.ref = db.doc('data/users/' + uid + '/italian-progress');
-      const snap = await this.ref.get();
-      if (snap.exists){ const r = snap.data(); if (r && r.lines && (r.updated || 0) > (this.d.updated || 0)){ this.d = JSON.parse(JSON.stringify(r)); this.saveLocal(); refresh(); } }
-      else if (this.d.updated) this.push();
+      this.take(await this.ref.get(), true);
+      if (typeof this.ref.onSnapshot === 'function' && !this.unsub) this.unsub = this.ref.onSnapshot(sn => this.take(sn, false), () => {});
     } catch(e){ this.ref = null; }
+  },
+  // the stored copy (on opening, or written by another device): merge it in. On opening, a copy here that holds
+  // something the stored one lacks is written back.
+  take(snap, first){
+    const r = snap && snap.exists ? snap.data() : null;
+    if (r && r.lines){ const m = mergeProg(this.d, r); if (canon(m) !== canon(this.d)){ this.d = m; this.saveLocal(); refreshSoon(); } }
+    if (first && this.d.updated && (!r || canon(this.d) !== canon(r))) this.push();
   },
   saveLocal(){ try { localStorage.setItem(PKEY, JSON.stringify(this.d)); } catch(e){} },
   save(){ this.d.updated = Date.now(); if (Cloud.user) this.d.owner = Cloud.user.id; try { this.d.tz = Intl.DateTimeFormat().resolvedOptions().timeZone || this.d.tz; } catch(e){} this.saveLocal(); this.push(); Cloud.push(); },
@@ -913,7 +933,11 @@ const Prog = {
     if (!this.ref) return;
     if (this.saving){ this.again = true; return; }
     this.saving = true;
-    try { await this.ref.set(JSON.parse(JSON.stringify(this.d))); } catch(e){ if (e && e.code !== 'unavailable') this.ref = null; }
+    try {
+      const sn = await this.ref.get(), r = sn && sn.exists ? sn.data() : null;
+      if (r && r.lines){ const m = mergeProg(this.d, r); if (canon(m) !== canon(this.d)){ this.d = m; this.saveLocal(); refreshSoon(); } }
+      await this.ref.set(JSON.parse(JSON.stringify(this.d)));
+    } catch(e){ if (e && e.code !== 'unavailable') this.ref = null; }
     this.saving = false;
     if (this.again){ this.again = false; this.push(); }
   },
@@ -995,8 +1019,10 @@ const SITE = /*__SITE__*/null;
 const canon = o => JSON.stringify(o, (k, v) => v && typeof v === 'object' && !Array.isArray(v) ? Object.keys(v).sort().reduce((a, x) => (a[x] = v[x], a), {}) : v);
 const newer = (x, y) => !x ? y : !y ? x : (y.v || 1) !== (x.v || 1) ? ((y.v || 1) > (x.v || 1) ? y : x) : (y.last || 0) > (x.last || 0) ? y : x;
 // two copies of the progress object -> one: newest record per line and puzzle, best of everything else
+const KNOWN = new Set(['lines', 'puz', 'sb', 'course', 'days', 'updated', 'packs', 'set', 'prefs', 'mail', 'badges', 'tz', 'me', 'owner', 'shop']);
 function mergeProg(a, b){
-  const o = JSON.parse(JSON.stringify(a || {})), r = b || {};
+  const o = JSON.parse(JSON.stringify(a || {})), r = JSON.parse(JSON.stringify(b || {}));
+  a = a || {};
   o.lines = o.lines || {}; o.puz = o.puz || {};
   for (const k in (r.lines || {})) o.lines[k] = newer(o.lines[k], r.lines[k]);
   for (const k in (r.puz || {})) o.puz[k] = newer(o.puz[k], r.puz[k]);
@@ -1018,9 +1044,14 @@ function mergeProg(a, b){
   o.updated = Math.max(o.updated || 0, r.updated || 0);
   const pk = [a.packs, r.packs].filter(Boolean).sort((x, y) => (y.updated || 0) - (x.updated || 0))[0]; if (pk) o.packs = Object.assign({}, pk);
   const st = [a.set, r.set].filter(Boolean).sort((x, y) => (y.t || 0) - (x.t || 0))[0]; if (st) o.set = Object.assign({}, st);   // the look and the coach
+  const pa = prefsOf(a), pr = prefsOf(r); if (Object.keys(pa).length || Object.keys(pr).length){ o.prefs = {}; for (const k of new Set([...Object.keys(pa), ...Object.keys(pr)])) o.prefs[k] = !pa[k] ? pr[k] : !pr[k] ? pa[k] : (pr[k][1] || 0) > (pa[k][1] || 0) ? pr[k] : pa[k]; }
+  if (a.shop || r.shop){ const x = a.shop || {}, y = r.shop || {}, sh = o.shop = {own: Object.assign({}, x.own), wear: Object.assign({}, x.wear)};
+    for (const k in (y.own || {})) sh.own[k] = sh.own[k] ? Math.min(sh.own[k], y.own[k]) : y.own[k];
+    for (const k in (y.wear || {})) if (!sh.wear[k] || (y.wear[k][1] || 0) > (sh.wear[k][1] || 0)) sh.wear[k] = y.wear[k]; }
   const ml = [a.mail, r.mail].filter(Boolean).sort((x, y) => (y.t || 0) - (x.t || 0))[0]; if (ml) o.mail = Object.assign({}, ml);
   if (r.badges){ const bd = o.badges || (o.badges = {}); for (const k in r.badges) bd[k] = bd[k] ? Math.min(bd[k], r.badges[k]) : r.badges[k]; }
   if (r.tz && !o.tz) o.tz = r.tz;
+  for (const k in r) if (!KNOWN.has(k) && (!(k in o) || (r.updated || 0) > (a.updated || 0))) o[k] = r[k];
   const me = mergeMe(a, r); if (me) o.me = JSON.parse(JSON.stringify(me)); else delete o.me;   // whose playbook this is (app/product.js)
   return o;
 }
@@ -1084,6 +1115,10 @@ const Cloud = {
     if (this.writing){ this.again = true; return; }
     this.writing = true; clearTimeout(this.timer); this.state = 'sync'; renderAcct();
     try {
+      const cur = await this.sb.from('progress').select('data').eq('user_id', this.user.id).maybeSingle();
+      if (cur.error) throw cur.error;
+      const r = cur.data && cur.data.data && cur.data.data.lines ? cur.data.data : null;
+      if (r && (!r.owner || r.owner === this.user.id)){ const m = mergeProg(Prog.d, r); m.owner = this.user.id; if (canon(m) !== canon(Prog.d)){ Prog.d = m; Prog.saveLocal(); refreshSoon(); } }
       const {error} = await this.sb.from('progress').upsert({user_id: this.user.id, data: Object.assign({}, Prog.d, {owner: this.user.id})});
       if (error) throw error;
       this.state = 'ok'; this.at = Date.now(); this.err = '';
@@ -1285,7 +1320,8 @@ function useSide(side){
 }
 /* ------------------------------------------------------------------ settings (kept on this device and with the progress) */
 const SET_KEY = 'playbook-settings', HOST_THEME = document.documentElement.dataset.theme || '';
-const SET = {theme: 'system', size: 'm', board: 'green', coords: true, coach: true, who: 'knight'};
+const SET_DEF = {theme: 'system', size: 'm', board: 'green', coords: true, coach: true, who: 'knight'};
+const SET = Object.assign({}, SET_DEF);
 try { Object.assign(SET, JSON.parse(localStorage.getItem(SET_KEY) || '{}')); } catch(e){}
 const SIZES = {s: .92, m: 1, l: 1.08, xl: 1.16};
 const BOARDS = [['green', 'Green', '#E6ECE2', '#84A390'], ['wood', 'Wood', '#F0DDBD', '#B98B63'], ['blue', 'Blue', '#E3EAF1', '#7C9CBF'], ['slate', 'Slate', '#E7E8EA', '#8E969E'], ['plum', 'Plum', '#ECE5F3', '#9C88BF']];
@@ -1295,20 +1331,25 @@ function applySettings(){
   if (SET.board && SET.board !== 'green') r.dataset.board = SET.board; else delete r.dataset.board;
   const app = document.getElementById('app'); if (app) app.style.zoom = SIZES[SET.size] === 1 ? '' : String(SIZES[SET.size] || 1);
 }
-// Settings travel with the progress record (d.set), so the coach and the look follow the player to every device.
-// Each copy carries the time it was last changed; the newer one wins.
+// Settings travel with the progress record, so the coach and the look follow the player to every device.
+// d.prefs holds [value, time changed] for each setting and the newest wins setting by setting: a board colour changed on
+// the phone never undoes a coach picked on the laptop. A choice made before times were kept counts as very old (time 1)
+// but still beats a device that never chose (time 0). d.set keeps the older one-time-for-all form for pages still open
+// on an earlier version.
 const SET_KEYS = ['theme', 'size', 'board', 'coords', 'coach', 'who'];
-const setCopy = () => SET_KEYS.reduce((o, k) => (o[k] = SET[k], o), {t: SET.t || 0});
-function setSetting(k, v){ SET[k] = v; SET.t = Date.now(); try { localStorage.setItem(SET_KEY, JSON.stringify(SET)); } catch(e){} applySettings(); Prog.d.set = setCopy(); Prog.save(); }
+SET.ts = SET.ts || {};
+for (const k of SET_KEYS) if (SET.ts[k] === undefined) SET.ts[k] = SET.t || (SET[k] !== SET_DEF[k] ? 1 : 0);
+const setLocal = () => { try { localStorage.setItem(SET_KEY, JSON.stringify(SET)); } catch(e){} };
+const prefsOf = d => d.prefs || (d.set ? SET_KEYS.reduce((o, k) => (d.set[k] !== undefined && (o[k] = [d.set[k], d.set.t || 1]), o), {}) : {});
+function setSetting(k, v){ SET[k] = v; SET.ts[k] = Date.now(); SET.t = Date.now(); setLocal(); applySettings(); adoptSettings(); Prog.save(); }
 function adoptSettings(){
-  const r = Prog.d.set;
-  if (r && (r.t || 0) > (SET.t || 0)){
-    for (const k of SET_KEYS) if (r[k] !== undefined) SET[k] = r[k];
-    SET.t = r.t; try { localStorage.setItem(SET_KEY, JSON.stringify(SET)); } catch(e){}
-    applySettings(); if (typeof Coach !== 'undefined') Coach.refresh(); return true;
-  }
-  if ((SET.t || 0) > ((r && r.t) || 0)) Prog.d.set = setCopy();
-  return false;
+  const P = prefsOf(Prog.d); let changed = false;
+  for (const k of SET_KEYS){ const r = P[k]; if (r && (r[1] || 0) > (SET.ts[k] || 0)){ SET[k] = r[0]; SET.ts[k] = r[1]; changed = true; } }
+  if (changed){ setLocal(); applySettings(); if (typeof Coach !== 'undefined') Coach.refresh(); }
+  const out = {}; let t = 0;
+  for (const k of SET_KEYS){ out[k] = [SET[k], SET.ts[k] || 0]; t = Math.max(t, SET.ts[k] || 0); }
+  Prog.d.prefs = out; Prog.d.set = SET_KEYS.reduce((o, k) => (o[k] = SET[k], o), {t});
+  return changed;
 }
 const Settings = {
   open(){ document.getElementById('setSheet').hidden = false; this.render(); document.getElementById('setPanel').querySelector('.x').focus(); },
@@ -1337,7 +1378,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && !document.
 applySettings();
 
 const view = document.getElementById('view');
-const VIEWS = ['sandbox', 'course', 'drill', 'games', 'cheat'];
+const VIEWS = ['sandbox', 'course', 'drill', 'games', 'cheat', 'shop'];
 const CVIEWS = ['course', 'unit', 'quiz'];
 const tabOf = (v, from) => CVIEWS.includes(v) || (v === 'study' && from === 'unit') ? 'course' : v === 'study' ? tabOf(from || 'learn') : v === 'learn' ? 'games' : VIEWS.includes(v) ? v : 'course';
 function setTab(v){
@@ -1367,6 +1408,8 @@ function setChapter(id, scroll){
 }
 function openLine(lineId, i, from){ S.line = lineId; S.i = (i === undefined ? lineStart(lineId) : i); S.showPre = false; go('study', {from}); }
 function refresh(){ adoptSettings(); render(); }
+// new data from another device: show it, but never pull the board out from under a line being played
+function refreshSoon(){ if (S.drill && S.drill.state === 'play'){ adoptSettings(); renderChrome(); return; } refresh(); }
 function render(){
   const U = (S.view === 'unit' || S.view === 'quiz') && UNIT[S.unit];
   if (U && U.side && !U.soon && U.kind !== 'skill' && U.side !== SIDE) useSide(U.side);
@@ -1385,6 +1428,7 @@ function render(){
   else if (S.view === 'sandbox') renderSandbox();
   else if (S.view === 'games') renderGames();
   else if (S.view === 'cheat') renderCheat();
+  else if (S.view === 'shop') renderShop();
   else if (S.view === 'explore') renderExplore();
 }
 document.addEventListener('click', e => {
@@ -2088,8 +2132,7 @@ function sbReport(){
   }).join('');
   const r = lid ? Prog.rec(lid) : null, days = r ? INTERVALS[r.box] : 0;
   const CU = D.scope.startsWith('u:') ? UNIT[D.scope.slice(2)] : null, cs = CU ? (up(CU.id).spar || 0) : 0;
-  const cline = CU ? `<p class="evaltext" style="text-align:left;margin:0">Course · ${esc(CU.title)}: ${Math.min(cs, SPAR)} of ${SPAR} clean practice games${cs >= SPAR ? '. This step is done.' : '.'}</p>` : '';
-  return `<div class="donebox ${n ? 'bad' : ''}">${cline}
+  return `<div class="donebox ${n ? 'bad' : ''}">
       <p class="kicker">${C ? esc(C.name) + ' · ' : ''}${L ? esc(L.title) : 'Line complete'}${lid && !LINES[lid].main ? ' · ' + esc(LINES[lid].title) : ''}</p>
       <div class="bigstat"><b class="tnum">${n}</b><span>${n === 1 ? 'slip' : 'slips'} in this game · ${n ? 'this line is back in today\'s review' : `clean; it comes back in ${days} ${days === 1 ? 'day' : 'days'}`}</span></div>
       ${n ? `<div class="slips">${slipCards}</div>` : ''}
@@ -2111,7 +2154,11 @@ function sbPanelHTML(){
   const black = bnode ? `<div class="mcard"><div class="who"><span class="side blk">${OPP}</span><span class="stepno">${pctTxt(bnode.q || 0)} of ${lastBlack.at === ODDS_ROOT ? 'your games' : 'players at your level'} go this way</span></div>
       <h3>${pieceIcon(bnode.pc, bnode.w === 1)}<span>${esc(bnode.l)}</span></h3>${bnode.t ? `<p class="note">${esc(bnode.t)}</p>` : ''}${bnode.g ? `<div class="chips">${tagChips(bnode.g)}</div>` : ''}
       ${lastBlack.kids.length > 1 ? `<details style="margin-top:10px"><summary class="kicker" style="cursor:pointer">What else ${OPP} could play here</summary><div style="margin-top:8px">${oddsRows(lastBlack)}</div></details>` : ''}</div>` : '';
-  const head = `<div class="dpanel"><p class="kicker">${D.slips.length} ${D.slips.length === 1 ? 'slip' : 'slips'} so far</p>
+  const CU = D.scope.startsWith('u:') ? UNIT[D.scope.slice(2)] : null, cs = CU ? Math.min(up(CU.id).spar || 0, SPAR) : 0;
+  const strip = CU ? `<div class="sbcourse"><div><p class="kicker">Course · ${unitNo(CU)} · ${esc(CU.title)}</p>
+      <p class="sbcl"><span class="pdots" aria-hidden="true">${Array.from({length: SPAR}, (_, k) => `<i class="${k < cs ? 'on' : ''}"></i>`).join('')}</span>${cs} of ${SPAR} clean practice games${cs >= SPAR ? ': this step is done' : ''}</p></div>
+      <button class="btn small" data-unit="${CU.id}">Back to the unit</button></div>` : '';
+  const head = `<div class="dpanel">${strip}<p class="kicker">${D.slips.length} ${D.slips.length === 1 ? 'slip' : 'slips'} so far${CU ? ` · ${OPP} plays only this unit's moves` : ''}</p>
       ${status ? `<div class="status ${D.busy ? 'wait' : ''} ${D.tries ? 'bad' : ''}"><span class="bub"></span>${status}</div>` : ''}
       ${D.state === 'done' ? sbReport() : `<p class="feedback">${D.msg || (D.hist.length <= 2 ? 'Drag a piece or tap it, then tap where it goes.' : '&nbsp;')}</p>`}</div>`;
   return head + (D.state === 'done' ? '' : black) + sbFeed();
@@ -2133,8 +2180,8 @@ function sbSideHTML(){
   const ses = S.sbSession, all = Prog.d.sb;
   const pool = DRILLABLE.filter(id => inScopeLine(id, SBS.scope)), seen = all ? pool.filter(id => all.seen[id]).length : 0;
   const D = S.drill, CU = D && D.kind === 'sb' && D.scope.startsWith('u:') ? UNIT[D.scope.slice(2)] : null;
-  const ban = CU ? `<div class="cban"><span><b>Course · ${unitNo(CU)}:</b> ${esc(CU.title)}. ${Math.min(up(CU.id).spar || 0, SPAR)} of ${SPAR} clean practice games. ${OPP} only plays moves from this unit and picks the lines you know least.</span><span class="cbtns"><button class="btn small" data-unit="${CU.id}">Back to the unit</button><button class="btn small primary" id="sbFree">Free play: pick openings</button></span></div>` : '';
-  return `${ban}<div class="dpanel">
+  if (CU) return '';
+  return `<div class="dpanel">
       <div><p class="kicker" style="margin-bottom:6px">Openings</p><div class="seg">${segBtn('scope', 'all', 'Every opening')}${DATA.chapters.map(C => `<button data-sbf="pick:${C.id}" aria-pressed="${scopeChs(SBS.scope).includes(C.id)}">${esc(C.name)}</button>`).join('')}</div></div>
       <div><p class="kicker" style="margin-bottom:6px">${OPP}'s odds</p><div class="seg">${segBtn('odds', 'real', 'Like real games')}${segBtn('odds', 'even', 'Even spread')}${segBtn('odds', 'weak', 'My weak spots')}</div>
       <p class="evaltext" style="text-align:left;margin-top:8px">${SBS.odds === 'real' ? 'Common replies come up often, rare ones rarely, just like your games.' : SBS.odds === 'even' ? 'Every line in your prep is equally likely, so rare branches get their turn.' : 'Lines you haven\'t played, are due, or slipped on come up more.'}</p>${sbPendingHTML()}</div>
@@ -2150,8 +2197,6 @@ function sbPendingHTML(){
 }
 function renderSbSide(){ const el = document.getElementById('sbside'); if (el){ el.innerHTML = sbSideHTML(); wireSbSide(); } }
 function wireSbSide(){
-  // leave a course practice game: the Sandbox goes back to its own state, where you choose the openings
-  const fr = document.getElementById('sbFree'); if (fr) fr.onclick = () => { S.sbState = S.drill = null; S.sbSession = null; render(); };
   view.querySelectorAll('[data-sbf]').forEach(b => b.onclick = () => { const [k, v] = b.dataset.sbf.split(':'); if (k === 'pick') SBS.scope = scopeToggle(SBS.scope, v); else SBS[k] = v; sbSave(); renderSbSide(); if (!S.drill) renderSbPanel(); });
   const now = document.getElementById('sbNow'); if (now) now.onclick = () => { sbStart(); renderSbSide(); };
 }
@@ -2159,11 +2204,14 @@ function renderSandbox(){
   const D = S.drill;
   view.innerHTML = `  <div class="sgrid">
     <div class="bcol"><div class="board ${D && D.state === 'play' ? 'input' : ''}" id="db">${D ? '' : boardSVG(N[0].f, {coords: true})}</div>
-      <div class="legend" style="margin-top:10px"><span><i style="background:var(--arr-g)"></i>your prep move</span><span><i style="background:var(--arr-r)"></i>what you tried</span></div></div>
+      <div class="legend" style="margin-top:10px"><span><i style="background:var(--arr-g)"></i>your prep move</span><span><i style="background:var(--arr-r)"></i>what you tried</span></div>
+      ${D && D.kind === 'sb' && D.scope.startsWith('u:') ? `<button class="btn freeplay" id="sbFree"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M4 12h16M4 18h7"/><circle cx="17" cy="6" r="2.2"/><circle cx="14" cy="18" r="2.2"/></svg>Free play: pick your own openings</button>` : ''}</div>
     <div class="ccol"><div id="sbpanel">${sbPanelHTML()}</div><div id="sbside">${sbSideHTML()}</div></div>
   </div>`;
   if (D) renderDrillBoard();
   wireSbPanel(); wireSbSide(); wireBoardInput();
+  // leave a course practice game: the Sandbox goes back to its own state, where you choose the openings
+  const fr = document.getElementById('sbFree'); if (fr) fr.onclick = () => { S.sbState = S.drill = null; S.sbSession = null; render(); };
   const f = document.getElementById('sbfeed'); if (f) f.scrollTop = f.scrollHeight;
   if (D && D.state === 'play' && D.busy){ D.busy = false; const t = ++D.tick; setTimeout(() => { if (S.drill === D && D.tick === t) sbContinue(); }, 250); }
 }

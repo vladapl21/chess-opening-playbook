@@ -36,11 +36,11 @@ with sync_playwright() as p:
 
     pg.goto(URL); pg.wait_for_timeout(1000)
     assert pg.evaluate('[PERSONA, S.view]') == ['new', 'start']
-    assert pg.locator('.tabs button.lock').count() == 4 and 'lock' not in (pg.get_attribute('.tabs [data-view="sandbox"]', 'class') or '')
+    assert pg.locator('.tabs button.lock').count() == 5 and 'lock' not in (pg.get_attribute('.tabs [data-view="sandbox"]', 'class') or '')
     w0 = pg.inner_text('.whero'); assert 'Connect your account' in w0 and not any(x in w0 for x in ('150', '200', '50 games')), w0
     assert pg.is_hidden('#meBtn') and pg.is_hidden('#drillDot'), 'no streak or drill mark before there is anything to drill'
     pg.screenshot(path=out + 'o_start.png', full_page=True)
-    for v in ('course', 'drill', 'games', 'cheat'):
+    for v in ('course', 'drill', 'games', 'cheat', 'shop'):
         pg.click(f'.tabs [data-view="{v}"]'); pg.wait_for_timeout(250)
         assert pg.locator('.plocked').count() == 1 and pg.locator('#view .urow, #view .rtile, #view .mrow').count() == 0, v
     pg.screenshot(path=out + 'o_locked.png')

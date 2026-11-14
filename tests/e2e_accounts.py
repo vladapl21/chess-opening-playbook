@@ -165,6 +165,23 @@ with sync_playwright() as p:
     assert a.evaluate("[SET.who, SET.board]") == ['pawn', 'wood'], 'the newer change wins, the rest stays'
     assert a.evaluate("mergeProg({set: {who: 'rook', t: 5}}, {set: {who: 'pawn', t: 3}}).set.who") == 'rook'
 
+    # ---- setting by setting: a board changed on B never undoes a coach picked on A, even with both pages open
+    # (the two saves can cross on the way to the account; the next pull on each side puts both changes together)
+    a.evaluate("setSetting('who', 'rook')"); bp.evaluate("setSetting('board', 'plum')"); a.wait_for_timeout(1800)
+    for pg in (a, bp): pg.evaluate("document.dispatchEvent(new Event('visibilitychange'))"); pg.wait_for_timeout(300)
+    for pg in (a, bp):
+        pg.evaluate("document.dispatchEvent(new Event('visibilitychange'))")
+        pg.wait_for_function("SET.who === 'rook' && SET.board === 'plum'", timeout=8000)
+    # the streak, badges and worn coach items travel too
+    bp.evaluate("Prog.d.days = Object.assign(Prog.d.days || {}, {[dayKey(-1)]: ['a', 'b', 'c', 'd', 'e']}); Prog.d.shop = {own: {cap: Date.now()}, wear: {head: ['cap', Date.now()]}}; Prog.save()"); bp.wait_for_timeout(1800)
+    a.evaluate("document.dispatchEvent(new Event('visibilitychange'))"); a.wait_for_timeout(900)
+    assert a.evaluate("[Daily.n(dayKey(-1)), Prog.d.shop.wear.head[0], !!Prog.d.shop.own.cap]") == [5, 'cap', True]
+    # a page from an older version writes a smaller copy: the next save on any device writes everything back
+    row = S.rows[uid]['data']; S.rows[uid]['data'] = {k: v for k, v in row.items() if k not in ('days', 'prefs', 'set', 'shop', 'badges')}
+    a.evaluate("Prog.save()"); a.wait_for_timeout(1800)
+    row = S.rows[uid]['data']; print('after an older copy and one save:', sorted(row.keys()))
+    assert all(k in row for k in ('days', 'prefs', 'shop', 'badges')) and row['prefs']['who'][0] == 'rook' and row['prefs']['board'][0] == 'plum'
+
     # ---- the account copy can't be reached: the app says so, keeps working, and catches up later
     S.down = True
     a.evaluate("markSeen('grab')"); a.wait_for_timeout(1800)

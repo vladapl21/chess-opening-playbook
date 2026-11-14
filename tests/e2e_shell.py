@@ -17,7 +17,7 @@ with sync_playwright() as p:
     ctx = b.new_context(viewport={'width': 1280, 'height': 900})
     pg = ctx.new_page(); hook(pg); pg.goto(URL); pg.wait_for_timeout(1000)
     tabs = [t.split('\n')[0].strip() for t in pg.locator('.tabs button').all_inner_texts()]
-    print('tabs:', tabs); assert tabs[:2] == ['Sandbox', 'Course'] and tabs[2].startswith('Drill') and tabs[3] == 'Your games' and len(tabs) == 5
+    print('tabs:', tabs); assert tabs[:2] == ['Sandbox', 'Course'] and tabs[2].startswith('Drill') and tabs[3] == 'Your games' and tabs[5] == 'Shop' and len(tabs) == 6
 
     # the colour switch stays on the tab: Drill on White, Course on Black, then switch back and forth
     pg.click('.tabs [data-view="drill"]'); pg.wait_for_timeout(300)
@@ -120,13 +120,13 @@ with sync_playwright() as p:
 
     # ---- a practice game from the course, then free play in the Sandbox
     cp.evaluate("doStep(UNIT['w-italian'], 'spar')"); cp.wait_for_timeout(700)
-    assert cp.evaluate("[S.view, S.drill.scope]") == ['sandbox', 'u:w-italian'] and cp.locator('.cban').count() == 1
+    assert cp.evaluate("[S.view, S.drill.scope]") == ['sandbox', 'u:w-italian'] and cp.locator('.sbcourse').count() == 1 and cp.locator('.cban').count() == 0
     cp.evaluate("go('course')"); cp.wait_for_timeout(300); cp.evaluate("go('sandbox')"); cp.wait_for_timeout(400)
-    assert cp.locator('.cban').count() == 1, 'the course game is still there when you come back'
+    assert cp.locator('.sbcourse').count() == 1, 'the course game is still there when you come back'
     cp.click('#sbFree'); cp.wait_for_timeout(400)
-    st = cp.evaluate("[S.view, S.drill, S.sbState, document.querySelectorAll('.cban').length, document.querySelectorAll('[data-sbf^=\"pick:\"]').length > 3, !!document.getElementById('sbGo')]")
+    st = cp.evaluate("[S.view, S.drill, S.sbState, document.querySelectorAll('.sbcourse, #sbFree').length, document.querySelectorAll('[data-sbf^=\"pick:\"]').length > 3, !!document.getElementById('sbGo')]")
     print('free play:', st); assert st == ['sandbox', None, None, 0, True, True]
-    cp.click('#sbGo'); cp.wait_for_timeout(600); assert cp.evaluate("S.drill.scope") == cp.evaluate("SBS.scope") and cp.locator('.cban').count() == 0
+    cp.click('#sbGo'); cp.wait_for_timeout(600); assert cp.evaluate("S.drill.scope") == cp.evaluate("SBS.scope") and cp.locator('.sbcourse, #sbFree').count() == 0
     b.close()
 print('ERRORS:', errors); assert not errors
 print('shell checks passed')

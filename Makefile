@@ -23,6 +23,8 @@ test: build
 	$(PY) tests/e2e_skills.py
 	$(PY) tests/e2e_packs.py
 	$(PY) tests/e2e_daily.py
+	$(PY) tests/e2e_shop.py
+	$(PY) tests/e2e_artifact_sync.py
 	node tests/analyze_check.js
 	node tests/nudge_check.mjs
 
