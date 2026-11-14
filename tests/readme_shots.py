@@ -133,6 +133,11 @@ with sync_playwright() as p:
     pg.evaluate("Acct.open('me')"); pg.wait_for_timeout(400); settle(pg)
     box = pg.evaluate("(() => { const r = document.getElementById('acctPanel').getBoundingClientRect(); return [r.left, r.top, r.right, Math.min(r.bottom, innerHeight)]; })()")
     save(pg.screenshot(), 'badges.png', crop=tuple(round(v * 2) for v in box)); pg.evaluate("Acct.close()")
+    # the shop, a week in: a top hat and the midnight colour on the coach
+    pg.evaluate("""(() => { const D = Prog.d.days; for (let k = 1; k <= 8; k++) D[dayKey(-k)] = ['a','b','c','d','e'];
+      Prog.d.shop = {own: {'h-tophat': 1, 'c-midnight': 1}, wear: {head: ['h-tophat', 2], skin: ['c-midnight', 2]}}; Prog.save(); Badges.queue = []; Coach.hush(); go('shop'); })()""")
+    pg.wait_for_timeout(500); pg.evaluate("Coach.hush()"); settle(pg)
+    save(pg.screenshot(), 'shop.png', crop=(0, 0, 2560, 1700))
     pg.evaluate("go('cheat')"); pg.wait_for_timeout(400); settle(pg); save(pg.screenshot(), 'cheat.png')
     pg.evaluate("go('drill')"); pg.wait_for_timeout(300)
     pg.evaluate("startPuzzle(DATA.puzzles.findIndex(p => p.id === 'gb-charizard-47'))"); pg.wait_for_timeout(500); settle(pg)

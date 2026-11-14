@@ -99,12 +99,13 @@ with sync_playwright() as p:
     assert pg.evaluate("mergeProg({badges: {l1: 5}}, {badges: {l1: 3, l10: 9}}).badges") == {'l1': 3, 'l10': 9}
 
     # ---- settings from another device: the newer copy wins, the coach changes face
-    pg.evaluate("Prog.d.set = {theme: 'light', size: 'm', board: 'plum', coords: true, coach: true, who: 'rook', t: Date.now() + 1000}; refresh()"); pg.wait_for_timeout(300)
+    pg.evaluate("Prog.d.prefs = Object.assign({}, Prog.d.prefs, {board: ['plum', Date.now() + 1000], who: ['rook', Date.now() + 1000]}); refresh()"); pg.wait_for_timeout(300)
     assert pg.evaluate("[SET.who, SET.board, document.documentElement.dataset.board, coachName()]") == ['rook', 'plum', 'plum', 'Rocco']
-    pg.evaluate("Prog.d.set = {who: 'pawn', t: 1}; refresh()"); pg.wait_for_timeout(200)
-    assert pg.evaluate("[SET.who, Prog.d.set.who]") == ['rook', 'rook'], 'an older copy gives way to this device'
-    # (headless Chromium can lose a file:// page's storage written just before a scripted reload: give it a moment)
-    pg.wait_for_timeout(1200); pg.reload(); pg.wait_for_timeout(800); assert pg.evaluate('SET.who') == 'rook', pg.evaluate("[SET.who, localStorage.getItem('playbook-settings')]")
+    pg.evaluate("Prog.d.prefs = Object.assign({}, Prog.d.prefs, {who: ['pawn', 1]}); refresh()"); pg.wait_for_timeout(200)
+    assert pg.evaluate("[SET.who, Prog.d.prefs.who[0], Prog.d.set.who]") == ['rook', 'rook', 'rook'], 'an older copy gives way to this device'
+    # a choice made before times were kept beats a device that never chose; the older all-in-one form still reads
+    assert pg.evaluate("mergeProg({prefs: {who: ['knight', 0]}}, {set: {who: 'rook', t: 1}}).prefs.who[0]") == 'rook'
+    # (staying put across a reload is checked in e2e_shell.py; a file:// page here can lose its storage on a scripted reload)
 
     # ---- the engine board steps back to move one from where you came in
     pg.evaluate("useSide('w'); openLine('fried-liver')"); pg.wait_for_timeout(400); pg.keyboard.press('End'); pg.wait_for_timeout(300)

@@ -13,6 +13,8 @@
   --arr-g:#11843F; --arr-r:#D2302A; --arr-b:#2F63C9; --arr-y:#E3A90E; --arr-e:#7646D6;
   --shadow:0 0 0 1px var(--line),0 2px 0 rgba(18,32,26,.05);
   --flame:#D9541E; --flame-2:#F4A21F; --flame-ink:#FFFFFF; --flame-soft:#FBE4D7;
+  --gear-ink:#18211D; --gear-edge:transparent;
+  --sk-mid:#2B4C8C; --sk-mid-2:#C9D7F2; --sk-ruby:#B5302A; --sk-ruby-2:#F4C9C5; --sk-plum:#6B4A9C; --sk-plum-2:#DDD0EF; --sk-tang:#D9661E; --sk-tang-2:#FAD9C2; --sk-gold:#B98A12; --sk-gold-2:#F6E3A6;
   --gold:#B7860F; --gold-2:#F1CF6B; --silver:#7D8B95; --silver-2:#DCE3E8; --bronze:#9A5A2C; --bronze-2:#E3A878; --ribbon-1:#2D5DAA; --ribbon-2:#B93628; --locked:#A9B5AD; --locked-2:#EEF2EF;
   --f-display:"Barlow Condensed","Arial Narrow","Roboto Condensed",Impact,sans-serif;
   --f-body:"Barlow","Segoe UI",system-ui,-apple-system,sans-serif;
@@ -26,6 +28,8 @@
   --sq-light:#CFD8CC; --sq-dark:#6F8D7B; --hl:rgba(240,201,64,.5); --sel:rgba(67,192,143,.42);
   --arr-g:#1FA155; --arr-r:#E8463D; --arr-b:#4F82E6; --arr-y:#F0B92A; --arr-e:#A78BF5;
   --flame:#FF8746; --flame-2:#FFC24A; --flame-ink:#2A1205; --flame-soft:#3B2216;
+  --gear-ink:#1C2420; --gear-edge:rgba(230,240,234,.55);
+  --sk-mid:#6E8FDA; --sk-mid-2:#2A3A5E; --sk-ruby:#E2605A; --sk-ruby-2:#4A2422; --sk-plum:#A78BF5; --sk-plum-2:#3A2E52; --sk-tang:#FF9A57; --sk-tang-2:#4A2E1C; --sk-gold:#E2B54C; --sk-gold-2:#4A3A12;
   --gold:#E2B54C; --gold-2:#F7DF92; --silver:#A9B6BF; --silver-2:#E2E8EC; --bronze:#C9864F; --bronze-2:#EFC29C; --ribbon-1:#5F8BE0; --ribbon-2:#E2614F; --locked:#55665D; --locked-2:#1F2A25;
   --shadow:0 0 0 1px var(--line),0 2px 0 rgba(0,0,0,.35); --pico-b:drop-shadow(0 0 1px rgba(214,226,219,.95)) drop-shadow(0 0 .6px rgba(214,226,219,.95)); --scrim:rgba(0,0,0,.62); color-scheme:dark}}
 :root[data-theme="dark"]{
@@ -35,6 +39,8 @@
   --sq-light:#CFD8CC; --sq-dark:#6F8D7B; --hl:rgba(240,201,64,.5); --sel:rgba(67,192,143,.42);
   --arr-g:#1FA155; --arr-r:#E8463D; --arr-b:#4F82E6; --arr-y:#F0B92A; --arr-e:#A78BF5;
   --flame:#FF8746; --flame-2:#FFC24A; --flame-ink:#2A1205; --flame-soft:#3B2216;
+  --gear-ink:#1C2420; --gear-edge:rgba(230,240,234,.55);
+  --sk-mid:#6E8FDA; --sk-mid-2:#2A3A5E; --sk-ruby:#E2605A; --sk-ruby-2:#4A2422; --sk-plum:#A78BF5; --sk-plum-2:#3A2E52; --sk-tang:#FF9A57; --sk-tang-2:#4A2E1C; --sk-gold:#E2B54C; --sk-gold-2:#4A3A12;
   --gold:#E2B54C; --gold-2:#F7DF92; --silver:#A9B6BF; --silver-2:#E2E8EC; --bronze:#C9864F; --bronze-2:#EFC29C; --ribbon-1:#5F8BE0; --ribbon-2:#E2614F; --locked:#55665D; --locked-2:#1F2A25;
   --shadow:0 0 0 1px var(--line),0 2px 0 rgba(0,0,0,.35); --pico-b:drop-shadow(0 0 1px rgba(214,226,219,.95)) drop-shadow(0 0 .6px rgba(214,226,219,.95)); --scrim:rgba(0,0,0,.62); color-scheme:dark}
 /* board colours (Settings): each palette has its own light and dark values */
@@ -478,6 +484,13 @@ button.ucard:hover{border-color:var(--accent);transform:translateY(-1px)}
 .tick.no{color:var(--muted);font-weight:500}
 .tick.due{color:var(--rosso)}
 .cban{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 12px;border-radius:4px;background:var(--viola-soft);font-size:13.5px}
+/* a course practice game: the unit at the top of the game panel, free play under the board */
+.sbcourse{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--line)}
+.sbcourse .kicker{color:var(--accent)} .sbcl{display:flex;align-items:center;gap:8px;margin:4px 0 0;font-weight:600;font-size:14px}
+.pdots{display:inline-flex;gap:4px} .pdots i{width:10px;height:10px;border-radius:50%;background:var(--surface-2);box-shadow:inset 0 0 0 1.5px var(--line)} .pdots i.on{background:var(--accent);box-shadow:none}
+.btn.freeplay{width:100%;justify-content:center;min-height:50px;margin-top:14px;font-size:15px;gap:10px;border:1.5px solid var(--accent);color:var(--accent);background:var(--surface)}
+.btn.freeplay:hover{background:var(--accent);color:var(--accent-ink)} .btn.freeplay svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.btn.freeplay circle{fill:var(--surface)} .btn.freeplay:hover circle{fill:var(--accent)}
 .cban span{flex:1 1 200px;min-width:0} .cban .cbtns{flex:0 0 auto;display:flex;flex-wrap:wrap;gap:8px}
 .lockednote{padding:12px 14px;border-radius:4px;background:var(--surface-2);color:var(--muted);font-size:14px}
 .qhead{display:flex;justify-content:space-between;align-items:center;gap:8px 12px;flex-wrap:wrap}
@@ -782,7 +795,7 @@ footer.foot .fcopy{margin-left:auto}
 /* one size on every tab; while you are being tested the coach only steps back a little */
 .coach.quiet .cav{opacity:.8}
 .cface svg{display:block;width:100%;height:auto}
-.kn-body{fill:var(--accent)} .kn-mane{fill:var(--ink)} .kn-muzzle{fill:var(--accent-soft)} .kn-eye{fill:var(--surface)} .kn-pupil{fill:var(--ink)} .kn-line{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round} .kn-blush{fill:var(--rosso);opacity:.35} .kn-base{fill:var(--ink)} .kn-crown{fill:var(--oro)}
+.kn-body{fill:var(--kb,var(--accent))} .kn-mane{fill:var(--ink)} .kn-muzzle{fill:var(--km,var(--accent-soft))} .kn-eye{fill:var(--surface)} .kn-pupil{fill:var(--ink)} .kn-line{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round} .kn-blush{fill:var(--rosso);opacity:.35} .kn-base{fill:var(--ink)} .kn-crown{fill:var(--oro)}
 .coachpick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .coachpick button{display:grid;justify-items:center;gap:2px;padding:12px 6px 10px;border-radius:6px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font:inherit;min-width:0}
 .coachpick button:hover{border-color:var(--accent)} .coachpick button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
@@ -849,6 +862,37 @@ body:has(.coach:not([hidden])) .foot{padding-right:100px}
 @media (max-width:420px){ .pstreak{grid-template-columns:auto minmax(0,1fr)} .pstreak p{grid-column:1 / -1;justify-self:start;text-align:left} }
 .tickrow{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--muted);cursor:pointer} .tickrow input{margin-top:3px;accent-color:var(--accent);width:16px;height:16px;flex:none}
 
+/* the coach's colours and gear (Shop) */
+.sk-mid{--kb:var(--sk-mid);--km:var(--sk-mid-2)} .sk-ruby{--kb:var(--sk-ruby);--km:var(--sk-ruby-2)} .sk-plum{--kb:var(--sk-plum);--km:var(--sk-plum-2)} .sk-tang{--kb:var(--sk-tang);--km:var(--sk-tang-2)} .sk-gold{--kb:var(--sk-gold);--km:var(--sk-gold-2)}
+.g-blu{fill:var(--blu)} .g-blu2{fill:var(--blu);opacity:.8} .g-ros{fill:var(--rosso)} .g-ros2{fill:var(--rosso);stroke:var(--gear-ink);stroke-width:.6} .g-vio{fill:var(--viola)} .g-vio2{fill:var(--viola);opacity:.85}
+.g-oro{fill:var(--oro)} .g-ink{fill:var(--gear-ink);stroke:var(--gear-edge);stroke-width:.6} .g-surf{fill:var(--surface)} .g-edge{stroke:var(--rosso);stroke-width:1} .g-edge2{stroke:var(--gear-ink);stroke-width:.7;stroke-linejoin:round}
+.g-dash{fill:none;stroke:var(--gear-ink);stroke-width:1.1;opacity:.35;stroke-linecap:round} .g-dash2{fill:none;stroke:var(--surface);stroke-width:1.6}
+.g-tass{fill:none;stroke:var(--oro);stroke-width:1.5;stroke-linecap:round} .g-rib1{fill:var(--ribbon-1)} .g-rib2{fill:var(--ribbon-2)}
+.g-lens{fill:var(--surface);fill-opacity:.18;stroke:var(--gear-ink);stroke-width:1.6} .g-wire{fill:none;stroke:var(--gear-ink);stroke-width:1.6;stroke-linecap:round}
+.g-shade{fill:var(--gear-ink)} .g-glint{fill:none;stroke:var(--surface);stroke-width:1.1;stroke-linecap:round;opacity:.8}
+.g-mono{fill:var(--surface);fill-opacity:.15;stroke:var(--oro);stroke-width:1.7} .g-chain{fill:none;stroke:var(--oro);stroke-width:.9;stroke-dasharray:1.4 1}
+/* the shop page */
+.coin{width:1.05em;height:1.05em;vertical-align:-.16em;flex:none} .coin circle{fill:var(--oro)} .coin .c2{fill:none;stroke:var(--surface);stroke-opacity:.55;stroke-width:1} .coin .c3{fill:var(--surface);opacity:.9}
+.shop{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:24px;align-items:start;margin-top:8px}
+.shopside{position:sticky;top:16px;display:grid;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.mannequin{background:var(--accent-soft);border-radius:4px;display:grid;place-items:center;padding:16px 0 6px} .mannequin svg{width:min(190px,60%);height:auto}
+.bal{display:flex;align-items:center;gap:8px;margin:0;font-size:15px;color:var(--muted);font-weight:600} .bal .coin{width:28px;height:28px} .bal b{font:700 36px/1 var(--f-display);color:var(--ink)}
+.earn{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:13.5px} .earn li{display:flex;justify-content:space-between;gap:8px;color:var(--muted)} .earn b{color:var(--ink)} .earn .sp b{color:var(--muted)}
+.nextt{margin:0;font-size:13px;color:var(--muted)}
+.coachpick.mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px} .coachpick.mini button{padding:6px 4px} .coachpick.mini .cface{width:42px}
+.shopmain{display:grid;gap:22px;min-width:0}
+.wlock{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;background:var(--flame-soft);border-radius:var(--r);padding:16px 18px}
+.wlock h3{margin:2px 0 6px} .wlock p{margin:0;font-size:14px}
+.wdays{display:flex;align-items:center;gap:5px} .wdays i{width:16px;height:16px;border-radius:50%;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line)} .wdays i.on{background:var(--flame);box-shadow:none} .wdays span{margin-left:6px;font-weight:700;font-size:13px}
+.slot h3{margin:0 0 10px;font-size:17px}
+.items{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}
+.item{display:grid;justify-items:center;align-content:start;gap:5px;text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:12px 8px;font-size:13px}
+.item.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)} .item.lock .ipv{opacity:.45;filter:grayscale(1)}
+.ipv{width:76px;height:76px;display:block} .ipv svg{width:100%;height:100%}
+.item .price,.item .owned,.item .wearing{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;color:var(--muted);font-weight:600} .item .wearing{color:var(--accent)}
+.item .need{font-size:12px;color:var(--muted)} .item .btn.small{min-height:32px;gap:5px} .item .btn .coin{width:15px;height:15px}
+@media (max-width:860px){ .shop{grid-template-columns:minmax(0,1fr)} .shopside{position:static} .wlock{grid-template-columns:minmax(0,1fr)} }
+
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><symbol id="p-wk" viewBox="0 0 45 45"><path d="M21.2,19.6 L21.2,11.2 L17.8,11.2 L17.8,8.4 L21.2,8.4 L21.2,4.6 L23.8,4.6 L23.8,8.4 L27.2,8.4 L27.2,11.2 L23.8,11.2 L23.8,19.6 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M13.2,36 C14.2,33.2 15.4,31.6 16,29.8 L29,29.8 C29.6,31.6 30.8,33.2 31.8,36 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M10,40.2 L35,40.2 L35,37.8 Q35,36 33.2,36 L11.8,36 Q10,36 10,37.8 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M15.2,30 L29.8,30 L30.4,27 L14.6,27 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M14.6,27.2 C10.6,23.6 9.8,18.6 12.9,16.1 C16.0,13.6 20.2,15.4 22.5,19.2 C24.8,15.4 29.0,13.6 32.1,16.1 C35.2,18.6 34.4,23.6 30.4,27.2 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/></symbol><symbol id="p-wq" viewBox="0 0 45 45"><path d="M13.2,36 C14.2,33.2 15.2,31.6 15.8,30.2 L29.2,30.2 C29.8,31.6 30.8,33.2 31.8,36 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M10,40.2 L35,40.2 L35,37.8 Q35,36 33.2,36 L11.8,36 Q10,36 10,37.8 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M15.2,30.4 L29.8,30.4 L30.6,27.2 L14.4,27.2 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M14.4,27.4 L9.4,15.6 L16.6,21.8 L15.8,11.4 L20.5,20.2 L22.5,9.4 L24.5,20.2 L29.2,11.4 L28.4,21.8 L35.6,15.6 L30.6,27.4 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><circle cx="9.2" cy="14.2" r="2.0" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35"/><circle cx="15.7" cy="9.9" r="2.0" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35"/><circle cx="22.5" cy="7.8" r="2.1" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35"/><circle cx="29.3" cy="9.9" r="2.0" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35"/><circle cx="35.8" cy="14.2" r="2.0" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35"/></symbol><symbol id="p-wr" viewBox="0 0 45 45"><path d="M14.6,33 L15.8,17.4 L29.2,17.4 L30.4,33 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M9.6,40.2 L35.4,40.2 L35.4,37.6 Q35.4,35.8 33.6,35.8 L11.4,35.8 Q9.6,35.8 9.6,37.6 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M12.4,35.8 L32.6,35.8 L31.6,32.4 L13.4,32.4 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M12.6,17.6 L32.4,17.6 L32.4,14.4 L12.6,14.4 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M12.6,14.6 L12.6,7.6 L16.9,7.6 L16.9,10.4 L20.4,10.4 L20.4,7.6 L24.6,7.6 L24.6,10.4 L28.1,10.4 L28.1,7.6 L32.4,7.6 L32.4,14.6 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M15.4,21.2 L29.6,21.2" fill="none" stroke="#1E2226" stroke-width="1.215" stroke-linecap="round"/></symbol><symbol id="p-wb" viewBox="0 0 45 45"><path d="M15.2,36 C16.6,33 19.2,31.4 19.6,28.6 L25.4,28.6 C25.8,31.4 28.4,33 29.8,36 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M10.5,40.2 L34.5,40.2 L34.5,37.8 Q34.5,36 32.6,36 L12.4,36 Q10.5,36 10.5,37.8 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M16.4,28.9 C16.4,26.6 28.6,26.6 28.6,28.9 C28.6,30.5 16.4,30.5 16.4,28.9 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M22.5,8.8 C27.6,12.4 30.8,16.8 30.4,20.6 C30.1,24.4 27,26.8 22.5,26.8 C18,26.8 14.9,24.4 14.6,20.6 C14.2,16.8 17.4,12.4 22.5,8.8 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M22.5,4.9 A2.35,2.35 0 1 1 22.49,4.9 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M24.3,13.6 L19.9,19.4" fill="none" stroke="#1E2226" stroke-width="1.215" stroke-linecap="round"/></symbol><symbol id="p-wn" viewBox="0 0 45 45"><path d="M13.4,36 C13.0,31.2 16.4,27.8 20.2,25.4 C18.4,24.9 16.8,24.3 15.4,24.0 C13.6,24.9 11.9,25.3 10.4,24.7 C8.8,24.0 8.5,22.4 9.2,20.9 C10.3,18.4 13.5,14.3 16.5,11.2 C17.1,10.5 17.5,9.9 17.7,9.1 L18.9,5.0 L21.6,8.7 C27.8,8.9 33.6,13.9 33.8,22.2 C33.9,27.4 32.6,31.6 32.4,36 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M10.5,40.2 L34.5,40.2 L34.5,37.8 Q34.5,36 32.6,36 L12.4,36 Q10.5,36 10.5,37.8 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><circle cx="17.0" cy="14.9" r="1.05" fill="#1E2226"/><circle cx="11.4" cy="21.7" r="0.7" fill="#1E2226"/><path d="M22.4,9.6 C28.4,10.6 32.0,15.6 32.0,22.4 C32.0,27.6 30.9,31.2 30.7,35" fill="none" stroke="#1E2226" stroke-width="1.215" stroke-linecap="round"/></symbol><symbol id="p-wp" viewBox="0 0 45 45"><path d="M14.2,36 C14.2,31.2 17.8,27.8 19.6,24.8 L25.4,24.8 C27.2,27.8 30.8,31.2 30.8,36 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M10.5,40.2 L34.5,40.2 L34.5,37.8 Q34.5,36 32.6,36 L12.4,36 Q10.5,36 10.5,37.8 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M16.6,24.6 C16.6,22.4 28.4,22.4 28.4,24.6 C28.4,26.2 16.6,26.2 16.6,24.6 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M22.5,10.6 A5.8,5.8 0 1 1 22.49,10.6 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/></symbol><symbol id="p-bk" viewBox="0 0 45 45"><path d="M21.2,19.6 L21.2,11.2 L17.8,11.2 L17.8,8.4 L21.2,8.4 L21.2,4.6 L23.8,4.6 L23.8,8.4 L27.2,8.4 L27.2,11.2 L23.8,11.2 L23.8,19.6 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M13.2,36 C14.2,33.2 15.4,31.6 16,29.8 L29,29.8 C29.6,31.6 30.8,33.2 31.8,36 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M10,40.2 L35,40.2 L35,37.8 Q35,36 33.2,36 L11.8,36 Q10,36 10,37.8 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M15.2,30 L29.8,30 L30.4,27 L14.6,27 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M14.6,27.2 C10.6,23.6 9.8,18.6 12.9,16.1 C16.0,13.6 20.2,15.4 22.5,19.2 C24.8,15.4 29.0,13.6 32.1,16.1 C35.2,18.6 34.4,23.6 30.4,27.2 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/></symbol><symbol id="p-bq" viewBox="0 0 45 45"><path d="M13.2,36 C14.2,33.2 15.2,31.6 15.8,30.2 L29.2,30.2 C29.8,31.6 30.8,33.2 31.8,36 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M10,40.2 L35,40.2 L35,37.8 Q35,36 33.2,36 L11.8,36 Q10,36 10,37.8 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M15.2,30.4 L29.8,30.4 L30.6,27.2 L14.4,27.2 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M14.4,27.4 L9.4,15.6 L16.6,21.8 L15.8,11.4 L20.5,20.2 L22.5,9.4 L24.5,20.2 L29.2,11.4 L28.4,21.8 L35.6,15.6 L30.6,27.4 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><circle cx="9.2" cy="14.2" r="2.0" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35"/><circle cx="15.7" cy="9.9" r="2.0" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35"/><circle cx="22.5" cy="7.8" r="2.1" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35"/><circle cx="29.3" cy="9.9" r="2.0" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35"/><circle cx="35.8" cy="14.2" r="2.0" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35"/></symbol><symbol id="p-br" viewBox="0 0 45 45"><path d="M14.6,33 L15.8,17.4 L29.2,17.4 L30.4,33 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M9.6,40.2 L35.4,40.2 L35.4,37.6 Q35.4,35.8 33.6,35.8 L11.4,35.8 Q9.6,35.8 9.6,37.6 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M12.4,35.8 L32.6,35.8 L31.6,32.4 L13.4,32.4 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M12.6,17.6 L32.4,17.6 L32.4,14.4 L12.6,14.4 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M12.6,14.6 L12.6,7.6 L16.9,7.6 L16.9,10.4 L20.4,10.4 L20.4,7.6 L24.6,7.6 L24.6,10.4 L28.1,10.4 L28.1,7.6 L32.4,7.6 L32.4,14.6 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M15.4,21.2 L29.6,21.2" fill="none" stroke="#D8CFBD" stroke-width="1.215" stroke-linecap="round"/></symbol><symbol id="p-bb" viewBox="0 0 45 45"><path d="M15.2,36 C16.6,33 19.2,31.4 19.6,28.6 L25.4,28.6 C25.8,31.4 28.4,33 29.8,36 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M10.5,40.2 L34.5,40.2 L34.5,37.8 Q34.5,36 32.6,36 L12.4,36 Q10.5,36 10.5,37.8 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M16.4,28.9 C16.4,26.6 28.6,26.6 28.6,28.9 C28.6,30.5 16.4,30.5 16.4,28.9 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M22.5,8.8 C27.6,12.4 30.8,16.8 30.4,20.6 C30.1,24.4 27,26.8 22.5,26.8 C18,26.8 14.9,24.4 14.6,20.6 C14.2,16.8 17.4,12.4 22.5,8.8 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M22.5,4.9 A2.35,2.35 0 1 1 22.49,4.9 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M24.3,13.6 L19.9,19.4" fill="none" stroke="#D8CFBD" stroke-width="1.215" stroke-linecap="round"/></symbol><symbol id="p-bn" viewBox="0 0 45 45"><path d="M13.4,36 C13.0,31.2 16.4,27.8 20.2,25.4 C18.4,24.9 16.8,24.3 15.4,24.0 C13.6,24.9 11.9,25.3 10.4,24.7 C8.8,24.0 8.5,22.4 9.2,20.9 C10.3,18.4 13.5,14.3 16.5,11.2 C17.1,10.5 17.5,9.9 17.7,9.1 L18.9,5.0 L21.6,8.7 C27.8,8.9 33.6,13.9 33.8,22.2 C33.9,27.4 32.6,31.6 32.4,36 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M10.5,40.2 L34.5,40.2 L34.5,37.8 Q34.5,36 32.6,36 L12.4,36 Q10.5,36 10.5,37.8 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><circle cx="17.0" cy="14.9" r="1.05" fill="#D8CFBD"/><circle cx="11.4" cy="21.7" r="0.7" fill="#D8CFBD"/><path d="M22.4,9.6 C28.4,10.6 32.0,15.6 32.0,22.4 C32.0,27.6 30.9,31.2 30.7,35" fill="none" stroke="#D8CFBD" stroke-width="1.215" stroke-linecap="round"/></symbol><symbol id="p-bp" viewBox="0 0 45 45"><path d="M14.2,36 C14.2,31.2 17.8,27.8 19.6,24.8 L25.4,24.8 C27.2,27.8 30.8,31.2 30.8,36 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M10.5,40.2 L34.5,40.2 L34.5,37.8 Q34.5,36 32.6,36 L12.4,36 Q10.5,36 10.5,37.8 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M16.6,24.6 C16.6,22.4 28.4,22.4 28.4,24.6 C28.4,26.2 16.6,26.2 16.6,24.6 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M22.5,10.6 A5.8,5.8 0 1 1 22.49,10.6 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/></symbol></defs></svg>
@@ -876,6 +920,7 @@ body:has(.coach:not([hidden])) .foot{padding-right:100px}
       <button role="tab" data-view="drill" aria-selected="false">Drill<span class="todo" id="drillDot" hidden title="Today's five lines are not done yet">!</span></button>
       <button role="tab" data-view="games" aria-selected="false"><span class="lg">Your games</span><span class="sm">Games</span></button>
       <button role="tab" data-view="cheat" aria-selected="false"><span class="lg">Cheat sheet</span><span class="sm">Cheats</span></button>
+      <button role="tab" data-view="shop" aria-selected="false"><span class="lg">Shop</span><span class="sm">Shop</span></button>
     </nav>
   </header>
   <main id="view" aria-live="polite"></main>
@@ -3050,10 +3095,16 @@ const Prog = {
       if (!db || !user) return;
       const uid = await user.id(); if (!uid) return;
       this.ref = db.doc('data/users/' + uid + '/italian-progress');
-      const snap = await this.ref.get();
-      if (snap.exists){ const r = snap.data(); if (r && r.lines && (r.updated || 0) > (this.d.updated || 0)){ this.d = JSON.parse(JSON.stringify(r)); this.saveLocal(); refresh(); } }
-      else if (this.d.updated) this.push();
+      this.take(await this.ref.get(), true);
+      if (typeof this.ref.onSnapshot === 'function' && !this.unsub) this.unsub = this.ref.onSnapshot(sn => this.take(sn, false), () => {});
     } catch(e){ this.ref = null; }
+  },
+  // the stored copy (on opening, or written by another device): merge it in. On opening, a copy here that holds
+  // something the stored one lacks is written back.
+  take(snap, first){
+    const r = snap && snap.exists ? snap.data() : null;
+    if (r && r.lines){ const m = mergeProg(this.d, r); if (canon(m) !== canon(this.d)){ this.d = m; this.saveLocal(); refreshSoon(); } }
+    if (first && this.d.updated && (!r || canon(this.d) !== canon(r))) this.push();
   },
   saveLocal(){ try { localStorage.setItem(PKEY, JSON.stringify(this.d)); } catch(e){} },
   save(){ this.d.updated = Date.now(); if (Cloud.user) this.d.owner = Cloud.user.id; try { this.d.tz = Intl.DateTimeFormat().resolvedOptions().timeZone || this.d.tz; } catch(e){} this.saveLocal(); this.push(); Cloud.push(); },
@@ -3061,7 +3112,11 @@ const Prog = {
     if (!this.ref) return;
     if (this.saving){ this.again = true; return; }
     this.saving = true;
-    try { await this.ref.set(JSON.parse(JSON.stringify(this.d))); } catch(e){ if (e && e.code !== 'unavailable') this.ref = null; }
+    try {
+      const sn = await this.ref.get(), r = sn && sn.exists ? sn.data() : null;
+      if (r && r.lines){ const m = mergeProg(this.d, r); if (canon(m) !== canon(this.d)){ this.d = m; this.saveLocal(); refreshSoon(); } }
+      await this.ref.set(JSON.parse(JSON.stringify(this.d)));
+    } catch(e){ if (e && e.code !== 'unavailable') this.ref = null; }
     this.saving = false;
     if (this.again){ this.again = false; this.push(); }
   },
@@ -3143,8 +3198,10 @@ const SITE = /*__SITE__*/null;
 const canon = o => JSON.stringify(o, (k, v) => v && typeof v === 'object' && !Array.isArray(v) ? Object.keys(v).sort().reduce((a, x) => (a[x] = v[x], a), {}) : v);
 const newer = (x, y) => !x ? y : !y ? x : (y.v || 1) !== (x.v || 1) ? ((y.v || 1) > (x.v || 1) ? y : x) : (y.last || 0) > (x.last || 0) ? y : x;
 // two copies of the progress object -> one: newest record per line and puzzle, best of everything else
+const KNOWN = new Set(['lines', 'puz', 'sb', 'course', 'days', 'updated', 'packs', 'set', 'prefs', 'mail', 'badges', 'tz', 'me', 'owner', 'shop']);
 function mergeProg(a, b){
-  const o = JSON.parse(JSON.stringify(a || {})), r = b || {};
+  const o = JSON.parse(JSON.stringify(a || {})), r = JSON.parse(JSON.stringify(b || {}));
+  a = a || {};
   o.lines = o.lines || {}; o.puz = o.puz || {};
   for (const k in (r.lines || {})) o.lines[k] = newer(o.lines[k], r.lines[k]);
   for (const k in (r.puz || {})) o.puz[k] = newer(o.puz[k], r.puz[k]);
@@ -3166,9 +3223,14 @@ function mergeProg(a, b){
   o.updated = Math.max(o.updated || 0, r.updated || 0);
   const pk = [a.packs, r.packs].filter(Boolean).sort((x, y) => (y.updated || 0) - (x.updated || 0))[0]; if (pk) o.packs = Object.assign({}, pk);
   const st = [a.set, r.set].filter(Boolean).sort((x, y) => (y.t || 0) - (x.t || 0))[0]; if (st) o.set = Object.assign({}, st);   // the look and the coach
+  const pa = prefsOf(a), pr = prefsOf(r); if (Object.keys(pa).length || Object.keys(pr).length){ o.prefs = {}; for (const k of new Set([...Object.keys(pa), ...Object.keys(pr)])) o.prefs[k] = !pa[k] ? pr[k] : !pr[k] ? pa[k] : (pr[k][1] || 0) > (pa[k][1] || 0) ? pr[k] : pa[k]; }
+  if (a.shop || r.shop){ const x = a.shop || {}, y = r.shop || {}, sh = o.shop = {own: Object.assign({}, x.own), wear: Object.assign({}, x.wear)};
+    for (const k in (y.own || {})) sh.own[k] = sh.own[k] ? Math.min(sh.own[k], y.own[k]) : y.own[k];
+    for (const k in (y.wear || {})) if (!sh.wear[k] || (y.wear[k][1] || 0) > (sh.wear[k][1] || 0)) sh.wear[k] = y.wear[k]; }
   const ml = [a.mail, r.mail].filter(Boolean).sort((x, y) => (y.t || 0) - (x.t || 0))[0]; if (ml) o.mail = Object.assign({}, ml);
   if (r.badges){ const bd = o.badges || (o.badges = {}); for (const k in r.badges) bd[k] = bd[k] ? Math.min(bd[k], r.badges[k]) : r.badges[k]; }
   if (r.tz && !o.tz) o.tz = r.tz;
+  for (const k in r) if (!KNOWN.has(k) && (!(k in o) || (r.updated || 0) > (a.updated || 0))) o[k] = r[k];
   const me = mergeMe(a, r); if (me) o.me = JSON.parse(JSON.stringify(me)); else delete o.me;   // whose playbook this is (app/product.js)
   return o;
 }
@@ -3232,6 +3294,10 @@ const Cloud = {
     if (this.writing){ this.again = true; return; }
     this.writing = true; clearTimeout(this.timer); this.state = 'sync'; renderAcct();
     try {
+      const cur = await this.sb.from('progress').select('data').eq('user_id', this.user.id).maybeSingle();
+      if (cur.error) throw cur.error;
+      const r = cur.data && cur.data.data && cur.data.data.lines ? cur.data.data : null;
+      if (r && (!r.owner || r.owner === this.user.id)){ const m = mergeProg(Prog.d, r); m.owner = this.user.id; if (canon(m) !== canon(Prog.d)){ Prog.d = m; Prog.saveLocal(); refreshSoon(); } }
       const {error} = await this.sb.from('progress').upsert({user_id: this.user.id, data: Object.assign({}, Prog.d, {owner: this.user.id})});
       if (error) throw error;
       this.state = 'ok'; this.at = Date.now(); this.err = '';
@@ -3433,7 +3499,8 @@ function useSide(side){
 }
 /* ------------------------------------------------------------------ settings (kept on this device and with the progress) */
 const SET_KEY = 'playbook-settings', HOST_THEME = document.documentElement.dataset.theme || '';
-const SET = {theme: 'system', size: 'm', board: 'green', coords: true, coach: true, who: 'knight'};
+const SET_DEF = {theme: 'system', size: 'm', board: 'green', coords: true, coach: true, who: 'knight'};
+const SET = Object.assign({}, SET_DEF);
 try { Object.assign(SET, JSON.parse(localStorage.getItem(SET_KEY) || '{}')); } catch(e){}
 const SIZES = {s: .92, m: 1, l: 1.08, xl: 1.16};
 const BOARDS = [['green', 'Green', '#E6ECE2', '#84A390'], ['wood', 'Wood', '#F0DDBD', '#B98B63'], ['blue', 'Blue', '#E3EAF1', '#7C9CBF'], ['slate', 'Slate', '#E7E8EA', '#8E969E'], ['plum', 'Plum', '#ECE5F3', '#9C88BF']];
@@ -3443,20 +3510,25 @@ function applySettings(){
   if (SET.board && SET.board !== 'green') r.dataset.board = SET.board; else delete r.dataset.board;
   const app = document.getElementById('app'); if (app) app.style.zoom = SIZES[SET.size] === 1 ? '' : String(SIZES[SET.size] || 1);
 }
-// Settings travel with the progress record (d.set), so the coach and the look follow the player to every device.
-// Each copy carries the time it was last changed; the newer one wins.
+// Settings travel with the progress record, so the coach and the look follow the player to every device.
+// d.prefs holds [value, time changed] for each setting and the newest wins setting by setting: a board colour changed on
+// the phone never undoes a coach picked on the laptop. A choice made before times were kept counts as very old (time 1)
+// but still beats a device that never chose (time 0). d.set keeps the older one-time-for-all form for pages still open
+// on an earlier version.
 const SET_KEYS = ['theme', 'size', 'board', 'coords', 'coach', 'who'];
-const setCopy = () => SET_KEYS.reduce((o, k) => (o[k] = SET[k], o), {t: SET.t || 0});
-function setSetting(k, v){ SET[k] = v; SET.t = Date.now(); try { localStorage.setItem(SET_KEY, JSON.stringify(SET)); } catch(e){} applySettings(); Prog.d.set = setCopy(); Prog.save(); }
+SET.ts = SET.ts || {};
+for (const k of SET_KEYS) if (SET.ts[k] === undefined) SET.ts[k] = SET.t || (SET[k] !== SET_DEF[k] ? 1 : 0);
+const setLocal = () => { try { localStorage.setItem(SET_KEY, JSON.stringify(SET)); } catch(e){} };
+const prefsOf = d => d.prefs || (d.set ? SET_KEYS.reduce((o, k) => (d.set[k] !== undefined && (o[k] = [d.set[k], d.set.t || 1]), o), {}) : {});
+function setSetting(k, v){ SET[k] = v; SET.ts[k] = Date.now(); SET.t = Date.now(); setLocal(); applySettings(); adoptSettings(); Prog.save(); }
 function adoptSettings(){
-  const r = Prog.d.set;
-  if (r && (r.t || 0) > (SET.t || 0)){
-    for (const k of SET_KEYS) if (r[k] !== undefined) SET[k] = r[k];
-    SET.t = r.t; try { localStorage.setItem(SET_KEY, JSON.stringify(SET)); } catch(e){}
-    applySettings(); if (typeof Coach !== 'undefined') Coach.refresh(); return true;
-  }
-  if ((SET.t || 0) > ((r && r.t) || 0)) Prog.d.set = setCopy();
-  return false;
+  const P = prefsOf(Prog.d); let changed = false;
+  for (const k of SET_KEYS){ const r = P[k]; if (r && (r[1] || 0) > (SET.ts[k] || 0)){ SET[k] = r[0]; SET.ts[k] = r[1]; changed = true; } }
+  if (changed){ setLocal(); applySettings(); if (typeof Coach !== 'undefined') Coach.refresh(); }
+  const out = {}; let t = 0;
+  for (const k of SET_KEYS){ out[k] = [SET[k], SET.ts[k] || 0]; t = Math.max(t, SET.ts[k] || 0); }
+  Prog.d.prefs = out; Prog.d.set = SET_KEYS.reduce((o, k) => (o[k] = SET[k], o), {t});
+  return changed;
 }
 const Settings = {
   open(){ document.getElementById('setSheet').hidden = false; this.render(); document.getElementById('setPanel').querySelector('.x').focus(); },
@@ -3485,7 +3557,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && !document.
 applySettings();
 
 const view = document.getElementById('view');
-const VIEWS = ['sandbox', 'course', 'drill', 'games', 'cheat'];
+const VIEWS = ['sandbox', 'course', 'drill', 'games', 'cheat', 'shop'];
 const CVIEWS = ['course', 'unit', 'quiz'];
 const tabOf = (v, from) => CVIEWS.includes(v) || (v === 'study' && from === 'unit') ? 'course' : v === 'study' ? tabOf(from || 'learn') : v === 'learn' ? 'games' : VIEWS.includes(v) ? v : 'course';
 function setTab(v){
@@ -3515,6 +3587,8 @@ function setChapter(id, scroll){
 }
 function openLine(lineId, i, from){ S.line = lineId; S.i = (i === undefined ? lineStart(lineId) : i); S.showPre = false; go('study', {from}); }
 function refresh(){ adoptSettings(); render(); }
+// new data from another device: show it, but never pull the board out from under a line being played
+function refreshSoon(){ if (S.drill && S.drill.state === 'play'){ adoptSettings(); renderChrome(); return; } refresh(); }
 function render(){
   const U = (S.view === 'unit' || S.view === 'quiz') && UNIT[S.unit];
   if (U && U.side && !U.soon && U.kind !== 'skill' && U.side !== SIDE) useSide(U.side);
@@ -3533,6 +3607,7 @@ function render(){
   else if (S.view === 'sandbox') renderSandbox();
   else if (S.view === 'games') renderGames();
   else if (S.view === 'cheat') renderCheat();
+  else if (S.view === 'shop') renderShop();
   else if (S.view === 'explore') renderExplore();
 }
 document.addEventListener('click', e => {
@@ -4236,8 +4311,7 @@ function sbReport(){
   }).join('');
   const r = lid ? Prog.rec(lid) : null, days = r ? INTERVALS[r.box] : 0;
   const CU = D.scope.startsWith('u:') ? UNIT[D.scope.slice(2)] : null, cs = CU ? (up(CU.id).spar || 0) : 0;
-  const cline = CU ? `<p class="evaltext" style="text-align:left;margin:0">Course · ${esc(CU.title)}: ${Math.min(cs, SPAR)} of ${SPAR} clean practice games${cs >= SPAR ? '. This step is done.' : '.'}</p>` : '';
-  return `<div class="donebox ${n ? 'bad' : ''}">${cline}
+  return `<div class="donebox ${n ? 'bad' : ''}">
       <p class="kicker">${C ? esc(C.name) + ' · ' : ''}${L ? esc(L.title) : 'Line complete'}${lid && !LINES[lid].main ? ' · ' + esc(LINES[lid].title) : ''}</p>
       <div class="bigstat"><b class="tnum">${n}</b><span>${n === 1 ? 'slip' : 'slips'} in this game · ${n ? 'this line is back in today\'s review' : `clean; it comes back in ${days} ${days === 1 ? 'day' : 'days'}`}</span></div>
       ${n ? `<div class="slips">${slipCards}</div>` : ''}
@@ -4259,7 +4333,11 @@ function sbPanelHTML(){
   const black = bnode ? `<div class="mcard"><div class="who"><span class="side blk">${OPP}</span><span class="stepno">${pctTxt(bnode.q || 0)} of ${lastBlack.at === ODDS_ROOT ? 'your games' : 'players at your level'} go this way</span></div>
       <h3>${pieceIcon(bnode.pc, bnode.w === 1)}<span>${esc(bnode.l)}</span></h3>${bnode.t ? `<p class="note">${esc(bnode.t)}</p>` : ''}${bnode.g ? `<div class="chips">${tagChips(bnode.g)}</div>` : ''}
       ${lastBlack.kids.length > 1 ? `<details style="margin-top:10px"><summary class="kicker" style="cursor:pointer">What else ${OPP} could play here</summary><div style="margin-top:8px">${oddsRows(lastBlack)}</div></details>` : ''}</div>` : '';
-  const head = `<div class="dpanel"><p class="kicker">${D.slips.length} ${D.slips.length === 1 ? 'slip' : 'slips'} so far</p>
+  const CU = D.scope.startsWith('u:') ? UNIT[D.scope.slice(2)] : null, cs = CU ? Math.min(up(CU.id).spar || 0, SPAR) : 0;
+  const strip = CU ? `<div class="sbcourse"><div><p class="kicker">Course · ${unitNo(CU)} · ${esc(CU.title)}</p>
+      <p class="sbcl"><span class="pdots" aria-hidden="true">${Array.from({length: SPAR}, (_, k) => `<i class="${k < cs ? 'on' : ''}"></i>`).join('')}</span>${cs} of ${SPAR} clean practice games${cs >= SPAR ? ': this step is done' : ''}</p></div>
+      <button class="btn small" data-unit="${CU.id}">Back to the unit</button></div>` : '';
+  const head = `<div class="dpanel">${strip}<p class="kicker">${D.slips.length} ${D.slips.length === 1 ? 'slip' : 'slips'} so far${CU ? ` · ${OPP} plays only this unit's moves` : ''}</p>
       ${status ? `<div class="status ${D.busy ? 'wait' : ''} ${D.tries ? 'bad' : ''}"><span class="bub"></span>${status}</div>` : ''}
       ${D.state === 'done' ? sbReport() : `<p class="feedback">${D.msg || (D.hist.length <= 2 ? 'Drag a piece or tap it, then tap where it goes.' : '&nbsp;')}</p>`}</div>`;
   return head + (D.state === 'done' ? '' : black) + sbFeed();
@@ -4281,8 +4359,8 @@ function sbSideHTML(){
   const ses = S.sbSession, all = Prog.d.sb;
   const pool = DRILLABLE.filter(id => inScopeLine(id, SBS.scope)), seen = all ? pool.filter(id => all.seen[id]).length : 0;
   const D = S.drill, CU = D && D.kind === 'sb' && D.scope.startsWith('u:') ? UNIT[D.scope.slice(2)] : null;
-  const ban = CU ? `<div class="cban"><span><b>Course · ${unitNo(CU)}:</b> ${esc(CU.title)}. ${Math.min(up(CU.id).spar || 0, SPAR)} of ${SPAR} clean practice games. ${OPP} only plays moves from this unit and picks the lines you know least.</span><span class="cbtns"><button class="btn small" data-unit="${CU.id}">Back to the unit</button><button class="btn small primary" id="sbFree">Free play: pick openings</button></span></div>` : '';
-  return `${ban}<div class="dpanel">
+  if (CU) return '';
+  return `<div class="dpanel">
       <div><p class="kicker" style="margin-bottom:6px">Openings</p><div class="seg">${segBtn('scope', 'all', 'Every opening')}${DATA.chapters.map(C => `<button data-sbf="pick:${C.id}" aria-pressed="${scopeChs(SBS.scope).includes(C.id)}">${esc(C.name)}</button>`).join('')}</div></div>
       <div><p class="kicker" style="margin-bottom:6px">${OPP}'s odds</p><div class="seg">${segBtn('odds', 'real', 'Like real games')}${segBtn('odds', 'even', 'Even spread')}${segBtn('odds', 'weak', 'My weak spots')}</div>
       <p class="evaltext" style="text-align:left;margin-top:8px">${SBS.odds === 'real' ? 'Common replies come up often, rare ones rarely, just like your games.' : SBS.odds === 'even' ? 'Every line in your prep is equally likely, so rare branches get their turn.' : 'Lines you haven\'t played, are due, or slipped on come up more.'}</p>${sbPendingHTML()}</div>
@@ -4298,8 +4376,6 @@ function sbPendingHTML(){
 }
 function renderSbSide(){ const el = document.getElementById('sbside'); if (el){ el.innerHTML = sbSideHTML(); wireSbSide(); } }
 function wireSbSide(){
-  // leave a course practice game: the Sandbox goes back to its own state, where you choose the openings
-  const fr = document.getElementById('sbFree'); if (fr) fr.onclick = () => { S.sbState = S.drill = null; S.sbSession = null; render(); };
   view.querySelectorAll('[data-sbf]').forEach(b => b.onclick = () => { const [k, v] = b.dataset.sbf.split(':'); if (k === 'pick') SBS.scope = scopeToggle(SBS.scope, v); else SBS[k] = v; sbSave(); renderSbSide(); if (!S.drill) renderSbPanel(); });
   const now = document.getElementById('sbNow'); if (now) now.onclick = () => { sbStart(); renderSbSide(); };
 }
@@ -4307,11 +4383,14 @@ function renderSandbox(){
   const D = S.drill;
   view.innerHTML = `  <div class="sgrid">
     <div class="bcol"><div class="board ${D && D.state === 'play' ? 'input' : ''}" id="db">${D ? '' : boardSVG(N[0].f, {coords: true})}</div>
-      <div class="legend" style="margin-top:10px"><span><i style="background:var(--arr-g)"></i>your prep move</span><span><i style="background:var(--arr-r)"></i>what you tried</span></div></div>
+      <div class="legend" style="margin-top:10px"><span><i style="background:var(--arr-g)"></i>your prep move</span><span><i style="background:var(--arr-r)"></i>what you tried</span></div>
+      ${D && D.kind === 'sb' && D.scope.startsWith('u:') ? `<button class="btn freeplay" id="sbFree"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M4 12h16M4 18h7"/><circle cx="17" cy="6" r="2.2"/><circle cx="14" cy="18" r="2.2"/></svg>Free play: pick your own openings</button>` : ''}</div>
     <div class="ccol"><div id="sbpanel">${sbPanelHTML()}</div><div id="sbside">${sbSideHTML()}</div></div>
   </div>`;
   if (D) renderDrillBoard();
   wireSbPanel(); wireSbSide(); wireBoardInput();
+  // leave a course practice game: the Sandbox goes back to its own state, where you choose the openings
+  const fr = document.getElementById('sbFree'); if (fr) fr.onclick = () => { S.sbState = S.drill = null; S.sbSession = null; render(); };
   const f = document.getElementById('sbfeed'); if (f) f.scrollTop = f.scrollHeight;
   if (D && D.state === 'play' && D.busy){ D.busy = false; const t = ++D.tick; setTimeout(() => { if (S.drill === D && D.tick === t) sbContinue(); }, 250); }
 }
@@ -5273,13 +5352,47 @@ const FACES = {
     ${eyes2(25, 39, 35.5, 5.2, mood)}<path class="kn-line" d="M${mood === 'think' ? '28 46q4 1.6 8 0' : '26.5 45q5.5 5 11 0'}"/><circle class="kn-blush" cx="19.5" cy="43" r="2.6"/><circle class="kn-blush" cx="44.5" cy="43" r="2.6"/>
     <rect class="kn-base" x="9" y="56" width="46" height="7" rx="3.5"/>`;
   },
-  pawn(mood){
-    return `<path class="kn-crown" d="M22.5 13.5 21 4l6.2 4.6L32 2.5l4.8 6.1L43 4l-1.5 9.5z"/><path class="kn-body" d="M17 58c0-10 5-16 15-16s15 6 15 16z"/><circle class="kn-body" cx="32" cy="26" r="15.5"/>
+  pawn(mood, L){
+    return `${L && L.head ? '' : '<path class="kn-crown" d="M22.5 13.5 21 4l6.2 4.6L32 2.5l4.8 6.1L43 4l-1.5 9.5z"/>'}<path class="kn-body" d="M17 58c0-10 5-16 15-16s15 6 15 16z"/><circle class="kn-body" cx="32" cy="26" r="15.5"/>
     <rect class="kn-mane" x="19" y="39.5" width="26" height="5.6" rx="2.8"/>${eyes2(26, 38, 25, 4.8, mood)}<path class="kn-line" d="M${mood === 'think' ? '29 33.5q3 1.4 6 0' : '27.5 32.5q4.5 4.4 9 0'}"/>
     <circle class="kn-blush" cx="20.5" cy="31" r="2.4"/><circle class="kn-blush" cx="43.5" cy="31" r="2.4"/><rect class="kn-base" x="12" y="56" width="40" height="7" rx="3.5"/>`;
   }
 };
-function knightSVG(mood, who){ return `<svg viewBox="0 0 64 64" aria-hidden="true">${(FACES[who || coachWho().id] || FACES.knight)(mood)}<\/svg>`; }
+// What the coach wears (the Shop tab). Colours are CSS tokens; each piece is drawn once around its own anchor and
+// placed on each character: hats on the head, glasses over the eyes, ties at the neck.
+const SKINS = {'c-midnight': 'mid', 'c-ruby': 'ruby', 'c-plum': 'plum', 'c-tangerine': 'tang', 'c-gold': 'gold'};
+const SPOT = {
+  knight: {head: 'translate(35.5 11.5) rotate(16) scale(.78)', eyes: [[28.5, 21, 5]], side: true, neck: 'translate(30.5 39.5) rotate(-18) scale(.8)'},
+  rook: {head: 'translate(32 7.4)', eyes: [[25, 35.5, 5.2], [39, 35.5, 5.2]], neck: 'translate(32 28.6) scale(.9)'},
+  pawn: {head: 'translate(32 12.2) scale(.95)', eyes: [[26, 25, 4.8], [38, 25, 4.8]], neck: 'translate(32 42.3) scale(.86)'}
+};
+const HATS = {
+  'h-cap': '<path class="g-blu" d="M-10.5 0C-10.5-11.5 10.5-11.5 10.5 0Z"/><ellipse class="g-blu2" cx="3.5" cy=".4" rx="14" ry="2.6"/><circle class="g-surf" cx="0" cy="-9.2" r="1.3"/>',
+  'h-beanie': '<path class="g-ros" d="M-10.5 0C-10.5-12.5 10.5-12.5 10.5 0Z"/><path class="g-dash" d="M-5-2.5v-6M0-2.5v-8M5-2.5v-6"/><rect class="g-surf g-edge" x="-11.5" y="-3.4" width="23" height="4.8" rx="2.4"/><circle class="g-surf g-edge" cx="0" cy="-11.6" r="3.2"/>',
+  'h-party': '<path class="g-vio" d="M-7.5 0L0-17L7.5 0Z"/><circle class="g-oro" cx="-2.6" cy="-4.5" r="1.3"/><circle class="g-oro" cx="2.4" cy="-8.6" r="1.2"/><circle class="g-oro" cx="-.4" cy="-12.6" r="1"/><circle class="g-oro" cx="0" cy="-17.4" r="2.3"/>',
+  'h-tophat': '<rect class="g-ink" x="-7.5" y="-15.5" width="15" height="14.5" rx="1.2"/><rect class="g-ros" x="-7.5" y="-5.6" width="15" height="2.8"/><rect class="g-ink" x="-12.5" y="-2" width="25" height="3.2" rx="1.6"/>',
+  'h-wizard': '<path class="g-vio" d="M-11 0Q-4-8 1.5-23.5Q5.5-9 11 0Z"/><ellipse class="g-vio2" cx="0" cy="0" rx="13.5" ry="2.4"/><path class="g-oro" d="M1.5-13.8l1.2 2.5 2.7.4-2 1.9.5 2.7-2.4-1.3-2.4 1.3.5-2.7-2-1.9 2.7-.4z"/>',
+  'h-grad': '<path class="g-ink" d="M-7.5-1v-5.5h15V-1q-7.5 3.2-15 0z"/><path class="g-ink" d="M-14.5-7.2L0-11.8L14.5-7.2L0-2.6Z"/><path class="g-tass" d="M0-7.2L9.5-5.8V1.6"/><circle class="g-oro" cx="9.5" cy="2.4" r="1.6"/>',
+  'h-crown': '<path class="g-oro g-edge2" d="M-10.5 0L-12-11.5L-5.8-5.8L0-13.8L5.8-5.8L12-11.5L10.5 0Z"/><circle class="g-ros" cx="0" cy="-4" r="1.7"/><circle class="g-blu" cx="-6.2" cy="-3" r="1.2"/><circle class="g-blu" cx="6.2" cy="-3" r="1.2"/>'
+};
+const NECKS = {
+  'n-bowtie': '<path class="g-ros" d="M0 0L-7.5-4.6V4.6ZM0 0L7.5-4.6V4.6Z"/><circle class="g-ros2" cx="0" cy="0" r="2"/>',
+  'n-scarf': '<rect class="g-blu" x="-12.5" y="-3.2" width="25" height="6.4" rx="3.2"/><path class="g-dash2" d="M-6-3v6M0-3v6M6-3v6"/><path class="g-blu" d="M4.5 1.5l2.5 11.5 5-1.2-2.6-10.8z"/>',
+  'n-medal': '<path class="g-rib1" d="M-4.5-3.5L-.6 6.5H2.4L-1.5-3.5Z"/><path class="g-rib2" d="M4.5-3.5L.6 6.5H-2.4L1.5-3.5Z"/><circle class="g-oro g-edge2" cx="0" cy="9.6" r="4.4"/>'
+};
+function gearSVG(who, L){
+  const P = SPOT[who] || SPOT.knight, E = P.eyes; let s = '';
+  if (L.neck && NECKS[L.neck]) s += `<g transform="${P.neck}">${NECKS[L.neck]}<\/g>`;
+  if (L.face === 'f-glasses') s += E.map(([x, y, r]) => `<circle class="g-lens" cx="${x}" cy="${y}" r="${r + 1.6}"/>`).join('') + (E.length > 1 ? `<path class="g-wire" d="M${E[0][0] + E[0][2] + 1.6} ${E[0][1]}H${E[1][0] - E[1][2] - 1.6}"/>` : `<path class="g-wire" d="M${E[0][0] + E[0][2] + 1.5} ${E[0][1] - .6}L${E[0][0] + 13} ${E[0][1] - 2}"/>`);
+  if (L.face === 'f-shades') s += E.map(([x, y, r]) => `<rect class="g-shade" x="${x - r - 1.8}" y="${y - r + .2}" width="${2 * r + 3.6}" height="${2 * r - .6}" rx="${r - .4}"/><path class="g-glint" d="M${x - r + .4} ${y - 1.6}l2.4-2.2"/>`).join('') + (E.length > 1 ? `<path class="g-wire" d="M${E[0][0] + E[0][2] + 1.8} ${E[0][1] - 1}H${E[1][0] - E[1][2] - 1.8}"/>` : `<path class="g-wire" d="M${E[0][0] + E[0][2] + 1.8} ${E[0][1] - 1}L${E[0][0] + 13} ${E[0][1] - 2.4}"/>`);
+  if (L.face === 'f-monocle'){ const [x, y, r] = E[E.length - 1]; s += `<circle class="g-mono" cx="${x}" cy="${y}" r="${r + 1.4}"/><path class="g-chain" d="M${x + r * .7} ${y + r + .6}q3 6 -1 12"/>`; }
+  if (L.head && HATS[L.head]) s += `<g transform="${P.head}">${HATS[L.head]}<\/g>`;
+  return s;
+}
+function knightSVG(mood, who, look){
+  const w = who || coachWho().id, L = look || (typeof Shop !== 'undefined' ? Shop.worn() : {}), sk = SKINS[L.skin];
+  return `<svg viewBox="${L.head ? '-6 -12 76 76' : '0 0 64 64'}" aria-hidden="true"${sk ? ` class="sk-${sk}"` : ''}>${(FACES[w] || FACES.knight)(mood, L)}${gearSVG(w, L)}<\/svg>`;
+}
 // the three faces to choose from (Settings, and the first screen after an account is made)
 function coachPickHTML(){ return `<div class="coachpick" role="group" aria-label="Your coach">${COACHES.map(c => `<button type="button" data-coachwho="${c.id}" aria-pressed="${coachWho().id === c.id}"><span class="cface">${knightSVG('', c.id)}<\/span><b>${c.name}<\/b><span>${c.what}<\/span><\/button>`).join('')}<\/div>`; }
 document.addEventListener('click', e => {
@@ -5521,7 +5634,8 @@ const Product = {
   locked(tab){
     const T = {course: ['Your course', 'One path through your openings, in the order your games say matters most: the idea, the lines, a drill, practice games and a checkpoint for each.'],
       drill: ['Drill', 'Five lines a day from memory, the ones you slipped on first. Do them every day to keep your streak.'],
-      games: ['Your games', 'Your results by opening, every lesson in each one, and the exact positions where you leave your playbook most often.'], cheat: ['Cheat sheet', 'One card per decision: their move, your answer.']}[tab] || ['This section', ''];
+      games: ['Your games', 'Your results by opening, every lesson in each one, and the exact positions where you leave your playbook most often.'], cheat: ['Cheat sheet', 'One card per decision: their move, your answer.'],
+      shop: ['Shop', 'A wardrobe for your coach, bought with tokens from badges and days in a row.']}[tab] || ['This section', ''];
     const out = this.signedOut(), idx = [LINES[DATA.lessons[0].lines[0]].n.slice(-1)[0], LINES[DATA.lessons[1].lines[0]].n.slice(-1)[0], LINES[DATA.lessons[2].lines[0]].n.slice(-1)[0]];
     view.innerHTML = `<div class="pv"><section class="plocked"><div class="lk">${ICON.lock}<\/div><p class="kicker">Locked until your games are in<\/p><h3>${T[0]}<\/h3><p>${T[1]}<\/p>
       <div class="cta">${out ? `<button class="btn primary" data-acct="signup">Create your account<\/button>` : `<button class="btn primary" data-pgo="setup">Connect your account<\/button>`}<button class="btn" data-view="sandbox">Open the sandbox<\/button><\/div>
@@ -5760,7 +5874,7 @@ function medalSVG(tier, glyph){
     <g class="mg" style="fill:${c(0)};stroke:${c(0)}" font-family="var(--f-display)" font-weight="700">${g}<\/g><path d="M17.5 37a16 16 0 0 1 9-9.5" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.4" stroke-linecap="round"/><\/svg>`;
 }
 const Badges = {
-  queue: [],
+  queue: [], n: 0,
   // stamp what has just been earned; the coach shows it at the next quiet moment. The first check after an update
   // stamps what was earned before it quietly.
   check(){
@@ -5768,14 +5882,15 @@ const Badges = {
     for (const B of BADGES) if (!have[B.id] && B.n(x) >= badgeNeed(B, x)) { have[B.id] = now; got.push(B); }
     if (!got.length && !first) return false;
     Prog.d.badges = have;
-    if (!first && got.length && PERSONA !== 'new'){ this.queue.push(...got); if (!(S.drill && S.drill.state === 'play')) this.show(); }
+    if (!first && got.length && PERSONA !== 'new'){ this.n++; this.queue.push(...got); if (!(S.drill && S.drill.state === 'play')) this.show(); }
     return true;
   },
   show(){
-    const B = this.queue.slice().sort((a, b) => ({gold: 0, silver: 1, bronze: 2}[a.tier] - {gold: 0, silver: 1, bronze: 2}[b.tier]))[0]; if (!B) return;
+    const rank = x => x.id === 's7' ? -1 : {gold: 0, silver: 1, bronze: 2}[x.tier];   // the week that opens the wardrobe says so first
+    const B = this.queue.slice().sort((a, b) => rank(a) - rank(b))[0]; if (!B) return;
     const more = this.queue.length - 1; this.queue = [];
     if (!SET.coach){ toast(`New badge: ${B.name}${more ? ` and ${more} more` : ''}.`); return; }
-    Coach.say(`${B.need}${more ? ` And ${more} more ${more === 1 ? 'badge' : 'badges'} with it.` : ''}`, {mood: 'cheer', stay: true, head: `New badge: ${B.name}`, art: `<span class="cmedal">${medalSVG(B.tier, B.glyph)}<\/span>`, cta: ['me', 'See your badges']});
+    Coach.say(`${B.need} ${more ? `And ${more} more ${more === 1 ? 'badge' : 'badges'} with it: ${more + 1} shop tokens.` : 'That\'s a shop token too.'}${B.id === 's7' ? ' And my wardrobe is open now.' : ''}`, {mood: 'cheer', stay: true, head: `New badge: ${B.name}`, art: `<span class="cmedal">${medalSVG(B.tier, B.glyph)}<\/span>`, cta: B.id === 's7' ? ['shop', 'Open the shop'] : ['me', 'See your badges']});
   }
 };
 // the profile: the streak, the last seven days and every badge, earned or not
@@ -5788,6 +5903,85 @@ function profileHTML(){
   return `<div class="prof"><div class="pstreak ${st ? '' : 'zero'}">${FLAME}<div><b class="tnum">${st}<\/b><span>${st === 1 ? 'day' : 'days'} in a row<\/span><\/div><p>Best: ${best} · today: ${k} of ${DAILY} lines<\/p><\/div>
     <ol class="week" aria-label="The last seven days">${week}<\/ol>
     <div class="bdgs"><p class="kicker">Badges · ${got} of ${BADGES.length}<\/p>${groups.map(g => `<div><p class="bgh">${esc(g)}<\/p><ul class="bgrid">${BADGES.filter(B => B.group === g).map(one).join('')}<\/ul><\/div>`).join('')}<\/div><\/div>`;
+}
+
+/* ---- the shop. Tokens are worked out from the progress (badges earned, days in a row) minus what has been bought,
+   so every device shows the same number. d.shop.own: item -> when bought; d.shop.wear: slot -> [item, when]. */
+const SHOP = [
+  {id: 'c-classic', slot: 'skin', name: 'Classic', price: 0},
+  {id: 'c-midnight', slot: 'skin', name: 'Midnight', price: 2},
+  {id: 'c-ruby', slot: 'skin', name: 'Ruby', price: 2},
+  {id: 'c-plum', slot: 'skin', name: 'Plum', price: 2},
+  {id: 'c-tangerine', slot: 'skin', name: 'Tangerine', price: 2},
+  {id: 'c-gold', slot: 'skin', name: 'Gold leaf', price: 4, needs: 's30'},
+  {id: 'h-cap', slot: 'head', name: 'Cap', price: 1},
+  {id: 'h-beanie', slot: 'head', name: 'Beanie', price: 1},
+  {id: 'h-party', slot: 'head', name: 'Party hat', price: 1},
+  {id: 'h-tophat', slot: 'head', name: 'Top hat', price: 3},
+  {id: 'h-wizard', slot: 'head', name: 'Wizard hat', price: 3, needs: 'l50'},
+  {id: 'h-grad', slot: 'head', name: 'Graduation cap', price: 2, needs: 'uall'},
+  {id: 'h-crown', slot: 'head', name: 'Crown', price: 5, needs: 's30'},
+  {id: 'f-glasses', slot: 'face', name: 'Reading glasses', price: 1},
+  {id: 'f-shades', slot: 'face', name: 'Sunglasses', price: 2},
+  {id: 'f-monocle', slot: 'face', name: 'Monocle', price: 2, needs: 'm10'},
+  {id: 'n-bowtie', slot: 'neck', name: 'Bow tie', price: 1},
+  {id: 'n-scarf', slot: 'neck', name: 'Scarf', price: 2},
+  {id: 'n-medal', slot: 'neck', name: 'Medal', price: 2, needs: 'u1'}
+];
+const SLOTS = [['skin', 'Colours'], ['head', 'Hats'], ['face', 'Glasses'], ['neck', 'Round the neck']];
+const COIN = '<svg class="coin" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9"/><circle class="c2" cx="10" cy="10" r="6.4"/><path class="c3" d="M10 5.6l1.3 2.7 3 .4-2.2 2.1.5 2.9L10 12.3l-2.6 1.4.5-2.9-2.2-2.1 3-.4z"/><\/svg>';
+const Shop = {
+  st(){ const s = Prog.d.shop || (Prog.d.shop = {own: {}, wear: {}}); s.own = s.own || {}; s.wear = s.wear || {}; return s; },
+  // every run of days with five lines, oldest first
+  runs(){ const ks = Object.keys(Prog.d.days || {}).filter(k => Daily.n(k) >= DAILY).sort(), out = []; let prev = null;
+    for (const k of ks){ if (prev && dkey(dayDate(1, prev)) === k) out[out.length - 1]++; else out.push(1); prev = k; } return out; },
+  earned(){ const have = Prog.d.badges || {}, r = this.runs();
+    return {badges: BADGES.filter(B => have[B.id]).length, streak: r.reduce((a, n) => a + Math.floor(n / 3), 0), week: Math.max(0, ...r) >= 7 ? 1 : 0}; },
+  spent(){ return Object.keys(this.st().own).reduce((a, id) => a + ((SHOP.find(i => i.id === id) || {}).price || 0), 0); },
+  total(){ const e = this.earned(); return e.badges + e.streak + e.week; },
+  balance(){ return Math.max(0, this.total() - this.spent()); },
+  isOpen(){ return Math.max(...this.runs(), 0) >= 7; },
+  owns(id){ return id === 'c-classic' || !!this.st().own[id]; },
+  worn(){ const w = (Prog.d.shop || {}).wear || {}, g = s => (w[s] || [])[0] || null; return {skin: g('skin') || 'c-classic', head: g('head'), face: g('face'), neck: g('neck')}; },
+  lockOf(I){ if (!I.price) return ''; if (!this.isOpen()) return 'week'; if (I.needs && !(Prog.d.badges || {})[I.needs]) return 'badge'; return ''; },
+  put(id){ const I = SHOP.find(x => x.id === id); if (!I || !this.owns(id)) return; this.st().wear[I.slot] = [id, Date.now()]; Prog.save(); },
+  off(slot){ this.st().wear[slot] = [slot === 'skin' ? 'c-classic' : null, Date.now()]; Prog.save(); },
+  buy(id){
+    const I = SHOP.find(x => x.id === id); if (!I || this.owns(id) || this.lockOf(I) || this.balance() < I.price) return false;
+    this.st().own[id] = Date.now(); this.st().wear[I.slot] = [id, Date.now()]; Prog.save(); return true;
+  }
+};
+// the shop page: the coach in what they wear, the tokens and where they come from, then every item by slot
+function renderShop(){
+  const view = document.getElementById('view'), bal = Shop.balance(), e = Shop.earned(), open = Shop.isOpen(), L = Shop.worn(), who = coachWho().id;
+  const st = Daily.streak(), toNext = 3 - (st % 3), best = Math.max(0, ...Shop.runs());
+  const card = I => {
+    const lk = Shop.lockOf(I), own = Shop.owns(I.id), on = L[I.slot] === I.id, B = I.needs && BADGES.find(x => x.id === I.needs);
+    const look = Object.assign({}, L, {[I.slot]: I.id});
+    const needB = B && !(Prog.d.badges || {})[B.id];
+    const act = needB ? `<span class="need">Needs the badge “${esc(B.name)}”<\/span>` : lk ? '' : on ? (I.slot === 'skin' && I.id === 'c-classic' ? '<span class="wearing">Wearing<\/span>' : `<button class="btn small" data-off="${I.slot}">Take off<\/button>`)
+      : own ? `<button class="btn small" data-wear="${I.id}">Wear<\/button>` : `<button class="btn small primary" data-buy="${I.id}" ${bal < I.price ? 'disabled' : ''}>${COIN}${I.price}<\/button>`;
+    return `<li class="item ${lk ? 'lock' : ''} ${on ? 'on' : ''}"><span class="ipv">${knightSVG('', who, look)}<\/span><b>${esc(I.name)}<\/b>${own && !on && I.id !== 'c-classic' ? '<span class="owned">Yours<\/span>' : !own && lk === 'week' && I.price && !needB ? `<span class="price">${COIN}${I.price}<\/span>` : ''}${act}<\/li>`;
+  };
+  const days = Array.from({length: 7}, (_, k) => `<i class="${k < Math.min(7, st) ? 'on' : ''}"><\/i>`).join('');
+  view.innerHTML = `<div class="chead"><div><p class="kicker">Shop<\/p><h2 style="font-size:clamp(30px,4vw,46px)">${esc(coachName())}'s wardrobe<\/h2><p>Tokens come from badges and from days in a row. Spend them on a new look for your coach.<\/p><\/div><\/div>
+    <div class="shop">
+      <aside class="shopside">
+        <div class="mannequin">${knightSVG('cheer', who, L)}<\/div>
+        <p class="bal">${COIN}<b class="tnum">${bal}<\/b><span>${bal === 1 ? 'token' : 'tokens'}<\/span><\/p>
+        <ul class="earn"><li><span>Badges<\/span><b class="tnum">${e.badges}<\/b><\/li><li><span>Every three days in a row<\/span><b class="tnum">${e.streak}<\/b><\/li><li><span>Your first full week<\/span><b class="tnum">${e.week}<\/b><\/li>${Shop.spent() ? `<li class="sp"><span>Spent<\/span><b class="tnum">−${Shop.spent()}<\/b><\/li>` : ''}<\/ul>
+        <p class="nextt">${st ? `${toNext === 3 ? 'Three' : toNext === 2 ? 'Two' : 'One'} more ${toNext === 1 ? 'day' : 'days'} in a row for the next token.` : 'Five lines today starts a streak: every third day in a row is a token.'}<\/p>
+        <div class="coachpick mini">${COACHES.map(c => `<button type="button" data-coachwho="${c.id}" aria-pressed="${who === c.id}"><span class="cface">${knightSVG('', c.id, L)}<\/span><b>${c.name}<\/b><\/button>`).join('')}<\/div>
+      <\/aside>
+      <div class="shopmain">
+        ${open ? '' : `<section class="wlock"><div><p class="kicker">Locked<\/p><h3>The wardrobe opens after a week in a row<\/h3><p>Five lines a day for seven days running, and every item here can be bought. Your tokens wait for you until then.<\/p><\/div>
+          <div class="wdays" aria-label="${Math.min(7, st)} of 7 days">${days}<span>${best >= 7 ? '' : `${Math.min(7, st)} of 7`}<\/span><\/div><\/section>`}
+        ${SLOTS.map(([slot, name]) => `<section class="slot"><h3>${name}<\/h3><ul class="items">${SHOP.filter(I => I.slot === slot).map(card).join('')}<\/ul><\/section>`).join('')}
+      <\/div>
+    <\/div>`;
+  view.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => { const I = SHOP.find(x => x.id === b.dataset.buy); if (Shop.buy(I.id)){ renderShop(); Coach.say(`${I.name}? Suits me. Thank you.`, {mood: 'cheer', ms: 5000}); } });
+  view.querySelectorAll('[data-wear]').forEach(b => b.onclick = () => { Shop.put(b.dataset.wear); renderShop(); Coach.refresh(); });
+  view.querySelectorAll('[data-off]').forEach(b => b.onclick = () => { Shop.off(b.dataset.off); renderShop(); Coach.refresh(); });
 }
 
 /* ---- the coach: a few words in a speech bubble, bottom right. Never a hint while you are being tested. */
@@ -5832,7 +6026,11 @@ const Coach = {
     this.hush();
   },
   // the fifth line of the day
-  daily(){ const st = Daily.streak(); this.say(st > 1 ? `That's today's five. ${st} days in a row: come back tomorrow for ${st + 1}.` : `That's today's five, and day one of your streak. Five more tomorrow keeps it going.`, {mood: 'cheer', ms: 9000, art: `<span class="cflame">${FLAME}<b>${st}<\/b><\/span>`}); },
+  daily(){
+    const st = Daily.streak(), week = st === 7 && Math.max(0, ...Shop.runs().slice(0, -1)) < 7;
+    if (week) return this.say(`Seven days in a row. My wardrobe is open now, and that's two tokens for the week plus one for the first full week.`, {mood: 'cheer', stay: true, head: 'A week in a row', art: `<span class="cflame">${FLAME}<b>${st}<\/b><\/span>`, cta: ['shop', 'Open the shop']});
+    this.say(st > 1 ? `That's today's five. ${st} days in a row${st % 3 === 0 ? ', and every third day is a shop token' : ''}: come back tomorrow for ${st + 1}.` : `That's today's five, and day one of your streak. Five more tomorrow keeps it going.`, {mood: 'cheer', ms: 9000, art: `<span class="cflame">${FLAME}<b>${st}<\/b><\/span>`, cta: st % 3 === 0 ? ['shop', 'Open the shop'] : null});
+  },
   event(kind, ok){
     if (kind === 'line' && S.view === 'drill'){ this.n++;
       if (!ok) return this.say('That one comes back today. The second time is where it sticks.');
@@ -5851,8 +6049,8 @@ const renderGames0 = renderGames;
 renderGames = function(){ if (PERSONA === 'ready' && Product.me().P) return Product.games(); renderGames0(); };
 const record0 = Prog.record.bind(Prog);
 Prog.record = function(id, clean){
-  const before = Daily.count(); record0(id, clean);
-  if (Badges.queue.length) return;                       // a new badge says it louder
+  const before = Daily.count(), nb = Badges.n; record0(id, clean);
+  if (Badges.n !== nb) return;                           // a new badge says it louder (now, or once the line is over)
   if (before < DAILY && Daily.count() >= DAILY) return Coach.daily();
   Coach.event('line', clean);
 };

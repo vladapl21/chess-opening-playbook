@@ -69,6 +69,12 @@ Facts that shape the design:
 - Settings and the account button moved out of the header into the corner of the screen; the header fits one row on an ordinary monitor and centres its rows when it has to wrap.
 - A lesson opened from a course unit has "Next lesson" at the top. The Sandbox has "Free play: pick openings" to leave a course practice game.
 
+## Phase 1.9: sync, the shop, course games (done, November 14)
+
+- **Everything follows the account.** Settings keep a time per setting; worn items per slot; every save reads and merges first; unknown fields are carried along. The claude.ai copy used to replace one device's progress with the other's newer copy and never heard the other device while open: it now merges and listens (`Prog.take`). `tests/e2e_artifact_sync.py` and the accounts test check two devices for both.
+- **Shop** (`SHOP`, `Shop`, `renderShop`, `gearSVG` in `app/product.js`): tokens from badges and every third day in a row, a wardrobe that opens after a week in a row, colours and gear for all three coaches.
+- **Course practice games**: the unit, its clean games and the way back sit at the top of the game's panel; free play is a wide button under the board; no opening picker during a course game.
+
 ## Phase 1.8: the daily habit (done, November 13)
 
 - **Today's five** opens the Drill tab: five lines from move one, from both books, slips first (oldest first), then changed lines, what is due, new lines from studied lessons, then new lines in course order. Any line played to its end counts toward the day; five different lines keep the streak (`Daily` and `dailyNext` in the template; `d.days` in the progress record, merged across devices as a union per day).

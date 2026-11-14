@@ -107,7 +107,10 @@ with sync_playwright() as p:
         if g == 0: pg.click('#sbAgain'); pg.wait_for_timeout(500)
     print('practice games:', pg.evaluate("up('b-slav')"))
     assert pg.evaluate("up('b-slav').spar") == 2
-    print('sandbox banner:', pg.inner_text('.cban').replace('\n', ' | '))
+    top = pg.inner_text('.sbcourse'); print('course strip:', top.replace('\n', ' | '))
+    assert '2 of 3 clean practice games' in top and pg.locator('.sbcourse .pdots i.on').count() == 2 and pg.locator('.cban').count() == 0
+    assert pg.is_visible('#sbFree') and pg.locator('#sbside [data-sbf]').count() == 0, 'no opening picker during a course game; free play sits under the board'
+    bx, fx = pg.locator('#db').bounding_box(), pg.locator('#sbFree').bounding_box(); assert fx['y'] > bx['y'] + bx['height'] and abs(fx['width'] - bx['width']) < 4
     pg.screenshot(path=out + 'c_spar_report.png', full_page=True)
     pg.click('.donebox [data-unit="b-slav"]'); pg.wait_for_timeout(400)
     pg.click('[data-ustep="cp"]'); pg.wait_for_timeout(500)

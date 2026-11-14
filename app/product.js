@@ -39,13 +39,47 @@ const FACES = {
     ${eyes2(25, 39, 35.5, 5.2, mood)}<path class="kn-line" d="M${mood === 'think' ? '28 46q4 1.6 8 0' : '26.5 45q5.5 5 11 0'}"/><circle class="kn-blush" cx="19.5" cy="43" r="2.6"/><circle class="kn-blush" cx="44.5" cy="43" r="2.6"/>
     <rect class="kn-base" x="9" y="56" width="46" height="7" rx="3.5"/>`;
   },
-  pawn(mood){
-    return `<path class="kn-crown" d="M22.5 13.5 21 4l6.2 4.6L32 2.5l4.8 6.1L43 4l-1.5 9.5z"/><path class="kn-body" d="M17 58c0-10 5-16 15-16s15 6 15 16z"/><circle class="kn-body" cx="32" cy="26" r="15.5"/>
+  pawn(mood, L){
+    return `${L && L.head ? '' : '<path class="kn-crown" d="M22.5 13.5 21 4l6.2 4.6L32 2.5l4.8 6.1L43 4l-1.5 9.5z"/>'}<path class="kn-body" d="M17 58c0-10 5-16 15-16s15 6 15 16z"/><circle class="kn-body" cx="32" cy="26" r="15.5"/>
     <rect class="kn-mane" x="19" y="39.5" width="26" height="5.6" rx="2.8"/>${eyes2(26, 38, 25, 4.8, mood)}<path class="kn-line" d="M${mood === 'think' ? '29 33.5q3 1.4 6 0' : '27.5 32.5q4.5 4.4 9 0'}"/>
     <circle class="kn-blush" cx="20.5" cy="31" r="2.4"/><circle class="kn-blush" cx="43.5" cy="31" r="2.4"/><rect class="kn-base" x="12" y="56" width="40" height="7" rx="3.5"/>`;
   }
 };
-function knightSVG(mood, who){ return `<svg viewBox="0 0 64 64" aria-hidden="true">${(FACES[who || coachWho().id] || FACES.knight)(mood)}</svg>`; }
+// What the coach wears (the Shop tab). Colours are CSS tokens; each piece is drawn once around its own anchor and
+// placed on each character: hats on the head, glasses over the eyes, ties at the neck.
+const SKINS = {'c-midnight': 'mid', 'c-ruby': 'ruby', 'c-plum': 'plum', 'c-tangerine': 'tang', 'c-gold': 'gold'};
+const SPOT = {
+  knight: {head: 'translate(35.5 11.5) rotate(16) scale(.78)', eyes: [[28.5, 21, 5]], side: true, neck: 'translate(30.5 39.5) rotate(-18) scale(.8)'},
+  rook: {head: 'translate(32 7.4)', eyes: [[25, 35.5, 5.2], [39, 35.5, 5.2]], neck: 'translate(32 28.6) scale(.9)'},
+  pawn: {head: 'translate(32 12.2) scale(.95)', eyes: [[26, 25, 4.8], [38, 25, 4.8]], neck: 'translate(32 42.3) scale(.86)'}
+};
+const HATS = {
+  'h-cap': '<path class="g-blu" d="M-10.5 0C-10.5-11.5 10.5-11.5 10.5 0Z"/><ellipse class="g-blu2" cx="3.5" cy=".4" rx="14" ry="2.6"/><circle class="g-surf" cx="0" cy="-9.2" r="1.3"/>',
+  'h-beanie': '<path class="g-ros" d="M-10.5 0C-10.5-12.5 10.5-12.5 10.5 0Z"/><path class="g-dash" d="M-5-2.5v-6M0-2.5v-8M5-2.5v-6"/><rect class="g-surf g-edge" x="-11.5" y="-3.4" width="23" height="4.8" rx="2.4"/><circle class="g-surf g-edge" cx="0" cy="-11.6" r="3.2"/>',
+  'h-party': '<path class="g-vio" d="M-7.5 0L0-17L7.5 0Z"/><circle class="g-oro" cx="-2.6" cy="-4.5" r="1.3"/><circle class="g-oro" cx="2.4" cy="-8.6" r="1.2"/><circle class="g-oro" cx="-.4" cy="-12.6" r="1"/><circle class="g-oro" cx="0" cy="-17.4" r="2.3"/>',
+  'h-tophat': '<rect class="g-ink" x="-7.5" y="-15.5" width="15" height="14.5" rx="1.2"/><rect class="g-ros" x="-7.5" y="-5.6" width="15" height="2.8"/><rect class="g-ink" x="-12.5" y="-2" width="25" height="3.2" rx="1.6"/>',
+  'h-wizard': '<path class="g-vio" d="M-11 0Q-4-8 1.5-23.5Q5.5-9 11 0Z"/><ellipse class="g-vio2" cx="0" cy="0" rx="13.5" ry="2.4"/><path class="g-oro" d="M1.5-13.8l1.2 2.5 2.7.4-2 1.9.5 2.7-2.4-1.3-2.4 1.3.5-2.7-2-1.9 2.7-.4z"/>',
+  'h-grad': '<path class="g-ink" d="M-7.5-1v-5.5h15V-1q-7.5 3.2-15 0z"/><path class="g-ink" d="M-14.5-7.2L0-11.8L14.5-7.2L0-2.6Z"/><path class="g-tass" d="M0-7.2L9.5-5.8V1.6"/><circle class="g-oro" cx="9.5" cy="2.4" r="1.6"/>',
+  'h-crown': '<path class="g-oro g-edge2" d="M-10.5 0L-12-11.5L-5.8-5.8L0-13.8L5.8-5.8L12-11.5L10.5 0Z"/><circle class="g-ros" cx="0" cy="-4" r="1.7"/><circle class="g-blu" cx="-6.2" cy="-3" r="1.2"/><circle class="g-blu" cx="6.2" cy="-3" r="1.2"/>'
+};
+const NECKS = {
+  'n-bowtie': '<path class="g-ros" d="M0 0L-7.5-4.6V4.6ZM0 0L7.5-4.6V4.6Z"/><circle class="g-ros2" cx="0" cy="0" r="2"/>',
+  'n-scarf': '<rect class="g-blu" x="-12.5" y="-3.2" width="25" height="6.4" rx="3.2"/><path class="g-dash2" d="M-6-3v6M0-3v6M6-3v6"/><path class="g-blu" d="M4.5 1.5l2.5 11.5 5-1.2-2.6-10.8z"/>',
+  'n-medal': '<path class="g-rib1" d="M-4.5-3.5L-.6 6.5H2.4L-1.5-3.5Z"/><path class="g-rib2" d="M4.5-3.5L.6 6.5H-2.4L1.5-3.5Z"/><circle class="g-oro g-edge2" cx="0" cy="9.6" r="4.4"/>'
+};
+function gearSVG(who, L){
+  const P = SPOT[who] || SPOT.knight, E = P.eyes; let s = '';
+  if (L.neck && NECKS[L.neck]) s += `<g transform="${P.neck}">${NECKS[L.neck]}</g>`;
+  if (L.face === 'f-glasses') s += E.map(([x, y, r]) => `<circle class="g-lens" cx="${x}" cy="${y}" r="${r + 1.6}"/>`).join('') + (E.length > 1 ? `<path class="g-wire" d="M${E[0][0] + E[0][2] + 1.6} ${E[0][1]}H${E[1][0] - E[1][2] - 1.6}"/>` : `<path class="g-wire" d="M${E[0][0] + E[0][2] + 1.5} ${E[0][1] - .6}L${E[0][0] + 13} ${E[0][1] - 2}"/>`);
+  if (L.face === 'f-shades') s += E.map(([x, y, r]) => `<rect class="g-shade" x="${x - r - 1.8}" y="${y - r + .2}" width="${2 * r + 3.6}" height="${2 * r - .6}" rx="${r - .4}"/><path class="g-glint" d="M${x - r + .4} ${y - 1.6}l2.4-2.2"/>`).join('') + (E.length > 1 ? `<path class="g-wire" d="M${E[0][0] + E[0][2] + 1.8} ${E[0][1] - 1}H${E[1][0] - E[1][2] - 1.8}"/>` : `<path class="g-wire" d="M${E[0][0] + E[0][2] + 1.8} ${E[0][1] - 1}L${E[0][0] + 13} ${E[0][1] - 2.4}"/>`);
+  if (L.face === 'f-monocle'){ const [x, y, r] = E[E.length - 1]; s += `<circle class="g-mono" cx="${x}" cy="${y}" r="${r + 1.4}"/><path class="g-chain" d="M${x + r * .7} ${y + r + .6}q3 6 -1 12"/>`; }
+  if (L.head && HATS[L.head]) s += `<g transform="${P.head}">${HATS[L.head]}</g>`;
+  return s;
+}
+function knightSVG(mood, who, look){
+  const w = who || coachWho().id, L = look || (typeof Shop !== 'undefined' ? Shop.worn() : {}), sk = SKINS[L.skin];
+  return `<svg viewBox="${L.head ? '-6 -12 76 76' : '0 0 64 64'}" aria-hidden="true"${sk ? ` class="sk-${sk}"` : ''}>${(FACES[w] || FACES.knight)(mood, L)}${gearSVG(w, L)}</svg>`;
+}
 // the three faces to choose from (Settings, and the first screen after an account is made)
 function coachPickHTML(){ return `<div class="coachpick" role="group" aria-label="Your coach">${COACHES.map(c => `<button type="button" data-coachwho="${c.id}" aria-pressed="${coachWho().id === c.id}"><span class="cface">${knightSVG('', c.id)}</span><b>${c.name}</b><span>${c.what}</span></button>`).join('')}</div>`; }
 document.addEventListener('click', e => {
@@ -287,7 +321,8 @@ const Product = {
   locked(tab){
     const T = {course: ['Your course', 'One path through your openings, in the order your games say matters most: the idea, the lines, a drill, practice games and a checkpoint for each.'],
       drill: ['Drill', 'Five lines a day from memory, the ones you slipped on first. Do them every day to keep your streak.'],
-      games: ['Your games', 'Your results by opening, every lesson in each one, and the exact positions where you leave your playbook most often.'], cheat: ['Cheat sheet', 'One card per decision: their move, your answer.']}[tab] || ['This section', ''];
+      games: ['Your games', 'Your results by opening, every lesson in each one, and the exact positions where you leave your playbook most often.'], cheat: ['Cheat sheet', 'One card per decision: their move, your answer.'],
+      shop: ['Shop', 'A wardrobe for your coach, bought with tokens from badges and days in a row.']}[tab] || ['This section', ''];
     const out = this.signedOut(), idx = [LINES[DATA.lessons[0].lines[0]].n.slice(-1)[0], LINES[DATA.lessons[1].lines[0]].n.slice(-1)[0], LINES[DATA.lessons[2].lines[0]].n.slice(-1)[0]];
     view.innerHTML = `<div class="pv"><section class="plocked"><div class="lk">${ICON.lock}</div><p class="kicker">Locked until your games are in</p><h3>${T[0]}</h3><p>${T[1]}</p>
       <div class="cta">${out ? `<button class="btn primary" data-acct="signup">Create your account</button>` : `<button class="btn primary" data-pgo="setup">Connect your account</button>`}<button class="btn" data-view="sandbox">Open the sandbox</button></div>
@@ -526,7 +561,7 @@ function medalSVG(tier, glyph){
     <g class="mg" style="fill:${c(0)};stroke:${c(0)}" font-family="var(--f-display)" font-weight="700">${g}</g><path d="M17.5 37a16 16 0 0 1 9-9.5" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.4" stroke-linecap="round"/></svg>`;
 }
 const Badges = {
-  queue: [],
+  queue: [], n: 0,
   // stamp what has just been earned; the coach shows it at the next quiet moment. The first check after an update
   // stamps what was earned before it quietly.
   check(){
@@ -534,14 +569,15 @@ const Badges = {
     for (const B of BADGES) if (!have[B.id] && B.n(x) >= badgeNeed(B, x)) { have[B.id] = now; got.push(B); }
     if (!got.length && !first) return false;
     Prog.d.badges = have;
-    if (!first && got.length && PERSONA !== 'new'){ this.queue.push(...got); if (!(S.drill && S.drill.state === 'play')) this.show(); }
+    if (!first && got.length && PERSONA !== 'new'){ this.n++; this.queue.push(...got); if (!(S.drill && S.drill.state === 'play')) this.show(); }
     return true;
   },
   show(){
-    const B = this.queue.slice().sort((a, b) => ({gold: 0, silver: 1, bronze: 2}[a.tier] - {gold: 0, silver: 1, bronze: 2}[b.tier]))[0]; if (!B) return;
+    const rank = x => x.id === 's7' ? -1 : {gold: 0, silver: 1, bronze: 2}[x.tier];   // the week that opens the wardrobe says so first
+    const B = this.queue.slice().sort((a, b) => rank(a) - rank(b))[0]; if (!B) return;
     const more = this.queue.length - 1; this.queue = [];
     if (!SET.coach){ toast(`New badge: ${B.name}${more ? ` and ${more} more` : ''}.`); return; }
-    Coach.say(`${B.need}${more ? ` And ${more} more ${more === 1 ? 'badge' : 'badges'} with it.` : ''}`, {mood: 'cheer', stay: true, head: `New badge: ${B.name}`, art: `<span class="cmedal">${medalSVG(B.tier, B.glyph)}</span>`, cta: ['me', 'See your badges']});
+    Coach.say(`${B.need} ${more ? `And ${more} more ${more === 1 ? 'badge' : 'badges'} with it: ${more + 1} shop tokens.` : 'That\'s a shop token too.'}${B.id === 's7' ? ' And my wardrobe is open now.' : ''}`, {mood: 'cheer', stay: true, head: `New badge: ${B.name}`, art: `<span class="cmedal">${medalSVG(B.tier, B.glyph)}</span>`, cta: B.id === 's7' ? ['shop', 'Open the shop'] : ['me', 'See your badges']});
   }
 };
 // the profile: the streak, the last seven days and every badge, earned or not
@@ -554,6 +590,85 @@ function profileHTML(){
   return `<div class="prof"><div class="pstreak ${st ? '' : 'zero'}">${FLAME}<div><b class="tnum">${st}</b><span>${st === 1 ? 'day' : 'days'} in a row</span></div><p>Best: ${best} · today: ${k} of ${DAILY} lines</p></div>
     <ol class="week" aria-label="The last seven days">${week}</ol>
     <div class="bdgs"><p class="kicker">Badges · ${got} of ${BADGES.length}</p>${groups.map(g => `<div><p class="bgh">${esc(g)}</p><ul class="bgrid">${BADGES.filter(B => B.group === g).map(one).join('')}</ul></div>`).join('')}</div></div>`;
+}
+
+/* ---- the shop. Tokens are worked out from the progress (badges earned, days in a row) minus what has been bought,
+   so every device shows the same number. d.shop.own: item -> when bought; d.shop.wear: slot -> [item, when]. */
+const SHOP = [
+  {id: 'c-classic', slot: 'skin', name: 'Classic', price: 0},
+  {id: 'c-midnight', slot: 'skin', name: 'Midnight', price: 2},
+  {id: 'c-ruby', slot: 'skin', name: 'Ruby', price: 2},
+  {id: 'c-plum', slot: 'skin', name: 'Plum', price: 2},
+  {id: 'c-tangerine', slot: 'skin', name: 'Tangerine', price: 2},
+  {id: 'c-gold', slot: 'skin', name: 'Gold leaf', price: 4, needs: 's30'},
+  {id: 'h-cap', slot: 'head', name: 'Cap', price: 1},
+  {id: 'h-beanie', slot: 'head', name: 'Beanie', price: 1},
+  {id: 'h-party', slot: 'head', name: 'Party hat', price: 1},
+  {id: 'h-tophat', slot: 'head', name: 'Top hat', price: 3},
+  {id: 'h-wizard', slot: 'head', name: 'Wizard hat', price: 3, needs: 'l50'},
+  {id: 'h-grad', slot: 'head', name: 'Graduation cap', price: 2, needs: 'uall'},
+  {id: 'h-crown', slot: 'head', name: 'Crown', price: 5, needs: 's30'},
+  {id: 'f-glasses', slot: 'face', name: 'Reading glasses', price: 1},
+  {id: 'f-shades', slot: 'face', name: 'Sunglasses', price: 2},
+  {id: 'f-monocle', slot: 'face', name: 'Monocle', price: 2, needs: 'm10'},
+  {id: 'n-bowtie', slot: 'neck', name: 'Bow tie', price: 1},
+  {id: 'n-scarf', slot: 'neck', name: 'Scarf', price: 2},
+  {id: 'n-medal', slot: 'neck', name: 'Medal', price: 2, needs: 'u1'}
+];
+const SLOTS = [['skin', 'Colours'], ['head', 'Hats'], ['face', 'Glasses'], ['neck', 'Round the neck']];
+const COIN = '<svg class="coin" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9"/><circle class="c2" cx="10" cy="10" r="6.4"/><path class="c3" d="M10 5.6l1.3 2.7 3 .4-2.2 2.1.5 2.9L10 12.3l-2.6 1.4.5-2.9-2.2-2.1 3-.4z"/></svg>';
+const Shop = {
+  st(){ const s = Prog.d.shop || (Prog.d.shop = {own: {}, wear: {}}); s.own = s.own || {}; s.wear = s.wear || {}; return s; },
+  // every run of days with five lines, oldest first
+  runs(){ const ks = Object.keys(Prog.d.days || {}).filter(k => Daily.n(k) >= DAILY).sort(), out = []; let prev = null;
+    for (const k of ks){ if (prev && dkey(dayDate(1, prev)) === k) out[out.length - 1]++; else out.push(1); prev = k; } return out; },
+  earned(){ const have = Prog.d.badges || {}, r = this.runs();
+    return {badges: BADGES.filter(B => have[B.id]).length, streak: r.reduce((a, n) => a + Math.floor(n / 3), 0), week: Math.max(0, ...r) >= 7 ? 1 : 0}; },
+  spent(){ return Object.keys(this.st().own).reduce((a, id) => a + ((SHOP.find(i => i.id === id) || {}).price || 0), 0); },
+  total(){ const e = this.earned(); return e.badges + e.streak + e.week; },
+  balance(){ return Math.max(0, this.total() - this.spent()); },
+  isOpen(){ return Math.max(...this.runs(), 0) >= 7; },
+  owns(id){ return id === 'c-classic' || !!this.st().own[id]; },
+  worn(){ const w = (Prog.d.shop || {}).wear || {}, g = s => (w[s] || [])[0] || null; return {skin: g('skin') || 'c-classic', head: g('head'), face: g('face'), neck: g('neck')}; },
+  lockOf(I){ if (!I.price) return ''; if (!this.isOpen()) return 'week'; if (I.needs && !(Prog.d.badges || {})[I.needs]) return 'badge'; return ''; },
+  put(id){ const I = SHOP.find(x => x.id === id); if (!I || !this.owns(id)) return; this.st().wear[I.slot] = [id, Date.now()]; Prog.save(); },
+  off(slot){ this.st().wear[slot] = [slot === 'skin' ? 'c-classic' : null, Date.now()]; Prog.save(); },
+  buy(id){
+    const I = SHOP.find(x => x.id === id); if (!I || this.owns(id) || this.lockOf(I) || this.balance() < I.price) return false;
+    this.st().own[id] = Date.now(); this.st().wear[I.slot] = [id, Date.now()]; Prog.save(); return true;
+  }
+};
+// the shop page: the coach in what they wear, the tokens and where they come from, then every item by slot
+function renderShop(){
+  const view = document.getElementById('view'), bal = Shop.balance(), e = Shop.earned(), open = Shop.isOpen(), L = Shop.worn(), who = coachWho().id;
+  const st = Daily.streak(), toNext = 3 - (st % 3), best = Math.max(0, ...Shop.runs());
+  const card = I => {
+    const lk = Shop.lockOf(I), own = Shop.owns(I.id), on = L[I.slot] === I.id, B = I.needs && BADGES.find(x => x.id === I.needs);
+    const look = Object.assign({}, L, {[I.slot]: I.id});
+    const needB = B && !(Prog.d.badges || {})[B.id];
+    const act = needB ? `<span class="need">Needs the badge “${esc(B.name)}”</span>` : lk ? '' : on ? (I.slot === 'skin' && I.id === 'c-classic' ? '<span class="wearing">Wearing</span>' : `<button class="btn small" data-off="${I.slot}">Take off</button>`)
+      : own ? `<button class="btn small" data-wear="${I.id}">Wear</button>` : `<button class="btn small primary" data-buy="${I.id}" ${bal < I.price ? 'disabled' : ''}>${COIN}${I.price}</button>`;
+    return `<li class="item ${lk ? 'lock' : ''} ${on ? 'on' : ''}"><span class="ipv">${knightSVG('', who, look)}</span><b>${esc(I.name)}</b>${own && !on && I.id !== 'c-classic' ? '<span class="owned">Yours</span>' : !own && lk === 'week' && I.price && !needB ? `<span class="price">${COIN}${I.price}</span>` : ''}${act}</li>`;
+  };
+  const days = Array.from({length: 7}, (_, k) => `<i class="${k < Math.min(7, st) ? 'on' : ''}"></i>`).join('');
+  view.innerHTML = `<div class="chead"><div><p class="kicker">Shop</p><h2 style="font-size:clamp(30px,4vw,46px)">${esc(coachName())}'s wardrobe</h2><p>Tokens come from badges and from days in a row. Spend them on a new look for your coach.</p></div></div>
+    <div class="shop">
+      <aside class="shopside">
+        <div class="mannequin">${knightSVG('cheer', who, L)}</div>
+        <p class="bal">${COIN}<b class="tnum">${bal}</b><span>${bal === 1 ? 'token' : 'tokens'}</span></p>
+        <ul class="earn"><li><span>Badges</span><b class="tnum">${e.badges}</b></li><li><span>Every three days in a row</span><b class="tnum">${e.streak}</b></li><li><span>Your first full week</span><b class="tnum">${e.week}</b></li>${Shop.spent() ? `<li class="sp"><span>Spent</span><b class="tnum">−${Shop.spent()}</b></li>` : ''}</ul>
+        <p class="nextt">${st ? `${toNext === 3 ? 'Three' : toNext === 2 ? 'Two' : 'One'} more ${toNext === 1 ? 'day' : 'days'} in a row for the next token.` : 'Five lines today starts a streak: every third day in a row is a token.'}</p>
+        <div class="coachpick mini">${COACHES.map(c => `<button type="button" data-coachwho="${c.id}" aria-pressed="${who === c.id}"><span class="cface">${knightSVG('', c.id, L)}</span><b>${c.name}</b></button>`).join('')}</div>
+      </aside>
+      <div class="shopmain">
+        ${open ? '' : `<section class="wlock"><div><p class="kicker">Locked</p><h3>The wardrobe opens after a week in a row</h3><p>Five lines a day for seven days running, and every item here can be bought. Your tokens wait for you until then.</p></div>
+          <div class="wdays" aria-label="${Math.min(7, st)} of 7 days">${days}<span>${best >= 7 ? '' : `${Math.min(7, st)} of 7`}</span></div></section>`}
+        ${SLOTS.map(([slot, name]) => `<section class="slot"><h3>${name}</h3><ul class="items">${SHOP.filter(I => I.slot === slot).map(card).join('')}</ul></section>`).join('')}
+      </div>
+    </div>`;
+  view.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => { const I = SHOP.find(x => x.id === b.dataset.buy); if (Shop.buy(I.id)){ renderShop(); Coach.say(`${I.name}? Suits me. Thank you.`, {mood: 'cheer', ms: 5000}); } });
+  view.querySelectorAll('[data-wear]').forEach(b => b.onclick = () => { Shop.put(b.dataset.wear); renderShop(); Coach.refresh(); });
+  view.querySelectorAll('[data-off]').forEach(b => b.onclick = () => { Shop.off(b.dataset.off); renderShop(); Coach.refresh(); });
 }
 
 /* ---- the coach: a few words in a speech bubble, bottom right. Never a hint while you are being tested. */
@@ -598,7 +713,11 @@ const Coach = {
     this.hush();
   },
   // the fifth line of the day
-  daily(){ const st = Daily.streak(); this.say(st > 1 ? `That's today's five. ${st} days in a row: come back tomorrow for ${st + 1}.` : `That's today's five, and day one of your streak. Five more tomorrow keeps it going.`, {mood: 'cheer', ms: 9000, art: `<span class="cflame">${FLAME}<b>${st}</b></span>`}); },
+  daily(){
+    const st = Daily.streak(), week = st === 7 && Math.max(0, ...Shop.runs().slice(0, -1)) < 7;
+    if (week) return this.say(`Seven days in a row. My wardrobe is open now, and that's two tokens for the week plus one for the first full week.`, {mood: 'cheer', stay: true, head: 'A week in a row', art: `<span class="cflame">${FLAME}<b>${st}</b></span>`, cta: ['shop', 'Open the shop']});
+    this.say(st > 1 ? `That's today's five. ${st} days in a row${st % 3 === 0 ? ', and every third day is a shop token' : ''}: come back tomorrow for ${st + 1}.` : `That's today's five, and day one of your streak. Five more tomorrow keeps it going.`, {mood: 'cheer', ms: 9000, art: `<span class="cflame">${FLAME}<b>${st}</b></span>`, cta: st % 3 === 0 ? ['shop', 'Open the shop'] : null});
+  },
   event(kind, ok){
     if (kind === 'line' && S.view === 'drill'){ this.n++;
       if (!ok) return this.say('That one comes back today. The second time is where it sticks.');
@@ -617,8 +736,8 @@ const renderGames0 = renderGames;
 renderGames = function(){ if (PERSONA === 'ready' && Product.me().P) return Product.games(); renderGames0(); };
 const record0 = Prog.record.bind(Prog);
 Prog.record = function(id, clean){
-  const before = Daily.count(); record0(id, clean);
-  if (Badges.queue.length) return;                       // a new badge says it louder
+  const before = Daily.count(), nb = Badges.n; record0(id, clean);
+  if (Badges.n !== nb) return;                           // a new badge says it louder (now, or once the line is over)
   if (before < DAILY && Daily.count() >= DAILY) return Coach.daily();
   Coach.event('line', clean);
 };
