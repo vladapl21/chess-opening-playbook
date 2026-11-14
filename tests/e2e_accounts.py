@@ -26,13 +26,13 @@ class Server:
 
     def session(self, u):
         t = secrets.token_hex(8); self.tokens[t] = u['id']
-        return {'access_token': t, 'user': {'id': u['id'], 'email': u['email']}}
+        return {'access_token': t, 'user': {'id': u['id'], 'email': u['email'], 'user_metadata': u.get('meta', {})}}
 
     def handle(self, path, b):
         uid = self.tokens.get(b.get('token'))
         if path == 'signup':
             if b['email'] in self.users: return {'error': {'message': 'User already registered'}}
-            u = self.users[b['email']] = {'id': 'u-' + secrets.token_hex(4), 'email': b['email'], 'password': b['password'], 'confirmed': not self.confirm}
+            u = self.users[b['email']] = {'id': 'u-' + secrets.token_hex(4), 'email': b['email'], 'password': b['password'], 'confirmed': not self.confirm, 'meta': b.get('data') or {}}
             if self.confirm:
                 c = secrets.token_hex(6); self.codes[c] = u['email']; self.mail.append(('confirm', u['email'], c))
                 return {'user': {'id': u['id'], 'email': u['email']}, 'session': None}
@@ -147,7 +147,23 @@ with sync_playwright() as p:
     assert a.evaluate("lessonSeen('w', 'center')"), 'device A picked up device B progress on return'
     bp.click('#acctBtn'); bp.wait_for_timeout(200)
     bp.screenshot(path=out + 'acct_phone_account.png')
+    assert bp.locator('#acctPanel .bdg').count() > 10 and bp.locator('#acctPanel [data-mail]').count() == 1, 'the profile: badges and the reminder switch'
+    assert bp.evaluate('document.getElementById("acctPanel").scrollWidth <= document.getElementById("acctPanel").clientWidth + 1')
     bp.click('#acctPanel [data-act="close"]')
+
+    # ---- the coach, the look and the reminder choice follow the account to the other device
+    a.evaluate("setSetting('who', 'rook'); setSetting('board', 'wood')"); a.click('#acctBtn'); a.wait_for_timeout(200)
+    assert a.get_attribute('#acctPanel [data-mail]', 'aria-checked') == 'false'
+    a.click('#acctPanel [data-mail]'); a.wait_for_timeout(200); assert a.get_attribute('#acctPanel [data-mail]', 'aria-checked') == 'true'
+    a.click('#acctPanel [data-act="close"]'); a.wait_for_timeout(1800)
+    row = S.rows[uid]['data']; assert row['set']['who'] == 'rook' and row['set']['board'] == 'wood' and row['mail']['on'] is True, (row.get('set'), row.get('mail'))
+    bp.evaluate("document.dispatchEvent(new Event('visibilitychange'))"); bp.wait_for_timeout(900)
+    got = bp.evaluate("[SET.who, SET.board, document.documentElement.dataset.board, coachName(), !!(Prog.d.mail && Prog.d.mail.on)]"); print('device B after a pull:', got)
+    assert got == ['rook', 'wood', 'wood', 'Rocco', True], got
+    bp.evaluate("setSetting('who', 'pawn')"); bp.wait_for_timeout(1800)
+    a.evaluate("document.dispatchEvent(new Event('visibilitychange'))"); a.wait_for_timeout(900)
+    assert a.evaluate("[SET.who, SET.board]") == ['pawn', 'wood'], 'the newer change wins, the rest stays'
+    assert a.evaluate("mergeProg({set: {who: 'rook', t: 5}}, {set: {who: 'pawn', t: 3}}).set.who") == 'rook'
 
     # ---- the account copy can't be reached: the app says so, keeps working, and catches up later
     S.down = True
@@ -226,17 +242,35 @@ with sync_playwright() as p:
     # playbook keeps it when it is opened on a new device.
     nb = launch(p, house=False); S.confirm = False
     N1 = nb.new_context(viewport={'width': 1280, 'height': 860}); wire(N1); n1 = N1.new_page(); hook(n1, 'N1')
+    ROOTP = Path(__file__).resolve().parents[1]
+    games = lambda f: ['[Event ' + g for g in (ROOTP / 'data' / 'games' / f).read_text().split('[Event ')[1:]]
+    arch = {'09': games('vladapl_1.pgn'), '10': games('vladapl_2.pgn')}
+    def chesscom(route):
+        u = route.request.url
+        if u.endswith('/player/vladapl/games/archives'): route.fulfill(status=200, content_type='application/json', body=json.dumps({'archives': [f'https://api.chess.com/pub/player/vladapl/games/2026/{m}' for m in arch]}))
+        elif u[-2:] in arch: route.fulfill(status=200, content_type='application/json', body=json.dumps({'games': [{'rules': 'chess', 'time_class': 'blitz', 'pgn': g} for g in arch[u[-2:]]]}))
+        else: route.fulfill(status=404, content_type='application/json', body='{}')
+    N1.route('https://api.chess.com/**', chesscom)
     n1.goto(APP); n1.wait_for_timeout(900)
     assert n1.evaluate('[PERSONA, S.view]') == ['new', 'start'] and n1.locator('.whero [data-acct="signup"]').count() == 1 and n1.locator('[data-pgo="setup"]').count() == 0
     n1.evaluate("go('setup')"); n1.wait_for_timeout(200); assert n1.locator('#uform').count() == 0 and 'First, an account' in n1.inner_text('#view')
     n1.evaluate("go('start')"); n1.wait_for_timeout(200)
     n1.click('.whero [data-acct="signup"]'); n1.wait_for_timeout(200); assert n1.evaluate('Acct.mode') == 'signup'
+    assert n1.locator('#acctPanel input[name=chess]').count() == 1 and n1.is_checked('#acctPanel input[name=mail]'), 'the chess account and reminders are part of the sign-up'
+    n1.click('#acctPanel [data-csite="lichess"]'); n1.wait_for_timeout(100); assert 'Lichess' in n1.get_attribute('#acctPanel input[name=chess]', 'placeholder')
+    n1.click('#acctPanel [data-csite="chess.com"]'); n1.wait_for_timeout(100)
+    n1.fill('#acctPanel input[name=chess]', 'VladAPL'); n1.screenshot(path=out + 'acct_signup_connect.png')
     sheet(n1, 'signup', 'player@example.com', 'a long password'); assert synced(n1), n1.evaluate('[!!Cloud.user, Cloud.state, Cloud.err, Cloud.writing, Cloud.pulling, Acct.mode, Acct.msg]')
     if n1.evaluate('!!Acct.mode'): n1.evaluate('Acct.close()')
-    n1.wait_for_timeout(300)
-    assert n1.locator('.whero [data-pgo="setup"]').count() == 1 and n1.locator('.steps3 li.done').count() == 1, 'signed in: the next step is the games'
-    row = S.rows[S.users['player@example.com']['id']]['data']; assert row['me']['state'] == 'new', row.get('me')
-    n1.click('.whero [data-pgo="setup"]'); n1.wait_for_timeout(200); assert n1.locator('#uform').count() == 1
+    # straight to the games: this made-up player has too few of them, so the playbook waits for more
+    n1.wait_for_function("S.view === 'setup' && !!document.querySelector('.pshort')", timeout=20000); n1.wait_for_timeout(1800)
+    assert S.users['player@example.com']['meta'] == {'chess_site': 'chess.com', 'chess_user': 'VladAPL'}
+    row = S.rows[S.users['player@example.com']['id']]['data']; print('after sign-up:', row['me'], '| reminders', row.get('mail'))
+    assert row['me']['state'] == 'new' and row['me']['short']['user'] == 'vladapl' and row['me']['auto'] == 1 and row['mail']['on'] is True, row.get('me')
+    n1.reload(); n1.wait_for_timeout(1200); assert n1.evaluate('Product.busy') is False and n1.locator('.pshort').count() == 1, 'the games are read once, not on every visit'
+    n1.evaluate("go('start')"); n1.wait_for_timeout(300)
+    assert n1.locator('.whero [data-pgo="setup"]').inner_text() == 'Check my games again' and n1.locator('.steps3 li.done').count() == 1
+    n1.click('.whero [data-pgo="setup"]'); n1.wait_for_timeout(200); n1.click('[data-other]'); n1.wait_for_timeout(200); assert n1.locator('#uform').count() == 1
     print('new player: account first, then', n1.inner_text('.chead h2'))
     N2 = nb.new_context(viewport={'width': 1280, 'height': 860}); wire(N2); n2 = N2.new_page(); hook(n2, 'N2')
     n2.goto(APP); n2.wait_for_timeout(900); assert n2.evaluate('PERSONA') == 'new'

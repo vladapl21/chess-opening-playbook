@@ -27,7 +27,7 @@
       },
       async getSession(){ await ready; return {data: {session}, error: null}; },
       async signUp({email, password, options}){
-        const r = await call('signup', {email, password, redirect: options && options.emailRedirectTo});
+        const r = await call('signup', {email, password, redirect: options && options.emailRedirectTo, data: (options && options.data) || {}});
         if (r.error) return {data: {user: null, session: null}, error: r.error};
         if (r.session){ keep(r.session); emit('SIGNED_IN'); }
         return {data: {user: r.user, session: r.session || null}, error: null};

@@ -36,9 +36,11 @@ with sync_playwright() as p:
 
     pg.goto(URL); pg.wait_for_timeout(1000)
     assert pg.evaluate('[PERSONA, S.view]') == ['new', 'start']
-    assert pg.locator('.tabs button.lock').count() == 5 and 'lock' not in (pg.get_attribute('.tabs [data-view="sandbox"]', 'class') or '')
+    assert pg.locator('.tabs button.lock').count() == 4 and 'lock' not in (pg.get_attribute('.tabs [data-view="sandbox"]', 'class') or '')
+    w0 = pg.inner_text('.whero'); assert 'Connect your account' in w0 and not any(x in w0 for x in ('150', '200', '50 games')), w0
+    assert pg.is_hidden('#meBtn') and pg.is_hidden('#drillDot'), 'no streak or drill mark before there is anything to drill'
     pg.screenshot(path=out + 'o_start.png', full_page=True)
-    for v in ('course', 'learn', 'drill', 'games', 'cheat'):
+    for v in ('course', 'drill', 'games', 'cheat'):
         pg.click(f'.tabs [data-view="{v}"]'); pg.wait_for_timeout(250)
         assert pg.locator('.plocked').count() == 1 and pg.locator('#view .urow, #view .rtile, #view .mrow').count() == 0, v
     pg.screenshot(path=out + 'o_locked.png')
@@ -57,12 +59,26 @@ with sync_playwright() as p:
     pg.screenshot(path=out + 'o_setup.png', full_page=True)
     pg.fill('#uname', 'nobody_here'); pg.click('#uform button[type=submit]'); pg.wait_for_timeout(600)
     print('unknown player:', pg.inner_text('.pmsg')); assert 'no player called' in pg.inner_text('.pmsg')
-    pg.fill('#uname', 'VladAPL'); pg.click('#uform button[type=submit]'); pg.wait_for_timeout(700)
+    assert not any(x in pg.inner_text('#view') for x in ('150', '200')), 'no game counts on the connect screen'
+    # this player has fewer games than a repertoire needs (bullet left out): play more first
+    pg.fill('#uname', 'VladAPL'); pg.click('#uform button[type=submit]'); pg.wait_for_timeout(900)
+    assert pg.evaluate('S.view') == 'setup' and pg.locator('.pshort').count() == 1, pg.inner_text('#view')[:300]
+    sh = pg.inner_text('.pshort'); print('not enough games:', sh.replace('\n', ' | ')[:200]); assert 'Not enough games yet' in sh and 'vladapl' in sh and not any(c.isdigit() for c in sh)
+    assert pg.evaluate("Prog.d.me.short.user") == 'vladapl'
+    pg.screenshot(path=out + 'o_short.png', full_page=True)
+    pg.reload(); pg.wait_for_timeout(800)
+    assert pg.locator('.pshort').count() == 1, 'still not enough after a reload'
+    pg.evaluate("go('start')"); pg.wait_for_timeout(300)
+    assert pg.locator('.whero [data-pgo="setup"]').inner_text() == 'Check my games again'
+    pg.click('.whero [data-pgo="setup"]'); pg.wait_for_timeout(300); assert pg.locator('.pshort').count() == 1
+    # (the made-up player gets a lower bar here, so the rest of the flow can run on the games in data/games)
+    pg.evaluate("Product.need = 90"); pg.click('[data-recheck]'); pg.wait_for_timeout(900)
     assert pg.evaluate('S.view') == 'reading', pg.evaluate('S.view')
     pg.wait_for_timeout(1500); pg.screenshot(path=out + 'o_reading.png')
     pg.wait_for_function("S.view === 'findings'", timeout=60000); pg.wait_for_timeout(400)
     me = pg.evaluate("({state: Prog.d.me.state, n: Prog.d.me.P.n, user: Prog.d.me.P.user, src: Prog.d.me.src, rating: Prog.d.me.P.rating, leaks: Prog.d.me.P.leaks.length})")
-    print('profile:', me); assert me['state'] == 'new' and me['n'] == 100 and me['user'] == 'vladapl' and me['src']['site'] == 'chess.com' and me['rating'] > 800
+    print('profile:', me); assert me['state'] == 'new' and me['n'] == 99 and me['user'] == 'vladapl' and me['src']['site'] == 'chess.com' and me['rating'] > 800   # the one bullet game is left out
+    assert pg.evaluate("Prog.d.me.short") is None
     pg.screenshot(path=out + 'o_findings.png', full_page=True)
     assert pg.locator('.tiles .tile').count() == 4 and pg.locator('.brow').count() >= 3 and pg.locator('.leak').count() >= 1
     pg.reload(); pg.wait_for_timeout(800)   # the profile is kept: the welcome screen offers to carry on
@@ -94,8 +110,11 @@ with sync_playwright() as p:
     assert st['persona'] == 'ready' and st['view'] == 'course' and st['locks'] == 0 and 'You met this in' in st['why'] and len(st['units']) == 17
     assert st['units'].index('threats') == 2 and st['units'] != ['w-italian', 'b-slav'] + st['units'][2:], 'the order comes from the games'
     pg.screenshot(path=out + 'o_course.png', full_page=True)
-    pg.click('.tabs [data-view="learn"]'); pg.wait_for_timeout(400)
-    tile = pg.inner_text('.rtile >> nth=0'); print('learn tile:', tile.replace('\n', ' | ')); assert pg.locator('.changes').count() == 0
+    foot = pg.inner_text('#foot'); print('footer:', foot.replace('\n', ' | '))
+    assert "vladapl's playbook" in foot and 'chess.com' in foot and '©' in foot and 'Stockfish' not in foot and 'games as' not in foot
+    assert pg.is_visible('#meBtn') and pg.is_visible('#drillDot'), 'the streak chip and the drill mark come with a playbook'
+    pg.evaluate("go('learn')"); pg.wait_for_timeout(400)
+    assert pg.locator('.chnav [data-ch]').count() >= 5 and pg.locator('.changes').count() == 0 and pg.evaluate('tabOf(S.view)') == 'games'
     pg.click('.tabs [data-view="games"]'); pg.wait_for_timeout(500)
     assert pg.locator('.leaks .leak').count() >= 4 and pg.locator('.gtable tbody tr').count() == 40
     print('first leak:', pg.inner_text('.leaks .leak >> nth=0').replace('\n', ' | ')[:170])
@@ -114,19 +133,20 @@ with sync_playwright() as p:
     wide = lambda tag: (lambda w: (print('  phone', tag, w), w)[1])(ph.evaluate('document.documentElement.scrollWidth'))
     assert wide('start') <= 390; ph.screenshot(path=out + 'o_phone_start.png', full_page=True)
     ph.click('.tabs [data-view="drill"]'); ph.wait_for_timeout(300); assert wide('locked') <= 390
-    ph.evaluate("go('setup')"); ph.wait_for_timeout(300); assert wide('setup') <= 390
+    ph.evaluate("go('setup'); Product.need = 40"); ph.wait_for_timeout(300); assert wide('setup') <= 390
     ph.set_input_files('#pgnFile', str(ROOT / 'data' / 'games' / 'aqua_alpaca.pgn')); ph.wait_for_timeout(600)
     assert ph.evaluate('S.view') == 'reading', ph.inner_text('#view')[:200]
     assert wide('reading') <= 390; ph.screenshot(path=out + 'o_phone_reading.png')
     ph.wait_for_function("S.view === 'findings'", timeout=60000); ph.wait_for_timeout(300)
-    assert ph.evaluate("[Prog.d.me.P.user, Prog.d.me.P.n, Prog.d.me.src.site]") == ['aqua_alpaca', 50, 'pgn']
+    assert ph.evaluate("[Prog.d.me.P.user, Prog.d.me.P.n, Prog.d.me.src.site]") == ['aqua_alpaca', 43, 'pgn']   # seven bullet games left out
     assert wide('findings') <= 390; ph.screenshot(path=out + 'o_phone_findings.png', full_page=True)
     ph.click('[data-pgo="choices"]'); ph.wait_for_timeout(400); assert wide('choices') <= 390; ph.screenshot(path=out + 'o_phone_choice.png', full_page=True)
-    # too few games: a clear message, and the count stays on the ring
+    # too few games in a file: the same 'play more first' screen, no counts, and another try is one tap away
     c3 = b.new_context(viewport={'width': 1280, 'height': 900}); q = c3.new_page(); hook(q); q.goto(URL + '#setup'); q.wait_for_timeout(800)
     small = ROOT / 'tests' / 'out' / 'few.pgn'; small.write_text(''.join(games_of('aqua_alpaca.pgn')[:20]))
     q.set_input_files('#pgnFile', str(small)); q.wait_for_timeout(500)
-    print('too few:', q.inner_text('.pmsg'), '| ring', q.inner_text('.pring').replace('\n', ' ')); assert '20 of your games so far' in q.inner_text('.pmsg') and q.evaluate('S.view') == 'setup'
+    sh = q.inner_text('.pshort'); print('too few:', sh.replace('\n', ' | ')[:160]); assert 'Not enough games yet' in sh and 'these files' in sh and q.evaluate('S.view') == 'setup'
+    assert q.locator('[data-recheck]').count() == 0; q.click('[data-other]'); q.wait_for_timeout(300); assert q.locator('#uform').count() == 1
     b.close()
 print('ERRORS:', errors); assert not errors
 print('onboarding checks passed')

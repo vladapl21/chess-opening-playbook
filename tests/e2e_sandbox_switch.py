@@ -47,4 +47,5 @@ with sync_playwright() as p:
     assert pg.evaluate('SBS.scope') == 'all', 'every opening picked is the same as Every opening'
     pg.reload(); pg.wait_for_timeout(800); assert pg.evaluate('SBS.scope') == 'all'
     print('errors', errors)
+    assert not [e for e in errors if 'ERR_' not in e], 'page errors'
     b.close()

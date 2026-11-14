@@ -35,14 +35,16 @@ with sync_playwright() as p:
     pg.click('.sidesw [data-side="b"]'); pg.wait_for_timeout(600)
     assert pg.evaluate('SIDE') == 'b' and pg.evaluate('FLIP') is True
     print('hash after switch', pg.evaluate('location.hash'), '| kicker', pg.inner_text('#brandKick'))
-    print('learn tiles', pg.locator('.rtile').count())
-    assert pg.locator('.rtile').count() == 9
+    assert pg.evaluate('S.view') == 'games', 'an opening page switches to the other book\'s Your games'
+    pg.evaluate("go('learn')"); pg.wait_for_timeout(400)
+    print('openings', pg.locator('.chnav [data-ch]').count())
+    assert pg.locator('.chnav [data-ch]').count() == 9
     # hero board orientation: black king (e8) drawn below the white king (e1)
     yk = pg.evaluate("""(() => { const s = document.querySelector('.hero-board svg'); const e8 = s.querySelector('use[data-sq="e8"]'), e1 = s.querySelector('use[data-sq="e1"]'); return [e8 && +e8.getAttribute('y'), e1 && +e1.getAttribute('y')]; })()""")
     print('hero e8/e1 y:', yk)
     pg.screenshot(path=out + 'b_learn_italian.png')
     for ch in ['ruy', 'scotch', 'vienna', 'attacks', 'slav', 'london', 'd4x', 'other', 'italian']:
-        pg.click(f'.rtile[data-ch="{ch}"]'); pg.wait_for_timeout(300)
+        pg.click(f'.chnav [data-ch="{ch}"]'); pg.wait_for_timeout(300)
         assert pg.evaluate('S.chapter') == ch
         stats = pg.evaluate("[...document.querySelectorAll('.hero .stat')].map(s => s.innerText.replace(/\\n/g, ' '))")
         print(f'  {ch}:', stats)
@@ -112,11 +114,12 @@ with sync_playwright() as p:
     pg.click('.sidesw [data-side="w"]'); pg.wait_for_timeout(500)
     print('back to white:', pg.evaluate('SIDE'), pg.evaluate('S.view'), pg.evaluate('location.hash'), '| learn h2' , pg.inner_text('.reps h2') if pg.query_selector('.reps h2') else '-')
     assert pg.evaluate('FLIP') is False
-    pg.click('.tabs button[data-view="learn"]'); pg.wait_for_timeout(300)
-    pg.click('.rtile[data-ch="italian"]'); pg.wait_for_timeout(300)
+    pg.evaluate("go('learn')"); pg.wait_for_timeout(300)
+    pg.click('.chnav [data-ch="italian"]'); pg.wait_for_timeout(300)
     assert pg.query_selector('#heroReplay') is not None
     pg.click('.sidesw [data-side="b"]'); pg.wait_for_timeout(400)
-    print('black again view:', pg.evaluate('S.view'), '| due badge W:', pg.inner_text('#dueW'), pg.is_hidden('#dueW'))
+    print('black again view:', pg.evaluate('S.view'))
+    assert pg.locator('.sidesw .badge').count() == 0, 'no counts beside White and Black'
     # ---- deep links
     for h in ['#b.learn.london', '#b.line.bs-classical', '#b.games', '#learn.sic', '#line.setup']:
         pg2 = ctx.new_page(); hook(pg2)
@@ -145,4 +148,5 @@ with sync_playwright() as p:
         q.evaluate("go('games')"); q.wait_for_timeout(300); q.screenshot(path=out + f'b_phone_games_{scheme}.png', full_page=True)
         ph.close()
     print('ERRORS:', errors[:10])
+    assert not [e for e in errors if 'ERR_' not in e], 'page errors'
     b.close()

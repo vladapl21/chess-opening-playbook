@@ -11,7 +11,11 @@ const ME_RANK = {house: 3, ready: 2, 'new': 1};
 function mergeMe(a, b){ const x = meOf(a), y = meOf(b); if (!x || !y) return x || y; const rx = ME_RANK[x.state] || 0, ry = ME_RANK[y.state] || 0; return rx !== ry ? (rx > ry ? x : y) : (y.updated || 0) > (x.updated || 0) ? y : x; }
 let PERSONA = 'house';
 const PVIEWS = ['start', 'setup', 'reading', 'findings', 'choices', 'built'], OPEN_NEW = PVIEWS.concat(['sandbox', 'explore']);
-const TARGET = 150, MINIMUM = 50;
+// A repertoire needs a real picture of what someone plays: NEED games that are not bullet, at most TAKE of the newest are read.
+// Neither number is shown to the player.
+const NEED = 200, TAKE = 300;
+// bullet (and faster): too quick to show what someone knows. A clock of base + 40 increments under three minutes.
+function isFast(g){ const tc = String(g.h.TimeControl || ''); if (/^\d+(\+\d+)?$/.test(tc)){ const [b, i] = tc.split('+').map(Number); return b + 40 * (i || 0) < 180; } return /bullet/i.test(g.h.Event || ''); }
 const pc = (a, b) => b ? Math.round(100 * a / b) : 0, rec = t => `${t.w}–${t.l}${t.d ? '–' + t.d : ''}`, scoreOf = t => t.n ? (t.w + t.d / 2) / t.n : 0;
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 
@@ -89,17 +93,45 @@ function syncPacks(){
   // give the browser a moment to commit what was just stored: a reload in the same tick can lose it
   document.documentElement.setAttribute('aria-busy', 'true'); setTimeout(() => location.reload(), 350);
 }
-// Settings: one row for every slot the library has more than one system for
+// Settings, folded away at the bottom: the system for each slot the library has more than one of. A switch swaps whole
+// units, so it is never one tap: the player types their username first.
+const Rep = {ask: null, open: false};
+const slotName = slot => slot === 'white' ? 'With White' : slot === 'blackE4' ? 'Against the e-pawn' : 'Against the d-pawn';
+function repNames(){
+  const me = meOf(Prog.d) || {}, out = [(me.P || {}).user, (me.src || {}).user];
+  if (PERSONA === 'house') for (const D of [BOOKS.w, BOOKS.b]) for (const G of (D.games || [])) out.push(G.acct);
+  return [...new Set(out.filter(Boolean).map(x => String(x).toLowerCase()))];
+}
 function packRowsHTML(){
   if (PERSONA === 'new') return '';
-  return packSlots().map(({slot, D, v}) => { const C = CATALOG.find(x => x.slot === slot), cur = packOf(D, slot);
-    return `<div class="setrow"><b>${slot === 'white' ? 'With White' : slot === 'blackE4' ? 'Against the e-pawn' : 'Against the d-pawn'}</b><div class="setseg" role="group">${Object.keys(v.packs).map(id => `<button type="button" data-pack="${slot}:${id}" aria-pressed="${cur === id}">${esc(((C && C.opts.find(o => o.id === id)) || {name: id}).name)}</button>`).join('')}</div><span>Changing this swaps the lessons, drills and course units for that part. Your progress in the other system is kept.</span></div>`; }).join('');
+  const slots = packSlots(); if (!slots.length) return '';
+  const names = repNames(), word = names[0] || 'switch', A = Rep.ask;
+  const rows = slots.map(({slot, D, v}) => {
+    const C = CATALOG.find(x => x.slot === slot), cur = packOf(D, slot), nm = id => ((C && C.opts.find(o => o.id === id)) || {name: id}).name;
+    const ask = A && A.slot === slot ? `<form class="repask" data-repform><label for="repName">${names.length > 1 ? 'Type one of your usernames' : `Type <b>${esc(word)}</b>`} to switch to <b>${esc(nm(A.id))}</b>.</label>
+        <div class="reprow"><input id="repName" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Your username"><button class="btn primary small" type="submit" disabled>Switch</button><button class="btn small ghost" type="button" data-repcancel>Cancel</button></div></form>` : '';
+    return `<div class="setrow"><b>${slotName(slot)}</b><div class="setseg" role="group">${Object.keys(v.packs).map(id => `<button type="button" data-packask="${slot}:${id}" aria-pressed="${cur === id}">${esc(nm(id))}</button>`).join('')}</div>${ask}</div>`; }).join('');
+  return `<details class="repdet" ${Rep.open || A ? 'open' : ''}><summary><span><b>Your repertoire</b><span>Which system you play in each part of the playbook</span></span></summary>
+    <div class="repbody"><p>Switching swaps the lessons, drills and course units for that part. Your progress in the other system is kept, and you can switch back.</p>${rows}</div></details>`;
 }
-document.addEventListener('click', e => {
-  const b = e.target.closest('[data-pack]'); if (!b) return; const [slot, id] = b.dataset.pack.split(':');
+function setPack(slot, id){
   if (PERSONA === 'ready'){ const me = meOf(Prog.d); me.picks = Object.assign({}, me.picks, {[slot]: id}); me.updated = Date.now(); }
   else Prog.d.packs = Object.assign({}, Prog.d.packs, {[slot]: id, updated: Date.now()});
-  Prog.save(); try { sessionStorage.removeItem('packs-reload'); } catch(e2){} Settings.close(); syncPacks();
+  Prog.save(); try { sessionStorage.removeItem('packs-reload'); } catch(e2){} Rep.ask = null; Settings.close(); syncPacks();
+}
+const repOk = v => { const t = String(v || '').trim().toLowerCase(), names = repNames(); return !!t && (names.length ? names.includes(t) : t === 'switch'); };
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-packask]');
+  if (b){ const [slot, id] = b.dataset.packask.split(':'), D = packSlots().find(x => x.slot === slot);
+    Rep.ask = D && packOf(D.D, slot) !== id ? {slot, id} : null; Settings.render(); const i = document.getElementById('repName'); if (i) i.focus(); return; }
+  if (e.target.closest('[data-repcancel]')){ Rep.ask = null; Settings.render(); }
+});
+document.addEventListener('toggle', e => { if (e.target.classList && e.target.classList.contains('repdet')) Rep.open = e.target.open; }, true);
+document.addEventListener('input', e => { if (e.target.id === 'repName'){ const f = e.target.closest('form'), sb = f && f.querySelector('[type=submit]'); if (sb) sb.disabled = !repOk(e.target.value); } });
+document.addEventListener('submit', e => {
+  const f = e.target.closest('[data-repform]'); if (!f) return; e.preventDefault();
+  const i = f.querySelector('#repName'); if (!Rep.ask || !i || !repOk(i.value)){ if (i){ i.setAttribute('aria-invalid', 'true'); i.focus(); } return; }
+  setPack(Rep.ask.slot, Rep.ask.id);
 });
 
 // which cards to show: a system card where the player's own habit is not the library's first system, or where the library
@@ -145,7 +177,8 @@ function depersonalise(){
   for (const s of ['w', 'b']){ const T = TXT[s], side = s === 'w' ? 'White' : 'Black';
     T.learnKick = st => st.total ? `Your ${st.total} games with ${side}` : `The ${side} playbook`;
     T.gamesP = st => `${st.total} games with ${side}: ${st.wins} wins, ${st.losses} losses${st.draws ? `, ${plural(st.draws, 'draw')}` : ''}.`;
-    T.foot = ['Every line checked with Stockfish 17.1.', 'Opponent odds come from Maia, a model trained on real club games.']; }
+  }
+  FOOT = '';
 }
 const chaptersOfUnit = U => [...new Set((U.lessons || []).map(l => { const L = LIDX[U.side] && LIDX[U.side][l], p = L && BOOKS[U.side].parts.find(x => x.id === L.part); return p && p.ch; }).filter(Boolean))];
 // the profile decides the numbers on every chapter, the order of the course and what each unit says about the player
@@ -159,8 +192,11 @@ function applyProfile(me){
       C.facts = t.n ? [{big: String(t.n), text: `of your ${side.all.n} ${s === 'w' ? 'White' : 'Black'} games went here`}, {big: rec(t), text: 'your record in them', alert: t.l > t.w},
         {big: String(Math.max(1, Math.round(t.depth / 2))), text: 'moves, on average, before the game left the playbook'}] : [{big: '0', text: 'of your games went here so far'}];
     }
-    TXT[s].foot = TXT[s].foot.slice(0, 2).concat([`Built from ${P.n} of your games${P.user ? ' as ' + P.user : ''}.`]);
   }
+  const ts = (P.games || []).map(g => g.t).filter(Boolean), a = new Date(Math.min(...ts)), z = new Date(Math.max(...ts)), mo = (d, y) => d.toLocaleDateString(undefined, y ? {month: 'long', year: 'numeric'} : {month: 'long'});
+  const span = !ts.length ? '' : mo(a, 1) === mo(z, 1) ? mo(z, 1) : a.getFullYear() === z.getFullYear() ? `${mo(a)} to ${mo(z, 1)}` : `${mo(a, 1)} to ${mo(z, 1)}`;
+  const site = (me.src || {}).site === 'lichess' ? 'Lichess' : (me.src || {}).site === 'chess.com' ? 'chess.com' : '';
+  FOOT = `${P.user ? P.user + '\'s playbook' : 'Your playbook'}, built from your${site ? ' ' + site : ''} games${span ? ', ' + span : ''}.`;
   const skills = COURSE.map((U, k) => U.kind === 'skill' ? [k, U] : null).filter(Boolean), open = COURSE.filter(U => U.kind !== 'skill');
   for (const U of open){
     const side = U.side === 'w' ? P.white : P.black, word = U.side === 'w' ? 'White' : 'Black', t = {n: 0, w: 0, l: 0, d: 0, depth: 0};
@@ -185,15 +221,15 @@ const Importer = {
   async json(url){ const r = await fetch(url); if (r.status === 404) throw Object.assign(new Error('missing'), {missing: true}); if (!r.ok) throw new Error('http ' + r.status); return r.json(); },
   async chesscom(user, want, tick){
     const base = 'https://api.chess.com/pub/player/' + encodeURIComponent(user.trim().toLowerCase());
-    const months = ((await this.json(base + '/games/archives')).archives || []).reverse().slice(0, 36), out = [];
+    const months = ((await this.json(base + '/games/archives')).archives || []).reverse().slice(0, 120), out = [];
     for (const m of months){
-      const gs = ((await this.json(m)).games || []).filter(g => g.rules === 'chess' && g.pgn && g.time_class !== 'daily').reverse();
+      const gs = ((await this.json(m)).games || []).filter(g => g.rules === 'chess' && g.pgn && g.time_class !== 'daily' && g.time_class !== 'bullet').reverse();
       for (const g of gs) out.push(g.pgn); tick(out.length); if (out.length >= want) break;
     }
     return out.slice(0, want).join('\n\n');
   },
   async lichess(user, want, tick){
-    const r = await fetch(`https://lichess.org/api/games/user/${encodeURIComponent(user.trim())}?max=${want}&perfType=bullet,blitz,rapid,classical&clocks=false&evals=false&opening=false`, {headers: {Accept: 'application/x-chess-pgn'}});
+    const r = await fetch(`https://lichess.org/api/games/user/${encodeURIComponent(user.trim())}?max=${want}&perfType=blitz,rapid,classical&clocks=false&evals=false&opening=false`, {headers: {Accept: 'application/x-chess-pgn'}});
     if (r.status === 404) throw Object.assign(new Error('missing'), {missing: true}); if (!r.ok) throw new Error('http ' + r.status);
     const t = await r.text(); tick((t.match(/^\[Event /gm) || []).length); return t;
   }
@@ -207,6 +243,7 @@ const Product = {
     if (SITE && !meOf(Prog.d)) Prog.d.me = {state: 'new', since: Date.now()};
     if (PERSONA !== 'house') depersonalise();
     if (PERSONA === 'ready' && this.me().P) applyProfile(this.me());
+    if (!Prog.d.badges && PERSONA !== 'new'){ Badges.check(); Prog.saveLocal(); }
     document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('lock', PERSONA === 'new' && b.dataset.view !== 'sandbox'));
     syncPacks();
   },
@@ -215,6 +252,18 @@ const Product = {
   // after a sign-in merge: if the account turns out to be someone else's kind of playbook, start over with it
   afterMerge(){ if (SITE && !meOf(Prog.d)) Prog.d.me = {state: 'new', since: Date.now()}; if (personaOf(Prog.d) !== PERSONA){ Prog.saveLocal(); location.reload(); return true; } return false; },
   signedOut(){ return Cloud.on() && !Cloud.user; },
+  // the chess account named at sign-up: read its games as soon as the account is there (once)
+  pendingConnect(){
+    const m = (Cloud.user && Cloud.user.user_metadata) || {}; let L = null; try { L = JSON.parse(localStorage.getItem(CONNECT_KEY) || 'null'); } catch(e){}
+    return m.chess_user ? {site: m.chess_site, user: m.chess_user} : L && L.user ? L : null;
+  },
+  autoConnect(){
+    if (PERSONA !== 'new' || !Cloud.user || this.busy || this.me().P || this.me().short || this.me().auto || ['reading', 'findings', 'choices', 'built'].includes(S.view)) return false;
+    const c = this.pendingConnect(); if (!c) return false;
+    try { localStorage.removeItem(CONNECT_KEY); } catch(e){}
+    Prog.d.me = Object.assign({}, this.me(), {auto: 1}); Prog.save();
+    this.site = c.site === 'lichess' ? 'lichess' : 'chess.com'; this.user = c.user; S.view = 'setup'; setHash(); this.fetchUser(c.user); return true;
+  },
   render(){
     const v = S.view;
     view.innerHTML = `<div class="pv">${v === 'start' ? this.startHTML() : v === 'setup' ? this.setupHTML() : v === 'reading' ? this.readingHTML() : v === 'findings' ? this.findingsHTML() : v === 'choices' ? this.choiceHTML() : this.builtHTML()}</div>`;
@@ -222,60 +271,69 @@ const Product = {
   },
   /* -- welcome */
   startHTML(){
-    const out = this.signedOut(), has = !!this.me().P, step = out ? 1 : has ? 3 : 2, w = fenOf('e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4');
+    const out = this.signedOut(), has = !!this.me().P, short = !has && this.me().short, step = out ? 1 : has ? 3 : 2, w = fenOf('e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4');
     const cta = out ? `<button class="btn primary" data-acct="signup">Create your account</button><button class="btn" data-acct="signin">I already have an account</button>`
-      : has ? `<button class="btn primary" data-pgo="findings">Continue: see what I found</button>` : `<button class="btn primary" data-pgo="setup">Bring your games</button>`;
+      : has ? `<button class="btn primary" data-pgo="findings">Continue: see what I found</button>` : short ? `<button class="btn primary" data-pgo="setup">Check my games again</button>` : `<button class="btn primary" data-pgo="setup">Connect your account</button>`;
     const li = (k, h, p) => `<li class="${k < step ? 'done' : k === step ? 'now' : ''}"><b>${h}</b><span>${p}</span></li>`;
     const lock = (v, h, p) => `<button class="lockcard" data-view="${v}"><b>${ICON.lock}${h}</b>${p}</button>`;
     return `<section class="whero"><div><p class="kicker">An opening course built from your own games</p>
-        <h2>Bring ${TARGET} games.<br>Get <em>your</em> playbook.</h2>
+        <h2>Connect your account.<br>Get <em>your</em> playbook.</h2>
         <p class="lede" style="margin-top:14px">It reads what you already play, where you score and where you leave the book, asks you a few would-you-rather questions, and builds a course in that order. No notation anywhere.</p>
         <div class="cta">${cta}<button class="btn ghost" data-view="sandbox">Try the sandbox first</button></div></div>
-      <div class="wart"><div class="board">${boardSVG(w.fen, {coords: false, last: w.last, arrows: ['c4f7r'], flip: false})}</div><p class="wbub">Hi, I'm ${coachName()}. Show me your games and I'll show you your openings.</p><div class="wcoach cface">${knightSVG()}</div></div></section>
-      <ol class="steps3">${li(1, 'Make an account', 'So your playbook follows you to every device.')}${li(2, `Bring ${TARGET} games`, 'A chess.com or Lichess username is enough. A file works too.')}${li(3, 'Pick your lines', 'A few would-you-rather questions, then your course opens.')}</ol>
-      <div><p class="kicker" style="margin-bottom:10px">Opens with your games</p><div class="lockgrid">${lock('course', 'Course', 'One path, ordered by what your games say matters most.')}${lock('learn', 'Learn', 'Every line as a board you step through, in plain words.')}${lock('drill', 'Drill', 'Your moves from memory, on a schedule that brings slips back.')}${lock('games', 'Your games', 'Results by opening and where you leave the book.')}${lock('cheat', 'Cheat sheet', 'One card per decision.')}</div></div>`;
+      <div class="wart"><div class="board">${boardSVG(w.fen, {coords: false, last: w.last, arrows: ['c4f7r'], flip: false})}</div><p class="wbub">${short ? `Not enough games yet. Play some more and I'll be here.` : `Hi, I'm ${coachName()}. Connect your account and I'll show you your openings.`}</p><div class="wcoach cface">${knightSVG()}</div></div></section>
+      <ol class="steps3">${li(1, 'Make an account', 'So your playbook follows you to every device.')}${li(2, 'Connect your chess account', 'Your chess.com or Lichess username. Only your public games are read.')}${li(3, 'Pick your lines', 'A few would-you-rather questions, then your course opens.')}</ol>
+      <div><p class="kicker" style="margin-bottom:10px">Opens with your games</p><div class="lockgrid">${lock('course', 'Course', 'One path, ordered by what your games say matters most.')}${lock('drill', 'Drill', 'Five lines a day from memory. Slips come back first.')}${lock('games', 'Your games', 'Results by opening, every lesson, and where you leave the book.')}${lock('cheat', 'Cheat sheet', 'One card per decision.')}</div></div>`;
   },
   locked(tab){
     const T = {course: ['Your course', 'One path through your openings, in the order your games say matters most: the idea, the lines, a drill, practice games and a checkpoint for each.'],
-      learn: ['Learn', 'Every line of your playbook as a board you step through, with each move described in plain words.'], drill: ['Drill', 'Your moves from memory. Clean runs come back later; slips come back today.'],
-      games: ['Your games', 'Your results by opening, and the exact positions where you leave your playbook most often.'], cheat: ['Cheat sheet', 'One card per decision: their move, your answer.']}[tab] || ['This section', ''];
+      drill: ['Drill', 'Five lines a day from memory, the ones you slipped on first. Do them every day to keep your streak.'],
+      games: ['Your games', 'Your results by opening, every lesson in each one, and the exact positions where you leave your playbook most often.'], cheat: ['Cheat sheet', 'One card per decision: their move, your answer.']}[tab] || ['This section', ''];
     const out = this.signedOut(), idx = [LINES[DATA.lessons[0].lines[0]].n.slice(-1)[0], LINES[DATA.lessons[1].lines[0]].n.slice(-1)[0], LINES[DATA.lessons[2].lines[0]].n.slice(-1)[0]];
     view.innerHTML = `<div class="pv"><section class="plocked"><div class="lk">${ICON.lock}</div><p class="kicker">Locked until your games are in</p><h3>${T[0]}</h3><p>${T[1]}</p>
-      <div class="cta">${out ? `<button class="btn primary" data-acct="signup">Create your account</button>` : `<button class="btn primary" data-pgo="setup">Bring your games</button>`}<button class="btn" data-view="sandbox">Open the sandbox</button></div>
+      <div class="cta">${out ? `<button class="btn primary" data-acct="signup">Create your account</button>` : `<button class="btn primary" data-pgo="setup">Connect your account</button>`}<button class="btn" data-view="sandbox">Open the sandbox</button></div>
       <div class="ghost3" aria-hidden="true">${idx.map(i => thumb(i, {coords: false})).join('')}</div></section></div>`;
     this.wire();
   },
   /* -- games in */
   count(){ return this.pool ? (this.pool.match(/^\[Event /gm) || this.pool.match(/^\[White /gm) || []).length : 0; },
+  siteName(x){ return (x || this.site) === 'lichess' ? 'Lichess' : 'chess.com'; },
+  // too few games that are not bullet: the repertoire waits until there are more
+  shortHTML(){
+    const sh = this.short || this.me().short || {}, who = sh.user ? `${esc(sh.user)} on ${this.siteName(sh.site)} has so far` : 'these files hold';
+    return `<section class="pshort pcard"><div class="say"><div class="cface">${knightSVG('think')}</div><p>Not enough games yet.</p></div>
+      <div><h3>Play some more first</h3><p>To build a repertoire I need more of your games than ${who}. Play some more blitz, rapid or classical games, then come back and check again. Bullet games don't count: they're too fast to show what you really know.</p>
+        <p class="kicker" style="margin-top:14px">How close you are</p><div class="pbar" style="margin-top:6px" aria-hidden="true"><i style="width:${Math.max(4, Math.min(96, pc(sh.n || 0, NEED)))}%"></i></div>
+        <div class="cta" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:16px">${sh.user ? `<button class="btn primary" data-recheck>Check again</button>` : ''}<button class="btn" data-other>Use another username</button><button class="btn ghost" data-view="sandbox">Open the sandbox</button></div></div></section>`;
+  },
   setupHTML(){
     if (this.signedOut()) return `<section class="plocked"><div class="lk">${ICON.lock}</div><h3>First, an account</h3><p>Your games and your playbook are kept with your account, so they are there on every device.</p><div class="cta"><button class="btn primary" data-acct="signup">Create your account</button><button class="btn" data-acct="signin">Sign in</button></div></section>`;
-    const n = this.count(), seg = (v, l) => `<button type="button" data-site="${v}" aria-pressed="${this.site === v}">${l}</button>`;
+    const seg = (v, l) => `<button type="button" data-site="${v}" aria-pressed="${this.site === v}">${l}</button>`;
     const month = new Date().toISOString().slice(0, 7).replace('-', '/');
-    return `<div class="chead"><div><p class="kicker">Step 2 of 3</p><h2 style="font-size:clamp(30px,4vw,46px)">Bring your games</h2><p>${TARGET} recent games is the target: enough to see what you really play. ${MINIMUM} is the least that works, and the picture sharpens as you add more.</p></div>
-        <div class="meter"><div class="pring" style="--p:${Math.min(100, pc(n, TARGET))}"><i>${n}<small>of ${TARGET}</small></i></div></div></div>
-      ${this.msg ? `<p class="pmsg ${this.msg.bad ? 'bad' : 'ok'}" role="status">${esc(this.msg.t)}</p>` : ''}
+    if (!this.busy && (this.short || (this.me().short && !this.fresh))) return `<div class="chead"><div><p class="kicker">Step 2 of 3</p><h2 style="font-size:clamp(30px,4vw,46px)">Connect your chess account</h2></div></div>${this.shortHTML()}`;
+    return `<div class="chead"><div><p class="kicker">Step 2 of 3</p><h2 style="font-size:clamp(30px,4vw,46px)">Connect your chess account</h2><p>I read your recent blitz, rapid and classical games to see what you really play. Bullet is skipped: it's too fast to show what you know.</p></div></div>
+      ${this.msg ? `<p class="pmsg ${this.msg.bad ? 'bad' : 'ok'}" role="status">${esc(this.msg.t)}</p>` : ''}${this.busy ? `<div class="pbar" aria-hidden="true" style="margin-top:0"><i id="fetchbar" style="width:3%"></i></div>` : ''}
       <div class="pcard pickc"><div><h3>Pick your coach</h3><p>They say the same things. Change your mind any time in Settings.</p></div>${coachPickHTML()}</div>
       ${this.names ? `<div class="pcard"><b>Which one is you?</b><div class="pwho" style="margin-top:10px">${this.names.map(x => `<button class="btn" data-who="${esc(x)}">${esc(x)}</button>`).join('')}</div></div>` : ''}
-      <div class="setup"><form class="pcard" id="uform"><h3>Fetch them by username</h3>
+      <div class="setup"><form class="pcard" id="uform"><h3>Your username</h3>
           <div class="setseg" role="group" aria-label="Where you play">${seg('chess.com', 'chess.com')}${seg('lichess', 'Lichess')}</div>
           <div class="pfield"><label for="uname">Your username on ${this.site === 'lichess' ? 'Lichess' : 'chess.com'}</label><input type="text" id="uname" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(this.user)}" placeholder="for example: ${this.site === 'lichess' ? 'your_lichess_name' : 'your_chesscom_name'}"></div>
-          <button class="btn primary" type="submit" ${this.busy ? 'disabled' : ''} style="justify-content:center;min-height:46px">${this.busy ? 'Fetching…' : `Fetch my last ${TARGET} games`}</button>
+          <button class="btn primary" type="submit" ${this.busy ? 'disabled' : ''} style="justify-content:center;min-height:46px">${this.busy ? 'Reading your games…' : 'Connect and read my games'}</button>
           <p style="color:var(--muted);font-size:13.5px">Only your public games are read, straight from ${this.site === 'lichess' ? 'Lichess' : 'chess.com'} to this page. Nothing is posted and no password is needed.</p></form>
-        <div class="pcard"><h3>Or drop a PGN file</h3>
+        <div class="pcard"><h3>No account online? Drop a PGN file</h3>
           <label class="drop" id="drop"><input type="file" id="pgnFile" accept=".pgn,.txt,text/plain" multiple><b>Drop PGN files here, or tap to choose</b><span>Several files are fine. They add up.</span></label>
           <details class="how"><summary>How do I get a PGN file?</summary>
             <ol><li><b>chess.com:</b> open this address in your browser with your own name in it, once for each month you need. Each one downloads a file.<br><code>api.chess.com/pub/player/YOUR_NAME/games/${month}/pgn</code></li>
               <li><b>Lichess:</b> open your profile, press the download button above your games, and choose "Export games".</li><li>Drop every file you got into the box above.</li></ol></details></div></div>`;
   },
-  async fetchUser(){
-    const u = (document.getElementById('uname').value || '').trim(); this.user = u; if (!u){ this.msg = {bad: 1, t: 'Type your username first.'}; return render(); }
-    this.busy = true; this.msg = {t: `Looking for ${u} on ${this.site}…`}; render();
+  async fetchUser(name){
+    const u = String(name !== undefined ? name : ((document.getElementById('uname') || {}).value || '')).trim(); this.user = u; if (!u){ this.msg = {bad: 1, t: 'Type your username first.'}; return render(); }
+    this.busy = true; this.short = null; this.fresh = true; this.pool = ''; this.msg = {t: `Looking for ${u} on ${this.siteName()}…`}; render();
     try {
-      const text = await Importer[this.site === 'lichess' ? 'lichess' : 'chesscom'](u, TARGET + 50, n => { const r = document.querySelector('.pring'); if (r){ r.style.setProperty('--p', Math.min(100, pc(n, TARGET))); r.firstElementChild.firstChild.textContent = n; } });
+      const text = await Importer[this.site === 'lichess' ? 'lichess' : 'chesscom'](u, TAKE, n => { const r = document.getElementById('fetchbar'); if (r) r.style.width = Math.max(3, Math.min(100, pc(n, NEED))) + '%'; });
       this.busy = false; this.pool = text; this.src = {site: this.site, user: u.toLowerCase()}; this.ingest(u.toLowerCase());
     } catch(e){
       this.busy = false;
-      this.msg = {bad: 1, t: e.missing ? `There is no player called "${u}" on ${this.site}. Check the spelling.` : `Couldn't reach ${this.site} from this page. Use a PGN file instead: the steps are under "How do I get a PGN file?"`}; render();
+      this.msg = {bad: 1, t: e.missing ? `There is no player called "${u}" on ${this.siteName()}. Check the spelling.` : `Couldn't reach ${this.siteName()} from this page. Use a PGN file instead: the steps are under "How do I get a PGN file?"`}; render();
     }
   },
   async addFiles(files){
@@ -285,19 +343,28 @@ const Product = {
   // enough games and a known player: read them. Otherwise say what is missing.
   ingest(user){
     const raw = Analyze.parsePGN(this.pool); this.names = null;
-    if (!raw.length){ this.msg = {bad: 1, t: 'No games found in that. A PGN file starts with lines like [Event "…"].'}; return render(); }
+    if (!raw.length){ this.msg = {bad: 1, t: this.src && this.src.site !== 'pgn' ? 'No games came back for that name.' : 'No games found in that. A PGN file starts with lines like [Event "…"].'}; if (this.src && this.src.site !== 'pgn') return this.tooFew(this.src.user, 0); return render(); }
     user = (user || Analyze.guessUser(raw) || '').toLowerCase();
-    if (!user){ const c = {}; for (const g of raw) for (const k of ['White', 'Black']) if (g.h[k]) c[g.h[k]] = (c[g.h[k]] || 0) + 1; this.names = Object.keys(c).sort((a, b) => c[b] - c[a]).slice(0, 4); this.msg = {t: `${raw.length} games read. They are not all by one player, so tell me who you are.`}; return render(); }
-    const mine = raw.filter(g => (g.h.White || '').toLowerCase() === user || (g.h.Black || '').toLowerCase() === user);
+    if (!user){ const c = {}; for (const g of raw) for (const k of ['White', 'Black']) if (g.h[k]) c[g.h[k]] = (c[g.h[k]] || 0) + 1; this.names = Object.keys(c).sort((a, b) => c[b] - c[a]).slice(0, 4); this.msg = {t: 'Those games are not all by one player, so tell me who you are.'}; return render(); }
+    const all = raw.filter(g => (g.h.White || '').toLowerCase() === user || (g.h.Black || '').toLowerCase() === user), mine = all.filter(g => !isFast(g));
     const key = g => (g.h.UTCDate || g.h.Date || '') + (g.h.UTCTime || g.h.StartTime || ''); mine.sort((a, b) => key(b) < key(a) ? -1 : 1);
-    if (mine.length < MINIMUM){ this.msg = {bad: mine.length === 0, t: mine.length ? `${mine.length} of your games so far. ${MINIMUM} is the least I can work with, ${TARGET} is the target. Add more.` : `None of those ${raw.length} games were played by "${user}".`}; return render(); }
-    this.read(mine.slice(0, 250), user);
+    if (!all.length){ this.msg = {bad: 1, t: `None of those games were played by "${user}".`}; return render(); }
+    if (mine.length < this.need) return this.tooFew(user, mine.length);
+    if (this.me().short){ const m = Object.assign({}, this.me()); delete m.short; Prog.d.me = m; }
+    this.read(mine.slice(0, TAKE), user);
+  },
+  need: NEED,
+  // not enough games yet: say so, keep it with the account so the welcome screen remembers, and wait
+  tooFew(user, n){
+    this.short = {site: (this.src || {}).site || this.site, user: (this.src || {}).site === 'pgn' ? '' : user, n, at: Date.now()};
+    Prog.d.me = Object.assign({}, this.me(), {state: 'new', short: this.short}); Prog.save(); this.msg = null; this.pool = (this.src || {}).site === 'pgn' ? this.pool : '';
+    S.view = 'setup'; render(); setHash();
   },
   /* -- the reading screen: the analysis runs while the board plays through the games */
   STAGES: ['Reading your games', 'Sorting them by opening', 'Measuring where you score', 'Finding where you leave the book', 'Building your playbook'],
   readingHTML(){
     return `<section class="proc"><div class="board" id="pboard">${boardSVG(N[0].f, {coords: false})}</div>
-      <div><p class="kicker">Step 2 of 3 · this takes a few seconds</p><h2 style="font-size:clamp(30px,4vw,48px)">Reading your games</h2>
+      <div><p class="kicker">Step 2 of 3 · a few seconds</p><h2 style="font-size:clamp(30px,4vw,48px)">Reading your games</h2>
         <ul class="plist" id="plist">${this.STAGES.map((s, k) => `<li class="${k === 0 ? 'on' : ''}" data-k="${k}"><i>${ICON.check}</i><span>${s}</span><span class="c"></span></li>`).join('')}</ul>
         <div class="pbar"><i id="pbar"></i></div>
         <div class="say"><div class="cface">${knightSVG('think')}</div><p id="psay">Let me look.</p></div></div></section>`;
@@ -324,7 +391,7 @@ const Product = {
     stage(3, plural(P.leaks.length, 'spot')); say(P.leaks[0] ? `One position came up ${plural(P.leaks[0].n, 'time')} and you left the playbook the same way each time. We'll fix that one first.` : 'You stay in the book longer than most.'); await wait(1700);
     stage(4); say(tb ? `Against you, White goes for the ${cn('b', tb[0])} most. Nearly done.` : 'Nearly done.'); await wait(1300);
     stage(5); clearInterval(anim);
-    this.pool = ''; Prog.d.me = {state: 'new', since: this.me().since || Date.now(), updated: Date.now(), src: this.src || {site: 'pgn', user}, P}; Prog.save();
+    this.pool = ''; this.short = null; Prog.d.me = {state: 'new', since: this.me().since || Date.now(), updated: Date.now(), src: this.src || {site: 'pgn', user}, P}; Prog.save();
     S.view = 'findings'; render(); setHash(); window.scrollTo({top: 0});
   },
   /* -- what the games say */
@@ -381,7 +448,7 @@ const Product = {
   },
   builtHTML(){
     const P = this.me().P || {n: 0};
-    return `<section class="done-art"><div class="cface pop">${knightSVG('cheer')}</div><p class="kicker">Built from ${P.n} games</p><h2>Your playbook is <em>ready</em>.</h2>
+    return `<section class="done-art"><div class="cface pop">${knightSVG('cheer')}</div><p class="kicker">Built from your games</p><h2>Your playbook is <em>ready</em>.</h2>
       <p class="lede">Your course is ordered by your own games, every chapter shows your own record, and Your games shows where you leave the book.</p>
       <div class="cta"><button class="btn primary" data-open style="min-height:48px;padding:12px 24px;font-size:16px">Open my course</button></div></section>`;
   },
@@ -393,8 +460,8 @@ const Product = {
     const day = t => t ? new Date(t).toLocaleDateString(undefined, {month: 'short', day: 'numeric'}) : '';
     const rows = P.games.slice(0, 40).map(g => `<tr><td>${day(g.t)}</td><td>${g.me === 'w' ? 'White' : 'Black'}</td><td>${esc(g.opp)}${g.oe ? ` <span style="color:var(--muted)">${g.oe}</span>` : ''}</td><td><span class="chip ${g.r === 1 ? 'win' : g.r === 0 ? 'loss' : 'draw'}">${g.r === 1 ? 'Won' : g.r === 0 ? 'Lost' : 'Draw'}</span></td><td>${esc(g.ch ? cn(g.me, g.ch) : 'Outside the playbook')}</td><td>${g.ch ? plural(Math.floor(g.bp / 2), 'move') + ' in the book' : ''}</td></tr>`).join('');
     const tile = (b, s) => `<div class="tile"><b>${b}</b><span>${s}</span></div>`;
-    view.innerHTML = `<div class="pv"><div class="chead"><div><p class="kicker">Your games${P.user ? ' · ' + esc(P.user) : ''}</p><h2 style="font-size:clamp(30px,4vw,44px)">What actually happened</h2><p>${P.n} games, read without an engine: what you met, how it went, and where your moves and your playbook part ways.</p></div>
-        <button class="btn" data-pgo="setup">Update from new games</button></div>
+    view.innerHTML = `<div class="pv"><div class="chead"><div><p class="kicker">Your games${P.user ? ' · ' + esc(P.user) : ''}</p><h2 style="font-size:clamp(30px,4vw,44px)">What actually happened</h2><p>Your games, read without an engine: what you met, how it went, and where your moves and your playbook part ways. Open an opening for every lesson in it.</p></div>
+        <button class="btn" data-pgo="setup">Read my newer games</button></div>
       <div class="tiles">${tile(P.n, 'games')}${tile(rec(P.all), 'wins and losses')}${tile(P.rating || '–', `${P.tc} rating`)}${tile(P.leaks.length, 'spots where you leave the book')}</div>
       <div class="fgrid"><div class="pcard"><p class="kicker">With White · ${rec(P.white.all)}</p><div class="bars">${col('w', P.white)}</div></div><div class="pcard"><p class="kicker">With Black · ${rec(P.black.all)}</p><div class="bars">${col('b', P.black)}</div></div></div>
       ${P.leaks.length ? `<div><div class="sechead"><h2>Where you leave your playbook</h2><p>The same position, the same different move. Red is what you played, green is the playbook.</p></div><div class="leaks">${P.leaks.slice(0, 8).map(L => this.leakHTML(L, true)).join('')}</div></div>` : ''}
@@ -411,6 +478,8 @@ const Product = {
     view.querySelectorAll('[data-pch]').forEach(b => b.onclick = () => { const [s, id] = b.dataset.pch.split(':'); useSide(s); S.chapter = id; go('learn'); });
     view.querySelectorAll('[data-leak]').forEach(b => b.onclick = () => { const [s, line, kid] = b.dataset.leak.split(':'); useSide(s); openLine(line, Math.max(0, LINES[line].n.indexOf(+kid)), 'games'); });
     const cb = view.querySelector('[data-cback]'); if (cb) cb.onclick = () => { this.ci--; render(); };
+    const rc = view.querySelector('[data-recheck]'); if (rc) rc.onclick = () => { const sh = this.short || this.me().short || {}; this.site = sh.site === 'lichess' ? 'lichess' : 'chess.com'; this.fetchUser(sh.user); };
+    const ot = view.querySelector('[data-other]'); if (ot) ot.onclick = () => { this.short = null; this.fresh = true; this.pool = ''; this.msg = null; render(); };
     const op = view.querySelector('[data-open]'); if (op) op.onclick = () => { try { history.replaceState(null, '', '#course'); } catch(e){} location.reload(); };
     const f = document.getElementById('uform'); if (f) f.onsubmit = e => { e.preventDefault(); if (!this.busy) this.fetchUser(); };
     const inp = document.getElementById('pgnFile'), drop = document.getElementById('drop');
@@ -419,45 +488,117 @@ const Product = {
   }
 };
 
+/* ---- badges: earned from the progress, kept with it (d.badges: id -> when), shown in the profile. Locked ones are grey. */
+const BADGES = [
+  {id: 'l1', group: 'Lines you know', name: 'First line', need: 'Play a line from memory without a slip.', tier: 'bronze', glyph: '1', n: x => x.clean, at: 1},
+  {id: 'l10', group: 'Lines you know', name: 'Ten lines', need: 'Ten lines played without a slip.', tier: 'bronze', glyph: '10', n: x => x.clean, at: 10},
+  {id: 'l25', group: 'Lines you know', name: 'Twenty-five lines', need: 'Twenty-five lines played without a slip.', tier: 'silver', glyph: '25', n: x => x.clean, at: 25},
+  {id: 'l50', group: 'Lines you know', name: 'Fifty lines', need: 'Fifty lines played without a slip.', tier: 'silver', glyph: '50', n: x => x.clean, at: 50},
+  {id: 'l100', group: 'Lines you know', name: 'A hundred lines', need: 'A hundred lines played without a slip.', tier: 'gold', glyph: '100', n: x => x.clean, at: 100},
+  {id: 'l250', group: 'Lines you know', name: 'The whole library', need: 'Two hundred and fifty lines played without a slip.', tier: 'gold', glyph: '250', n: x => x.clean, at: 250},
+  {id: 's3', group: 'Streak', name: 'Three in a row', need: 'Five lines a day, three days running.', tier: 'bronze', glyph: 'flame', n: x => x.best, at: 3},
+  {id: 's7', group: 'Streak', name: 'A full week', need: 'Five lines a day for a week.', tier: 'silver', glyph: 'flame', n: x => x.best, at: 7},
+  {id: 's30', group: 'Streak', name: 'A month', need: 'Five lines a day for thirty days.', tier: 'gold', glyph: 'flame', n: x => x.best, at: 30},
+  {id: 's100', group: 'Streak', name: 'A hundred days', need: 'Five lines a day for a hundred days.', tier: 'gold', glyph: 'crown', n: x => x.best, at: 100},
+  {id: 'u1', group: 'Course', name: 'First checkpoint', need: 'Pass a unit\'s checkpoint.', tier: 'bronze', glyph: 'flag', n: x => x.units, at: 1},
+  {id: 'u5', group: 'Course', name: 'Five units', need: 'Pass five units of your course.', tier: 'silver', glyph: 'flag', n: x => x.units, at: 5},
+  {id: 'uall', group: 'Course', name: 'Course complete', need: 'Pass every open unit of your course.', tier: 'gold', glyph: 'star', n: x => x.units, at: x => x.open},
+  {id: 'm10', group: 'Practice', name: 'Solid ten', need: 'Ten lines clean on four reviews in a row.', tier: 'silver', glyph: 'star', n: x => x.solid, at: 10},
+  {id: 'm50', group: 'Practice', name: 'Solid fifty', need: 'Fifty lines clean on four reviews in a row.', tier: 'gold', glyph: 'star', n: x => x.solid, at: 50},
+  {id: 'g10', group: 'Practice', name: 'Sparring partner', need: 'Ten practice games in the Sandbox.', tier: 'bronze', glyph: 'board', n: x => x.spar, at: 10}
+];
+const badgeNeed = (B, x) => typeof B.at === 'function' ? B.at(x) : B.at;
+function badgeStats(){
+  let clean = 0, solid = 0; for (const id in (Prog.d.lines || {})){ const r = Prog.rec(id); if (!r) continue; if (r.clean) clean++; if ((r.box || 0) >= 4) solid++; }
+  const open = COURSE.filter(U => !U.soon);
+  return {clean, solid, best: Daily.best(), units: open.filter(unitPassed).length, open: Math.max(1, open.length), spar: (Prog.d.sb || {}).games || 0};
+}
+// a medal: two ribbons and a struck disc; the glyph is a number or a small picture. Locked ones are drawn in grey.
+function medalSVG(tier, glyph){
+  const t = tier === 'locked' ? ['locked', 'locked-2', 'locked', 'locked'] : [tier, tier + '-2', 'ribbon-1', 'ribbon-2'], c = k => `var(--${t[k]})`;
+  const G = {flame: '<path d="M33 31c.3 2.6-.9 4-2.3 5.5-1.5 1.6-3 3.2-3 5.9 0 3.2 2.1 5.6 4.6 5.6s4.7-2.2 4.7-5.3c0-2.3-1.2-3.8-2-4.8-.2 1.2-.7 2.2-1.6 2.6.5-3.1-.2-6.1-.4-9.5z"/>',
+    crown: '<path d="M23 50l-2-12 6 5 5-8 5 8 6-5-2 12z"/>', flag: '<path d="M27 52V32h2v1.5c4-2.5 7 1.5 11-.5v10c-4 2-7-2-11 .5V52z"/>',
+    star: '<path d="M32 31.5l3.1 6.4 7 1-5.1 4.9 1.2 7-6.2-3.3-6.2 3.3 1.2-7-5.1-4.9 7-1z"/>', board: '<path d="M24 34h8v8h-8zM32 42h8v8h-8z"/><path d="M24 34h16v16H24z" fill="none" stroke-width="1.6"/>',
+    lock: '<rect x="26" y="40" width="12" height="9" rx="1.6"/><path d="M28.5 40v-3a3.5 3.5 0 0 1 7 0v3" fill="none" stroke-width="2"/>'};
+  const g = tier === 'locked' ? G.lock : G[glyph] || `<text x="32" y="${glyph.length > 2 ? 46.5 : 47.5}" text-anchor="middle" font-size="${glyph.length > 2 ? 12.5 : 15}">${glyph}</text>`;
+  return `<svg class="medal" viewBox="0 0 64 76" aria-hidden="true"><path d="M16 2h14l6 26-12 4z" style="fill:${c(2)}"/><path d="M48 2H34l-6 26 12 4z" style="fill:${c(3)}"/>
+    <circle cx="32" cy="45" r="22" style="fill:${c(1)};stroke:${c(0)}" stroke-width="3"/><circle cx="32" cy="45" r="16.5" fill="none" style="stroke:${c(0)}" stroke-width="1.2" stroke-dasharray="2 2.2"/>
+    <g class="mg" style="fill:${c(0)};stroke:${c(0)}" font-family="var(--f-display)" font-weight="700">${g}</g><path d="M17.5 37a16 16 0 0 1 9-9.5" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.4" stroke-linecap="round"/></svg>`;
+}
+const Badges = {
+  queue: [],
+  // stamp what has just been earned; the coach shows it at the next quiet moment. The first check after an update
+  // stamps what was earned before it quietly.
+  check(){
+    const first = !Prog.d.badges, have = Prog.d.badges || {}, x = badgeStats(), now = Date.now(), got = [];
+    for (const B of BADGES) if (!have[B.id] && B.n(x) >= badgeNeed(B, x)) { have[B.id] = now; got.push(B); }
+    if (!got.length && !first) return false;
+    Prog.d.badges = have;
+    if (!first && got.length && PERSONA !== 'new'){ this.queue.push(...got); if (!(S.drill && S.drill.state === 'play')) this.show(); }
+    return true;
+  },
+  show(){
+    const B = this.queue.slice().sort((a, b) => ({gold: 0, silver: 1, bronze: 2}[a.tier] - {gold: 0, silver: 1, bronze: 2}[b.tier]))[0]; if (!B) return;
+    const more = this.queue.length - 1; this.queue = [];
+    if (!SET.coach){ toast(`New badge: ${B.name}${more ? ` and ${more} more` : ''}.`); return; }
+    Coach.say(`${B.need}${more ? ` And ${more} more ${more === 1 ? 'badge' : 'badges'} with it.` : ''}`, {mood: 'cheer', stay: true, head: `New badge: ${B.name}`, art: `<span class="cmedal">${medalSVG(B.tier, B.glyph)}</span>`, cta: ['me', 'See your badges']});
+  }
+};
+// the profile: the streak, the last seven days and every badge, earned or not
+function profileHTML(){
+  const st = Daily.streak(), best = Math.max(st, Daily.best()), k = Math.min(DAILY, Daily.count()), have = Prog.d.badges || {}, x = badgeStats();
+  const got = BADGES.filter(B => have[B.id]).length, groups = [...new Set(BADGES.map(B => B.group))];
+  const week = [-6, -5, -4, -3, -2, -1, 0].map(o => { const d = dayDate(o), on = Daily.done(o); return `<li class="${on ? 'on' : ''} ${o === 0 ? 'now' : ''}"><i>${on ? ICON.check : ''}</i><span>${d.toLocaleDateString(undefined, {weekday: 'narrow'})}</span></li>`; }).join('');
+  const one = B => { const at = have[B.id], need = badgeNeed(B, x), cur = Math.min(need, B.n(x));
+    return `<li class="bdg ${at ? 'got' : 'lock'}" title="${esc(B.need)}">${medalSVG(at ? B.tier : 'locked', B.glyph)}<b>${esc(B.name)}</b><span>${at ? 'Earned ' + new Date(at).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'}) : esc(B.need)}</span>${at ? '' : `<i class="bprog" aria-hidden="true"><i style="width:${Math.round(cur / need * 100)}%"></i></i>`}</li>`; };
+  return `<div class="prof"><div class="pstreak ${st ? '' : 'zero'}">${FLAME}<div><b class="tnum">${st}</b><span>${st === 1 ? 'day' : 'days'} in a row</span></div><p>Best: ${best} · today: ${k} of ${DAILY} lines</p></div>
+    <ol class="week" aria-label="The last seven days">${week}</ol>
+    <div class="bdgs"><p class="kicker">Badges · ${got} of ${BADGES.length}</p>${groups.map(g => `<div><p class="bgh">${esc(g)}</p><ul class="bgrid">${BADGES.filter(B => B.group === g).map(one).join('')}</ul></div>`).join('')}</div></div>`;
+}
+
 /* ---- the coach: a few words in a speech bubble, bottom right. Never a hint while you are being tested. */
 const Coach = {
   seen: (() => { try { return JSON.parse(localStorage.getItem('playbook-coach') || '{}'); } catch(e){ return {}; } })(), timer: null, last: null, n: 0,
   el(){ let e = document.getElementById('coach'); if (!e){ e = document.createElement('div'); e.id = 'coach'; e.className = 'coach'; document.body.appendChild(e);
-      e.addEventListener('click', ev => { if (ev.target.closest('.cx')) return this.hush(); const a = ev.target.closest('[data-cgo]'); if (a){ this.hush(); return go(a.dataset.cgo); } if (ev.target.closest('.cav')) this.last && !e.querySelector('.cbub') ? this.say(this.last.t, this.last.o) : e.querySelector('.cbub') ? this.hush() : this.say(this.tip()); }); }
+      e.addEventListener('click', ev => { if (ev.target.closest('.cx')) return this.hush(); const a = ev.target.closest('[data-cgo]'); if (a){ this.hush(); return a.dataset.cgo === 'me' ? Acct.open(Cloud.user ? 'in' : 'me') : go(a.dataset.cgo); } if (ev.target.closest('.cav')) this.last && !e.querySelector('.cbub') ? this.say(this.last.t, this.last.o) : e.querySelector('.cbub') ? this.hush() : this.say(this.tip()); }); }
     return e; },
   // on the welcome, reading, findings and choice screens the coach is part of the page, so the corner one stays away
   draw(bub){ const e = this.el(); e.hidden = !SET.coach || (PVIEWS.includes(S.view) && S.view !== 'setup'); e.classList.toggle('quiet', ['drill', 'quiz', 'sandbox', 'study', 'explore'].includes(S.view));
     e.innerHTML = (bub || '') + `<button class="cav" type="button" aria-label="${coachName()}, your coach">${knightSVG(this.mood)}</button>`; },
   say(t, o = {}){
     if (!SET.coach) return; clearTimeout(this.timer); this.last = {t, o}; this.mood = o.mood;
-    this.draw(`<div class="cbub" role="status"><button class="cx" type="button" aria-label="Close">×</button><span class="cwho">${coachName()}</span>${esc(t)}${o.cta ? `<div class="cacts"><button class="btn small primary" data-cgo="${o.cta[0]}">${esc(o.cta[1])}</button></div>` : ''}</div>`);
+    this.draw(`<div class="cbub ${o.art ? 'art' : ''}" role="status"><button class="cx" type="button" aria-label="Close">×</button>${o.art ? `<span class="cart">${o.art}</span>` : ''}<span class="cwho">${coachName()}</span>${o.head ? `<b class="chead2">${esc(o.head)}</b>` : ''}${esc(t)}${o.cta ? `<div class="cacts"><button class="btn small primary" data-cgo="${o.cta[0]}">${esc(o.cta[1])}</button></div>` : ''}</div>`);
     if (!o.stay) this.timer = setTimeout(() => this.hush(), 9000 + t.length * 45);
   },
   hush(){ clearTimeout(this.timer); this.mood = null; this.draw(''); },
   once(key, t, o){ if (this.seen[key]) return false; this.seen[key] = 1; try { localStorage.setItem('playbook-coach', JSON.stringify(this.seen)); } catch(e){} this.say(t, o); return true; },
   refresh(){ this.hush(); },
   tip(){
-    const T = {start: `Bring me ${TARGET} of your games and I'll build your course around them.`, setup: 'A username is the quickest way. I only read your public games.', sandbox: 'Play your side. The other side answers the way club players really do.',
-      course: 'Work down the path. Each checkpoint you pass opens the next unit.', learn: 'Pick an opening, then step through a lesson with the arrow keys.', drill: 'Clean runs come back in days. Slips come back today.',
+    const T = {start: 'Connect your chess account and I\'ll build your course around your games.', setup: 'A username is the quickest way. I only read your public games.', sandbox: 'Play your side. The other side answers the way club players really do.',
+      course: 'Work down the path. Each checkpoint you pass opens the next unit.', learn: 'Pick a lesson, then step through it with the arrow keys.', drill: 'Five lines a day keeps your streak. The ones you slipped on come first.',
       games: 'This is where your moves and your playbook part ways.', cheat: 'Their move is highlighted. The green arrow is your answer.', study: 'Step through with the arrow keys. Switch the engine on under the board if a position looks scary.'};
     return T[S.view] || T[tabOf(S.view, S.studyFrom)] || 'Keep going.';
   },
   // called after every full render: at most one thing to say, and only the first time
   onView(){
-    const v = S.view, e = this.el(); if (e.querySelector('.cbub') && this.lastView === v) return this.draw(e.querySelector('.cbub').outerHTML); this.lastView = v;
+    const v = S.view, e = this.el();
+    if (S.drill && S.drill.state === 'play'){ this.lastView = v; return this.hush(); } // never while a drill, a practice game or a checkpoint is being played
+    if (Badges.queue.length && PERSONA !== 'new') return Badges.show();
+    if (e.querySelector('.cbub') && this.lastView === v) return this.draw(e.querySelector('.cbub').outerHTML); this.lastView = v;
     if (v === 'reading' || v === 'choices' || v === 'built' || v === 'findings') return this.hush(); // the coach is already on the page there
-    if (S.drill && S.drill.state === 'play') return this.hush(); // never while a drill, a practice game or a checkpoint is being played
     if (PERSONA === 'new'){
       if (v === 'start') return this.hush();
       if (v === 'setup') return this.once('setup', this.tip()) || this.hush();
-      if (v === 'sandbox') return this.once('sb-new', `This is the sandbox: pick an opening and play. I'll stop you where the playbook has a better move. Bring your games and the rest opens.`, {cta: Product.signedOut() ? null : ['setup', 'Bring my games']}) || this.hush();
-      if (!OPEN_NEW.includes(v)) return this.say('This opens once I\'ve read your games.', {cta: Product.signedOut() ? null : ['setup', 'Bring my games']});
+      if (v === 'sandbox') return this.once('sb-new', `This is the sandbox: pick an opening and play. I'll stop you where the playbook has a better move. Connect your account and the rest opens.`, {cta: Product.signedOut() ? null : ['setup', 'Connect my account']}) || this.hush();
+      if (!OPEN_NEW.includes(v)) return this.say('This opens once I\'ve read your games.', {cta: Product.signedOut() ? null : ['setup', 'Connect my account']});
       return this.hush();
     }
     if (PERSONA === 'ready' && v === 'course' && this.once('ready-course', 'This is your course, in the order your games asked for. Start with the unit at the top.')) return;
     if (['course', 'learn', 'drill', 'games', 'cheat', 'sandbox'].includes(v) && this.once('tab-' + v, this.tip())) return;
     this.hush();
   },
+  // the fifth line of the day
+  daily(){ const st = Daily.streak(); this.say(st > 1 ? `That's today's five. ${st} days in a row: come back tomorrow for ${st + 1}.` : `That's today's five, and day one of your streak. Five more tomorrow keeps it going.`, {mood: 'cheer', ms: 9000, art: `<span class="cflame">${FLAME}<b>${st}</b></span>`}); },
   event(kind, ok){
     if (kind === 'line' && S.view === 'drill'){ this.n++;
       if (!ok) return this.say('That one comes back today. The second time is where it sticks.');
@@ -468,11 +609,19 @@ const Coach = {
 /* ---- hooks into the app */
 const render0 = render;
 render = function(){
-  if (PERSONA === 'new' && !OPEN_NEW.includes(S.view)){ stopPlay(); setTab(S.view); renderChrome(); S.drill = null; EngineUI.detach(); Product.locked(tabOf(S.view, S.studyFrom)); return Coach.onView(); }
-  if (PVIEWS.includes(S.view)){ setTab(S.view); renderChrome(); S.drill = null; EngineUI.detach(); document.getElementById('dueBadge').hidden = true; Product.render(); return Coach.onView(); }
+  if (PERSONA === 'new' && !OPEN_NEW.includes(S.view)){ stopPlay(); setTab(S.view); renderChrome(); S.drill = null; EngineUI.detach(); document.getElementById('drillDot').hidden = true; Product.locked(tabOf(S.view, S.studyFrom)); return Coach.onView(); }
+  if (PVIEWS.includes(S.view)){ setTab(S.view); renderChrome(); S.drill = null; EngineUI.detach(); document.getElementById('drillDot').hidden = true; Product.render(); return Coach.onView(); }
   render0(); Coach.onView();
 };
 const renderGames0 = renderGames;
 renderGames = function(){ if (PERSONA === 'ready' && Product.me().P) return Product.games(); renderGames0(); };
 const record0 = Prog.record.bind(Prog);
-Prog.record = function(id, clean){ record0(id, clean); Coach.event('line', clean); };
+Prog.record = function(id, clean){
+  const before = Daily.count(); record0(id, clean);
+  if (Badges.queue.length) return;                       // a new badge says it louder
+  if (before < DAILY && Daily.count() >= DAILY) return Coach.daily();
+  Coach.event('line', clean);
+};
+// every save is a moment something may have been earned
+const save0 = Prog.save.bind(Prog);
+Prog.save = function(){ save0(); if (Badges.check()) save0(); };

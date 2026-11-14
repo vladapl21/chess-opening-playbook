@@ -69,6 +69,19 @@ Facts that shape the design:
 - Settings and the account button moved out of the header into the corner of the screen; the header fits one row on an ordinary monitor and centres its rows when it has to wrap.
 - A lesson opened from a course unit has "Next lesson" at the top. The Sandbox has "Free play: pick openings" to leave a course practice game.
 
+## Phase 1.8: the daily habit (done, November 13)
+
+- **Today's five** opens the Drill tab: five lines from move one, from both books, slips first (oldest first), then changed lines, what is due, new lines from studied lessons, then new lines in course order. Any line played to its end counts toward the day; five different lines keep the streak (`Daily` and `dailyNext` in the template; `d.days` in the progress record, merged across devices as a union per day).
+- A **!** on the Drill tab until today's five are done. The red counts beside White and Black and on Drill are gone.
+- **Badges** in the profile (the flame in the corner, or the account button): sixteen of them in four groups, locked ones grey with a progress bar. A new one arrives as a medal in the coach's bubble, held back while a line, practice game or checkpoint is being played (`BADGES`, `Badges`, `profileHTML` in `app/product.js`; `d.badges` keeps the first date).
+- **Reminder emails**, written but not switched on: `supabase/functions/nudge` (Deno) with its rules in `pick.js`, `supabase/nudge.sql` for the log table and the hourly schedule. At most one a week, only in the player's evening, only with reminders on. Needs a Resend key and a sending domain (README, "Reminder emails").
+- **Connect your account**: the chess username is part of sign-up and the games are read straight after; bullet is left out; under 200 games that aren't bullet, the page says to play more first and remembers it. No game counts anywhere in the app's words.
+- **Learn folded into Your games**: the openings list there opens each opening's page; the tab is gone (`#learn` links still work).
+- **Settings follow the account** (`d.set`, the newer copy wins). The system switch is folded away in Settings and asks for the username.
+- **The explore board keeps the game from move one**, with a mark and a button for where you came in.
+- **The footer** says whose playbook it is, then a copyright line.
+- A bug found on the way: a second function called `fenAfter` (for the skill units) had replaced the puzzle one, so a solved missed shot threw an error and showed no final position. Renamed, and three suites now fail on page errors instead of printing them.
+
 ## Phase 2: onboarding (first version built, November 12)
 
 Built (see README, "Where it is going"):
@@ -82,7 +95,8 @@ Built (see README, "Where it is going"):
 Still to do in this phase:
 
 - **More systems, first** (Phase 5 below). Order suggested by what club players at this level play: for Black against the e-pawn the Sicilian and the Caro-Kann; against the d-pawn the classical defence and a fianchetto setup; for White a d-pawn system. The would-you-rather cards already list them as "being written" (`CATALOG` in `app/product.js`); a system becomes selectable by adding its lessons and setting `ready`.
-- The questions from the old plan that are not asked yet: rating and time control are read from the games, but there is no daily goal.
+- The questions from the old plan that are not asked yet: rating and time control are read from the games. The daily goal is fixed at five lines; a choice of three, five or ten could come later.
+- **Sign in with chess.com.** chess.com has OAuth 2.0 / OpenID Connect by application (their form); once approved, it plugs into Supabase as a custom OIDC provider and the username comes with the sign-in.
 - Sentences about the house player's games are cut at start-up by a pattern (`PERS` in `app/product.js`). Better: mark them in the content so they can be replaced by the player's own.
 - "Update from new games" re-reads everything. It should add to what is there.
 - The real chess.com and Lichess calls have only been run against a stand-in. Check both in a browser with a real username, and add the Edge Function fallback if chess.com refuses the page.
@@ -106,8 +120,8 @@ The original plan for this phase, for reference:
 
 ## Phase 4: gamification
 
-- XP for every step, a daily goal ring, a streak (with one freeze a week), and levels.
-- A celebration when you pass a checkpoint, a short weekly recap card, and optional sound.
+- Done (Phase 1.8): the daily goal ring, the streak, badges with the coach's medal, scarce reminder emails.
+- Still to do: a streak freeze (one a week), XP and levels, a celebration when you pass a checkpoint, a short weekly recap card, and optional sound.
 - Leagues and friends later, once other players exist.
 
 ## Phase 5: the systems library (ongoing)

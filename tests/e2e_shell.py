@@ -17,7 +17,7 @@ with sync_playwright() as p:
     ctx = b.new_context(viewport={'width': 1280, 'height': 900})
     pg = ctx.new_page(); hook(pg); pg.goto(URL); pg.wait_for_timeout(1000)
     tabs = [t.split('\n')[0].strip() for t in pg.locator('.tabs button').all_inner_texts()]
-    print('tabs:', tabs); assert tabs[:3] == ['Sandbox', 'Course', 'Learn'] and tabs[3].startswith('Drill')
+    print('tabs:', tabs); assert tabs[:2] == ['Sandbox', 'Course'] and tabs[2].startswith('Drill') and tabs[3] == 'Your games' and len(tabs) == 5
 
     # the colour switch stays on the tab: Drill on White, Course on Black, then switch back and forth
     pg.click('.tabs [data-view="drill"]'); pg.wait_for_timeout(300)
@@ -26,16 +26,18 @@ with sync_playwright() as p:
     pg.click('.tabs [data-view="course"]'); pg.wait_for_timeout(300)
     pg.click('.sidesw [data-side="w"]'); pg.wait_for_timeout(400)
     assert pg.evaluate('[SIDE, S.view]') == ['w', 'course'] and tab(pg) == 'Course', pg.evaluate('[SIDE, S.view]')
-    for v in ('sandbox', 'learn', 'games', 'cheat'):
+    for v in ('sandbox', 'games', 'cheat'):
         pg.click(f'.tabs [data-view="{v}"]'); pg.wait_for_timeout(300)
         pg.click('.sidesw [data-side="b"]'); pg.wait_for_timeout(400)
         assert pg.evaluate('[SIDE, S.view]') == ['b', v], (v, pg.evaluate('[SIDE, S.view]'))
         pg.click('.sidesw [data-side="w"]'); pg.wait_for_timeout(400)
         assert pg.evaluate('[SIDE, S.view]') == ['w', v], (v, pg.evaluate('[SIDE, S.view]'))
-    # inside a lesson: the other book has no such lesson, so the switch lands on Learn; switching back returns to the lesson
+    # inside a lesson opened from an opening's page: the other book has no such lesson, so the switch lands on Your games
+    # (where the opening pages live); switching back returns to the lesson
     pg.evaluate("openLine('setup', undefined, 'learn')"); pg.wait_for_timeout(300)
+    assert tab(pg) == 'Your games'
     pg.click('.sidesw [data-side="b"]'); pg.wait_for_timeout(400)
-    assert pg.evaluate('[SIDE, S.view]') == ['b', 'learn'], pg.evaluate('[SIDE, S.view, S.studyFrom, S.line]')
+    assert pg.evaluate('[SIDE, S.view]') == ['b', 'games'], pg.evaluate('[SIDE, S.view, S.studyFrom, S.line]')
     pg.click('.sidesw [data-side="w"]'); pg.wait_for_timeout(400)
     assert pg.evaluate('[SIDE, S.view, S.line]') == ['w', 'study', 'setup']
     print('switch keeps the tab')

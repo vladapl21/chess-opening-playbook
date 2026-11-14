@@ -22,7 +22,9 @@ test: build
 	$(PY) tests/e2e_onboarding.py
 	$(PY) tests/e2e_skills.py
 	$(PY) tests/e2e_packs.py
+	$(PY) tests/e2e_daily.py
 	node tests/analyze_check.js
+	node tests/nudge_check.mjs
 
 # Engine and wording checks for the Black book
 check:

@@ -12,6 +12,8 @@
   --sq-light:#E6ECE2; --sq-dark:#84A390; --hl:rgba(240,201,64,.55); --sel:rgba(13,106,78,.38);
   --arr-g:#11843F; --arr-r:#D2302A; --arr-b:#2F63C9; --arr-y:#E3A90E; --arr-e:#7646D6;
   --shadow:0 0 0 1px var(--line),0 2px 0 rgba(18,32,26,.05);
+  --flame:#D9541E; --flame-2:#F4A21F; --flame-ink:#FFFFFF; --flame-soft:#FBE4D7;
+  --gold:#B7860F; --gold-2:#F1CF6B; --silver:#7D8B95; --silver-2:#DCE3E8; --bronze:#9A5A2C; --bronze-2:#E3A878; --ribbon-1:#2D5DAA; --ribbon-2:#B93628; --locked:#A9B5AD; --locked-2:#EEF2EF;
   --f-display:"Barlow Condensed","Arial Narrow","Roboto Condensed",Impact,sans-serif;
   --f-body:"Barlow","Segoe UI",system-ui,-apple-system,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
@@ -23,6 +25,8 @@
   --rosso:#F2685B; --rosso-soft:#3D1C18; --oro:#E2B54C; --oro-soft:#3A2F14; --blu:#86AEF2; --blu-soft:#1B2A45; --viola:#B9A2EC; --viola-soft:#2C2342;
   --sq-light:#CFD8CC; --sq-dark:#6F8D7B; --hl:rgba(240,201,64,.5); --sel:rgba(67,192,143,.42);
   --arr-g:#1FA155; --arr-r:#E8463D; --arr-b:#4F82E6; --arr-y:#F0B92A; --arr-e:#A78BF5;
+  --flame:#FF8746; --flame-2:#FFC24A; --flame-ink:#2A1205; --flame-soft:#3B2216;
+  --gold:#E2B54C; --gold-2:#F7DF92; --silver:#A9B6BF; --silver-2:#E2E8EC; --bronze:#C9864F; --bronze-2:#EFC29C; --ribbon-1:#5F8BE0; --ribbon-2:#E2614F; --locked:#55665D; --locked-2:#1F2A25;
   --shadow:0 0 0 1px var(--line),0 2px 0 rgba(0,0,0,.35); --pico-b:drop-shadow(0 0 1px rgba(214,226,219,.95)) drop-shadow(0 0 .6px rgba(214,226,219,.95)); --scrim:rgba(0,0,0,.62); color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0D1411; --surface:#151F1A; --surface-2:#1C2822; --ink:#E4EDE8; --muted:#97ACA2; --line:#2A3832;
@@ -30,6 +34,8 @@
   --rosso:#F2685B; --rosso-soft:#3D1C18; --oro:#E2B54C; --oro-soft:#3A2F14; --blu:#86AEF2; --blu-soft:#1B2A45; --viola:#B9A2EC; --viola-soft:#2C2342;
   --sq-light:#CFD8CC; --sq-dark:#6F8D7B; --hl:rgba(240,201,64,.5); --sel:rgba(67,192,143,.42);
   --arr-g:#1FA155; --arr-r:#E8463D; --arr-b:#4F82E6; --arr-y:#F0B92A; --arr-e:#A78BF5;
+  --flame:#FF8746; --flame-2:#FFC24A; --flame-ink:#2A1205; --flame-soft:#3B2216;
+  --gold:#E2B54C; --gold-2:#F7DF92; --silver:#A9B6BF; --silver-2:#E2E8EC; --bronze:#C9864F; --bronze-2:#EFC29C; --ribbon-1:#5F8BE0; --ribbon-2:#E2614F; --locked:#55665D; --locked-2:#1F2A25;
   --shadow:0 0 0 1px var(--line),0 2px 0 rgba(0,0,0,.35); --pico-b:drop-shadow(0 0 1px rgba(214,226,219,.95)) drop-shadow(0 0 .6px rgba(214,226,219,.95)); --scrim:rgba(0,0,0,.62); color-scheme:dark}
 /* board colours (Settings): each palette has its own light and dark values */
 :root[data-board="wood"]{--sq-light:#F0DDBD;--sq-dark:#B98B63}
@@ -68,7 +74,7 @@ p{margin:0}
 .tabs button{border:0;background:none;padding:8px 14px;border-radius:3px;font-weight:600;font-size:14px;color:var(--muted);cursor:pointer;white-space:nowrap}
 .tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
 .tabs button .sm{display:none}
-.tabs button .badge,.sidesw .badge{display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:3px;background:var(--rosso);color:#fff;font-size:11px;margin-left:6px;padding:0 5px;font-family:var(--f-mono)}
+.tabs button .todo{display:inline-grid;place-items:center;width:17px;height:17px;border-radius:50%;background:var(--flame);color:var(--flame-ink);font:800 11.5px/1 var(--f-body);margin-left:6px;vertical-align:1px}
 .brandrow{display:flex;align-items:center;gap:10px 18px;flex-wrap:wrap;min-width:0}
 /* settings and the account sit in the corner of the screen, away from the chess: in the margin on a wide screen, in a slim row above the header otherwise */
 .corner{display:flex;justify-content:flex-end;align-items:center;gap:8px;min-height:36px;margin-bottom:8px}
@@ -236,6 +242,8 @@ p{margin:0}
 .trow.blk .lbl{color:var(--muted)}
 .trow .tg{display:flex;gap:4px}
 .trow .tg i{width:8px;height:8px;border-radius:50%;display:block}
+.trow.pre:not(.cur) .lbl,.trow.pre:not(.cur) .n{opacity:.62}
+.chip.came{background:var(--accent-soft);color:var(--accent)}
 .tg .key,.tg .good{background:var(--accent)} .tg .best{background:var(--blu)} .tg .mistake{background:var(--oro)} .tg .blunder,.tg .trap,.tg .warn,.tg .missed{background:var(--rosso)} .tg .mate{background:var(--ink)} .tg .fix,.tg .new,.tg .swap{background:var(--viola)} .tg .game{background:var(--oro)} .tg .draw{background:var(--muted)}
 .collapsed{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;font-size:13px;color:var(--muted);background:var(--surface-2);width:100%;border:0;text-align:left;cursor:pointer}
 .outcome{display:flex;align-items:center;gap:10px;font-size:14px;padding:10px 12px;border-radius:4px;background:var(--surface-2)}
@@ -271,6 +279,30 @@ p{margin:0}
 .donebox{display:grid;gap:10px;padding:14px;border-radius:4px;background:var(--accent-soft)}
 .donebox.bad{background:var(--oro-soft)}
 .donebox h4{font-size:17px}
+/* Today: the daily five at the top of Drill */
+.today{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.today.done{border-color:var(--accent)}
+.tring{--p:0;width:78px;height:78px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--flame) calc(var(--p) * 1%),var(--surface-2) 0)}
+.today.done .tring{background:conic-gradient(var(--accent) 100%,var(--surface-2) 0)}
+.tring i{width:62px;height:62px;border-radius:50%;background:var(--surface);display:grid;place-items:center;align-content:center;font-style:normal;line-height:1}
+.tring b{font-family:var(--f-display);font-size:28px} .tring small{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.tmain{display:grid;gap:8px;min-width:0} .tline{font-size:15px;font-weight:600}
+.tside{display:grid;gap:8px;justify-items:end}
+.streak{display:flex;align-items:center;gap:6px;margin:0;font-size:13px;color:var(--muted)} .streak b{font-family:var(--f-display);font-size:26px;line-height:1;color:var(--ink)}
+.flame{width:26px;height:26px;fill:var(--flame);flex:none} .flame .fl-in{fill:var(--flame-2)}
+.streak.zero .flame{fill:var(--locked)} .streak.zero .flame .fl-in{fill:var(--locked-2)}
+.week{display:flex;gap:5px;margin:0;padding:0;list-style:none}
+.week li{display:grid;justify-items:center;gap:3px;font-size:10.5px;color:var(--muted);font-weight:600}
+.week i{width:20px;height:20px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center}
+.week i svg{width:12px;height:12px}
+.week li.on i{background:var(--flame);color:var(--flame-ink)} .week li.now i{box-shadow:0 0 0 2px var(--flame)}
+.dmore > summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.dmore > summary::-webkit-details-marker{display:none}
+.dmore > summary::after{content:"";flex:none;width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translateY(-3px);transition:transform .15s}
+.dmore[open] > summary::after{transform:rotate(225deg) translateY(-1px)}
+.dmore > summary > span{display:grid;gap:2px} .dmore > summary b{font-size:14.5px} .dmore > summary span span{font-size:13px;color:var(--muted)}
+.dmore[open]{display:grid;gap:12px}
+@media (max-width:640px){ .sgrid.idle .ccol{order:-1} footer.foot .fcopy{margin-left:0} .today{grid-template-columns:auto minmax(0,1fr)} .tside{grid-column:1 / -1;justify-items:start;grid-template-columns:auto auto;justify-content:space-between;align-items:center;width:100%} }
 
 /* games */
 .insights{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:28px}
@@ -461,6 +493,8 @@ button.ucard:hover{border-color:var(--accent);transform:translateY(-1px)}
 .acct .av::after{content:"";position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:50%;border:2px solid var(--surface);background:var(--muted)}
 .acct.ok .av::after{background:var(--accent)} .acct.sync .av::after{background:var(--oro)} .acct.err .av::after{background:var(--rosso)}
 .acct .acctx{font-size:13px;color:var(--muted);font-weight:600}
+.mebtn{display:inline-flex;align-items:center;gap:4px;min-height:36px;padding:4px 12px 4px 8px;border-radius:18px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font:700 15px var(--f-body)}
+.mebtn .flame{width:20px;height:20px} .mebtn.zero .flame{fill:var(--locked)} .mebtn.zero .flame .fl-in{fill:var(--locked-2)} .mebtn:hover{border-color:var(--flame)}
 .gear{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--muted);display:grid;place-items:center;cursor:pointer;flex:none}
 .gear:hover{color:var(--ink);border-color:var(--accent)} .gear svg{width:19px;height:19px}
 .setsheet{width:min(480px,100%);gap:18px}
@@ -563,6 +597,8 @@ button.ucard:hover{border-color:var(--accent);transform:translateY(-1px)}
 @media (prefers-reduced-motion: reduce){.spin{animation:none}}
 
 footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
+footer.foot .fcopy{margin-left:auto}
+.chnav{display:flex;flex-wrap:wrap;gap:6px;margin:-6px 0 18px} .chnav .chip{border:0;cursor:pointer;font-size:12.5px;padding:5px 10px} .chnav .chip.on{background:var(--accent);color:var(--accent-ink)}
 
 @media (max-width: 760px){
   .lcard.feat{grid-column:auto;grid-row:auto;grid-template-columns:96px minmax(0,1fr);gap:12px;padding:12px}
@@ -657,7 +693,7 @@ footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);fo
 .steps3 li.now{border-color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent)} .steps3 li.now::before{background:var(--accent);color:var(--accent-ink)}
 .steps3 li.done::before{content:"✓";background:var(--accent-soft);color:var(--accent);font-family:var(--f-body)}
 .steps3 b{font-size:15.5px} .steps3 span{color:var(--muted);font-size:14px;grid-column:2}
-.lockgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.lockgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 .lockcard{display:grid;gap:6px;align-content:start;padding:14px;border-radius:6px;border:1px dashed var(--line);color:var(--muted);font-size:13.5px;text-align:left;background:none;cursor:pointer;min-width:0}
 .lockcard:hover{border-color:var(--accent)} .lockcard b{color:var(--ink);font-size:14.5px;display:flex;align-items:center;gap:6px} .lockcard svg{width:13px;height:13px;flex:none}
 
@@ -768,12 +804,58 @@ footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);fo
 }
 body:has(.coach:not([hidden])) .foot{padding-right:100px}
 
+/* the repertoire switch: folded away in Settings, a username to confirm */
+.repdet{border-top:1px solid var(--line);padding-top:14px}
+.repdet > summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.repdet > summary::-webkit-details-marker{display:none}
+.repdet > summary::after{content:"";flex:none;width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translateY(-3px);transition:transform .15s}
+.repdet[open] > summary::after{transform:rotate(225deg) translateY(-1px)}
+.repdet > summary > span{display:grid;gap:2px} .repdet > summary b{font-size:14px} .repdet > summary span span{font-size:13px;color:var(--muted)}
+.repbody{display:grid;gap:14px;margin-top:12px} .repbody > p{font-size:13px;color:var(--muted);margin:0}
+.repask{display:grid;gap:8px;background:var(--surface-2);border-radius:4px;padding:10px 12px;font-size:13.5px}
+.repask.repask{display:grid;gap:8px} .reprow{display:flex;gap:6px;flex-wrap:wrap;align-items:center} .reprow .btn.primary{width:auto;min-height:38px;font-size:14px} .reprow input{flex:1 1 140px;min-width:0;font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:3px;background:var(--surface);color:var(--ink)}
+.reprow input[aria-invalid="true"]{border-color:var(--rosso)}
+
+/* the chess account field in the sign-up form */
+.chessacct{gap:8px} .chessacct > span{font-weight:600}
+.chessacct input{font:15px var(--f-body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:11px 12px;width:100%;min-width:0}
+.chessacct input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.pshort{display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);gap:24px;align-items:start}
+.pshort h3{margin:0 0 8px} .pshort p{margin:0}
+@media (max-width:760px){ .pshort{grid-template-columns:minmax(0,1fr)} }
+
+/* the coach's art: a medal or the streak flame beside the words */
+.cbub .cart{display:flex;justify-content:center;margin:0 0 8px}
+.cmedal{position:relative;display:grid;place-items:center;width:110px;height:104px}
+.cmedal::before{content:"";position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(var(--oro-soft) 0 9deg,transparent 9deg 18deg);-webkit-mask:radial-gradient(circle,#000 30%,transparent 70%);mask:radial-gradient(circle,#000 30%,transparent 70%);animation:rays 9s linear infinite}
+.cmedal .medal{position:relative;width:70px;height:83px;display:block;animation:medalIn .6s cubic-bezier(.2,1.4,.4,1)}
+@keyframes rays{to{transform:rotate(360deg)}}
+.cflame{display:grid;place-items:center;position:relative;width:46px;height:52px} .cflame .flame{width:46px;height:46px;animation:medalIn .6s cubic-bezier(.2,1.4,.4,1)}
+.cflame b{position:absolute;bottom:6px;font:800 14px var(--f-display);color:var(--flame-ink)}
+.chead2{display:block;font-size:15px;margin-bottom:2px}
+@keyframes medalIn{0%{transform:scale(.3) rotate(-16deg);opacity:0}70%{transform:scale(1.08) rotate(3deg);opacity:1}100%{transform:none}}
+/* the profile */
+.prof{display:grid;gap:16px}
+.pstreak{display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:10px;align-items:center;padding:14px;border-radius:4px;background:var(--flame-soft)}
+.pstreak .flame{width:44px;height:44px} .pstreak.zero{background:var(--surface-2)} .pstreak.zero .flame{fill:var(--locked)} .pstreak.zero .flame .fl-in{fill:var(--locked-2)}
+.pstreak b{display:block;font:700 34px/1 var(--f-display)} .pstreak span{font-size:12.5px;color:var(--muted);font-weight:600}
+.pstreak p{justify-self:end;font-size:13px;color:var(--muted);text-align:right;margin:0}
+.bdgs{display:grid;gap:12px} .bgh{font-size:13px;font-weight:700;margin:0 0 6px}
+.bgrid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:8px}
+.bdg{display:grid;justify-items:center;align-content:start;text-align:center;gap:2px;padding:10px 6px;border-radius:4px;background:var(--surface-2);font-size:11.5px;color:var(--muted);line-height:1.3}
+.bdg .medal{width:46px;height:55px} .bdg b{font-size:12.5px;color:var(--ink)}
+.bdg.got{background:var(--oro-soft)} .bdg.lock{background:none;box-shadow:inset 0 0 0 1px var(--line)} .bdg.lock b{color:var(--muted)}
+.bprog{display:block;width:70%;height:4px;border-radius:2px;background:var(--line);overflow:hidden;margin-top:4px} .bprog i{display:block;height:100%;background:var(--muted)}
+@media (max-width:420px){ .pstreak{grid-template-columns:auto minmax(0,1fr)} .pstreak p{grid-column:1 / -1;justify-self:start;text-align:left} }
+.tickrow{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--muted);cursor:pointer} .tickrow input{margin-top:3px;accent-color:var(--accent);width:16px;height:16px;flex:none}
+
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><symbol id="p-wk" viewBox="0 0 45 45"><path d="M21.2,19.6 L21.2,11.2 L17.8,11.2 L17.8,8.4 L21.2,8.4 L21.2,4.6 L23.8,4.6 L23.8,8.4 L27.2,8.4 L27.2,11.2 L23.8,11.2 L23.8,19.6 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M13.2,36 C14.2,33.2 15.4,31.6 16,29.8 L29,29.8 C29.6,31.6 30.8,33.2 31.8,36 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M10,40.2 L35,40.2 L35,37.8 Q35,36 33.2,36 L11.8,36 Q10,36 10,37.8 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M15.2,30 L29.8,30 L30.4,27 L14.6,27 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M14.6,27.2 C10.6,23.6 9.8,18.6 12.9,16.1 C16.0,13.6 20.2,15.4 22.5,19.2 C24.8,15.4 29.0,13.6 32.1,16.1 C35.2,18.6 34.4,23.6 30.4,27.2 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/></symbol><symbol id="p-wq" viewBox="0 0 45 45"><path d="M13.2,36 C14.2,33.2 15.2,31.6 15.8,30.2 L29.2,30.2 C29.8,31.6 30.8,33.2 31.8,36 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M10,40.2 L35,40.2 L35,37.8 Q35,36 33.2,36 L11.8,36 Q10,36 10,37.8 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M15.2,30.4 L29.8,30.4 L30.6,27.2 L14.4,27.2 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M14.4,27.4 L9.4,15.6 L16.6,21.8 L15.8,11.4 L20.5,20.2 L22.5,9.4 L24.5,20.2 L29.2,11.4 L28.4,21.8 L35.6,15.6 L30.6,27.4 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><circle cx="9.2" cy="14.2" r="2.0" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35"/><circle cx="15.7" cy="9.9" r="2.0" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35"/><circle cx="22.5" cy="7.8" r="2.1" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35"/><circle cx="29.3" cy="9.9" r="2.0" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35"/><circle cx="35.8" cy="14.2" r="2.0" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35"/></symbol><symbol id="p-wr" viewBox="0 0 45 45"><path d="M14.6,33 L15.8,17.4 L29.2,17.4 L30.4,33 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M9.6,40.2 L35.4,40.2 L35.4,37.6 Q35.4,35.8 33.6,35.8 L11.4,35.8 Q9.6,35.8 9.6,37.6 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M12.4,35.8 L32.6,35.8 L31.6,32.4 L13.4,32.4 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M12.6,17.6 L32.4,17.6 L32.4,14.4 L12.6,14.4 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M12.6,14.6 L12.6,7.6 L16.9,7.6 L16.9,10.4 L20.4,10.4 L20.4,7.6 L24.6,7.6 L24.6,10.4 L28.1,10.4 L28.1,7.6 L32.4,7.6 L32.4,14.6 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M15.4,21.2 L29.6,21.2" fill="none" stroke="#1E2226" stroke-width="1.215" stroke-linecap="round"/></symbol><symbol id="p-wb" viewBox="0 0 45 45"><path d="M15.2,36 C16.6,33 19.2,31.4 19.6,28.6 L25.4,28.6 C25.8,31.4 28.4,33 29.8,36 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M10.5,40.2 L34.5,40.2 L34.5,37.8 Q34.5,36 32.6,36 L12.4,36 Q10.5,36 10.5,37.8 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M16.4,28.9 C16.4,26.6 28.6,26.6 28.6,28.9 C28.6,30.5 16.4,30.5 16.4,28.9 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M22.5,8.8 C27.6,12.4 30.8,16.8 30.4,20.6 C30.1,24.4 27,26.8 22.5,26.8 C18,26.8 14.9,24.4 14.6,20.6 C14.2,16.8 17.4,12.4 22.5,8.8 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M22.5,4.9 A2.35,2.35 0 1 1 22.49,4.9 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M24.3,13.6 L19.9,19.4" fill="none" stroke="#1E2226" stroke-width="1.215" stroke-linecap="round"/></symbol><symbol id="p-wn" viewBox="0 0 45 45"><path d="M13.4,36 C13.0,31.2 16.4,27.8 20.2,25.4 C18.4,24.9 16.8,24.3 15.4,24.0 C13.6,24.9 11.9,25.3 10.4,24.7 C8.8,24.0 8.5,22.4 9.2,20.9 C10.3,18.4 13.5,14.3 16.5,11.2 C17.1,10.5 17.5,9.9 17.7,9.1 L18.9,5.0 L21.6,8.7 C27.8,8.9 33.6,13.9 33.8,22.2 C33.9,27.4 32.6,31.6 32.4,36 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M10.5,40.2 L34.5,40.2 L34.5,37.8 Q34.5,36 32.6,36 L12.4,36 Q10.5,36 10.5,37.8 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><circle cx="17.0" cy="14.9" r="1.05" fill="#1E2226"/><circle cx="11.4" cy="21.7" r="0.7" fill="#1E2226"/><path d="M22.4,9.6 C28.4,10.6 32.0,15.6 32.0,22.4 C32.0,27.6 30.9,31.2 30.7,35" fill="none" stroke="#1E2226" stroke-width="1.215" stroke-linecap="round"/></symbol><symbol id="p-wp" viewBox="0 0 45 45"><path d="M14.2,36 C14.2,31.2 17.8,27.8 19.6,24.8 L25.4,24.8 C27.2,27.8 30.8,31.2 30.8,36 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M10.5,40.2 L34.5,40.2 L34.5,37.8 Q34.5,36 32.6,36 L12.4,36 Q10.5,36 10.5,37.8 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M16.6,24.6 C16.6,22.4 28.4,22.4 28.4,24.6 C28.4,26.2 16.6,26.2 16.6,24.6 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/><path d="M22.5,10.6 A5.8,5.8 0 1 1 22.49,10.6 Z" fill="#FBF8F1" stroke="#1E2226" stroke-width="1.35" stroke-linejoin="round"/></symbol><symbol id="p-bk" viewBox="0 0 45 45"><path d="M21.2,19.6 L21.2,11.2 L17.8,11.2 L17.8,8.4 L21.2,8.4 L21.2,4.6 L23.8,4.6 L23.8,8.4 L27.2,8.4 L27.2,11.2 L23.8,11.2 L23.8,19.6 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M13.2,36 C14.2,33.2 15.4,31.6 16,29.8 L29,29.8 C29.6,31.6 30.8,33.2 31.8,36 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M10,40.2 L35,40.2 L35,37.8 Q35,36 33.2,36 L11.8,36 Q10,36 10,37.8 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M15.2,30 L29.8,30 L30.4,27 L14.6,27 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M14.6,27.2 C10.6,23.6 9.8,18.6 12.9,16.1 C16.0,13.6 20.2,15.4 22.5,19.2 C24.8,15.4 29.0,13.6 32.1,16.1 C35.2,18.6 34.4,23.6 30.4,27.2 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/></symbol><symbol id="p-bq" viewBox="0 0 45 45"><path d="M13.2,36 C14.2,33.2 15.2,31.6 15.8,30.2 L29.2,30.2 C29.8,31.6 30.8,33.2 31.8,36 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M10,40.2 L35,40.2 L35,37.8 Q35,36 33.2,36 L11.8,36 Q10,36 10,37.8 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M15.2,30.4 L29.8,30.4 L30.6,27.2 L14.4,27.2 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M14.4,27.4 L9.4,15.6 L16.6,21.8 L15.8,11.4 L20.5,20.2 L22.5,9.4 L24.5,20.2 L29.2,11.4 L28.4,21.8 L35.6,15.6 L30.6,27.4 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><circle cx="9.2" cy="14.2" r="2.0" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35"/><circle cx="15.7" cy="9.9" r="2.0" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35"/><circle cx="22.5" cy="7.8" r="2.1" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35"/><circle cx="29.3" cy="9.9" r="2.0" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35"/><circle cx="35.8" cy="14.2" r="2.0" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35"/></symbol><symbol id="p-br" viewBox="0 0 45 45"><path d="M14.6,33 L15.8,17.4 L29.2,17.4 L30.4,33 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M9.6,40.2 L35.4,40.2 L35.4,37.6 Q35.4,35.8 33.6,35.8 L11.4,35.8 Q9.6,35.8 9.6,37.6 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M12.4,35.8 L32.6,35.8 L31.6,32.4 L13.4,32.4 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M12.6,17.6 L32.4,17.6 L32.4,14.4 L12.6,14.4 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M12.6,14.6 L12.6,7.6 L16.9,7.6 L16.9,10.4 L20.4,10.4 L20.4,7.6 L24.6,7.6 L24.6,10.4 L28.1,10.4 L28.1,7.6 L32.4,7.6 L32.4,14.6 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M15.4,21.2 L29.6,21.2" fill="none" stroke="#D8CFBD" stroke-width="1.215" stroke-linecap="round"/></symbol><symbol id="p-bb" viewBox="0 0 45 45"><path d="M15.2,36 C16.6,33 19.2,31.4 19.6,28.6 L25.4,28.6 C25.8,31.4 28.4,33 29.8,36 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M10.5,40.2 L34.5,40.2 L34.5,37.8 Q34.5,36 32.6,36 L12.4,36 Q10.5,36 10.5,37.8 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M16.4,28.9 C16.4,26.6 28.6,26.6 28.6,28.9 C28.6,30.5 16.4,30.5 16.4,28.9 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M22.5,8.8 C27.6,12.4 30.8,16.8 30.4,20.6 C30.1,24.4 27,26.8 22.5,26.8 C18,26.8 14.9,24.4 14.6,20.6 C14.2,16.8 17.4,12.4 22.5,8.8 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M22.5,4.9 A2.35,2.35 0 1 1 22.49,4.9 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M24.3,13.6 L19.9,19.4" fill="none" stroke="#D8CFBD" stroke-width="1.215" stroke-linecap="round"/></symbol><symbol id="p-bn" viewBox="0 0 45 45"><path d="M13.4,36 C13.0,31.2 16.4,27.8 20.2,25.4 C18.4,24.9 16.8,24.3 15.4,24.0 C13.6,24.9 11.9,25.3 10.4,24.7 C8.8,24.0 8.5,22.4 9.2,20.9 C10.3,18.4 13.5,14.3 16.5,11.2 C17.1,10.5 17.5,9.9 17.7,9.1 L18.9,5.0 L21.6,8.7 C27.8,8.9 33.6,13.9 33.8,22.2 C33.9,27.4 32.6,31.6 32.4,36 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M10.5,40.2 L34.5,40.2 L34.5,37.8 Q34.5,36 32.6,36 L12.4,36 Q10.5,36 10.5,37.8 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><circle cx="17.0" cy="14.9" r="1.05" fill="#D8CFBD"/><circle cx="11.4" cy="21.7" r="0.7" fill="#D8CFBD"/><path d="M22.4,9.6 C28.4,10.6 32.0,15.6 32.0,22.4 C32.0,27.6 30.9,31.2 30.7,35" fill="none" stroke="#D8CFBD" stroke-width="1.215" stroke-linecap="round"/></symbol><symbol id="p-bp" viewBox="0 0 45 45"><path d="M14.2,36 C14.2,31.2 17.8,27.8 19.6,24.8 L25.4,24.8 C27.2,27.8 30.8,31.2 30.8,36 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M10.5,40.2 L34.5,40.2 L34.5,37.8 Q34.5,36 32.6,36 L12.4,36 Q10.5,36 10.5,37.8 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M16.6,24.6 C16.6,22.4 28.4,22.4 28.4,24.6 C28.4,26.2 16.6,26.2 16.6,24.6 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/><path d="M22.5,10.6 A5.8,5.8 0 1 1 22.49,10.6 Z" fill="#2A2E35" stroke="#0C0E11" stroke-width="1.35" stroke-linejoin="round"/></symbol></defs></svg>
 
 <div class="app" id="app">
   <div class="corner">
+    <button class="mebtn zero" id="meBtn" type="button" aria-haspopup="dialog" hidden><svg class="flame" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.6 2.2c.5 3-1 4.6-2.6 6.3C8.3 10.3 6.5 12.2 6.5 15.3 6.5 19 9 21.8 12 21.8s5.5-2.5 5.5-6.1c0-2.7-1.4-4.4-2.4-5.6-.2 1.4-.8 2.5-1.9 3 .6-3.6-.2-7.1-.6-10.9z"/><path class="fl-in" d="M12.2 13.2c-1.4 1.3-2.4 2.3-2.4 3.9 0 1.5 1 2.6 2.2 2.6s2.2-1.1 2.2-2.6c0-1.5-.9-2.4-2-3.9z"/></svg><b class="tnum" id="meN">0</b></button>
     <button class="gear" id="setBtn" type="button" aria-haspopup="dialog" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.5-2.4 1a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.5A7.6 7.6 0 0 0 7 6.5l-2.4-1-2 3.5 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.5 2.4-1a7.6 7.6 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.6 7.6 0 0 0 2.6-1.5l2.4 1 2-3.5z"/></svg></button>
     <button class="acct out" id="acctBtn" type="button" aria-haspopup="dialog" hidden>Sign in</button>
   </div>
@@ -784,15 +866,14 @@ body:has(.coach:not([hidden])) .foot{padding-right:100px}
         <span><span class="kicker" id="brandKick">White repertoire</span><h1 class="wordmark">The Opening <em>Playbook</em></h1></span>
       </button>
       <div class="sidesw" role="group" aria-label="Repertoire color">
-        <button data-side="w" aria-pressed="true"><i class="sw w" aria-hidden="true"></i>White<span class="badge" id="dueW" hidden>0</span></button>
-        <button data-side="b" aria-pressed="false"><i class="sw b" aria-hidden="true"></i>Black<span class="badge" id="dueB" hidden>0</span></button>
+        <button data-side="w" aria-pressed="true"><i class="sw w" aria-hidden="true"></i>White</button>
+        <button data-side="b" aria-pressed="false"><i class="sw b" aria-hidden="true"></i>Black</button>
       </div>
     </div>
     <nav class="tabs" role="tablist" aria-label="Sections">
       <button role="tab" data-view="sandbox" aria-selected="false">Sandbox</button>
       <button role="tab" data-view="course" aria-selected="true">Course</button>
-      <button role="tab" data-view="learn" aria-selected="false">Learn</button>
-      <button role="tab" data-view="drill" aria-selected="false">Drill<span class="badge" id="dueBadge" hidden>0</span></button>
+      <button role="tab" data-view="drill" aria-selected="false">Drill<span class="todo" id="drillDot" hidden title="Today's five lines are not done yet">!</span></button>
       <button role="tab" data-view="games" aria-selected="false"><span class="lg">Your games</span><span class="sm">Games</span></button>
       <button role="tab" data-view="cheat" aria-selected="false"><span class="lg">Cheat sheet</span><span class="sm">Cheats</span></button>
     </nav>
@@ -2976,7 +3057,7 @@ const Prog = {
     } catch(e){ this.ref = null; }
   },
   saveLocal(){ try { localStorage.setItem(PKEY, JSON.stringify(this.d)); } catch(e){} },
-  save(){ this.d.updated = Date.now(); if (Cloud.user) this.d.owner = Cloud.user.id; this.saveLocal(); this.push(); Cloud.push(); },
+  save(){ this.d.updated = Date.now(); if (Cloud.user) this.d.owner = Cloud.user.id; try { this.d.tz = Intl.DateTimeFormat().resolvedOptions().timeZone || this.d.tz; } catch(e){} this.saveLocal(); this.push(); Cloud.push(); },
   async push(){
     if (!this.ref) return;
     if (this.saving){ this.again = true; return; }
@@ -2997,13 +3078,64 @@ const Prog = {
     r.seen++; r.last = Date.now();
     if (clean){ r.clean++; r.box = Math.min(5, (r.box || 0) + 1); } else r.box = 0;
     r.due = Date.now() + INTERVALS[r.box] * DAY - 60e3;
-    this.d.lines[id] = r; this.save();
+    this.d.lines[id] = r; Daily.mark(id); this.save();
   },
   puz(id, ok){ const r = this.d.puz[id] || {tries: 0, ok: 0}; r.tries++; if (ok) r.ok++; r.last = Date.now(); this.d.puz[id] = r; this.save(); },
   lessonLevel(lid){ const ls = LESSONS[lid].lines.filter(x => DRILLABLE.includes(x)); if (!ls.length) return 0;
     return Math.round(ls.reduce((a, x) => a + Math.min(5, (this.rec(x) || {}).box || 0), 0) / ls.length); },
   dueCount(side){ const now = Date.now(), ids = side ? BOOKS[side].drillable : DRILLABLE; return ids.filter(id => { const r = this.rec(id); return r && r.due <= now; }).length; }
 };
+
+/* ------------------------------------------------------------------ the daily five */
+// Five different lines played to their end in a day keep the streak alive (the Drill tab serves them, but any finished
+// line counts). d.days holds the ids of the lines played on each local date; days older than two months fold to a count.
+const DAILY = 5;
+const dkey = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const dayDate = (off = 0, from) => { const d = from ? new Date(+from.slice(0, 4), +from.slice(5, 7) - 1, +from.slice(8, 10)) : new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + off); return d; };
+const dayKey = (off = 0) => dkey(dayDate(off));
+const Daily = {
+  n(k){ const v = (Prog.d.days || {})[k]; return Array.isArray(v) ? v.length : (v || 0); },
+  ids(){ const v = (Prog.d.days || {})[dayKey()]; return Array.isArray(v) ? v : []; },
+  count(){ return this.n(dayKey()); },
+  done(off = 0){ return this.n(dayKey(off)) >= DAILY; },
+  // days in a row with five lines: up to today, or up to yesterday while today is still open
+  streak(){ let k = this.done(0) ? 0 : -1, n = 0; while (this.done(k)){ n++; k--; } return n; },
+  best(){ const ks = Object.keys(Prog.d.days || {}).filter(k => this.n(k) >= DAILY).sort(); let b = 0, run = 0, prev = null;
+    for (const k of ks){ run = prev && dkey(dayDate(1, prev)) === k ? run + 1 : 1; b = Math.max(b, run); prev = k; } return b; },
+  mark(id){
+    const D = Prog.d.days || (Prog.d.days = {}), k = dayKey(), v = Array.isArray(D[k]) ? D[k] : [];
+    if (!v.includes(id)) v.push(id); D[k] = v;
+    const old = dayKey(-60); for (const x in D) if (x < old && Array.isArray(D[x])) D[x] = D[x].length;
+    return v.length;
+  }
+};
+// The next line for today's five, from either book: the oldest slips first, then lines whose moves changed, then what is
+// due, then new lines from lessons already studied, then new lines in course order. Never one already played today.
+const cmpArr = (a, b) => { for (let i = 0; i < Math.max(a.length, b.length); i++){ const d = (a[i] || 0) - (b[i] || 0); if (d) return d; } return 0; };
+function dailyNext(){
+  const today = new Set(Daily.ids()), now = Date.now(), PR = {core: 0, common: 1, rare: 2}, rank = {}, c = [];
+  let k = 0; for (const U of COURSE) if (!U.soon && U.lessons) for (const l of U.lessons.concat(U.deeper || [])) if (rank[U.side + l] === undefined) rank[U.side + l] = k++;
+  for (const s of ['w', 'b']){
+    const B = BOOKS[s], lines = B.lineMap || (B.lineMap = Object.fromEntries(B.lines.map(l => [l.id, l])));
+    for (const id of B.drillable){
+      if (today.has(id)) continue;
+      const l = lines[id], L = LIDX[s][l.lesson]; if (!L) continue;
+      const r = Prog.rec(id), cr = rank[s + L.id] === undefined ? 1e4 : rank[s + L.id], pri = PR[L.pri] === undefined ? 1 : PR[L.pri], fresh = [cr, pri, l.main ? 0 : 1];
+      let tier, key;
+      if (r && r.changed){ tier = 1; key = [cr]; }
+      else if (r && r.seen && !r.box){ tier = 0; key = [r.last || 0]; }
+      else if (r && r.due <= now){ tier = 2; key = [r.box, r.due]; }
+      else if (!r && lessonSeen(s, L.id)){ tier = 3; key = fresh; }
+      else if (!r && cr < 1e4){ tier = 4; key = fresh; }
+      else if (r){ tier = 5; key = [r.due]; }
+      else continue;
+      c.push({s, id, tier, key});
+    }
+  }
+  c.sort((a, b) => a.tier - b.tier || cmpArr(a.key, b.key));
+  const x = c[0]; if (!x) return null;
+  return {s: x.s, id: x.id, why: ['You slipped here last time', 'Changed line', 'Due for review', 'New line from a lesson you studied', 'New line', 'Extra practice'][x.tier]};
+}
 
 /* ------------------------------------------------------------------ accounts (site build only) */
 // The GitHub Pages build fills SITE from app/site.json and loads supabase-js; the claude.ai build leaves it null.
@@ -3027,8 +3159,17 @@ function mergeProg(a, b){
     for (const id in (r.course.u || {})){ const x = c.u[id] || (c.u[id] = {}), y = r.course.u[id]; for (const f in y) x[f] = Math.max(x[f] || 0, y[f] || 0); }
     for (const k in (r.course.seen || {})) c.seen[k] = Math.max(c.seen[k] || 0, r.course.seen[k] || 0);
   }
+  if (r.days){
+    const d = o.days || (o.days = {}), cnt = v => Array.isArray(v) ? v.length : (v || 0);
+    for (const k in r.days){ const x = d[k], y = r.days[k];
+      d[k] = x === undefined ? (Array.isArray(y) ? y.slice() : y) : Array.isArray(x) && Array.isArray(y) ? [...new Set(x.concat(y))] : Math.max(cnt(x), cnt(y)); }
+  }
   o.updated = Math.max(o.updated || 0, r.updated || 0);
   const pk = [a.packs, r.packs].filter(Boolean).sort((x, y) => (y.updated || 0) - (x.updated || 0))[0]; if (pk) o.packs = Object.assign({}, pk);
+  const st = [a.set, r.set].filter(Boolean).sort((x, y) => (y.t || 0) - (x.t || 0))[0]; if (st) o.set = Object.assign({}, st);   // the look and the coach
+  const ml = [a.mail, r.mail].filter(Boolean).sort((x, y) => (y.t || 0) - (x.t || 0))[0]; if (ml) o.mail = Object.assign({}, ml);
+  if (r.badges){ const bd = o.badges || (o.badges = {}); for (const k in r.badges) bd[k] = bd[k] ? Math.min(bd[k], r.badges[k]) : r.badges[k]; }
+  if (r.tz && !o.tz) o.tz = r.tz;
   const me = mergeMe(a, r); if (me) o.me = JSON.parse(JSON.stringify(me)); else delete o.me;   // whose playbook this is (app/product.js)
   return o;
 }
@@ -3063,6 +3204,7 @@ const Cloud = {
     if (u.email) keepEmail(u.email);
     if (u.id !== was) await this.pull();
     renderAcct();
+    if (typeof Product !== 'undefined') Product.autoConnect();   // a username given at sign-up: read the games now
   },
   // fetch the account's copy and merge it in; progress made by someone else on this device is set aside, not mixed in
   async pull(){
@@ -3138,11 +3280,18 @@ function renderNudge(){
     Acct.open(x.dataset.nudge);
   });
 }
+// Reminder emails (supabase/functions/nudge): off unless the player turns them on. At most one a week.
+function mailHTML(){
+  const on = !!(Prog.d.mail && Prog.d.mail.on);
+  return `<button type="button" class="switch" role="switch" aria-checked="${on}" data-mail><span><b>Reminder emails</b><span>At most one a week: when lines you slipped on have been waiting a few days, or your streak is about to end.</span></span><i class="knob" aria-hidden="true"></i></button>`;
+}
+// a chess username given at sign-up, kept until the games have been read (the account carries it too, in its metadata)
+const CONNECT_KEY = 'playbook-connect';
 // the sign-in sheet: modes signup, signin, forgot, newpass, check, in
 const Acct = {
-  mode: null, msg: '', bad: false, busy: false, email: '', back: null,
+  mode: null, msg: '', bad: false, busy: false, email: '', back: null, csite: 'chess.com', cuser: '',
   open(mode, msg, bad){
-    if (!Cloud.on()) return;
+    if (!Cloud.on() && mode !== 'me') return;
     if (!this.mode) this.back = document.activeElement;
     // the header button says "Sign in", so signed-out players land on sign-in; making an account is the tab beside it
     this.mode = mode || (Cloud.user ? 'in' : 'signin'); this.msg = msg || ''; this.bad = !!bad; this.busy = false;
@@ -3164,8 +3313,14 @@ const Acct = {
     const go = t => `<button class="btn primary" type="submit" ${this.busy ? 'disabled' : ''}>${this.busy ? 'One moment…' : t}</button>`;
     const tabs = `<div class="atabs" role="group" aria-label="Sign in or make an account"><button type="button" data-mode="signin" aria-pressed="${m === 'signin'}">Sign in</button><button type="button" data-mode="signup" aria-pressed="${m === 'signup'}">Create account</button></div>`;
     let h;
-    if (m === 'signup') h = `${tabs}<h2 id="acctTitle">Save your progress</h2><p>Make an account to keep your drills, course and practice games on every device. What you've done on this device comes with you.</p>${msg}
-      <form data-act="signup">${email}${pass('new-password', true)}${go('Create account')}</form>`;
+    // a player without games connects their chess account in the same form, so the games are read as soon as it exists
+    const fresh = typeof PERSONA !== 'undefined' && PERSONA === 'new';
+    const chess = fresh ? `<div class="field chessacct"><span>Your chess account</span><div class="setseg" role="group" aria-label="Where you play">${['chess.com', 'lichess'].map(x => `<button type="button" data-csite="${x}" aria-pressed="${this.csite === x}">${x === 'lichess' ? 'Lichess' : 'chess.com'}</button>`).join('')}</div>
+        <input name="chess" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Your username on ${this.csite === 'lichess' ? 'Lichess' : 'chess.com'}" value="${esc(this.cuser)}" aria-label="Your username on ${this.csite === 'lichess' ? 'Lichess' : 'chess.com'}">
+        <small>Your playbook is built from your public games there. You can leave this empty and add games later.</small></div>
+      <label class="tickrow"><input type="checkbox" name="mail" checked><span>Email me a reminder when lines I slipped on are waiting or my streak is about to end. At most once a week.</span></label>` : '';
+    if (m === 'signup') h = `${tabs}<h2 id="acctTitle">${fresh ? 'Make your account' : 'Save your progress'}</h2><p>${fresh ? 'Your playbook, drills and streak are kept with it, on every device.' : 'Make an account to keep your drills, course and practice games on every device. What you\'ve done on this device comes with you.'}</p>${msg}
+      <form data-act="signup">${email}${pass('new-password', true)}${chess}${go(fresh ? 'Create account and connect' : 'Create account')}</form>`;
     else if (m === 'signin') h = `${tabs}<h2 id="acctTitle">Welcome back</h2><p>Sign in to pick up where you left off. What you've done on this device while signed out comes with you.</p>${msg}
       <form data-act="signin">${email}${pass('current-password')}${go('Sign in')}</form><div class="alt"><button class="linkish" data-mode="forgot" type="button">Forgot your password?</button></div>`;
     else if (m === 'forgot') h = `<h2 id="acctTitle">Reset your password</h2><p>We'll email you a link. Open it in this browser to choose a new password.</p>${msg}
@@ -3173,20 +3328,25 @@ const Acct = {
     else if (m === 'newpass') h = `<h2 id="acctTitle">Choose a new password</h2>${msg}<form data-act="newpass">${pass('new-password', true)}${go('Save the password')}</form>`;
     else if (m === 'check') h = `<h2 id="acctTitle">Check your email</h2><p>We sent a confirmation link to <b>${em}</b>. Open it in this browser to finish. Your progress here stays safe in the meantime.</p>${msg}
       <div class="alt"><button class="linkish" data-mode="signin" type="button">Back to sign in</button></div>`;
+    else if (m === 'me') h = `<h2 id="acctTitle">You</h2>${typeof profileHTML === 'function' ? profileHTML() : ''}${Cloud.on() ? `<div class="alt"><span>Sign in to keep your streak and badges on every device.</span> <button class="linkish" data-mode="signin" type="button">Sign in</button></div>` : ''}`;
     else {
       const st = Cloud.state, line = st === 'sync' ? 'Saving to your account…' : st === 'err' ? `Couldn't reach your account (${esc(Cloud.err)}). Your progress is still kept on this device and will be saved when the connection is back.` : `Progress saved to your account ${Cloud.at ? ago(Cloud.at) : ''}.`;
-      h = `<h2 id="acctTitle">Your account</h2><p>Signed in as <b>${esc(u ? u.email : '')}</b>. Sign in with the same email on any device to pick up where you left off.</p>${msg}
+      h = `<h2 id="acctTitle">You</h2><p>Signed in as <b>${esc(u ? u.email : '')}</b>. Sign in with the same email on any device to pick up where you left off.</p>${msg}
+        ${typeof profileHTML === 'function' && !(typeof PERSONA !== 'undefined' && PERSONA === 'new') ? profileHTML() + mailHTML() : ''}
         <p class="syncline ${st}"><i aria-hidden="true"></i><span>${line}</span></p>
         <div class="lesson-actions"><button class="btn" data-act="sync" type="button">Sync now</button><button class="btn ghost" data-act="signout" type="button">Sign out</button></div>`;
     }
     P.innerHTML = `<button class="x" type="button" aria-label="Close" data-act="close">×</button>${h}`;
     const F = P.querySelector('form'); if (F) F.onsubmit = e => { e.preventDefault(); this.submit(F.dataset.act, new FormData(F)); };
+    P.querySelectorAll('[data-csite]').forEach(x => x.onclick = () => { const i = P.querySelector('input[name=email]'), c = P.querySelector('input[name=chess]'); if (i) this.email = i.value; if (c) this.cuser = c.value; this.csite = x.dataset.csite; this.render(); const c2 = P.querySelector('input[name=chess]'); if (c2) c2.focus(); });
     P.querySelectorAll('[data-mode]').forEach(x => x.onclick = () => {
       const i = P.querySelector('input[name=email]'); if (i) this.email = i.value;
+      const c = P.querySelector('input[name=chess]'); if (c) this.cuser = c.value;
       const tab = x.closest('.atabs'); this.open(x.dataset.mode);
       if (tab){ const t = P.querySelector(`.atabs [data-mode="${x.dataset.mode}"]`); if (t) t.focus(); }
     });
     P.querySelectorAll('button[data-act]').forEach(x => x.onclick = () => this.submit(x.dataset.act));
+    const ml = P.querySelector('[data-mail]'); if (ml) ml.onclick = () => { Prog.d.mail = {on: !(Prog.d.mail && Prog.d.mail.on), t: Date.now()}; Prog.save(); this.render(); };
   },
   async submit(act, fd){
     if (act === 'close'){ this.close(); return; }
@@ -3196,7 +3356,11 @@ const Acct = {
     let r = {error: null};
     try {
       if (act === 'signup'){
-        r = await A.signUp({email, password, options: {emailRedirectTo: SITE.home}});
+        const cu = fd ? String(fd.get('chess') || '').trim() : ''; this.cuser = cu;
+        if (fd && fd.get('mail')) Prog.d.mail = {on: true, t: Date.now()};
+        const data = cu ? {chess_site: this.csite, chess_user: cu} : {};
+        if (cu) try { localStorage.setItem(CONNECT_KEY, JSON.stringify({site: this.csite, user: cu})); } catch(e){}
+        r = await A.signUp({email, password, options: {emailRedirectTo: SITE.home, data}});
         if (!r.error){ keepEmail(email); if (r.data && r.data.session){ this.close(); toast('Account made. Your progress is saved to it now.'); return; } this.busy = false; this.mode = 'check'; this.render(); return; }
       }
       else if (act === 'signin'){
@@ -3227,25 +3391,22 @@ const TXT = {
   w: {kick: 'White repertoire', piece: 'p-wb',
       learnKick: st => `Your ${st.total} games with White · every one started with the e-pawn`, learnH: 'What Black plays against your e-pawn',
       gamesP: st => `Your last ${st.total} games with White across both accounts, July to October: ${st.wins} wins, ${st.losses} losses. Every one started with the e-pawn.`,
-      byHead: 'Black\'s reply', miss: 'Not the move from your study. Try again.', miss2: 'Not that one. The arrow shows the move from your study; play it to continue.',
-      foot: ['Italian lines from your coach\'s study (Aleks_Ra, 2022); everything else built for you. All lines checked with Stockfish 17.1.',
-             'Black\'s odds: your first move from your own games; after that from Maia, a model trained on real club games at your level.',
-             'Games: your last 76 with White across both chess.com accounts, Jul–Oct 2026.']},
+      byHead: 'Black\'s reply', miss: 'Not the move from your study. Try again.', miss2: 'Not that one. The arrow shows the move from your study; play it to continue.'},
   b: {kick: 'Black repertoire', piece: 'p-bb',
       learnKick: st => `Your ${st.total} games with Black · both accounts`, learnH: 'What White plays against you',
       gamesP: st => `Your ${st.total} games with Black across both accounts, July to October: ${st.wins} wins, ${st.losses} losses${st.draws ? `, ${st.draws} draw${st.draws === 1 ? '' : 's'}` : ''}.`,
-      byHead: 'White\'s opening', miss: 'Not the move in the guide. Try again.', miss2: 'Not that one. The arrow shows the guide\'s move; play it to continue.',
-      foot: ['Black lines built for you from your own games and checked with Stockfish 17.1.',
-             'White\'s odds: the first move from your own games; after that from Maia, a model trained on real club games at your level.',
-             'Games: your 73 with Black across both chess.com accounts, Jul–Oct 2026.']}};
+      byHead: 'White\'s opening', miss: 'Not the move in the guide. Try again.', miss2: 'Not that one. The arrow shows the guide\'s move; play it to continue.'}};
 function renderChrome(){
   const T = TXT[SIDE];
+  const mb = document.getElementById('meBtn'), st = Daily.streak(), np = typeof PERSONA !== 'undefined' && PERSONA === 'new';
+  if (mb){ mb.hidden = np; mb.classList.toggle('zero', !st); document.getElementById('meN').textContent = st; mb.setAttribute('aria-label', `Your profile: ${st} ${st === 1 ? 'day' : 'days'} in a row`); }
   document.getElementById('brandKick').textContent = T.kick;
   document.getElementById('brandPiece').setAttribute('href', '#' + T.piece);
   document.querySelectorAll('.sidesw [data-side]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.side === SIDE)));
-  for (const s of ['w', 'b']){ const el = document.getElementById(s === 'w' ? 'dueW' : 'dueB'), d = s === SIDE ? 0 : Prog.dueCount(s); el.hidden = !d; el.textContent = d; el.title = `${d} lines due`; }
-  document.getElementById('foot').innerHTML = T.foot.map(t => `<span>${esc(t)}</span>`).join('');
+  document.getElementById('foot').innerHTML = `${FOOT ? `<span class="fmine">${esc(FOOT)}</span>` : ''}<span class="fcopy">© ${new Date().getFullYear()} The Opening Playbook</span>`;
 }
+// one line about whose playbook this is (app/product.js writes it for a personal playbook), then the copyright
+let FOOT = 'Built for you from your games on both chess.com accounts, July to October 2026, and from your coach\'s Italian study.';
 const STASH = {};
 function stashSide(){ STASH[SIDE] = {view: S.view, chapter: S.chapter, line: S.line, i: S.i, studyFrom: S.studyFrom, drillState: S.drillState, sbState: S.sbState, dfilter: S.dfilter, sbSession: S.sbSession}; }
 function switchSide(side){
@@ -3271,7 +3432,7 @@ function useSide(side){
   S.drill = null; S.renderedLine = null; S.showPre = false;
   try { localStorage.setItem(SIDE_KEY, side); } catch(e){}
 }
-/* ------------------------------------------------------------------ settings (kept on this device) */
+/* ------------------------------------------------------------------ settings (kept on this device and with the progress) */
 const SET_KEY = 'playbook-settings', HOST_THEME = document.documentElement.dataset.theme || '';
 const SET = {theme: 'system', size: 'm', board: 'green', coords: true, coach: true, who: 'knight'};
 try { Object.assign(SET, JSON.parse(localStorage.getItem(SET_KEY) || '{}')); } catch(e){}
@@ -3283,7 +3444,21 @@ function applySettings(){
   if (SET.board && SET.board !== 'green') r.dataset.board = SET.board; else delete r.dataset.board;
   const app = document.getElementById('app'); if (app) app.style.zoom = SIZES[SET.size] === 1 ? '' : String(SIZES[SET.size] || 1);
 }
-function setSetting(k, v){ SET[k] = v; try { localStorage.setItem(SET_KEY, JSON.stringify(SET)); } catch(e){} applySettings(); }
+// Settings travel with the progress record (d.set), so the coach and the look follow the player to every device.
+// Each copy carries the time it was last changed; the newer one wins.
+const SET_KEYS = ['theme', 'size', 'board', 'coords', 'coach', 'who'];
+const setCopy = () => SET_KEYS.reduce((o, k) => (o[k] = SET[k], o), {t: SET.t || 0});
+function setSetting(k, v){ SET[k] = v; SET.t = Date.now(); try { localStorage.setItem(SET_KEY, JSON.stringify(SET)); } catch(e){} applySettings(); Prog.d.set = setCopy(); Prog.save(); }
+function adoptSettings(){
+  const r = Prog.d.set;
+  if (r && (r.t || 0) > (SET.t || 0)){
+    for (const k of SET_KEYS) if (r[k] !== undefined) SET[k] = r[k];
+    SET.t = r.t; try { localStorage.setItem(SET_KEY, JSON.stringify(SET)); } catch(e){}
+    applySettings(); if (typeof Coach !== 'undefined') Coach.refresh(); return true;
+  }
+  if ((SET.t || 0) > ((r && r.t) || 0)) Prog.d.set = setCopy();
+  return false;
+}
 const Settings = {
   open(){ document.getElementById('setSheet').hidden = false; this.render(); document.getElementById('setPanel').querySelector('.x').focus(); },
   close(){ document.getElementById('setSheet').hidden = true; document.getElementById('setBtn').focus(); },
@@ -3291,7 +3466,7 @@ const Settings = {
     const seg = (k, opts) => `<div class="setseg" role="group">${opts.map(([v, label]) => `<button type="button" data-set="${k}:${v}" aria-pressed="${SET[k] === v}">${label}</button>`).join('')}</div>`;
     const sw = (k, h, p) => `<button type="button" class="switch" role="switch" aria-checked="${!!SET[k]}" data-set="${k}:${SET[k] ? 0 : 1}"><span><b>${h}</b><span>${p}</span></span><i class="knob" aria-hidden="true"></i></button>`;
     document.getElementById('setPanel').innerHTML = `<button class="x" type="button" aria-label="Close" data-setx>×</button>
-      <div><p class="kicker">On this device</p><h2 id="setTitle">Settings</h2></div>
+      <div><p class="kicker">${Cloud.user || Prog.ref ? 'Saved with your progress' : 'On this device'}</p><h2 id="setTitle">Settings</h2></div>
       <div class="setrow"><b>Appearance</b>${seg('theme', [['system', 'Match device'], ['light', 'Light'], ['dark', 'Dark']])}</div>
       <div class="setrow"><b>Text size</b>${seg('size', [['s', '<span class="aa" style="font-size:13px">A</span>'], ['m', '<span class="aa" style="font-size:16px">A</span>'], ['l', '<span class="aa" style="font-size:19px">A</span>'], ['xl', '<span class="aa" style="font-size:22px">A</span>']])}<span>Boards grow with the text.</span></div>
       <div class="setrow"><b>Board colour</b><div class="swatches" role="group">${BOARDS.map(([v, label, l, d]) => `<button type="button" class="swatch" data-set="board:${v}" aria-pressed="${SET.board === v}"><i aria-hidden="true"><b style="background:${l}"></b><b style="background:${d}"></b><b style="background:${d}"></b><b style="background:${l}"></b></i>${label}</button>`).join('')}</div></div>
@@ -3311,13 +3486,13 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && !document.
 applySettings();
 
 const view = document.getElementById('view');
-const VIEWS = ['sandbox', 'course', 'learn', 'drill', 'games', 'cheat'];
+const VIEWS = ['sandbox', 'course', 'drill', 'games', 'cheat'];
 const CVIEWS = ['course', 'unit', 'quiz'];
-const tabOf = (v, from) => CVIEWS.includes(v) || (v === 'study' && from === 'unit') ? 'course' : v === 'study' ? (from || 'learn') : VIEWS.includes(v) ? v : 'course';
+const tabOf = (v, from) => CVIEWS.includes(v) || (v === 'study' && from === 'unit') ? 'course' : v === 'study' ? tabOf(from || 'learn') : v === 'learn' ? 'games' : VIEWS.includes(v) ? v : 'course';
 function setTab(v){
   const b = v === 'explore' && S.ex && S.ex.back; if (b){ v = b.view === 'explore' ? 'course' : b.view; }
   const from = b ? b.studyFrom : S.studyFrom;
-  const t = CVIEWS.includes(v) || (v === 'study' && from === 'unit') ? 'course' : v === 'study' ? (from || 'learn') : v;
+  const t = tabOf(v, from);
   document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.view === t)));
 }
 function setHash(){
@@ -3340,13 +3515,13 @@ function setChapter(id, scroll){
   if (scroll){ const el = document.getElementById('chapter'); if (el && el.getBoundingClientRect().top > window.innerHeight * 0.55) el.scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block: 'start'}); }
 }
 function openLine(lineId, i, from){ S.line = lineId; S.i = (i === undefined ? lineStart(lineId) : i); S.showPre = false; go('study', {from}); }
-function refresh(){ render(); }
+function refresh(){ adoptSettings(); render(); }
 function render(){
   const U = (S.view === 'unit' || S.view === 'quiz') && UNIT[S.unit];
   if (U && U.side && !U.soon && U.kind !== 'skill' && U.side !== SIDE) useSide(U.side);
   setPerspective(viewSide());
   setTab(S.view); renderChrome();
-  const b = document.getElementById('dueBadge'), d = Prog.dueCount(); b.hidden = !d; b.textContent = d;
+  const b = document.getElementById('drillDot'); b.hidden = Daily.done(0) || (typeof PERSONA !== 'undefined' && PERSONA === 'new');
   if (S.view === 'drill') S.drill = S.drillState; else if (S.view === 'sandbox') S.drill = S.sbState; else if (S.view === 'quiz') S.drill = S.quizState; else S.drill = null;
   if (S.view !== 'study' && S.view !== 'explore') EngineUI.detach(); // the engine only runs where it's shown
   if (S.view !== 'explore') exStopAuto();
@@ -3374,7 +3549,7 @@ document.addEventListener('click', e => {
   if (t.dataset.lesson){ const L = LESSONS[t.dataset.lesson]; openLine(L.lines[0], undefined, S.view === 'study' ? S.studyFrom : S.view); return; }
   if (t.dataset.line){ openLine(t.dataset.line, t.dataset.i !== undefined ? +t.dataset.i : undefined, S.view === 'study' ? S.studyFrom : S.view); return; }
   const g = t.dataset.go;
-  if (VIEWS.includes(g)) go(PERSONA === 'new' ? 'start' : g);
+  if (VIEWS.includes(g) || g === 'learn') go(PERSONA === 'new' ? 'start' : g);
 });
 
 /* ------------------------------------------------------------------ LEARN */
@@ -3434,10 +3609,11 @@ function chapterNotes(C){
 }
 // keep words like 'e-pawn' on one line instead of breaking at the hyphen
 const keepHyph = h => h.replace(/\b([a-h])-pawn\b/g, '<span class="nw">$1-pawn</span>');
+// an opening's page: its story, every lesson in it and the notes. Reached from Your games.
 function renderLearn(){
   const st = DATA.stats, C = CHAPTERS[S.chapter] || DATA.chapters[0];
-  let html = `<section class="reps"><p class="legendline">The bar shows how often each opening came up in your games. The numbers are your wins and losses.</p>
-    <div class="rgrid ${DATA.chapters.length === 9 ? 'n9' : ''}">${replyTiles()}</div></section><div id="chapter" class="chapter">`;
+  let html = `<div class="crumbs"><button class="btn small" data-go="games">← Your games</button><span class="where">${esc(C.name)}</span></div>
+    <nav class="chnav" aria-label="Openings">${DATA.chapters.map(c => `<button class="chip ${c.id === C.id ? 'on' : ''}" data-ch="${c.id}" ${c.id === C.id ? 'aria-current="page"' : ''}>${esc(c.name)}</button>`).join('')}</nav><div id="chapter" class="chapter">`;
   if (SIDE !== 'w' || C.id !== 'italian' || PERSONA !== 'house'){ // the Italian's own page tells the story of the house player's study
     html += chapterHero(C) + partsHTML(C) + chapterNotes(C) + '</div>';
     view.innerHTML = html; return;
@@ -3522,7 +3698,7 @@ function renderStudy(){
     if (k < order.length - 1) navNext = `<button class="btn small" data-lesson="${order[k+1]}" aria-label="Next lesson: ${esc(LESSONS[order[k+1]].title)}"><span class="navtxt">${esc(LESSONS[order[k+1]].title)} </span>›</button>`; }
   if (CU && les && CU.lessons.includes(les.id)){ const nx = CU.lessons[CU.lessons.indexOf(les.id) + 1];
     navNext = nx ? `<button class="btn small primary" id="topNext" data-lesson="${nx}" title="${esc(LESSONS[nx].title)}">Next lesson ›</button>` : `<button class="btn small primary" id="topNext" data-unit="${CU.id}">Done · back to the unit ›</button>`; }
-  const back = CU ? `<button class="btn small" data-unit="${CU.id}">← ${esc(CU.title)}</button>` : S.studyFrom === 'games' ? '<button class="btn small" data-go="games">← Your games</button>' : S.studyFrom === 'cheat' ? '<button class="btn small" data-go="cheat">← Cheat sheet</button>' : S.studyFrom === 'sandbox' ? '<button class="btn small" data-go="sandbox">← Sandbox</button>' : '<button class="btn small" data-go="learn">← All lessons</button>';
+  const back = CU ? `<button class="btn small" data-unit="${CU.id}">← ${esc(CU.title)}</button>` : S.studyFrom === 'games' ? '<button class="btn small" data-go="games">← Your games</button>' : S.studyFrom === 'cheat' ? '<button class="btn small" data-go="cheat">← Cheat sheet</button>' : S.studyFrom === 'sandbox' ? '<button class="btn small" data-go="sandbox">← Sandbox</button>' : `<button class="btn small" data-go="learn">← ${esc(((lessonOf(S.line) && chapterOf(lessonOf(S.line))) || {name: 'The opening'}).name)}</button>`;
   // reaching the last move of a lesson's main line counts as studying it
   const atEnd = !!les && !!line.main && S.i === line.n.length - 1;
   if (atEnd) markSeen(les.id);
@@ -3616,11 +3792,11 @@ function renderStudy(){
   view.querySelectorAll('[data-step]').forEach(b => b.onclick = () => jump(+b.dataset.step));
   const dt = document.getElementById('drillThis'); if (dt) dt.onclick = () => startDrillLine(S.line, '', CU ? CU.id : null);
   const tn = document.getElementById('topNext'); if (tn) tn.onclick = () => markSeen(les.id);   // moving on from the top counts as having studied it
-  document.getElementById('exHere').onclick = () => exploreFrom(nodeFen(idx), exOpts({}));
+  document.getElementById('exHere').onclick = () => exploreNode(idx, exOpts({}));
   document.getElementById('cEng').onclick = () => { EngineUI.set(!engOn); renderStudy(); };
   if (engOn) EngineUI.attach({fen: nodeFen(idx), card: 'engcard', board: 'sb', bar: 'sbar', text: 'stext', flip: FLIP,
-    pick: u => exploreFrom(nodeFen(idx), exOpts({moves: [u]})),
-    acts: [{id: 'eLine', t: 'Play the line it expects', go: pv => exploreFrom(nodeFen(idx), exOpts({moves: pv.slice(0, 10), i: 0, auto: true}))}]});
+    pick: u => exploreNode(idx, exOpts({moves: [u]})),
+    acts: [{id: 'eLine', t: 'Play the line it expects', go: pv => exploreNode(idx, exOpts({moves: pv.slice(0, 10), i: 0, auto: true}))}]});
   else EngineUI.detach();
   const tl = view.querySelector('.timeline'), cur = view.querySelector('.trow.cur');
   if (tl && tl.scrollHeight > tl.clientHeight + 4){
@@ -3645,6 +3821,7 @@ function togglePlay(){
   step(1);
 }
 document.getElementById('acctBtn').addEventListener('click', () => Acct.open());
+document.getElementById('meBtn').addEventListener('click', () => Acct.open(Cloud.user ? 'in' : 'me'));
 document.getElementById('acctSheet').addEventListener('click', e => { if (e.target.id === 'acctSheet') Acct.close(); });
 document.addEventListener('keydown', e => {
   if (Acct.mode){ if (e.key === 'Escape'){ e.preventDefault(); Acct.close(); } return; } // the sign-in sheet owns the keyboard while open
@@ -3677,11 +3854,11 @@ function nextSmart(exclude){
   const soon = el.slice().sort((a, b) => Prog.rec(a).due - Prog.rec(b).due);
   return soon.length ? {id: soon[0], why: 'Extra practice (nothing due)'} : null;
 }
-function startDrillLine(id, why, unit){
+function startDrillLine(id, why, unit, o = {}){
   const line = LINES[id];
-  const s0 = S.dfilter.from === 'start' ? 0 : lineStart(id);
+  const s0 = o.from0 || S.dfilter.from === 'start' ? 0 : lineStart(id);
   if (!why && Prog.stale(id)) why = 'This line has changed since you last drilled it. If a move is new to you, two tries and the arrow shows it.';
-  S.drill = S.drillState = {kind: 'line', id, i: s0, s0, mistakes: 0, tries: 0, sel: null, busy: false, msg: why || '', state: 'play', hint: null, flash: null, unit: unit || null};
+  S.drill = S.drillState = {kind: 'line', id, i: s0, s0, mistakes: 0, tries: 0, sel: null, busy: false, msg: why || '', state: 'play', hint: null, flash: null, unit: unit || null, daily: !!o.daily};
   S.view = 'drill'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
   setTimeout(drillAdvance, 450);
 }
@@ -3727,7 +3904,7 @@ function tryMove(from, to){
   if (exp.includes(u)){
     if (D.kind === 'puz'){
       D.state = 'done'; const P = DATA.puzzles[D.k]; if (D.tries === 0) Prog.puz(P.id, true);
-      const fen = fenAfter(dNode(), u);
+      const fen = puzAfter(dNode(), u);
       D.after = {fen, u}; D.flash = {sq: to, ok: true}; D.msg = '';
       renderDrillBoard({u, meta: {}}); renderDrillPanel(); return;
     }
@@ -3745,7 +3922,7 @@ function tryMove(from, to){
     setTimeout(() => { if (S.drill === D && D.flash && !D.flash.ok){ D.flash = null; renderDrillBoard(); } }, 650);
   }
 }
-function fenAfter(idx, u){ return applyMove(N[idx].f, u); } // puzzle reveal
+function puzAfter(idx, u){ return applyMove(N[idx].f, u); } // puzzle reveal (fenAfter, below, replays moves from a full position)
 function finishLine(){
   const D = S.drill; D.state = 'done';
   Prog.record(D.id, D.mistakes === 0);
@@ -3786,15 +3963,17 @@ function drillPanelHTML(){
   if (D.state === 'done'){
     const r = Prog.rec(D.id), clean = D.mistakes === 0, days = INTERVALS[r.box];
     const CU = D.unit && UNIT[D.unit], nxU = CU ? unitNextLine(CU, D.id) : null;
+    const dk = Daily.count(), left = Math.max(0, DAILY - dk);
     const acts = CU ? `${nxU ? `<button class="btn primary" id="dNextU">Next line in this unit</button>` : ''}<button class="btn ${nxU ? '' : 'primary'}" data-unit="${CU.id}">Back to the unit</button><button class="btn" id="dAgain">Again</button>`
+      : D.daily ? (left ? `<button class="btn primary" id="dDaily">Next line · ${dk + 1} of ${DAILY}</button><button class="btn" id="dAgain">Again</button>` : `<button class="btn primary" id="dDaily">Keep going</button><button class="btn" id="dToday">Done for today</button>`)
       : `<button class="btn primary" id="dNext">Next line</button><button class="btn" id="dAgain">Again</button><button class="btn ghost" data-line="${D.id}">Study it</button>`;
     const pl = line.main ? planFor(L.id) : null;
-    const cnote = CU ? ` ${CU.lines.filter(lineClean).length} of ${CU.lines.length} main lines in this unit are clean.` : '';
+    const cnote = CU ? ` ${CU.lines.filter(lineClean).length} of ${CU.lines.length} main lines in this unit are clean.` : D.daily ? (left ? ` Today: ${dk} of ${DAILY}.` : ` That's today's five: ${Daily.streak()} ${Daily.streak() === 1 ? 'day' : 'days'} in a row.`) : '';
     doneBox = `<div class="donebox ${clean ? '' : 'bad'}"><h4>${clean ? 'Clean run.' : `Done, with ${D.mistakes} ${D.mistakes === 1 ? 'slip' : 'slips'}.`}</h4>
       <p>${clean ? `This line comes back in ${days} ${days === 1 ? 'day' : 'days'}.` : 'This line stays in today\'s review until you get it clean.'} Ends: ${esc(line.main ? (L.outcome || '') : ((evalInfo(N[n[n.length-1]].e) || {}).txt || ''))}.${cnote}</p>
       <div class="lesson-actions">${acts}<button class="btn ghost" id="dExplore">Play on with the engine</button></div></div>${planCardHTML(pl)}`;
   }
-  return `<div class="dpanel"><p class="kicker">${D.unit && UNIT[D.unit] ? 'Course · ' + esc(UNIT[D.unit].title) + ' · ' : ''}${esc(L.title)}${line.main ? '' : ' · ' + esc(line.title)}${D.msgWhy ? ' · ' + esc(D.msgWhy) : ''}</p><h3>Play ${MYC}'s moves from memory</h3>
+  return `<div class="dpanel"><p class="kicker">${D.unit && UNIT[D.unit] ? 'Course · ' + esc(UNIT[D.unit].title) + ' · ' : D.daily ? 'Today · ' : ''}${esc(L.title)}${line.main ? '' : ' · ' + esc(line.title)}${D.msgWhy ? ' · ' + esc(D.msgWhy) : ''}</p><h3>Play ${MYC}'s moves from memory</h3>
     <div class="progressbar" aria-hidden="true"><i style="width:${pct}%"></i></div>
     ${status ? `<div class="status ${D.busy ? 'wait' : ''} ${D.tries ? 'bad' : ''}"><span class="bub"></span>${status}</div>` : ''}
     <p class="feedback">${D.msg || (D.i === D.s0 ? `${OPP}'s moves play automatically. Drag a piece or tap it, then tap where it goes.` : '&nbsp;')}</p>${doneBox}</div>`;
@@ -3803,12 +3982,33 @@ function renderDrillPanel(){ const el = document.getElementById('dpanel'); if (e
 function wireDrillPanel(){
   const D = S.drill;
   const nx = document.getElementById('dNext'); if (nx) nx.onclick = () => { const s = nextSmart(D.id); if (s){ startDrillLine(s.id); S.drill.msgWhy = s.why; renderDrillPanel(); } };
-  const ag = document.getElementById('dAgain'); if (ag) ag.onclick = () => startDrillLine(D.id, '', D.unit);
+  const ag = document.getElementById('dAgain'); if (ag) ag.onclick = () => startDrillLine(D.id, '', D.unit, {from0: D.s0 === 0, daily: D.daily});
+  const dd = document.getElementById('dDaily'); if (dd) dd.onclick = dailyGo;
+  const dt = document.getElementById('dToday'); if (dt) dt.onclick = () => { S.drill = S.drillState = null; renderDrill(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'}); };
   const nu = document.getElementById('dNextU'); if (nu) nu.onclick = () => { const s = unitNextLine(UNIT[D.unit], D.id); if (s) startDrillLine(s, '', D.unit); };
   const np = document.getElementById('nextPuz'); if (np) np.onclick = () => startPuzzle(D.k + 1);
   const de = document.getElementById('dExplore'); if (de) de.onclick = () => { const line = LINES[D.id], L = lessonOf(D.id), idx = line.n[line.n.length - 1];
-    exploreFrom(nodeFen(idx), {title: `${L.title} · end of the ${line.main ? 'main line' : 'line'}`, plan: line.main && planFor(L.id) ? {side: SIDE, lesson: L.id} : null}); };
-  const pe = document.getElementById('pExplore'); if (pe) pe.onclick = () => { const P = DATA.puzzles[D.k]; exploreFrom(nodeFen(P.node), {moves: D.after ? [D.after.u] : [], title: `Missed shot · ${P.title}`}); };
+    exploreNode(idx, {title: `${L.title} · end of the ${line.main ? 'main line' : 'line'}`, plan: line.main && planFor(L.id) ? {side: SIDE, lesson: L.id} : null}); };
+  const pe = document.getElementById('pExplore'); if (pe) pe.onclick = () => { const P = DATA.puzzles[D.k]; exploreNode(P.node, {moves: D.after ? [D.after.u] : [], title: `Missed shot · ${P.title}`}); };
+}
+// today's five: the next line, in whichever book it lives, played from move one
+function dailyGo(){
+  const x = dailyNext(); if (!x){ toast('Nothing left to drill today.'); return; }
+  if (x.s !== SIDE) useSide(x.s);
+  startDrillLine(x.id, '', null, {from0: true, daily: true}); S.drill.msgWhy = x.why; renderDrillPanel();
+}
+const FLAME = '<svg class="flame" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.6 2.2c.5 3-1 4.6-2.6 6.3C8.3 10.3 6.5 12.2 6.5 15.3 6.5 19 9 21.8 12 21.8s5.5-2.5 5.5-6.1c0-2.7-1.4-4.4-2.4-5.6-.2 1.4-.8 2.5-1.9 3 .6-3.6-.2-7.1-.6-10.9z"/><path class="fl-in" d="M12.2 13.2c-1.4 1.3-2.4 2.3-2.4 3.9 0 1.5 1 2.6 2.2 2.6s2.2-1.1 2.2-2.6c0-1.5-.9-2.4-2-3.9z"/></svg>';
+// the Today card at the top of Drill: today's count, the streak and the last seven days
+function todayHTML(){
+  const k = Daily.count(), st = Daily.streak(), done = k >= DAILY, D = S.drill, playing = !!D;
+  const week = [-6, -5, -4, -3, -2, -1, 0].map(o => { const d = dayDate(o), on = Daily.done(o);
+    return `<li class="${on ? 'on' : ''} ${o === 0 ? 'now' : ''}" title="${d.toLocaleDateString(undefined, {weekday: 'long', month: 'short', day: 'numeric'})}${on ? ': five lines' : ''}"><i>${on ? ICON.check : ''}</i><span>${d.toLocaleDateString(undefined, {weekday: 'narrow'})}</span></li>`; }).join('');
+  const line = done ? 'Today\'s five are done. Anything more is a bonus.' : k ? `${DAILY - k} more ${DAILY - k === 1 ? 'line' : 'lines'} today to ${st ? 'keep' : 'start'} your streak.` : 'Five lines from move one, the ones you slipped on first. About ten minutes.';
+  const cta = playing ? '' : `<button class="btn primary" id="dailyGo">${done ? 'Keep going' : k ? `Next line · ${k + 1} of ${DAILY}` : 'Start today\'s five'}</button>`;
+  return `<section class="today ${done ? 'done' : ''}" aria-label="Today's practice">
+    <div class="tring" style="--p:${Math.min(100, Math.round(k / DAILY * 100))}" aria-label="${Math.min(k, DAILY)} of ${DAILY} lines today"><i><b class="tnum">${Math.min(k, DAILY)}</b><small>of ${DAILY}</small></i></div>
+    <div class="tmain"><p class="kicker">Today</p><p class="tline">${line}</p>${cta ? `<div class="lesson-actions">${cta}</div>` : ''}</div>
+    <div class="tside"><p class="streak ${st ? '' : 'zero'}">${FLAME}<b class="tnum">${st}</b><span>${st === 1 ? 'day' : 'days'} in a row</span></p><ol class="week" aria-label="The last seven days">${week}</ol></div></section>`;
 }
 function fmtDue(r){ if (!r) return 'new'; if (r.changed) return 'changed'; const d = r.due - Date.now(); if (d <= 0) return 'due'; const days = Math.ceil(d / DAY); return `in ${days}d`; }
 function renderDrill(){
@@ -3825,25 +4025,28 @@ function renderDrill(){
   }).join('');
   const D = S.drill;
   const boardHTML = D ? '' : boardSVG(N[0].f, {coords: true});
-  view.innerHTML = `  <div class="sgrid">
+  view.innerHTML = `  <div class="sgrid ${D ? '' : 'idle'}">
     <div class="bcol"><div class="board ${D && D.state === 'play' ? 'input' : ''}" id="db">${boardHTML}</div>
-      ${D ? '' : '<p class="evaltext">Pick what to drill and the board comes alive.</p>'}</div>
+      ${D ? '' : '<p class="evaltext">Five lines a day, played from move one. Slips come back first.</p>'}</div>
     <div class="ccol">
       <div id="dpanel">${D ? drillPanelHTML() : ''}</div>
+      ${todayHTML()}
+      <details class="dmore" ${S.dmore ? 'open' : ''}><summary><span><b>Pick lines yourself</b><span>${due} due · ${fresh} not started · ${mastered} solid</span></span></summary>
       <div class="dpanel">
-        <div class="queue"><div><b class="tnum">${due}</b><span>due now</span></div><div><b class="tnum">${fresh}</b><span>not started</span></div><div><b class="tnum">${mastered}</b><span>solid (4+ clean)</span></div></div>
-        <div class="lesson-actions"><button class="btn primary" id="smart">${due ? 'Review what\'s due' : 'Start next line'}</button><button class="btn" id="shots">Missed shots from your games (${DATA.puzzles.length})</button></div>
+        <div class="lesson-actions"><button class="btn" id="smart">${due ? 'Review what\'s due' : 'Start next line'}</button>${DATA.puzzles.length ? `<button class="btn" id="shots">Missed shots from your games</button>` : ''}</div>
         <div><p class="kicker" style="margin-bottom:6px">Which opening</p><div class="seg">${segBtn('ch','all','All')}${DATA.chapters.map(C => segBtn('ch', C.id, esc(C.name))).join('')}</div></div>
         <div><div class="seg">${segBtn('pri','all','Any priority')}${segBtn('pri','core','Core')}${segBtn('pri','common','Common')}${segBtn('pri','rare','Rare')}</div></div>
         <div><p class="kicker" style="margin-bottom:6px">Start each line</p><div class="seg">${segBtn('from','branch','Where it branches')}${segBtn('from','start','From move 1')}</div></div>
       </div>
-      <div class="dpanel"><p class="kicker">Every line · tap one to drill it</p><div class="mtable">${rows}</div></div>
+      <div class="dpanel"><p class="kicker">Every line · tap one to drill it</p><div class="mtable">${rows}</div></div></details>
     </div></div>`;
   if (D) renderDrillBoard();
   wireDrillPanel();
   if (D && D.kind === 'line' && D.state === 'play' && D.busy){ D.busy = false; setTimeout(drillAdvance, 300); }
+  const dg = document.getElementById('dailyGo'); if (dg) dg.onclick = dailyGo;
+  const dm = view.querySelector('.dmore'); if (dm) dm.ontoggle = () => { S.dmore = dm.open; };
   document.getElementById('smart').onclick = () => { const s = nextSmart(); if (s){ startDrillLine(s.id); S.drill.msgWhy = s.why; renderDrillPanel(); } };
-  document.getElementById('shots').onclick = () => startPuzzle(0);
+  const sh = document.getElementById('shots'); if (sh) sh.onclick = () => startPuzzle(0);
   view.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { const [k, v] = b.dataset.f.split(':'); S.dfilter[k] = v; renderDrill(); });
   view.querySelectorAll('[data-drill]').forEach(b => b.onclick = () => startDrillLine(b.dataset.drill));
   wireBoardInput();
@@ -4072,7 +4275,7 @@ function wireSbPanel(){
   const a = document.getElementById('sbAgain'); if (a) a.onclick = () => { const D = S.drill; if (D && D.kind === 'sb' && D.scope.startsWith('u:')) sbStart(D.scope, D.odds); else sbStart(); };
   const dr = document.getElementById('sbDrill'); if (dr && S.drill && S.drill.line) dr.onclick = () => startDrillLine(S.drill.line);
   const ex = document.getElementById('sbExplore'); if (ex && S.drill) ex.onclick = () => { const D = S.drill, lid = D.line, L = lid ? lessonOf(lid) : null;
-    exploreFrom(nodeFen(D.node), {title: `Practice game · ${L ? L.title : 'end of your prep'}`, plan: L && LINES[lid].main && planFor(L.id) ? {side: SIDE, lesson: L.id} : null}); };
+    exploreNode(D.node, {title: `Practice game · ${L ? L.title : 'end of your prep'}`, plan: L && LINES[lid].main && planFor(L.id) ? {side: SIDE, lesson: L.id} : null}); };
 }
 function sbSideHTML(){
   const segBtn = (key, val, label) => `<button data-sbf="${key}:${val}" aria-pressed="${SBS[key] === val}">${label}</button>`;
@@ -4137,7 +4340,7 @@ function renderGames(){
   const st = DATA.stats, maxn = Math.max(...DATA.chapters.map(c => c.stats.n));
   const byOpening = DATA.chapters.map(C => { const s = C.stats, pct = Math.round(s.w / Math.max(1, s.n) * 100);
     return `<button class="orow2" data-ch="${C.id}"><span class="on">${esc(C.name)}</span><span class="ob"><i style="width:${Math.round(s.n / maxn * 100)}%"></i></span><span class="tnum">${s.n}</span><span class="tnum">${s.w}–${s.l}</span><span class="tnum op2 ${pct >= 60 ? 'good' : pct < 50 ? 'bad' : ''}">${pct}%</span></button>`; }).join('');
-  view.innerHTML = `    <div class="panel" style="margin-bottom:24px"><h3>By opening</h3><div class="otable"><div class="orow2 head" aria-hidden="true"><span>${esc(TXT[SIDE].byHead)}</span><span>How often</span><span>Games</span><span>Record</span><span style="text-align:right">Won</span></div>${byOpening}</div></div>
+  view.innerHTML = `    <div class="panel" style="margin-bottom:24px"><h3>Your openings</h3><p class="legendline" style="margin:4px 0 10px">Open one for every lesson in it.</p><div class="otable"><div class="orow2 head" aria-hidden="true"><span>${esc(TXT[SIDE].byHead)}</span><span>How often</span><span>Games</span><span>Record</span><span style="text-align:right">Won</span></div>${byOpening}</div></div>
     <div class="insights">${(DATA.insights || []).map(insight).join('')}</div>
     <div class="gcards">${cards}</div>`;
   view.querySelectorAll('[data-puz]').forEach(b => b.onclick = () => startPuzzle(+b.dataset.puz));
@@ -4478,7 +4681,7 @@ function missExplore(k){
   const Q = S.quizState, it = Q && Q.items[k]; if (!it) return;
   const U = UNIT[Q.unit];
   if (it.ff) exploreFrom(it.ff, {title: `${U.title} · vs ${it.opp}, ${it.date}`, side: it.me || SIDE, flip: it.me === 'b'});
-  else exploreFrom(nodeFen(it.node), {title: `${U.title} · ${it.rule}`});
+  else exploreNode(it.node, {title: `${U.title} · ${it.rule}`});
 }
 function missCard(it){
   const k = S.quizState ? S.quizState.items.indexOf(it) : -1, ex = k >= 0 && (it.ff || it.node !== undefined) ? `<button class="linkish" type="button" data-miss="${k}">Play on with the engine</button>` : '';
@@ -4555,6 +4758,11 @@ function nodeFen(idx){
   const ch = new Chess(); for (let k = us.length - 1; k >= 0; k--) ch.move(uciObj(us[k]));
   const f = ch.fen(); _ff.set(key, f); return f;
 }
+// the moves from the start of the game to a book position
+function nodeUcis(idx){ const us = []; for (let i = idx; N[i] && N[i].p !== null && N[i].p !== undefined; i = N[i].p) us.push(N[i].u); return us.reverse(); }
+const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+// the explore board at a book position, with the moves that led there
+function exploreNode(idx, o = {}){ exploreFrom(nodeFen(idx), Object.assign({pre: nodeUcis(idx)}, o)); }
 // the same position with the other side to move: what would they do if they could move twice?
 function nullFen(fen){ const p = fen.split(' '); p[1] = p[1] === 'w' ? 'b' : 'w'; p[3] = '-'; return p.join(' '); }
 const scoreNum = s => typeof s === 'string' ? (parseInt(s.slice(1), 10) > 0 ? 1 : -1) * (100000 - 100 * Math.abs(parseInt(s.slice(1), 10))) : s;
@@ -4854,16 +5062,18 @@ function planCardHTML(p, kick){
 const EXK = 'playbook-explore';
 function backHere(){ return {view: S.view, line: S.line, i: S.i, studyFrom: S.studyFrom, unit: S.unit, side: SIDE}; }
 // o: {moves, i, title, plan, flip, side, auto}
+// o.pre: the moves from the start of the game to `fen`. With them the board can step back to move 1, and the list
+// marks the move where the player came in.
 function exploreFrom(fen, o = {}){
   stopPlay(); exStopAuto();
-  const ms = (o.moves || []).slice();
-  S.ex = {start: fen, moves: ms, i: o.i !== undefined ? o.i : ms.length, flip: o.flip !== undefined ? o.flip : FLIP, side: o.side || viewSide(), back: o.back || backHere(),
-    title: o.title || '', plan: o.plan || null, answer: false, sel: null, busy: false, auto: null, anim: o.i === undefined && ms.length ? ms[ms.length - 1] : null};
+  const pre = (o.pre || []).slice(), own = (o.moves || []).slice(), ms = pre.concat(own);
+  S.ex = {start: pre.length ? START_FEN : fen, base: pre.length, moves: ms, i: pre.length + (o.i !== undefined ? o.i : own.length), flip: o.flip !== undefined ? o.flip : FLIP, side: o.side || viewSide(), back: o.back || backHere(),
+    title: o.title || '', plan: o.plan || null, answer: false, sel: null, busy: false, auto: null, anim: o.i === undefined && own.length ? ms[ms.length - 1] : null};
   exSave(); S.view = 'explore'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
   if (o.auto) exAutoPlay();
 }
-function exSave(){ const X = S.ex; if (!X) return; try { sessionStorage.setItem(EXK, JSON.stringify({start: X.start, moves: X.moves, i: X.i, flip: X.flip, side: X.side, back: X.back, title: X.title, plan: X.plan})); } catch(e){} }
-function exLoad(){ try { const v = JSON.parse(sessionStorage.getItem(EXK) || 'null'); if (v && v.start && new Chess().validate_fen(v.start).valid){ S.ex = Object.assign({answer: false, sel: null, busy: false, auto: null, anim: null}, v); return true; } } catch(e){} return false; }
+function exSave(){ const X = S.ex; if (!X) return; try { sessionStorage.setItem(EXK, JSON.stringify({start: X.start, base: X.base || 0, moves: X.moves, i: X.i, flip: X.flip, side: X.side, back: X.back, title: X.title, plan: X.plan})); } catch(e){} }
+function exLoad(){ try { const v = JSON.parse(sessionStorage.getItem(EXK) || 'null'); if (v && v.start && new Chess().validate_fen(v.start).valid){ S.ex = Object.assign({answer: false, sel: null, busy: false, auto: null, anim: null, base: 0}, v); return true; } } catch(e){} return false; }
 function exChess(upto){ const X = S.ex, ch = new Chess(X.start); for (const u of X.moves.slice(0, upto === undefined ? X.i : upto)) if (!ch.move(uciObj(u))) break; return ch; }
 const _exw = {key: '', words: []};
 function exWords(){ const X = S.ex, key = X.start + '|' + X.moves.join(' '); if (_exw.key !== key){ _exw.key = key; _exw.words = lineWords(X.start, X.moves, 400); } return _exw.words; }
@@ -4885,7 +5095,7 @@ function exAnimate(u, back){
 function exPush(u, byUser){
   const X = S.ex; if (!X) return;
   if (X.i < X.moves.length && X.moves[X.i] === u) X.i++;
-  else { X.moves = X.moves.slice(0, X.i).concat([u]); X.i = X.moves.length; }
+  else { if (X.i < (X.base || 0)) X.base = 0; X.moves = X.moves.slice(0, X.i).concat([u]); X.i = X.moves.length; }
   X.anim = u; X.sel = null; exSave();
   if (byUser && X.answer && !exChess().game_over()){ X.busy = true; renderExplore(); exReply(); return; }
   renderExplore();
@@ -4943,13 +5153,13 @@ function renderExplore(){
   const over = ch.in_checkmate() ? `Checkmate. ${turnW ? 'Black' : 'White'} wins.` : ch.in_stalemate() ? 'Stalemate: a draw.' : ch.in_threefold_repetition() ? 'Same position three times: a draw.' : ch.insufficient_material() ? 'Not enough pieces left to mate: a draw.' : ch.in_draw() ? 'A draw.' : '';
   const status = over || (X.busy ? 'The engine is choosing its reply…' : X.auto ? 'Playing the engine\'s line…' : `${turnW ? 'White' : 'Black'} to move`);
   const plan = X.plan ? (BOOKS[X.plan.side] && BOOKS[X.plan.side].lessons.find(l => l.id === X.plan.lesson)) : null;
-  const rows = words.map((w, k) => `<li><button class="trow ${w.white === (ME === 1) ? 'you' : 'blk'} ${k === X.i - 1 ? 'cur' : ''}" data-xi="${k + 1}"><span class="n">${w.no}${w.white ? '' : '…'}</span>${pieceIcon(w.pc, w.white)}<span class="lbl">${esc(w.label)}</span><span class="tg"></span></button></li>`).join('');
+  const B = X.base || 0, rows = words.map((w, k) => `<li><button class="trow ${w.white === (ME === 1) ? 'you' : 'blk'} ${k === X.i - 1 ? 'cur' : ''} ${k < B - 1 ? 'pre' : ''}" data-xi="${k + 1}"><span class="n">${w.no}${w.white ? '' : '…'}</span>${pieceIcon(w.pc, w.white)}<span class="lbl">${esc(w.label)}</span><span class="tg">${k === B - 1 ? '<span class="chip came">You came in here</span>' : ''}</span></button></li>`).join('');
   view.innerHTML = `<div class="crumbs"><button class="btn small" id="exBack">← Back</button><span class="where">${esc(X.title || 'Explore')}</span></div>
   <div class="sgrid">
     <div class="bcol">
       <div class="board-wrap"><div class="evalbar ${X.flip ? 'flip' : ''}" id="xbar" aria-hidden="true"><div class="fill" style="height:50%"></div><div class="mid"></div></div><div class="board ${X.busy || X.auto ? '' : 'input'}" id="xb"></div></div>
       <div class="controls">
-        <button class="ctl" id="xFirst" aria-label="Back to where you started" ${X.i === 0 ? 'disabled' : ''}>${ICO.first}</button>
+        <button class="ctl" id="xFirst" aria-label="Back to the start of the game" ${X.i === 0 ? 'disabled' : ''}>${ICO.first}</button>
         <button class="ctl" id="xPrev" aria-label="Back one move" ${X.i === 0 ? 'disabled' : ''}>${ICO.prev}</button>
         <button class="ctl play" id="xPlay" aria-label="${X.auto ? 'Stop' : 'Play the moves forward'}" aria-pressed="${!!X.auto}" ${X.i >= n && !X.auto ? 'disabled' : ''}>${X.auto ? ICO.pause : ICO.play}</button>
         <button class="ctl" id="xNext" aria-label="Forward one move" ${X.i >= n ? 'disabled' : ''}>${ICO.next}</button>
@@ -4957,6 +5167,7 @@ function renderExplore(){
         <button class="ctl" id="xFlip" aria-label="Turn the board around">${ICO.flip}</button>
       </div>
       <p class="evaltext" id="xeval">&nbsp;</p>
+      ${B && X.i !== B && X.moves.length >= B ? `<button class="btn small" id="xCame">Back to where you came in</button>` : ''}
     </div>
     <div class="ccol">
       <div class="dpanel"><p class="kicker">Explore · moves for both sides</p><h3>Play on from here</h3>
@@ -4977,6 +5188,7 @@ function renderExplore(){
   document.getElementById('xLast').onclick = () => { exStopAuto(); exStep(999); };
   document.getElementById('xPlay').onclick = () => { if (X.auto){ exStopAuto(); renderExplore(); } else exAutoPlay(); };
   document.getElementById('xFlip').onclick = () => { X.flip = !X.flip; exSave(); renderExplore(); };
+  const xc = document.getElementById('xCame'); if (xc) xc.onclick = () => { exStopAuto(); exStep(B - X.i); };
   document.getElementById('exAns').onchange = e => { X.answer = e.target.checked; if (X.answer && !over && !X.busy && turnW !== (ME === 1)){ X.busy = true; renderExplore(); exReply(); } };
   view.querySelectorAll('[data-xi]').forEach(b => b.onclick = () => { exStopAuto(); const k = +b.dataset.xi; exStep(k - X.i); });
   const tl = view.querySelector('.timeline'), cur = view.querySelector('.timeline .trow.cur');
@@ -4985,7 +5197,7 @@ function renderExplore(){
   if (X.busy) return; // the engine is busy choosing a reply; analysis resumes after it
   EngineUI.attach({fen, card: 'engcard', board: 'xb', bar: 'xbar', text: 'xeval', flip: X.flip,
     pick: u => { exStopAuto(); exPush(u, true); },
-    acts: [{id: 'eLine', t: 'Play the line on the board', go: pv => { if (!pv.length) return; X.moves = X.moves.slice(0, X.i).concat(pv.slice(0, 10)); exSave(); exAutoPlay(); }}]});
+    acts: [{id: 'eLine', t: 'Play the line on the board', go: pv => { if (!pv.length) return; if (X.i < (X.base || 0)) X.base = 0; X.moves = X.moves.slice(0, X.i).concat(pv.slice(0, 10)); exSave(); exAutoPlay(); }}]});
 }
 function wireExInput(){
   const el = document.getElementById('xb'); if (!el) return;
@@ -5034,7 +5246,11 @@ const ME_RANK = {house: 3, ready: 2, 'new': 1};
 function mergeMe(a, b){ const x = meOf(a), y = meOf(b); if (!x || !y) return x || y; const rx = ME_RANK[x.state] || 0, ry = ME_RANK[y.state] || 0; return rx !== ry ? (rx > ry ? x : y) : (y.updated || 0) > (x.updated || 0) ? y : x; }
 let PERSONA = 'house';
 const PVIEWS = ['start', 'setup', 'reading', 'findings', 'choices', 'built'], OPEN_NEW = PVIEWS.concat(['sandbox', 'explore']);
-const TARGET = 150, MINIMUM = 50;
+// A repertoire needs a real picture of what someone plays: NEED games that are not bullet, at most TAKE of the newest are read.
+// Neither number is shown to the player.
+const NEED = 200, TAKE = 300;
+// bullet (and faster): too quick to show what someone knows. A clock of base + 40 increments under three minutes.
+function isFast(g){ const tc = String(g.h.TimeControl || ''); if (/^\d+(\+\d+)?$/.test(tc)){ const [b, i] = tc.split('+').map(Number); return b + 40 * (i || 0) < 180; } return /bullet/i.test(g.h.Event || ''); }
 const pc = (a, b) => b ? Math.round(100 * a / b) : 0, rec = t => `${t.w}–${t.l}${t.d ? '–' + t.d : ''}`, scoreOf = t => t.n ? (t.w + t.d / 2) / t.n : 0;
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 
@@ -5112,17 +5328,45 @@ function syncPacks(){
   // give the browser a moment to commit what was just stored: a reload in the same tick can lose it
   document.documentElement.setAttribute('aria-busy', 'true'); setTimeout(() => location.reload(), 350);
 }
-// Settings: one row for every slot the library has more than one system for
+// Settings, folded away at the bottom: the system for each slot the library has more than one of. A switch swaps whole
+// units, so it is never one tap: the player types their username first.
+const Rep = {ask: null, open: false};
+const slotName = slot => slot === 'white' ? 'With White' : slot === 'blackE4' ? 'Against the e-pawn' : 'Against the d-pawn';
+function repNames(){
+  const me = meOf(Prog.d) || {}, out = [(me.P || {}).user, (me.src || {}).user];
+  if (PERSONA === 'house') for (const D of [BOOKS.w, BOOKS.b]) for (const G of (D.games || [])) out.push(G.acct);
+  return [...new Set(out.filter(Boolean).map(x => String(x).toLowerCase()))];
+}
 function packRowsHTML(){
   if (PERSONA === 'new') return '';
-  return packSlots().map(({slot, D, v}) => { const C = CATALOG.find(x => x.slot === slot), cur = packOf(D, slot);
-    return `<div class="setrow"><b>${slot === 'white' ? 'With White' : slot === 'blackE4' ? 'Against the e-pawn' : 'Against the d-pawn'}<\/b><div class="setseg" role="group">${Object.keys(v.packs).map(id => `<button type="button" data-pack="${slot}:${id}" aria-pressed="${cur === id}">${esc(((C && C.opts.find(o => o.id === id)) || {name: id}).name)}<\/button>`).join('')}<\/div><span>Changing this swaps the lessons, drills and course units for that part. Your progress in the other system is kept.<\/span><\/div>`; }).join('');
+  const slots = packSlots(); if (!slots.length) return '';
+  const names = repNames(), word = names[0] || 'switch', A = Rep.ask;
+  const rows = slots.map(({slot, D, v}) => {
+    const C = CATALOG.find(x => x.slot === slot), cur = packOf(D, slot), nm = id => ((C && C.opts.find(o => o.id === id)) || {name: id}).name;
+    const ask = A && A.slot === slot ? `<form class="repask" data-repform><label for="repName">${names.length > 1 ? 'Type one of your usernames' : `Type <b>${esc(word)}<\/b>`} to switch to <b>${esc(nm(A.id))}<\/b>.<\/label>
+        <div class="reprow"><input id="repName" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Your username"><button class="btn primary small" type="submit" disabled>Switch<\/button><button class="btn small ghost" type="button" data-repcancel>Cancel<\/button><\/div><\/form>` : '';
+    return `<div class="setrow"><b>${slotName(slot)}<\/b><div class="setseg" role="group">${Object.keys(v.packs).map(id => `<button type="button" data-packask="${slot}:${id}" aria-pressed="${cur === id}">${esc(nm(id))}<\/button>`).join('')}<\/div>${ask}<\/div>`; }).join('');
+  return `<details class="repdet" ${Rep.open || A ? 'open' : ''}><summary><span><b>Your repertoire<\/b><span>Which system you play in each part of the playbook<\/span><\/span><\/summary>
+    <div class="repbody"><p>Switching swaps the lessons, drills and course units for that part. Your progress in the other system is kept, and you can switch back.<\/p>${rows}<\/div><\/details>`;
 }
-document.addEventListener('click', e => {
-  const b = e.target.closest('[data-pack]'); if (!b) return; const [slot, id] = b.dataset.pack.split(':');
+function setPack(slot, id){
   if (PERSONA === 'ready'){ const me = meOf(Prog.d); me.picks = Object.assign({}, me.picks, {[slot]: id}); me.updated = Date.now(); }
   else Prog.d.packs = Object.assign({}, Prog.d.packs, {[slot]: id, updated: Date.now()});
-  Prog.save(); try { sessionStorage.removeItem('packs-reload'); } catch(e2){} Settings.close(); syncPacks();
+  Prog.save(); try { sessionStorage.removeItem('packs-reload'); } catch(e2){} Rep.ask = null; Settings.close(); syncPacks();
+}
+const repOk = v => { const t = String(v || '').trim().toLowerCase(), names = repNames(); return !!t && (names.length ? names.includes(t) : t === 'switch'); };
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-packask]');
+  if (b){ const [slot, id] = b.dataset.packask.split(':'), D = packSlots().find(x => x.slot === slot);
+    Rep.ask = D && packOf(D.D, slot) !== id ? {slot, id} : null; Settings.render(); const i = document.getElementById('repName'); if (i) i.focus(); return; }
+  if (e.target.closest('[data-repcancel]')){ Rep.ask = null; Settings.render(); }
+});
+document.addEventListener('toggle', e => { if (e.target.classList && e.target.classList.contains('repdet')) Rep.open = e.target.open; }, true);
+document.addEventListener('input', e => { if (e.target.id === 'repName'){ const f = e.target.closest('form'), sb = f && f.querySelector('[type=submit]'); if (sb) sb.disabled = !repOk(e.target.value); } });
+document.addEventListener('submit', e => {
+  const f = e.target.closest('[data-repform]'); if (!f) return; e.preventDefault();
+  const i = f.querySelector('#repName'); if (!Rep.ask || !i || !repOk(i.value)){ if (i){ i.setAttribute('aria-invalid', 'true'); i.focus(); } return; }
+  setPack(Rep.ask.slot, Rep.ask.id);
 });
 
 // which cards to show: a system card where the player's own habit is not the library's first system, or where the library
@@ -5168,7 +5412,8 @@ function depersonalise(){
   for (const s of ['w', 'b']){ const T = TXT[s], side = s === 'w' ? 'White' : 'Black';
     T.learnKick = st => st.total ? `Your ${st.total} games with ${side}` : `The ${side} playbook`;
     T.gamesP = st => `${st.total} games with ${side}: ${st.wins} wins, ${st.losses} losses${st.draws ? `, ${plural(st.draws, 'draw')}` : ''}.`;
-    T.foot = ['Every line checked with Stockfish 17.1.', 'Opponent odds come from Maia, a model trained on real club games.']; }
+  }
+  FOOT = '';
 }
 const chaptersOfUnit = U => [...new Set((U.lessons || []).map(l => { const L = LIDX[U.side] && LIDX[U.side][l], p = L && BOOKS[U.side].parts.find(x => x.id === L.part); return p && p.ch; }).filter(Boolean))];
 // the profile decides the numbers on every chapter, the order of the course and what each unit says about the player
@@ -5182,8 +5427,11 @@ function applyProfile(me){
       C.facts = t.n ? [{big: String(t.n), text: `of your ${side.all.n} ${s === 'w' ? 'White' : 'Black'} games went here`}, {big: rec(t), text: 'your record in them', alert: t.l > t.w},
         {big: String(Math.max(1, Math.round(t.depth / 2))), text: 'moves, on average, before the game left the playbook'}] : [{big: '0', text: 'of your games went here so far'}];
     }
-    TXT[s].foot = TXT[s].foot.slice(0, 2).concat([`Built from ${P.n} of your games${P.user ? ' as ' + P.user : ''}.`]);
   }
+  const ts = (P.games || []).map(g => g.t).filter(Boolean), a = new Date(Math.min(...ts)), z = new Date(Math.max(...ts)), mo = (d, y) => d.toLocaleDateString(undefined, y ? {month: 'long', year: 'numeric'} : {month: 'long'});
+  const span = !ts.length ? '' : mo(a, 1) === mo(z, 1) ? mo(z, 1) : a.getFullYear() === z.getFullYear() ? `${mo(a)} to ${mo(z, 1)}` : `${mo(a, 1)} to ${mo(z, 1)}`;
+  const site = (me.src || {}).site === 'lichess' ? 'Lichess' : (me.src || {}).site === 'chess.com' ? 'chess.com' : '';
+  FOOT = `${P.user ? P.user + '\'s playbook' : 'Your playbook'}, built from your${site ? ' ' + site : ''} games${span ? ', ' + span : ''}.`;
   const skills = COURSE.map((U, k) => U.kind === 'skill' ? [k, U] : null).filter(Boolean), open = COURSE.filter(U => U.kind !== 'skill');
   for (const U of open){
     const side = U.side === 'w' ? P.white : P.black, word = U.side === 'w' ? 'White' : 'Black', t = {n: 0, w: 0, l: 0, d: 0, depth: 0};
@@ -5208,15 +5456,15 @@ const Importer = {
   async json(url){ const r = await fetch(url); if (r.status === 404) throw Object.assign(new Error('missing'), {missing: true}); if (!r.ok) throw new Error('http ' + r.status); return r.json(); },
   async chesscom(user, want, tick){
     const base = 'https://api.chess.com/pub/player/' + encodeURIComponent(user.trim().toLowerCase());
-    const months = ((await this.json(base + '/games/archives')).archives || []).reverse().slice(0, 36), out = [];
+    const months = ((await this.json(base + '/games/archives')).archives || []).reverse().slice(0, 120), out = [];
     for (const m of months){
-      const gs = ((await this.json(m)).games || []).filter(g => g.rules === 'chess' && g.pgn && g.time_class !== 'daily').reverse();
+      const gs = ((await this.json(m)).games || []).filter(g => g.rules === 'chess' && g.pgn && g.time_class !== 'daily' && g.time_class !== 'bullet').reverse();
       for (const g of gs) out.push(g.pgn); tick(out.length); if (out.length >= want) break;
     }
     return out.slice(0, want).join('\n\n');
   },
   async lichess(user, want, tick){
-    const r = await fetch(`https://lichess.org/api/games/user/${encodeURIComponent(user.trim())}?max=${want}&perfType=bullet,blitz,rapid,classical&clocks=false&evals=false&opening=false`, {headers: {Accept: 'application/x-chess-pgn'}});
+    const r = await fetch(`https://lichess.org/api/games/user/${encodeURIComponent(user.trim())}?max=${want}&perfType=blitz,rapid,classical&clocks=false&evals=false&opening=false`, {headers: {Accept: 'application/x-chess-pgn'}});
     if (r.status === 404) throw Object.assign(new Error('missing'), {missing: true}); if (!r.ok) throw new Error('http ' + r.status);
     const t = await r.text(); tick((t.match(/^\[Event /gm) || []).length); return t;
   }
@@ -5230,6 +5478,7 @@ const Product = {
     if (SITE && !meOf(Prog.d)) Prog.d.me = {state: 'new', since: Date.now()};
     if (PERSONA !== 'house') depersonalise();
     if (PERSONA === 'ready' && this.me().P) applyProfile(this.me());
+    if (!Prog.d.badges && PERSONA !== 'new'){ Badges.check(); Prog.saveLocal(); }
     document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('lock', PERSONA === 'new' && b.dataset.view !== 'sandbox'));
     syncPacks();
   },
@@ -5238,6 +5487,18 @@ const Product = {
   // after a sign-in merge: if the account turns out to be someone else's kind of playbook, start over with it
   afterMerge(){ if (SITE && !meOf(Prog.d)) Prog.d.me = {state: 'new', since: Date.now()}; if (personaOf(Prog.d) !== PERSONA){ Prog.saveLocal(); location.reload(); return true; } return false; },
   signedOut(){ return Cloud.on() && !Cloud.user; },
+  // the chess account named at sign-up: read its games as soon as the account is there (once)
+  pendingConnect(){
+    const m = (Cloud.user && Cloud.user.user_metadata) || {}; let L = null; try { L = JSON.parse(localStorage.getItem(CONNECT_KEY) || 'null'); } catch(e){}
+    return m.chess_user ? {site: m.chess_site, user: m.chess_user} : L && L.user ? L : null;
+  },
+  autoConnect(){
+    if (PERSONA !== 'new' || !Cloud.user || this.busy || this.me().P || this.me().short || this.me().auto || ['reading', 'findings', 'choices', 'built'].includes(S.view)) return false;
+    const c = this.pendingConnect(); if (!c) return false;
+    try { localStorage.removeItem(CONNECT_KEY); } catch(e){}
+    Prog.d.me = Object.assign({}, this.me(), {auto: 1}); Prog.save();
+    this.site = c.site === 'lichess' ? 'lichess' : 'chess.com'; this.user = c.user; S.view = 'setup'; setHash(); this.fetchUser(c.user); return true;
+  },
   render(){
     const v = S.view;
     view.innerHTML = `<div class="pv">${v === 'start' ? this.startHTML() : v === 'setup' ? this.setupHTML() : v === 'reading' ? this.readingHTML() : v === 'findings' ? this.findingsHTML() : v === 'choices' ? this.choiceHTML() : this.builtHTML()}<\/div>`;
@@ -5245,60 +5506,69 @@ const Product = {
   },
   /* -- welcome */
   startHTML(){
-    const out = this.signedOut(), has = !!this.me().P, step = out ? 1 : has ? 3 : 2, w = fenOf('e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4');
+    const out = this.signedOut(), has = !!this.me().P, short = !has && this.me().short, step = out ? 1 : has ? 3 : 2, w = fenOf('e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4');
     const cta = out ? `<button class="btn primary" data-acct="signup">Create your account<\/button><button class="btn" data-acct="signin">I already have an account<\/button>`
-      : has ? `<button class="btn primary" data-pgo="findings">Continue: see what I found<\/button>` : `<button class="btn primary" data-pgo="setup">Bring your games<\/button>`;
+      : has ? `<button class="btn primary" data-pgo="findings">Continue: see what I found<\/button>` : short ? `<button class="btn primary" data-pgo="setup">Check my games again<\/button>` : `<button class="btn primary" data-pgo="setup">Connect your account<\/button>`;
     const li = (k, h, p) => `<li class="${k < step ? 'done' : k === step ? 'now' : ''}"><b>${h}<\/b><span>${p}<\/span><\/li>`;
     const lock = (v, h, p) => `<button class="lockcard" data-view="${v}"><b>${ICON.lock}${h}<\/b>${p}<\/button>`;
     return `<section class="whero"><div><p class="kicker">An opening course built from your own games<\/p>
-        <h2>Bring ${TARGET} games.<br>Get <em>your<\/em> playbook.<\/h2>
+        <h2>Connect your account.<br>Get <em>your<\/em> playbook.<\/h2>
         <p class="lede" style="margin-top:14px">It reads what you already play, where you score and where you leave the book, asks you a few would-you-rather questions, and builds a course in that order. No notation anywhere.<\/p>
         <div class="cta">${cta}<button class="btn ghost" data-view="sandbox">Try the sandbox first<\/button><\/div><\/div>
-      <div class="wart"><div class="board">${boardSVG(w.fen, {coords: false, last: w.last, arrows: ['c4f7r'], flip: false})}<\/div><p class="wbub">Hi, I'm ${coachName()}. Show me your games and I'll show you your openings.<\/p><div class="wcoach cface">${knightSVG()}<\/div><\/div><\/section>
-      <ol class="steps3">${li(1, 'Make an account', 'So your playbook follows you to every device.')}${li(2, `Bring ${TARGET} games`, 'A chess.com or Lichess username is enough. A file works too.')}${li(3, 'Pick your lines', 'A few would-you-rather questions, then your course opens.')}<\/ol>
-      <div><p class="kicker" style="margin-bottom:10px">Opens with your games<\/p><div class="lockgrid">${lock('course', 'Course', 'One path, ordered by what your games say matters most.')}${lock('learn', 'Learn', 'Every line as a board you step through, in plain words.')}${lock('drill', 'Drill', 'Your moves from memory, on a schedule that brings slips back.')}${lock('games', 'Your games', 'Results by opening and where you leave the book.')}${lock('cheat', 'Cheat sheet', 'One card per decision.')}<\/div><\/div>`;
+      <div class="wart"><div class="board">${boardSVG(w.fen, {coords: false, last: w.last, arrows: ['c4f7r'], flip: false})}<\/div><p class="wbub">${short ? `Not enough games yet. Play some more and I'll be here.` : `Hi, I'm ${coachName()}. Connect your account and I'll show you your openings.`}<\/p><div class="wcoach cface">${knightSVG()}<\/div><\/div><\/section>
+      <ol class="steps3">${li(1, 'Make an account', 'So your playbook follows you to every device.')}${li(2, 'Connect your chess account', 'Your chess.com or Lichess username. Only your public games are read.')}${li(3, 'Pick your lines', 'A few would-you-rather questions, then your course opens.')}<\/ol>
+      <div><p class="kicker" style="margin-bottom:10px">Opens with your games<\/p><div class="lockgrid">${lock('course', 'Course', 'One path, ordered by what your games say matters most.')}${lock('drill', 'Drill', 'Five lines a day from memory. Slips come back first.')}${lock('games', 'Your games', 'Results by opening, every lesson, and where you leave the book.')}${lock('cheat', 'Cheat sheet', 'One card per decision.')}<\/div><\/div>`;
   },
   locked(tab){
     const T = {course: ['Your course', 'One path through your openings, in the order your games say matters most: the idea, the lines, a drill, practice games and a checkpoint for each.'],
-      learn: ['Learn', 'Every line of your playbook as a board you step through, with each move described in plain words.'], drill: ['Drill', 'Your moves from memory. Clean runs come back later; slips come back today.'],
-      games: ['Your games', 'Your results by opening, and the exact positions where you leave your playbook most often.'], cheat: ['Cheat sheet', 'One card per decision: their move, your answer.']}[tab] || ['This section', ''];
+      drill: ['Drill', 'Five lines a day from memory, the ones you slipped on first. Do them every day to keep your streak.'],
+      games: ['Your games', 'Your results by opening, every lesson in each one, and the exact positions where you leave your playbook most often.'], cheat: ['Cheat sheet', 'One card per decision: their move, your answer.']}[tab] || ['This section', ''];
     const out = this.signedOut(), idx = [LINES[DATA.lessons[0].lines[0]].n.slice(-1)[0], LINES[DATA.lessons[1].lines[0]].n.slice(-1)[0], LINES[DATA.lessons[2].lines[0]].n.slice(-1)[0]];
     view.innerHTML = `<div class="pv"><section class="plocked"><div class="lk">${ICON.lock}<\/div><p class="kicker">Locked until your games are in<\/p><h3>${T[0]}<\/h3><p>${T[1]}<\/p>
-      <div class="cta">${out ? `<button class="btn primary" data-acct="signup">Create your account<\/button>` : `<button class="btn primary" data-pgo="setup">Bring your games<\/button>`}<button class="btn" data-view="sandbox">Open the sandbox<\/button><\/div>
+      <div class="cta">${out ? `<button class="btn primary" data-acct="signup">Create your account<\/button>` : `<button class="btn primary" data-pgo="setup">Connect your account<\/button>`}<button class="btn" data-view="sandbox">Open the sandbox<\/button><\/div>
       <div class="ghost3" aria-hidden="true">${idx.map(i => thumb(i, {coords: false})).join('')}<\/div><\/section><\/div>`;
     this.wire();
   },
   /* -- games in */
   count(){ return this.pool ? (this.pool.match(/^\[Event /gm) || this.pool.match(/^\[White /gm) || []).length : 0; },
+  siteName(x){ return (x || this.site) === 'lichess' ? 'Lichess' : 'chess.com'; },
+  // too few games that are not bullet: the repertoire waits until there are more
+  shortHTML(){
+    const sh = this.short || this.me().short || {}, who = sh.user ? `${esc(sh.user)} on ${this.siteName(sh.site)} has so far` : 'these files hold';
+    return `<section class="pshort pcard"><div class="say"><div class="cface">${knightSVG('think')}<\/div><p>Not enough games yet.<\/p><\/div>
+      <div><h3>Play some more first<\/h3><p>To build a repertoire I need more of your games than ${who}. Play some more blitz, rapid or classical games, then come back and check again. Bullet games don't count: they're too fast to show what you really know.<\/p>
+        <p class="kicker" style="margin-top:14px">How close you are<\/p><div class="pbar" style="margin-top:6px" aria-hidden="true"><i style="width:${Math.max(4, Math.min(96, pc(sh.n || 0, NEED)))}%"><\/i><\/div>
+        <div class="cta" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:16px">${sh.user ? `<button class="btn primary" data-recheck>Check again<\/button>` : ''}<button class="btn" data-other>Use another username<\/button><button class="btn ghost" data-view="sandbox">Open the sandbox<\/button><\/div><\/div><\/section>`;
+  },
   setupHTML(){
     if (this.signedOut()) return `<section class="plocked"><div class="lk">${ICON.lock}<\/div><h3>First, an account<\/h3><p>Your games and your playbook are kept with your account, so they are there on every device.<\/p><div class="cta"><button class="btn primary" data-acct="signup">Create your account<\/button><button class="btn" data-acct="signin">Sign in<\/button><\/div><\/section>`;
-    const n = this.count(), seg = (v, l) => `<button type="button" data-site="${v}" aria-pressed="${this.site === v}">${l}<\/button>`;
+    const seg = (v, l) => `<button type="button" data-site="${v}" aria-pressed="${this.site === v}">${l}<\/button>`;
     const month = new Date().toISOString().slice(0, 7).replace('-', '/');
-    return `<div class="chead"><div><p class="kicker">Step 2 of 3<\/p><h2 style="font-size:clamp(30px,4vw,46px)">Bring your games<\/h2><p>${TARGET} recent games is the target: enough to see what you really play. ${MINIMUM} is the least that works, and the picture sharpens as you add more.<\/p><\/div>
-        <div class="meter"><div class="pring" style="--p:${Math.min(100, pc(n, TARGET))}"><i>${n}<small>of ${TARGET}<\/small><\/i><\/div><\/div><\/div>
-      ${this.msg ? `<p class="pmsg ${this.msg.bad ? 'bad' : 'ok'}" role="status">${esc(this.msg.t)}<\/p>` : ''}
+    if (!this.busy && (this.short || (this.me().short && !this.fresh))) return `<div class="chead"><div><p class="kicker">Step 2 of 3<\/p><h2 style="font-size:clamp(30px,4vw,46px)">Connect your chess account<\/h2><\/div><\/div>${this.shortHTML()}`;
+    return `<div class="chead"><div><p class="kicker">Step 2 of 3<\/p><h2 style="font-size:clamp(30px,4vw,46px)">Connect your chess account<\/h2><p>I read your recent blitz, rapid and classical games to see what you really play. Bullet is skipped: it's too fast to show what you know.<\/p><\/div><\/div>
+      ${this.msg ? `<p class="pmsg ${this.msg.bad ? 'bad' : 'ok'}" role="status">${esc(this.msg.t)}<\/p>` : ''}${this.busy ? `<div class="pbar" aria-hidden="true" style="margin-top:0"><i id="fetchbar" style="width:3%"><\/i><\/div>` : ''}
       <div class="pcard pickc"><div><h3>Pick your coach<\/h3><p>They say the same things. Change your mind any time in Settings.<\/p><\/div>${coachPickHTML()}<\/div>
       ${this.names ? `<div class="pcard"><b>Which one is you?<\/b><div class="pwho" style="margin-top:10px">${this.names.map(x => `<button class="btn" data-who="${esc(x)}">${esc(x)}<\/button>`).join('')}<\/div><\/div>` : ''}
-      <div class="setup"><form class="pcard" id="uform"><h3>Fetch them by username<\/h3>
+      <div class="setup"><form class="pcard" id="uform"><h3>Your username<\/h3>
           <div class="setseg" role="group" aria-label="Where you play">${seg('chess.com', 'chess.com')}${seg('lichess', 'Lichess')}<\/div>
           <div class="pfield"><label for="uname">Your username on ${this.site === 'lichess' ? 'Lichess' : 'chess.com'}<\/label><input type="text" id="uname" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(this.user)}" placeholder="for example: ${this.site === 'lichess' ? 'your_lichess_name' : 'your_chesscom_name'}"><\/div>
-          <button class="btn primary" type="submit" ${this.busy ? 'disabled' : ''} style="justify-content:center;min-height:46px">${this.busy ? 'Fetching…' : `Fetch my last ${TARGET} games`}<\/button>
+          <button class="btn primary" type="submit" ${this.busy ? 'disabled' : ''} style="justify-content:center;min-height:46px">${this.busy ? 'Reading your games…' : 'Connect and read my games'}<\/button>
           <p style="color:var(--muted);font-size:13.5px">Only your public games are read, straight from ${this.site === 'lichess' ? 'Lichess' : 'chess.com'} to this page. Nothing is posted and no password is needed.<\/p><\/form>
-        <div class="pcard"><h3>Or drop a PGN file<\/h3>
+        <div class="pcard"><h3>No account online? Drop a PGN file<\/h3>
           <label class="drop" id="drop"><input type="file" id="pgnFile" accept=".pgn,.txt,text/plain" multiple><b>Drop PGN files here, or tap to choose<\/b><span>Several files are fine. They add up.<\/span><\/label>
           <details class="how"><summary>How do I get a PGN file?<\/summary>
             <ol><li><b>chess.com:<\/b> open this address in your browser with your own name in it, once for each month you need. Each one downloads a file.<br><code>api.chess.com/pub/player/YOUR_NAME/games/${month}/pgn<\/code><\/li>
               <li><b>Lichess:<\/b> open your profile, press the download button above your games, and choose "Export games".<\/li><li>Drop every file you got into the box above.<\/li><\/ol><\/details><\/div><\/div>`;
   },
-  async fetchUser(){
-    const u = (document.getElementById('uname').value || '').trim(); this.user = u; if (!u){ this.msg = {bad: 1, t: 'Type your username first.'}; return render(); }
-    this.busy = true; this.msg = {t: `Looking for ${u} on ${this.site}…`}; render();
+  async fetchUser(name){
+    const u = String(name !== undefined ? name : ((document.getElementById('uname') || {}).value || '')).trim(); this.user = u; if (!u){ this.msg = {bad: 1, t: 'Type your username first.'}; return render(); }
+    this.busy = true; this.short = null; this.fresh = true; this.pool = ''; this.msg = {t: `Looking for ${u} on ${this.siteName()}…`}; render();
     try {
-      const text = await Importer[this.site === 'lichess' ? 'lichess' : 'chesscom'](u, TARGET + 50, n => { const r = document.querySelector('.pring'); if (r){ r.style.setProperty('--p', Math.min(100, pc(n, TARGET))); r.firstElementChild.firstChild.textContent = n; } });
+      const text = await Importer[this.site === 'lichess' ? 'lichess' : 'chesscom'](u, TAKE, n => { const r = document.getElementById('fetchbar'); if (r) r.style.width = Math.max(3, Math.min(100, pc(n, NEED))) + '%'; });
       this.busy = false; this.pool = text; this.src = {site: this.site, user: u.toLowerCase()}; this.ingest(u.toLowerCase());
     } catch(e){
       this.busy = false;
-      this.msg = {bad: 1, t: e.missing ? `There is no player called "${u}" on ${this.site}. Check the spelling.` : `Couldn't reach ${this.site} from this page. Use a PGN file instead: the steps are under "How do I get a PGN file?"`}; render();
+      this.msg = {bad: 1, t: e.missing ? `There is no player called "${u}" on ${this.siteName()}. Check the spelling.` : `Couldn't reach ${this.siteName()} from this page. Use a PGN file instead: the steps are under "How do I get a PGN file?"`}; render();
     }
   },
   async addFiles(files){
@@ -5308,19 +5578,28 @@ const Product = {
   // enough games and a known player: read them. Otherwise say what is missing.
   ingest(user){
     const raw = Analyze.parsePGN(this.pool); this.names = null;
-    if (!raw.length){ this.msg = {bad: 1, t: 'No games found in that. A PGN file starts with lines like [Event "…"].'}; return render(); }
+    if (!raw.length){ this.msg = {bad: 1, t: this.src && this.src.site !== 'pgn' ? 'No games came back for that name.' : 'No games found in that. A PGN file starts with lines like [Event "…"].'}; if (this.src && this.src.site !== 'pgn') return this.tooFew(this.src.user, 0); return render(); }
     user = (user || Analyze.guessUser(raw) || '').toLowerCase();
-    if (!user){ const c = {}; for (const g of raw) for (const k of ['White', 'Black']) if (g.h[k]) c[g.h[k]] = (c[g.h[k]] || 0) + 1; this.names = Object.keys(c).sort((a, b) => c[b] - c[a]).slice(0, 4); this.msg = {t: `${raw.length} games read. They are not all by one player, so tell me who you are.`}; return render(); }
-    const mine = raw.filter(g => (g.h.White || '').toLowerCase() === user || (g.h.Black || '').toLowerCase() === user);
+    if (!user){ const c = {}; for (const g of raw) for (const k of ['White', 'Black']) if (g.h[k]) c[g.h[k]] = (c[g.h[k]] || 0) + 1; this.names = Object.keys(c).sort((a, b) => c[b] - c[a]).slice(0, 4); this.msg = {t: 'Those games are not all by one player, so tell me who you are.'}; return render(); }
+    const all = raw.filter(g => (g.h.White || '').toLowerCase() === user || (g.h.Black || '').toLowerCase() === user), mine = all.filter(g => !isFast(g));
     const key = g => (g.h.UTCDate || g.h.Date || '') + (g.h.UTCTime || g.h.StartTime || ''); mine.sort((a, b) => key(b) < key(a) ? -1 : 1);
-    if (mine.length < MINIMUM){ this.msg = {bad: mine.length === 0, t: mine.length ? `${mine.length} of your games so far. ${MINIMUM} is the least I can work with, ${TARGET} is the target. Add more.` : `None of those ${raw.length} games were played by "${user}".`}; return render(); }
-    this.read(mine.slice(0, 250), user);
+    if (!all.length){ this.msg = {bad: 1, t: `None of those games were played by "${user}".`}; return render(); }
+    if (mine.length < this.need) return this.tooFew(user, mine.length);
+    if (this.me().short){ const m = Object.assign({}, this.me()); delete m.short; Prog.d.me = m; }
+    this.read(mine.slice(0, TAKE), user);
+  },
+  need: NEED,
+  // not enough games yet: say so, keep it with the account so the welcome screen remembers, and wait
+  tooFew(user, n){
+    this.short = {site: (this.src || {}).site || this.site, user: (this.src || {}).site === 'pgn' ? '' : user, n, at: Date.now()};
+    Prog.d.me = Object.assign({}, this.me(), {state: 'new', short: this.short}); Prog.save(); this.msg = null; this.pool = (this.src || {}).site === 'pgn' ? this.pool : '';
+    S.view = 'setup'; render(); setHash();
   },
   /* -- the reading screen: the analysis runs while the board plays through the games */
   STAGES: ['Reading your games', 'Sorting them by opening', 'Measuring where you score', 'Finding where you leave the book', 'Building your playbook'],
   readingHTML(){
     return `<section class="proc"><div class="board" id="pboard">${boardSVG(N[0].f, {coords: false})}<\/div>
-      <div><p class="kicker">Step 2 of 3 · this takes a few seconds<\/p><h2 style="font-size:clamp(30px,4vw,48px)">Reading your games<\/h2>
+      <div><p class="kicker">Step 2 of 3 · a few seconds<\/p><h2 style="font-size:clamp(30px,4vw,48px)">Reading your games<\/h2>
         <ul class="plist" id="plist">${this.STAGES.map((s, k) => `<li class="${k === 0 ? 'on' : ''}" data-k="${k}"><i>${ICON.check}<\/i><span>${s}<\/span><span class="c"><\/span><\/li>`).join('')}<\/ul>
         <div class="pbar"><i id="pbar"><\/i><\/div>
         <div class="say"><div class="cface">${knightSVG('think')}<\/div><p id="psay">Let me look.<\/p><\/div><\/div><\/section>`;
@@ -5347,7 +5626,7 @@ const Product = {
     stage(3, plural(P.leaks.length, 'spot')); say(P.leaks[0] ? `One position came up ${plural(P.leaks[0].n, 'time')} and you left the playbook the same way each time. We'll fix that one first.` : 'You stay in the book longer than most.'); await wait(1700);
     stage(4); say(tb ? `Against you, White goes for the ${cn('b', tb[0])} most. Nearly done.` : 'Nearly done.'); await wait(1300);
     stage(5); clearInterval(anim);
-    this.pool = ''; Prog.d.me = {state: 'new', since: this.me().since || Date.now(), updated: Date.now(), src: this.src || {site: 'pgn', user}, P}; Prog.save();
+    this.pool = ''; this.short = null; Prog.d.me = {state: 'new', since: this.me().since || Date.now(), updated: Date.now(), src: this.src || {site: 'pgn', user}, P}; Prog.save();
     S.view = 'findings'; render(); setHash(); window.scrollTo({top: 0});
   },
   /* -- what the games say */
@@ -5404,7 +5683,7 @@ const Product = {
   },
   builtHTML(){
     const P = this.me().P || {n: 0};
-    return `<section class="done-art"><div class="cface pop">${knightSVG('cheer')}<\/div><p class="kicker">Built from ${P.n} games<\/p><h2>Your playbook is <em>ready<\/em>.<\/h2>
+    return `<section class="done-art"><div class="cface pop">${knightSVG('cheer')}<\/div><p class="kicker">Built from your games<\/p><h2>Your playbook is <em>ready<\/em>.<\/h2>
       <p class="lede">Your course is ordered by your own games, every chapter shows your own record, and Your games shows where you leave the book.<\/p>
       <div class="cta"><button class="btn primary" data-open style="min-height:48px;padding:12px 24px;font-size:16px">Open my course<\/button><\/div><\/section>`;
   },
@@ -5416,8 +5695,8 @@ const Product = {
     const day = t => t ? new Date(t).toLocaleDateString(undefined, {month: 'short', day: 'numeric'}) : '';
     const rows = P.games.slice(0, 40).map(g => `<tr><td>${day(g.t)}<\/td><td>${g.me === 'w' ? 'White' : 'Black'}<\/td><td>${esc(g.opp)}${g.oe ? ` <span style="color:var(--muted)">${g.oe}<\/span>` : ''}<\/td><td><span class="chip ${g.r === 1 ? 'win' : g.r === 0 ? 'loss' : 'draw'}">${g.r === 1 ? 'Won' : g.r === 0 ? 'Lost' : 'Draw'}<\/span><\/td><td>${esc(g.ch ? cn(g.me, g.ch) : 'Outside the playbook')}<\/td><td>${g.ch ? plural(Math.floor(g.bp / 2), 'move') + ' in the book' : ''}<\/td><\/tr>`).join('');
     const tile = (b, s) => `<div class="tile"><b>${b}<\/b><span>${s}<\/span><\/div>`;
-    view.innerHTML = `<div class="pv"><div class="chead"><div><p class="kicker">Your games${P.user ? ' · ' + esc(P.user) : ''}<\/p><h2 style="font-size:clamp(30px,4vw,44px)">What actually happened<\/h2><p>${P.n} games, read without an engine: what you met, how it went, and where your moves and your playbook part ways.<\/p><\/div>
-        <button class="btn" data-pgo="setup">Update from new games<\/button><\/div>
+    view.innerHTML = `<div class="pv"><div class="chead"><div><p class="kicker">Your games${P.user ? ' · ' + esc(P.user) : ''}<\/p><h2 style="font-size:clamp(30px,4vw,44px)">What actually happened<\/h2><p>Your games, read without an engine: what you met, how it went, and where your moves and your playbook part ways. Open an opening for every lesson in it.<\/p><\/div>
+        <button class="btn" data-pgo="setup">Read my newer games<\/button><\/div>
       <div class="tiles">${tile(P.n, 'games')}${tile(rec(P.all), 'wins and losses')}${tile(P.rating || '–', `${P.tc} rating`)}${tile(P.leaks.length, 'spots where you leave the book')}<\/div>
       <div class="fgrid"><div class="pcard"><p class="kicker">With White · ${rec(P.white.all)}<\/p><div class="bars">${col('w', P.white)}<\/div><\/div><div class="pcard"><p class="kicker">With Black · ${rec(P.black.all)}<\/p><div class="bars">${col('b', P.black)}<\/div><\/div><\/div>
       ${P.leaks.length ? `<div><div class="sechead"><h2>Where you leave your playbook<\/h2><p>The same position, the same different move. Red is what you played, green is the playbook.<\/p><\/div><div class="leaks">${P.leaks.slice(0, 8).map(L => this.leakHTML(L, true)).join('')}<\/div><\/div>` : ''}
@@ -5434,6 +5713,8 @@ const Product = {
     view.querySelectorAll('[data-pch]').forEach(b => b.onclick = () => { const [s, id] = b.dataset.pch.split(':'); useSide(s); S.chapter = id; go('learn'); });
     view.querySelectorAll('[data-leak]').forEach(b => b.onclick = () => { const [s, line, kid] = b.dataset.leak.split(':'); useSide(s); openLine(line, Math.max(0, LINES[line].n.indexOf(+kid)), 'games'); });
     const cb = view.querySelector('[data-cback]'); if (cb) cb.onclick = () => { this.ci--; render(); };
+    const rc = view.querySelector('[data-recheck]'); if (rc) rc.onclick = () => { const sh = this.short || this.me().short || {}; this.site = sh.site === 'lichess' ? 'lichess' : 'chess.com'; this.fetchUser(sh.user); };
+    const ot = view.querySelector('[data-other]'); if (ot) ot.onclick = () => { this.short = null; this.fresh = true; this.pool = ''; this.msg = null; render(); };
     const op = view.querySelector('[data-open]'); if (op) op.onclick = () => { try { history.replaceState(null, '', '#course'); } catch(e){} location.reload(); };
     const f = document.getElementById('uform'); if (f) f.onsubmit = e => { e.preventDefault(); if (!this.busy) this.fetchUser(); };
     const inp = document.getElementById('pgnFile'), drop = document.getElementById('drop');
@@ -5442,45 +5723,117 @@ const Product = {
   }
 };
 
+/* ---- badges: earned from the progress, kept with it (d.badges: id -> when), shown in the profile. Locked ones are grey. */
+const BADGES = [
+  {id: 'l1', group: 'Lines you know', name: 'First line', need: 'Play a line from memory without a slip.', tier: 'bronze', glyph: '1', n: x => x.clean, at: 1},
+  {id: 'l10', group: 'Lines you know', name: 'Ten lines', need: 'Ten lines played without a slip.', tier: 'bronze', glyph: '10', n: x => x.clean, at: 10},
+  {id: 'l25', group: 'Lines you know', name: 'Twenty-five lines', need: 'Twenty-five lines played without a slip.', tier: 'silver', glyph: '25', n: x => x.clean, at: 25},
+  {id: 'l50', group: 'Lines you know', name: 'Fifty lines', need: 'Fifty lines played without a slip.', tier: 'silver', glyph: '50', n: x => x.clean, at: 50},
+  {id: 'l100', group: 'Lines you know', name: 'A hundred lines', need: 'A hundred lines played without a slip.', tier: 'gold', glyph: '100', n: x => x.clean, at: 100},
+  {id: 'l250', group: 'Lines you know', name: 'The whole library', need: 'Two hundred and fifty lines played without a slip.', tier: 'gold', glyph: '250', n: x => x.clean, at: 250},
+  {id: 's3', group: 'Streak', name: 'Three in a row', need: 'Five lines a day, three days running.', tier: 'bronze', glyph: 'flame', n: x => x.best, at: 3},
+  {id: 's7', group: 'Streak', name: 'A full week', need: 'Five lines a day for a week.', tier: 'silver', glyph: 'flame', n: x => x.best, at: 7},
+  {id: 's30', group: 'Streak', name: 'A month', need: 'Five lines a day for thirty days.', tier: 'gold', glyph: 'flame', n: x => x.best, at: 30},
+  {id: 's100', group: 'Streak', name: 'A hundred days', need: 'Five lines a day for a hundred days.', tier: 'gold', glyph: 'crown', n: x => x.best, at: 100},
+  {id: 'u1', group: 'Course', name: 'First checkpoint', need: 'Pass a unit\'s checkpoint.', tier: 'bronze', glyph: 'flag', n: x => x.units, at: 1},
+  {id: 'u5', group: 'Course', name: 'Five units', need: 'Pass five units of your course.', tier: 'silver', glyph: 'flag', n: x => x.units, at: 5},
+  {id: 'uall', group: 'Course', name: 'Course complete', need: 'Pass every open unit of your course.', tier: 'gold', glyph: 'star', n: x => x.units, at: x => x.open},
+  {id: 'm10', group: 'Practice', name: 'Solid ten', need: 'Ten lines clean on four reviews in a row.', tier: 'silver', glyph: 'star', n: x => x.solid, at: 10},
+  {id: 'm50', group: 'Practice', name: 'Solid fifty', need: 'Fifty lines clean on four reviews in a row.', tier: 'gold', glyph: 'star', n: x => x.solid, at: 50},
+  {id: 'g10', group: 'Practice', name: 'Sparring partner', need: 'Ten practice games in the Sandbox.', tier: 'bronze', glyph: 'board', n: x => x.spar, at: 10}
+];
+const badgeNeed = (B, x) => typeof B.at === 'function' ? B.at(x) : B.at;
+function badgeStats(){
+  let clean = 0, solid = 0; for (const id in (Prog.d.lines || {})){ const r = Prog.rec(id); if (!r) continue; if (r.clean) clean++; if ((r.box || 0) >= 4) solid++; }
+  const open = COURSE.filter(U => !U.soon);
+  return {clean, solid, best: Daily.best(), units: open.filter(unitPassed).length, open: Math.max(1, open.length), spar: (Prog.d.sb || {}).games || 0};
+}
+// a medal: two ribbons and a struck disc; the glyph is a number or a small picture. Locked ones are drawn in grey.
+function medalSVG(tier, glyph){
+  const t = tier === 'locked' ? ['locked', 'locked-2', 'locked', 'locked'] : [tier, tier + '-2', 'ribbon-1', 'ribbon-2'], c = k => `var(--${t[k]})`;
+  const G = {flame: '<path d="M33 31c.3 2.6-.9 4-2.3 5.5-1.5 1.6-3 3.2-3 5.9 0 3.2 2.1 5.6 4.6 5.6s4.7-2.2 4.7-5.3c0-2.3-1.2-3.8-2-4.8-.2 1.2-.7 2.2-1.6 2.6.5-3.1-.2-6.1-.4-9.5z"/>',
+    crown: '<path d="M23 50l-2-12 6 5 5-8 5 8 6-5-2 12z"/>', flag: '<path d="M27 52V32h2v1.5c4-2.5 7 1.5 11-.5v10c-4 2-7-2-11 .5V52z"/>',
+    star: '<path d="M32 31.5l3.1 6.4 7 1-5.1 4.9 1.2 7-6.2-3.3-6.2 3.3 1.2-7-5.1-4.9 7-1z"/>', board: '<path d="M24 34h8v8h-8zM32 42h8v8h-8z"/><path d="M24 34h16v16H24z" fill="none" stroke-width="1.6"/>',
+    lock: '<rect x="26" y="40" width="12" height="9" rx="1.6"/><path d="M28.5 40v-3a3.5 3.5 0 0 1 7 0v3" fill="none" stroke-width="2"/>'};
+  const g = tier === 'locked' ? G.lock : G[glyph] || `<text x="32" y="${glyph.length > 2 ? 46.5 : 47.5}" text-anchor="middle" font-size="${glyph.length > 2 ? 12.5 : 15}">${glyph}<\/text>`;
+  return `<svg class="medal" viewBox="0 0 64 76" aria-hidden="true"><path d="M16 2h14l6 26-12 4z" style="fill:${c(2)}"/><path d="M48 2H34l-6 26 12 4z" style="fill:${c(3)}"/>
+    <circle cx="32" cy="45" r="22" style="fill:${c(1)};stroke:${c(0)}" stroke-width="3"/><circle cx="32" cy="45" r="16.5" fill="none" style="stroke:${c(0)}" stroke-width="1.2" stroke-dasharray="2 2.2"/>
+    <g class="mg" style="fill:${c(0)};stroke:${c(0)}" font-family="var(--f-display)" font-weight="700">${g}<\/g><path d="M17.5 37a16 16 0 0 1 9-9.5" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.4" stroke-linecap="round"/><\/svg>`;
+}
+const Badges = {
+  queue: [],
+  // stamp what has just been earned; the coach shows it at the next quiet moment. The first check after an update
+  // stamps what was earned before it quietly.
+  check(){
+    const first = !Prog.d.badges, have = Prog.d.badges || {}, x = badgeStats(), now = Date.now(), got = [];
+    for (const B of BADGES) if (!have[B.id] && B.n(x) >= badgeNeed(B, x)) { have[B.id] = now; got.push(B); }
+    if (!got.length && !first) return false;
+    Prog.d.badges = have;
+    if (!first && got.length && PERSONA !== 'new'){ this.queue.push(...got); if (!(S.drill && S.drill.state === 'play')) this.show(); }
+    return true;
+  },
+  show(){
+    const B = this.queue.slice().sort((a, b) => ({gold: 0, silver: 1, bronze: 2}[a.tier] - {gold: 0, silver: 1, bronze: 2}[b.tier]))[0]; if (!B) return;
+    const more = this.queue.length - 1; this.queue = [];
+    if (!SET.coach){ toast(`New badge: ${B.name}${more ? ` and ${more} more` : ''}.`); return; }
+    Coach.say(`${B.need}${more ? ` And ${more} more ${more === 1 ? 'badge' : 'badges'} with it.` : ''}`, {mood: 'cheer', stay: true, head: `New badge: ${B.name}`, art: `<span class="cmedal">${medalSVG(B.tier, B.glyph)}<\/span>`, cta: ['me', 'See your badges']});
+  }
+};
+// the profile: the streak, the last seven days and every badge, earned or not
+function profileHTML(){
+  const st = Daily.streak(), best = Math.max(st, Daily.best()), k = Math.min(DAILY, Daily.count()), have = Prog.d.badges || {}, x = badgeStats();
+  const got = BADGES.filter(B => have[B.id]).length, groups = [...new Set(BADGES.map(B => B.group))];
+  const week = [-6, -5, -4, -3, -2, -1, 0].map(o => { const d = dayDate(o), on = Daily.done(o); return `<li class="${on ? 'on' : ''} ${o === 0 ? 'now' : ''}"><i>${on ? ICON.check : ''}<\/i><span>${d.toLocaleDateString(undefined, {weekday: 'narrow'})}<\/span><\/li>`; }).join('');
+  const one = B => { const at = have[B.id], need = badgeNeed(B, x), cur = Math.min(need, B.n(x));
+    return `<li class="bdg ${at ? 'got' : 'lock'}" title="${esc(B.need)}">${medalSVG(at ? B.tier : 'locked', B.glyph)}<b>${esc(B.name)}<\/b><span>${at ? 'Earned ' + new Date(at).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'}) : esc(B.need)}<\/span>${at ? '' : `<i class="bprog" aria-hidden="true"><i style="width:${Math.round(cur / need * 100)}%"><\/i><\/i>`}<\/li>`; };
+  return `<div class="prof"><div class="pstreak ${st ? '' : 'zero'}">${FLAME}<div><b class="tnum">${st}<\/b><span>${st === 1 ? 'day' : 'days'} in a row<\/span><\/div><p>Best: ${best} · today: ${k} of ${DAILY} lines<\/p><\/div>
+    <ol class="week" aria-label="The last seven days">${week}<\/ol>
+    <div class="bdgs"><p class="kicker">Badges · ${got} of ${BADGES.length}<\/p>${groups.map(g => `<div><p class="bgh">${esc(g)}<\/p><ul class="bgrid">${BADGES.filter(B => B.group === g).map(one).join('')}<\/ul><\/div>`).join('')}<\/div><\/div>`;
+}
+
 /* ---- the coach: a few words in a speech bubble, bottom right. Never a hint while you are being tested. */
 const Coach = {
   seen: (() => { try { return JSON.parse(localStorage.getItem('playbook-coach') || '{}'); } catch(e){ return {}; } })(), timer: null, last: null, n: 0,
   el(){ let e = document.getElementById('coach'); if (!e){ e = document.createElement('div'); e.id = 'coach'; e.className = 'coach'; document.body.appendChild(e);
-      e.addEventListener('click', ev => { if (ev.target.closest('.cx')) return this.hush(); const a = ev.target.closest('[data-cgo]'); if (a){ this.hush(); return go(a.dataset.cgo); } if (ev.target.closest('.cav')) this.last && !e.querySelector('.cbub') ? this.say(this.last.t, this.last.o) : e.querySelector('.cbub') ? this.hush() : this.say(this.tip()); }); }
+      e.addEventListener('click', ev => { if (ev.target.closest('.cx')) return this.hush(); const a = ev.target.closest('[data-cgo]'); if (a){ this.hush(); return a.dataset.cgo === 'me' ? Acct.open(Cloud.user ? 'in' : 'me') : go(a.dataset.cgo); } if (ev.target.closest('.cav')) this.last && !e.querySelector('.cbub') ? this.say(this.last.t, this.last.o) : e.querySelector('.cbub') ? this.hush() : this.say(this.tip()); }); }
     return e; },
   // on the welcome, reading, findings and choice screens the coach is part of the page, so the corner one stays away
   draw(bub){ const e = this.el(); e.hidden = !SET.coach || (PVIEWS.includes(S.view) && S.view !== 'setup'); e.classList.toggle('quiet', ['drill', 'quiz', 'sandbox', 'study', 'explore'].includes(S.view));
     e.innerHTML = (bub || '') + `<button class="cav" type="button" aria-label="${coachName()}, your coach">${knightSVG(this.mood)}<\/button>`; },
   say(t, o = {}){
     if (!SET.coach) return; clearTimeout(this.timer); this.last = {t, o}; this.mood = o.mood;
-    this.draw(`<div class="cbub" role="status"><button class="cx" type="button" aria-label="Close">×<\/button><span class="cwho">${coachName()}<\/span>${esc(t)}${o.cta ? `<div class="cacts"><button class="btn small primary" data-cgo="${o.cta[0]}">${esc(o.cta[1])}<\/button><\/div>` : ''}<\/div>`);
+    this.draw(`<div class="cbub ${o.art ? 'art' : ''}" role="status"><button class="cx" type="button" aria-label="Close">×<\/button>${o.art ? `<span class="cart">${o.art}<\/span>` : ''}<span class="cwho">${coachName()}<\/span>${o.head ? `<b class="chead2">${esc(o.head)}<\/b>` : ''}${esc(t)}${o.cta ? `<div class="cacts"><button class="btn small primary" data-cgo="${o.cta[0]}">${esc(o.cta[1])}<\/button><\/div>` : ''}<\/div>`);
     if (!o.stay) this.timer = setTimeout(() => this.hush(), 9000 + t.length * 45);
   },
   hush(){ clearTimeout(this.timer); this.mood = null; this.draw(''); },
   once(key, t, o){ if (this.seen[key]) return false; this.seen[key] = 1; try { localStorage.setItem('playbook-coach', JSON.stringify(this.seen)); } catch(e){} this.say(t, o); return true; },
   refresh(){ this.hush(); },
   tip(){
-    const T = {start: `Bring me ${TARGET} of your games and I'll build your course around them.`, setup: 'A username is the quickest way. I only read your public games.', sandbox: 'Play your side. The other side answers the way club players really do.',
-      course: 'Work down the path. Each checkpoint you pass opens the next unit.', learn: 'Pick an opening, then step through a lesson with the arrow keys.', drill: 'Clean runs come back in days. Slips come back today.',
+    const T = {start: 'Connect your chess account and I\'ll build your course around your games.', setup: 'A username is the quickest way. I only read your public games.', sandbox: 'Play your side. The other side answers the way club players really do.',
+      course: 'Work down the path. Each checkpoint you pass opens the next unit.', learn: 'Pick a lesson, then step through it with the arrow keys.', drill: 'Five lines a day keeps your streak. The ones you slipped on come first.',
       games: 'This is where your moves and your playbook part ways.', cheat: 'Their move is highlighted. The green arrow is your answer.', study: 'Step through with the arrow keys. Switch the engine on under the board if a position looks scary.'};
     return T[S.view] || T[tabOf(S.view, S.studyFrom)] || 'Keep going.';
   },
   // called after every full render: at most one thing to say, and only the first time
   onView(){
-    const v = S.view, e = this.el(); if (e.querySelector('.cbub') && this.lastView === v) return this.draw(e.querySelector('.cbub').outerHTML); this.lastView = v;
+    const v = S.view, e = this.el();
+    if (S.drill && S.drill.state === 'play'){ this.lastView = v; return this.hush(); } // never while a drill, a practice game or a checkpoint is being played
+    if (Badges.queue.length && PERSONA !== 'new') return Badges.show();
+    if (e.querySelector('.cbub') && this.lastView === v) return this.draw(e.querySelector('.cbub').outerHTML); this.lastView = v;
     if (v === 'reading' || v === 'choices' || v === 'built' || v === 'findings') return this.hush(); // the coach is already on the page there
-    if (S.drill && S.drill.state === 'play') return this.hush(); // never while a drill, a practice game or a checkpoint is being played
     if (PERSONA === 'new'){
       if (v === 'start') return this.hush();
       if (v === 'setup') return this.once('setup', this.tip()) || this.hush();
-      if (v === 'sandbox') return this.once('sb-new', `This is the sandbox: pick an opening and play. I'll stop you where the playbook has a better move. Bring your games and the rest opens.`, {cta: Product.signedOut() ? null : ['setup', 'Bring my games']}) || this.hush();
-      if (!OPEN_NEW.includes(v)) return this.say('This opens once I\'ve read your games.', {cta: Product.signedOut() ? null : ['setup', 'Bring my games']});
+      if (v === 'sandbox') return this.once('sb-new', `This is the sandbox: pick an opening and play. I'll stop you where the playbook has a better move. Connect your account and the rest opens.`, {cta: Product.signedOut() ? null : ['setup', 'Connect my account']}) || this.hush();
+      if (!OPEN_NEW.includes(v)) return this.say('This opens once I\'ve read your games.', {cta: Product.signedOut() ? null : ['setup', 'Connect my account']});
       return this.hush();
     }
     if (PERSONA === 'ready' && v === 'course' && this.once('ready-course', 'This is your course, in the order your games asked for. Start with the unit at the top.')) return;
     if (['course', 'learn', 'drill', 'games', 'cheat', 'sandbox'].includes(v) && this.once('tab-' + v, this.tip())) return;
     this.hush();
   },
+  // the fifth line of the day
+  daily(){ const st = Daily.streak(); this.say(st > 1 ? `That's today's five. ${st} days in a row: come back tomorrow for ${st + 1}.` : `That's today's five, and day one of your streak. Five more tomorrow keeps it going.`, {mood: 'cheer', ms: 9000, art: `<span class="cflame">${FLAME}<b>${st}<\/b><\/span>`}); },
   event(kind, ok){
     if (kind === 'line' && S.view === 'drill'){ this.n++;
       if (!ok) return this.say('That one comes back today. The second time is where it sticks.');
@@ -5491,19 +5844,27 @@ const Coach = {
 /* ---- hooks into the app */
 const render0 = render;
 render = function(){
-  if (PERSONA === 'new' && !OPEN_NEW.includes(S.view)){ stopPlay(); setTab(S.view); renderChrome(); S.drill = null; EngineUI.detach(); Product.locked(tabOf(S.view, S.studyFrom)); return Coach.onView(); }
-  if (PVIEWS.includes(S.view)){ setTab(S.view); renderChrome(); S.drill = null; EngineUI.detach(); document.getElementById('dueBadge').hidden = true; Product.render(); return Coach.onView(); }
+  if (PERSONA === 'new' && !OPEN_NEW.includes(S.view)){ stopPlay(); setTab(S.view); renderChrome(); S.drill = null; EngineUI.detach(); document.getElementById('drillDot').hidden = true; Product.locked(tabOf(S.view, S.studyFrom)); return Coach.onView(); }
+  if (PVIEWS.includes(S.view)){ setTab(S.view); renderChrome(); S.drill = null; EngineUI.detach(); document.getElementById('drillDot').hidden = true; Product.render(); return Coach.onView(); }
   render0(); Coach.onView();
 };
 const renderGames0 = renderGames;
 renderGames = function(){ if (PERSONA === 'ready' && Product.me().P) return Product.games(); renderGames0(); };
 const record0 = Prog.record.bind(Prog);
-Prog.record = function(id, clean){ record0(id, clean); Coach.event('line', clean); };
+Prog.record = function(id, clean){
+  const before = Daily.count(); record0(id, clean);
+  if (Badges.queue.length) return;                       // a new badge says it louder
+  if (before < DAILY && Daily.count() >= DAILY) return Coach.daily();
+  Coach.event('line', clean);
+};
+// every save is a moment something may have been earned
+const save0 = Prog.save.bind(Prog);
+Prog.save = function(){ save0(); if (Badges.check()) save0(); };
 
 
 /* ------------------------------------------------------------------ boot */
 function start(saved){
-  Prog.load(); Cloud.init(); Product.boot();
+  Prog.load(); adoptSettings(); Cloud.init(); Product.boot();
   let h = (location.hash || '').slice(1), side = 'w';
   try { const v = localStorage.getItem(SIDE_KEY); if (v && BOOKS[v]) side = v; } catch(e){}
   const hu = h.startsWith('unit.') ? UNIT[h.slice(5)] : null; // course hashes carry no colour: a unit brings its own book
@@ -5523,7 +5884,7 @@ function start(saved){
   else if (h.startsWith('line.') && LINES[h.slice(5)]){ S.line = h.slice(5); S.i = lineStart(S.line); S.view = 'study'; }
   else if (h.startsWith('learn.') && CHAPTERS[h.slice(6)]){ S.chapter = h.slice(6); S.view = 'learn'; }
   else if (h === 'explore' && exLoad()){ if (S.ex.side && BOOKS[S.ex.side] && S.ex.side !== SIDE){ loadBook(S.ex.side); S.chapter = savedChapter(SIDE); } S.view = 'explore'; }
-  else if (VIEWS.includes(h)) S.view = h;
+  else if (VIEWS.includes(h) || h === 'learn') S.view = h;   // #learn: the openings, now under Your games
   Product.landing(h);
   render();
   Prog.connect(); renderAcct();

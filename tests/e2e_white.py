@@ -75,14 +75,14 @@ if __name__ == '__main__':
         pg.goto(URL + '#learn'); pg.wait_for_timeout(1200)
         pg.screenshot(path=out + 'v2_learn_italian.png')
         for ch in ['e5x', 'caro', 'sic', 'scandi', 'pirc', 'french', 'rare']:
-            pg.click(f'.rtile[data-ch="{ch}"]'); pg.wait_for_timeout(350)
+            pg.click(f'.chnav [data-ch="{ch}"]'); pg.wait_for_timeout(350)
             assert pg.evaluate(f"S.chapter") == ch
             if ch in ('caro', 'sic'):
                 pg.evaluate("window.scrollTo(0,0)"); pg.wait_for_timeout(150)
                 pg.screenshot(path=out + f'v2_learn_{ch}.png', full_page=True)
         print('hash', pg.evaluate('location.hash'))
         # open a lesson and look at options with odds
-        pg.click('.rtile[data-ch="caro"]'); pg.wait_for_timeout(300)
+        pg.click('.chnav [data-ch="caro"]'); pg.wait_for_timeout(300)
         pg.click('[data-lesson="ck-march"]'); pg.wait_for_timeout(300)
         for _ in range(4): pg.keyboard.press('ArrowRight'); pg.wait_for_timeout(120)
         pg.screenshot(path=out + 'v2_study_caro.png')
@@ -109,6 +109,7 @@ if __name__ == '__main__':
         pg.screenshot(path=out + 'v2_sb_mid.png')
         # drill by chapter
         pg.click('.tabs button[data-view="drill"]'); pg.wait_for_timeout(300)
+        pg.click('.dmore > summary'); pg.wait_for_timeout(200)   # picking lines yourself is folded under today's five
         pg.click('[data-f="ch:sic"]'); pg.wait_for_timeout(200)
         pg.click('#smart'); pg.wait_for_timeout(900)
         print('drill line:', pg.evaluate('S.drill.id'))
@@ -141,7 +142,7 @@ if __name__ == '__main__':
         pg.goto(URL + '#learn'); pg.wait_for_timeout(1200)
         print('m learn scrollWidth', pg.evaluate('document.documentElement.scrollWidth'))
         pg.screenshot(path=out + 'v2_m_learn.png')
-        pg.evaluate("document.querySelector('.rtile[data-ch=\"sic\"]').click()"); pg.wait_for_timeout(500)
+        pg.evaluate("document.querySelector('.chnav [data-ch=\"sic\"]').click()"); pg.wait_for_timeout(500)
         pg.screenshot(path=out + 'v2_m_learn_sic.png', full_page=True)
         print('m sic scrollWidth', pg.evaluate('document.documentElement.scrollWidth'))
         pg.evaluate("document.querySelector('.tabs button[data-view=\"sandbox\"]').click()"); pg.wait_for_timeout(300)
@@ -166,4 +167,5 @@ if __name__ == '__main__':
         pg.evaluate("document.getElementById('sbGo').click()"); pg.wait_for_timeout(2500)
         pg.screenshot(path=out + 'v2_dark_sb.png')
         print('errors', errors[:10])
+        assert not [e for e in errors if 'ERR_' not in e], 'page errors'
         b.close()

@@ -48,8 +48,15 @@ with sync_playwright() as p:
     # some progress in the first system, then switch
     pg.evaluate("useSide('b'); startDrillLine('bi-main')"); pg.wait_for_timeout(600); assert drill_clean(pg) == 'done'
     pg.click('#setBtn'); pg.wait_for_timeout(300)
-    rows = pg.locator('#setPanel [data-pack]').all_inner_texts(); print('settings:', rows); assert len(rows) == 3
-    pg.evaluate("window.__before = 1"); pg.click('#setPanel [data-pack="blackE4:caro"]')
+    assert not pg.locator('#setPanel [data-packask="blackE4:caro"]').is_visible(), 'the repertoire is folded away'
+    pg.click('#setPanel .repdet > summary'); pg.wait_for_timeout(200)
+    rows = pg.locator('#setPanel [data-packask]').all_inner_texts(); print('settings:', rows); assert len(rows) == 3
+    pg.click('#setPanel [data-packask="blackE4:caro"]'); pg.wait_for_timeout(200)
+    assert pg.evaluate("PICKS.blackE4 || null") is None and pg.locator('#repName').count() == 1, 'a tap alone switches nothing'
+    pg.fill('#repName', 'somebody'); assert pg.is_disabled('.repask [type=submit]')
+    pg.screenshot(path=out + 'p_confirm.png')
+    pg.fill('#repName', 'VladAPL'); assert not pg.is_disabled('.repask [type=submit]')
+    pg.evaluate("window.__before = 1"); pg.click('.repask [type=submit]')
     pg.wait_for_function("typeof __before === 'undefined' && typeof COURSE !== 'undefined' && typeof PERSONA !== 'undefined'"); pg.wait_for_timeout(900)
     print('after the switch:', pg.evaluate("[localStorage.getItem('playbook-packs'), JSON.stringify(Prog.d.packs), JSON.stringify(PICKS), PERSONA, performance.getEntriesByType('navigation')[0].type]"))
     c = shape(pg); print('caro:', {k: (v if k != 'units' else len(v)) for k, v in c.items()})
@@ -89,8 +96,10 @@ with sync_playwright() as p:
 
     # and back
     pg.evaluate("go('course')"); pg.click('#setBtn'); pg.wait_for_timeout(300)
-    assert pg.get_attribute('#setPanel [data-pack="blackE4:caro"]', 'aria-pressed') == 'true'
-    pg.evaluate("window.__before = 1"); pg.click('#setPanel [data-pack="blackE4:e5"]')
+    pg.click('#setPanel .repdet > summary'); pg.wait_for_timeout(200)
+    assert pg.get_attribute('#setPanel [data-packask="blackE4:caro"]', 'aria-pressed') == 'true'
+    pg.click('#setPanel [data-packask="blackE4:e5"]'); pg.wait_for_timeout(200); pg.fill('#repName', 'aqua_alpaca')
+    pg.evaluate("window.__before = 1"); pg.click('.repask [type=submit]')
     pg.wait_for_function("typeof __before === 'undefined' && typeof COURSE !== 'undefined' && typeof PERSONA !== 'undefined'"); pg.wait_for_timeout(900)
     d = shape(pg); assert d['chapters'] == a['chapters'] and d['units'] == a['units'] and d['first'] == ['e7e5'] and d['lines'] == a['lines']
     assert pg.evaluate("[Prog.rec('bck-main-bd3').clean, Prog.rec('bi-main').clean]") == [1, 1]
