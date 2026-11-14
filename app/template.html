@@ -1035,6 +1035,7 @@ function mergeProg(a, b){
     const c = o.course || (o.course = {u: {}, seen: {}}); c.u = c.u || {}; c.seen = c.seen || {};
     for (const id in (r.course.u || {})){ const x = c.u[id] || (c.u[id] = {}), y = r.course.u[id]; for (const f in y) x[f] = Math.max(x[f] || 0, y[f] || 0); }
     for (const k in (r.course.seen || {})) c.seen[k] = Math.max(c.seen[k] || 0, r.course.seen[k] || 0);
+    if (r.course.grad) c.grad = c.grad ? Math.min(c.grad, r.course.grad) : r.course.grad;   // when the first course was finished
   }
   if (r.days){
     const d = o.days || (o.days = {}), cnt = v => Array.isArray(v) ? v.length : (v || 0);
@@ -1379,7 +1380,7 @@ applySettings();
 
 const view = document.getElementById('view');
 const VIEWS = ['sandbox', 'course', 'drill', 'games', 'cheat', 'shop'];
-const CVIEWS = ['course', 'unit', 'quiz'];
+const CVIEWS = ['course', 'unit', 'quiz', 'grad'];
 const tabOf = (v, from) => CVIEWS.includes(v) || (v === 'study' && from === 'unit') ? 'course' : v === 'study' ? tabOf(from || 'learn') : v === 'learn' ? 'games' : VIEWS.includes(v) ? v : 'course';
 function setTab(v){
   const b = v === 'explore' && S.ex && S.ex.back; if (b){ v = b.view === 'explore' ? 'course' : b.view; }
@@ -1388,7 +1389,7 @@ function setTab(v){
   document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.view === t)));
 }
 function setHash(){
-  const h = S.view === 'course' ? 'course' : S.view === 'explore' ? 'explore' : (S.view === 'unit' || S.view === 'quiz') && S.unit ? 'unit.' + S.unit
+  const h = S.view === 'course' ? (S.deep ? 'deep.' + S.deep : S.coursePath && gradAt() ? 'course.path' : 'course') : S.view === 'grad' ? 'grad' : S.view === 'explore' ? 'explore' : (S.view === 'unit' || S.view === 'quiz') && S.unit ? 'unit.' + S.unit
     : (SIDE === 'b' ? 'b.' : '') + (S.view === 'study' && S.line ? 'line.' + S.line : S.view === 'learn' && S.chapter !== DATA.chapters[0].id ? 'learn.' + S.chapter : S.view);
   try { history.replaceState(null, '', '#' + h); } catch(e){}
 }
@@ -1429,21 +1430,27 @@ function render(){
   else if (S.view === 'games') renderGames();
   else if (S.view === 'cheat') renderCheat();
   else if (S.view === 'shop') renderShop();
+  else if (S.view === 'grad') renderGrad();
   else if (S.view === 'explore') renderExplore();
 }
 document.addEventListener('click', e => {
-  const t = e.target.closest('[data-go],[data-view],[data-lesson],[data-line],[data-ch],[data-sbch],[data-drillch],[data-side],[data-unit],[data-soon]');
+  const t = e.target.closest('[data-go],[data-view],[data-lesson],[data-line],[data-ch],[data-sbch],[data-drillch],[data-side],[data-unit],[data-soon],[data-deep],[data-lib],[data-cpath],[data-grad]');
   if (!t || !document.getElementById('app').contains(t)) return;
   if (t.dataset.side){ switchSide(t.dataset.side); return; }
   if (t.dataset.unit){ openUnit(t.dataset.unit); return; }
+  if (t.dataset.deep){ openDeep(t.dataset.deep); return; }
+  if (t.dataset.lib !== undefined){ openLibrary(); return; }
+  if (t.dataset.cpath !== undefined){ openPath(); return; }
+  if (t.dataset.grad !== undefined){ go('grad', {top: true}); return; }
   if (t.dataset.soon){ const U = UNIT[t.dataset.soon]; useSide(U.side); setChapter(U.chapter, true); return; }
-  if (t.dataset.view){ go(t.dataset.view); return; }
+  if (t.dataset.view){ if (t.dataset.view === 'course'){ S.deep = null; S.coursePath = false; } go(t.dataset.view); return; }
   if (t.dataset.ch){ setChapter(t.dataset.ch, true); return; }
   if (t.dataset.sbch){ SBS.scope = t.dataset.sbch; sbSave(); S.sbState = null; go('sandbox'); sbStart(); return; }
   if (t.dataset.drillch){ S.dfilter.ch = t.dataset.drillch; go('drill'); return; }
   if (t.dataset.lesson){ const L = LESSONS[t.dataset.lesson]; openLine(L.lines[0], undefined, S.view === 'study' ? S.studyFrom : S.view); return; }
   if (t.dataset.line){ openLine(t.dataset.line, t.dataset.i !== undefined ? +t.dataset.i : undefined, S.view === 'study' ? S.studyFrom : S.view); return; }
   const g = t.dataset.go;
+  if (g === 'course'){ S.deep = null; S.coursePath = false; }
   if (VIEWS.includes(g) || g === 'learn') go(PERSONA === 'new' ? 'start' : g);
 });
 
@@ -1592,7 +1599,7 @@ function renderStudy(){
     if (k > 0) navPrev = `<button class="btn small" data-lesson="${order[k-1]}" aria-label="Previous lesson: ${esc(LESSONS[order[k-1]].title)}">‹<span class="navtxt"> ${esc(LESSONS[order[k-1]].title)}</span></button>`;
     if (k < order.length - 1) navNext = `<button class="btn small" data-lesson="${order[k+1]}" aria-label="Next lesson: ${esc(LESSONS[order[k+1]].title)}"><span class="navtxt">${esc(LESSONS[order[k+1]].title)} </span>›</button>`; }
   if (CU && les && CU.lessons.includes(les.id)){ const nx = CU.lessons[CU.lessons.indexOf(les.id) + 1];
-    navNext = nx ? `<button class="btn small primary" id="topNext" data-lesson="${nx}" title="${esc(LESSONS[nx].title)}">Next lesson ›</button>` : `<button class="btn small primary" id="topNext" data-unit="${CU.id}">Done · back to the unit ›</button>`; }
+    navNext = nx ? `<button class="btn small primary" id="topNext" data-lesson="${nx}" title="${esc(LESSONS[nx].title)}">Next lesson ›</button>` : `<button class="btn small primary" id="topNext" data-unit="${CU.id}">Done · back to the ${uword(CU)} ›</button>`; }
   const back = CU ? `<button class="btn small" data-unit="${CU.id}">← ${esc(CU.title)}</button>` : S.studyFrom === 'games' ? '<button class="btn small" data-go="games">← Your games</button>' : S.studyFrom === 'cheat' ? '<button class="btn small" data-go="cheat">← Cheat sheet</button>' : S.studyFrom === 'sandbox' ? '<button class="btn small" data-go="sandbox">← Sandbox</button>' : `<button class="btn small" data-go="learn">← ${esc(((lessonOf(S.line) && chapterOf(lessonOf(S.line))) || {name: 'The opening'}).name)}</button>`;
   // reaching the last move of a lesson's main line counts as studying it
   const atEnd = !!les && !!line.main && S.i === line.n.length - 1;
@@ -1652,7 +1659,7 @@ function renderStudy(){
   let unitBtns = '';
   if (CU && les && CU.lessons.includes(les.id)){
     const nextL = CU.lessons.find(l => l !== les.id && !lessonSeen(CU.side, l));
-    unitBtns = (atEnd && nextL ? `<button class="btn primary" data-lesson="${nextL}">Next lesson: ${esc(LESSONS[nextL].title)}</button>` : '') + `<button class="btn ${atEnd && !nextL ? 'primary' : 'ghost'}" data-unit="${CU.id}">Back to the unit</button>`;
+    unitBtns = (atEnd && nextL ? `<button class="btn primary" data-lesson="${nextL}">Next lesson: ${esc(LESSONS[nextL].title)}</button>` : '') + `<button class="btn ${atEnd && !nextL ? 'primary' : 'ghost'}" data-unit="${CU.id}">Back to the ${uword(CU)}</button>`;
   }
   const oldTl = view.querySelector('.timeline'), oldScroll = oldTl ? oldTl.scrollTop : 0, sameLine = S.renderedLine === S.line;
   S.renderedLine = S.line;
@@ -1859,11 +1866,11 @@ function drillPanelHTML(){
     const r = Prog.rec(D.id), clean = D.mistakes === 0, days = INTERVALS[r.box];
     const CU = D.unit && UNIT[D.unit], nxU = CU ? unitNextLine(CU, D.id) : null;
     const dk = Daily.count(), left = Math.max(0, DAILY - dk);
-    const acts = CU ? `${nxU ? `<button class="btn primary" id="dNextU">Next line in this unit</button>` : ''}<button class="btn ${nxU ? '' : 'primary'}" data-unit="${CU.id}">Back to the unit</button><button class="btn" id="dAgain">Again</button>`
+    const acts = CU ? `${nxU ? `<button class="btn primary" id="dNextU">Next line in this ${uword(CU)}</button>` : ''}<button class="btn ${nxU ? '' : 'primary'}" data-unit="${CU.id}">Back to the ${uword(CU)}</button><button class="btn" id="dAgain">Again</button>`
       : D.daily ? (left ? `<button class="btn primary" id="dDaily">Next line · ${dk + 1} of ${DAILY}</button><button class="btn" id="dAgain">Again</button>` : `<button class="btn primary" id="dDaily">Keep going</button><button class="btn" id="dToday">Done for today</button>`)
       : `<button class="btn primary" id="dNext">Next line</button><button class="btn" id="dAgain">Again</button><button class="btn ghost" data-line="${D.id}">Study it</button>`;
     const pl = line.main ? planFor(L.id) : null;
-    const cnote = CU ? ` ${CU.lines.filter(lineClean).length} of ${CU.lines.length} main lines in this unit are clean.` : D.daily ? (left ? ` Today: ${dk} of ${DAILY}.` : ` That's today's five: ${Daily.streak()} ${Daily.streak() === 1 ? 'day' : 'days'} in a row.`) : '';
+    const cnote = CU ? ` ${CU.lines.filter(lineClean).length} of ${CU.lines.length} main lines in this ${uword(CU)} are clean.` : D.daily ? (left ? ` Today: ${dk} of ${DAILY}.` : ` That's today's five: ${Daily.streak()} ${Daily.streak() === 1 ? 'day' : 'days'} in a row.`) : '';
     doneBox = `<div class="donebox ${clean ? '' : 'bad'}"><h4>${clean ? 'Clean run.' : `Done, with ${D.mistakes} ${D.mistakes === 1 ? 'slip' : 'slips'}.`}</h4>
       <p>${clean ? `This line comes back in ${days} ${days === 1 ? 'day' : 'days'}.` : 'This line stays in today\'s review until you get it clean.'} Ends: ${esc(line.main ? (L.outcome || '') : ((evalInfo(N[n[n.length-1]].e) || {}).txt || ''))}.${cnote}</p>
       <div class="lesson-actions">${acts}<button class="btn ghost" id="dExplore">Play on with the engine</button></div></div>${planCardHTML(pl)}`;
@@ -2137,7 +2144,7 @@ function sbReport(){
       <div class="bigstat"><b class="tnum">${n}</b><span>${n === 1 ? 'slip' : 'slips'} in this game · ${n ? 'this line is back in today\'s review' : `clean; it comes back in ${days} ${days === 1 ? 'day' : 'days'}`}</span></div>
       ${n ? `<div class="slips">${slipCards}</div>` : ''}
       ${D.choices.length ? `<div><p class="kicker" style="margin-bottom:6px">${OPP}'s choices</p><div class="chain">${chain}</div><p class="evaltext" style="text-align:left">This exact line: ${oneIn(prob)}.</p></div>` : ''}
-      <div class="lesson-actions"><button class="btn ${CU && cs >= SPAR ? '' : 'primary'}" id="sbAgain">Next game</button>${CU ? `<button class="btn ${cs >= SPAR ? 'primary' : ''}" data-unit="${CU.id}">Back to the unit</button>` : ''}${lid ? `<button class="btn" data-line="${lid}">Study this line</button><button class="btn ghost" id="sbDrill">Drill it</button>` : ''}<button class="btn ghost" id="sbExplore">Play on with the engine</button></div></div>
+      <div class="lesson-actions"><button class="btn ${CU && cs >= SPAR ? '' : 'primary'}" id="sbAgain">Next game</button>${CU ? `<button class="btn ${cs >= SPAR ? 'primary' : ''}" data-unit="${CU.id}">Back to the ${uword(CU)}</button>` : ''}${lid ? `<button class="btn" data-line="${lid}">Study this line</button><button class="btn ghost" id="sbDrill">Drill it</button>` : ''}<button class="btn ghost" id="sbExplore">Play on with the engine</button></div></div>
       ${lid && LINES[lid].main && L ? planCardHTML(planFor(L.id), `Plan from here · ${L.title}`) : ''}`;
 }
 function sbPanelHTML(){
@@ -2155,10 +2162,10 @@ function sbPanelHTML(){
       <h3>${pieceIcon(bnode.pc, bnode.w === 1)}<span>${esc(bnode.l)}</span></h3>${bnode.t ? `<p class="note">${esc(bnode.t)}</p>` : ''}${bnode.g ? `<div class="chips">${tagChips(bnode.g)}</div>` : ''}
       ${lastBlack.kids.length > 1 ? `<details style="margin-top:10px"><summary class="kicker" style="cursor:pointer">What else ${OPP} could play here</summary><div style="margin-top:8px">${oddsRows(lastBlack)}</div></details>` : ''}</div>` : '';
   const CU = D.scope.startsWith('u:') ? UNIT[D.scope.slice(2)] : null, cs = CU ? Math.min(up(CU.id).spar || 0, SPAR) : 0;
-  const strip = CU ? `<div class="sbcourse"><div><p class="kicker">Course · ${unitNo(CU)} · ${esc(CU.title)}</p>
+  const strip = CU ? `<div class="sbcourse"><div><p class="kicker">${CU.deep ? `Deep dive · ${esc(DEEPOF[CU.deep].title)}` : 'Course'} · ${unitNo(CU)} · ${esc(CU.title)}</p>
       <p class="sbcl"><span class="pdots" aria-hidden="true">${Array.from({length: SPAR}, (_, k) => `<i class="${k < cs ? 'on' : ''}"></i>`).join('')}</span>${cs} of ${SPAR} clean practice games${cs >= SPAR ? ': this step is done' : ''}</p></div>
-      <button class="btn small" data-unit="${CU.id}">Back to the unit</button></div>` : '';
-  const head = `<div class="dpanel">${strip}<p class="kicker">${D.slips.length} ${D.slips.length === 1 ? 'slip' : 'slips'} so far${CU ? ` · ${OPP} plays only this unit's moves` : ''}</p>
+      <button class="btn small" data-unit="${CU.id}">Back to the ${uword(CU)}</button></div>` : '';
+  const head = `<div class="dpanel">${strip}<p class="kicker">${D.slips.length} ${D.slips.length === 1 ? 'slip' : 'slips'} so far${CU ? ` · ${OPP} plays only this ${uword(CU)}'s moves` : ''}</p>
       ${status ? `<div class="status ${D.busy ? 'wait' : ''} ${D.tries ? 'bad' : ''}"><span class="bub"></span>${status}</div>` : ''}
       ${D.state === 'done' ? sbReport() : `<p class="feedback">${D.msg || (D.hist.length <= 2 ? 'Drag a piece or tap it, then tap where it goes.' : '&nbsp;')}</p>`}</div>`;
   return head + (D.state === 'done' ? '' : black) + sbFeed();
@@ -2273,6 +2280,15 @@ for (const s of ['w', 'b']){ LIDX[s] = {}; BOOKS[s].lessons.forEach(l => LIDX[s]
 // a unit is in the course when its lessons are in the packs in play
 const COURSE = DATA_C.units.filter(U => !U.lessons || U.lessons.concat(U.deeper || []).every(l => LIDX[U.side][l])), UNIT = {};
 COURSE.forEach((U, k) => { U.k = k; UNIT[U.id] = U; });
+// Deep dives: one opening each, the lessons its unit marks 'deeper', in parts that work like units. They open once the
+// first course is finished (Prog.d.course.grad); the coach then suggests three of them (app/product.js, deepRank).
+const DEEP = [], DEEPOF = {};
+for (const X of (DATA_C.deep || [])){
+  const us = X.parts.map(id => (DATA_C.deepUnits || []).find(u => u.id === id));
+  if (!UNIT[X.base] || us.some(U => !U || !U.lessons.every(l => LIDX[U.side][l]))) continue;
+  X.units = us; us.forEach((U, k) => { U.k = k; UNIT[U.id] = U; });
+  DEEP.push(X); DEEPOF[X.id] = X;
+}
 const SPAR = 3;
 const ICON = {
   check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg>',
@@ -2286,7 +2302,9 @@ function markSeen(lid){ const c = Prog.d.course || (Prog.d.course = {u: {}, seen
 function lessonSeen(side, lid){ if ((cprog().seen || {})[lid]) return true; const L = LIDX[side][lid], r = L && Prog.rec(L.lines[0]); return !!(r && r.clean); }
 const lineClean = id => !!((Prog.rec(id) || {}).clean);
 const lc = s => s ? s[0].toLowerCase() + s.slice(1) : '';
-const unitNo = U => `Unit ${U.k + 1}`;
+const listOf = U => U.deep ? DEEPOF[U.deep].units : COURSE;   // a unit's siblings: the course, or its deep dive's parts
+const unitNo = U => U.deep ? `Part ${U.k + 1}` : `Unit ${U.k + 1}`;
+const uword = U => U.deep ? 'part' : 'unit';
 const sideChip = U => U.kind === 'skill' ? '<span class="chip skill">Skill</span>' : `<span class="chip sw-${U.side}"><i class="disc" aria-hidden="true"></i>${U.side === 'w' ? 'White' : 'Black'}</span>`;
 function unitAllLines(U){ if (U.soon || !U.lessons) return []; const ds = BOOKS[U.side].drillSet; return U.lessons.concat(U.deeper).flatMap(lid => LIDX[U.side][lid].lines.filter(id => ds.has(id))); }
 function unitDue(U){ const now = Date.now(); return unitAllLines(U).filter(id => { const r = Prog.rec(id); return r && r.due <= now; }).length; }
@@ -2306,19 +2324,32 @@ function unitSteps(U){
     {key: 'cp', title: 'Checkpoint', done: !!p.pass, best: p.cp, of: U.quiz.length}];
 }
 const unitPassed = U => !U.soon && !!up(U.id).pass;
-function unitOpen(U){ if (U.soon) return false; for (const V of COURSE){ if (V === U) return true; if (!V.soon && !unitPassed(V)) return false; } return false; }
+// the first course is finished when every open unit's checkpoint is passed; the moment is stamped once (and synced)
+const baseDone = () => { const open = COURSE.filter(U => !U.soon); return open.length > 0 && open.every(unitPassed); };
+const gradAt = () => (Prog.d.course || {}).grad || 0;
+function stampGrad(){ if (gradAt() || !baseDone()) return false; const c = Prog.d.course || (Prog.d.course = {u: {}, seen: {}}); c.grad = Date.now(); S.gradNow = true; return true; }
+function unitOpen(U){ if (U.soon || (U.deep && !gradAt())) return false; for (const V of listOf(U)){ if (V === U) return true; if (!V.soon && !unitPassed(V)) return false; } return false; }
 const currentUnit = () => COURSE.find(U => !U.soon && !unitPassed(U)) || null;
-const nextUnitAfter = U => COURSE.slice(U.k + 1).find(V => !V.soon) || null;
+const nextUnitAfter = U => listOf(U).slice(U.k + 1).find(V => !V.soon) || null;
+const deepDone = X => X.units.every(unitPassed);
+const deepCur = X => X.units.find(U => !unitPassed(U)) || null;
+// when a deep dive was last worked on (0: never started). Starting any step stamps its first part (o).
+const deepTouched = X => X.units.reduce((t, U) => Math.max(t, ...Object.values(up(U.id)).filter(v => v > 1e12)), 0);
+const deepFor = U => DEEP.find(X => X.base === U.id) || null;
+function openDeep(id){ const X = DEEPOF[id]; if (!X) return; useSide(X.side); S.deep = id; S.coursePath = false; go('course', {top: true}); }
+function openLibrary(){ S.deep = null; S.coursePath = false; go('course', {top: true}); }
+function openPath(){ S.deep = null; S.coursePath = true; go('course', {top: true}); }
 function unitNextLine(U, exclude){
   const fresh = U.lines.find(id => id !== exclude && !lineClean(id)); if (fresh) return fresh;
   const now = Date.now(); return unitAllLines(U).find(id => id !== exclude && Prog.rec(id) && Prog.rec(id).due <= now) || null;
 }
 function stepCta(U, s){
-  if (!s) return 'Open the unit';
+  if (!s) return `Open the ${uword(U)}`;
   if (s.key === 'learn'){ const lid = U.lessons.find(l => !lessonSeen(U.side, l)); return lid ? `Study: ${LIDX[U.side][lid].title}` : 'Learn the lines'; }
   return {idea: U.kind === 'skill' ? 'Start with the habit' : 'Start with the idea', drill: 'Drill the next line', spar: 'Play a practice game', cp: 'Take the checkpoint', s1: 'Practice set 1', s2: 'Practice set 2'}[s.key];
 }
 function doStep(U, key){
+  if (U.deep){ const p = upW(DEEPOF[U.deep].units[0].id); if (!p.o){ p.o = Date.now(); Prog.save(); } }
   if (key === 'idea'){ S.slide = 0; openUnit(U.id); return; }
   if (key === 'learn'){ openUnitLesson(U, U.lessons.find(l => !lessonSeen(U.side, l)) || U.lessons[0]); return; }
   if (key === 'drill'){ useSide(U.side); const id = unitNextLine(U) || U.lines[0]; startDrillLine(id, '', U.id); return; }
@@ -2329,6 +2360,17 @@ function openUnit(id){ const U = UNIT[id]; if (!U || U.soon) return; if (U.side 
 function openUnitLesson(U, lid){ useSide(U.side); S.unit = U.id; openLine(LIDX[U.side][lid].lines[0], undefined, 'unit'); }
 
 /* idea cards: positions from either book, or a position from your games for the skill unit */
+// a deep dive's lesson card takes its words from the lesson, so a personal playbook gets the same scrubbed text
+function slideOf(U, s){ if (!s || !s.lesson) return s; const L = LIDX[U.side][s.lesson]; return Object.assign({}, s, {h: L.title, t: lessonCardText(L, s)}); }
+// Green names the answer on the board; the lesson's subtitle and its reasons follow, without saying anything twice
+function lessonCardText(L, s){
+  const words = t => new Set(t.toLowerCase().match(/[a-z'-]{3,}/g) || []), sub = (L.sub || '').trim().replace(/([^.!?])$/, '$1.'), sw = words(sub);
+  const why = ((L.why || '').match(/[^.!?]+[.!?]+["')]*\s*|[^.!?]+$/g) || []).filter(x => { if (/^\s*(From|Not in) your study\b/i.test(x)) return false;
+    const w = [...words(x)]; return !w.length || w.filter(v => sw.has(v)).length / w.length < .6; }).join('').trim();
+  if (s.avoid) return [`Red: ${lc(s.avoid)}, the move to leave alone.${s.say ? ` Green: ${lc(s.say)}.` : ''}`, why].filter(Boolean).join(' ');
+  const said = s.say && lc(sub).replace(/[^a-z ]/g, '').startsWith(lc(s.say).replace(/[^a-z ]/g, ''));
+  return [said ? `Green: ${lc(sub)}` : s.say ? `Green: ${lc(s.say)}.` : '', said ? '' : sub, why.length > 12 ? why : ''].filter(Boolean).join(' ');
+}
 function slideSVG(U, s, extra){
   const B = U.side ? BOOKS[U.side].nodes : null, fen = s.fen || B[s.node].f, lu = s.last || (s.node !== undefined ? B[s.node].u : null);
   return boardSVG(fen, Object.assign({coords: true, flip: (s.me || U.side) === 'b', last: lu ? [lu.slice(0, 2), lu.slice(2, 4)] : null, arrows: s.arrows, circles: s.circles, aria: s.h}, extra || {}));
@@ -2346,8 +2388,11 @@ function ideaStep(d){
   renderUnit();
 }
 
-/* the path */
+/* the path. Once the course is finished the tab is a library (app/product.js): the finished course, the coach's picks
+   and the deep dives. The path stays one click away. */
 function renderCourse(){
+  if (stampGrad()){ Prog.save(); S.view = 'grad'; setHash(); return renderGrad(); }   // finished before the stamp existed, or on another device
+  if (gradAt() && !S.coursePath){ const X = S.deep && DEEPOF[S.deep]; if (X) return renderDeep(X); S.deep = null; return renderLibrary(); }
   const cur = currentUnit(), open = COURSE.filter(U => !U.soon), passedN = open.filter(unitPassed).length;
   const bar = COURSE.map(U => `<i class="${U.soon ? 'soon' : unitPassed(U) ? 'on' : ''}" title="${esc(unitNo(U) + ': ' + U.title)}"></i>`).join('');
   let hero;
@@ -2359,9 +2404,14 @@ function renderCourse(){
         <ol class="ministeps" aria-label="Steps in this unit">${steps.map(s => `<li class="${s.done ? 'done' : s === nx ? 'next' : ''}">${s.done ? ICON.check : ''}${esc(s.title)}</li>`).join('')}</ol>
         <div class="cta"><button class="btn primary" id="cGo">${esc(stepCta(cur, nx))}</button><button class="btn" data-unit="${cur.id}">See the whole unit</button></div></div></section>`;
   } else hero = `<section class="chero done"><div><p class="kicker">Every open unit passed</p><h3>Now keep it fresh.</h3><p class="lede">Lines you've learned come back for review in the Drill tab. Every lesson can be played on with the engine, and the practice sets are open any time.</p></div></section>`;
-  view.innerHTML = `<div class="nudge" id="nudge" hidden></div>${changedNote()}<div class="chead solo"><div class="cmeter"><div class="bar" aria-hidden="true">${bar}</div><span>${passedN} of ${open.length} units passed${COURSE.length > open.length ? ` · ${COURSE.length - open.length} coming soon` : ''}</span></div></div>
+  const lib = gradAt() ? `<div class="crumbs"><button class="btn small" data-lib>← Library</button><span class="where">Your first course · finished ${new Date(gradAt()).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})}</span></div>` : '';
+  view.innerHTML = `${lib}<div class="nudge" id="nudge" hidden></div>${changedNote()}<div class="chead solo"><div class="cmeter"><div class="bar" aria-hidden="true">${bar}</div><span>${passedN} of ${open.length} units passed${COURSE.length > open.length ? ` · ${COURSE.length - open.length} coming soon` : ''}</span></div></div>
     ${hero}<ol class="path" aria-label="Course units">${COURSE.map(U => unitRow(U, cur)).join('')}</ol>`;
   const g = document.getElementById('cGo'); if (g) g.onclick = () => { const nx = unitSteps(cur).find(s => !s.done); if (nx) doStep(cur, nx.key); else openUnit(cur.id); };
+  courseNotes();
+}
+// the account nudge and the changed-lines note, on the path, the library and a deep dive's page
+function courseNotes(){
   renderNudge();
   const cg = document.getElementById('changedGo'); if (cg) cg.onclick = () => { const side = ['b', 'w'].find(x => Prog.staleCount(x)); if (!side) return;
     useSide(side); startDrillLine(BOOKS[side].drillable.find(id => Prog.stale(id))); S.drill.msgWhy = 'Changed line'; renderDrillPanel(); };
@@ -2374,8 +2424,8 @@ function changedNote(){
 function unitRow(U, cur){
   const open = unitOpen(U), passed = unitPassed(U), isCur = U === cur, steps = U.soon ? [] : unitSteps(U), done = steps.filter(s => s.done).length, due = passed ? unitDue(U) : 0;
   const bub = U.soon ? `<span class="ubub soon">${U.k + 1}</span>` : passed ? `<span class="ubub pass" title="Passed">${ICON.check}</span>` : isCur ? `<span class="ubub cur">${U.k + 1}</span>` : open ? `<span class="ubub">${U.k + 1}</span>` : `<span class="ubub" title="Locked">${ICON.lock}</span>`;
-  const before = COURSE.slice(0, U.k).reverse().find(V => !V.soon);
-  const status = U.soon ? '' : passed ? (done === steps.length ? 'Complete' : 'Passed') : open ? `${done} of ${steps.length} steps` : `Opens after unit ${before.k + 1}`;
+  const before = listOf(U).slice(0, U.k).reverse().find(V => !V.soon);
+  const status = U.soon ? '' : passed ? (done === steps.length ? 'Complete' : 'Passed') : open ? `${done} of ${steps.length} steps` : before ? `Opens after ${unitNo(before).toLowerCase()}` : 'Opens when your course is finished';
   const pips = U.soon ? '' : `<span class="pips" aria-hidden="true">${steps.map(s => `<i class="${s.done ? 'on' : ''}"></i>`).join('')}</span>`;
   const meta = U.soon ? '' : `<span class="ust">${pips}<span>${status}</span>${due ? `<span class="chip blunder">${due} to review</span>` : ''}</span>`;
   const tail = U.kicker.split(' · ').slice(1).join(' · ') || U.kicker, sub = U.soon ? U.why : tail[0].toUpperCase() + tail.slice(1);
@@ -2405,37 +2455,41 @@ function stepHTML(U, s, k, nx, open){
     body = head('Drill', `${s.n}/${s.of}`) + `<p class="sp">Play each main line from memory once without a slip. Clean lines come back later for review.</p><div class="sx"><div class="mtable">${U.lines.map(id => drillRow(U, id)).join('')}</div>
       <div class="lesson-actions"><button class="btn ${prim}" data-ustep="drill" ${dis || (nl ? '' : 'disabled')}>${s.done ? (due ? `Review ${due} due ${due === 1 ? 'line' : 'lines'}` : 'Nothing due') : 'Drill the next line'}</button></div></div>`;
   }
-  else if (s.key === 'spar') body = head('Practice games', `${s.n}/${s.of}`) + `<p class="sp">Play ${SPAR} games in the Sandbox without a slip. Your opponent only plays moves from this unit and picks the lines you know least.${up(U.id).sparGames ? ` ${up(U.id).sparGames} played so far.` : ''}</p>
+  else if (s.key === 'spar') body = head('Practice games', `${s.n}/${s.of}`) + `<p class="sp">Play ${SPAR} games in the Sandbox without a slip. Your opponent only plays moves from this ${uword(U)} and picks the lines you know least.${up(U.id).sparGames ? ` ${up(U.id).sparGames} played so far.` : ''}</p>
       <div class="sx"><div class="lesson-actions"><button class="btn ${prim}" data-ustep="spar" ${dis}>Play a practice game</button></div></div>`;
   else if (s.key === 's1' || s.key === 's2') body = head(s.title, s.best !== undefined ? `${s.best}/${s.of}` : '') + `<p class="sp">${s.of} ${skillOf(U).what}; ${U.passSet} right on the first try clears the set.${best}</p>
       <div class="sx"><div class="lesson-actions"><button class="btn ${prim}" data-ustep="${s.key}" ${dis}>${s.best !== undefined ? 'Try it again' : 'Start the set'}</button></div></div>`;
   else {
     const n = s.of, need = U.kind === 'skill' ? U.passCheck : U.pass;
-    body = head('Checkpoint', s.best !== undefined ? `${s.best}/${n}` : '') + `<p class="sp">${n} ${U.kind === 'skill' ? 'new positions from your games' : 'positions from this unit'}. Get ${need} right on the first try to pass${nextUnitAfter(U) ? ' and open the next unit' : ''}.${best}</p>
+    body = head('Checkpoint', s.best !== undefined ? `${s.best}/${n}` : '') + `<p class="sp">${n} ${U.kind === 'skill' ? 'new positions from your games' : `positions from this ${uword(U)}`}. Get ${need} right on the first try to pass${nextUnitAfter(U) ? ` and open the next ${uword(U)}` : ''}.${best}</p>
       <div class="sx"><div class="lesson-actions"><button class="btn ${prim}" data-ustep="cp" ${dis}>${s.done ? 'Take it again' : 'Take the checkpoint'}</button></div>${!s.done && !isNext && open ? '<p class="sp">Already know this? You can take it now.</p>' : ''}</div>`;
   }
   return `<li class="step ${s.done ? 'done' : ''} ${isNext ? 'next' : ''}"><span class="sn">${s.done ? ICON.check : k + 1}</span><div>${body}</div></li>`;
 }
 function renderUnit(){
   const U = UNIT[S.unit]; if (!U || U.soon){ go('course'); return; }
-  const open = unitOpen(U), passed = unitPassed(U), steps = unitSteps(U), nx = steps.find(s => !s.done);
+  const open = unitOpen(U), passed = unitPassed(U), steps = unitSteps(U), nx = steps.find(s => !s.done), L = listOf(U), X = U.deep ? DEEPOF[U.deep] : null;
   S.slide = Math.max(0, Math.min(S.slide || 0, U.idea.length - 1));
-  const s = U.idea[S.slide], seenIdea = !!up(U.id).idea, nextU = nextUnitAfter(U);
-  const prevOpen = COURSE.slice(0, U.k).reverse().find(V => !V.soon);
-  const crumbs = `<div class="crumbs"><button class="btn small" data-go="course">← Course</button><span class="where">${unitNo(U)} of ${COURSE.length} · ${U.kind === 'skill' ? 'Skill' : U.side === 'w' ? 'White' : 'Black'}</span><span class="spacer"></span>
-    ${prevOpen ? `<button class="btn small" data-unit="${prevOpen.id}" aria-label="Previous unit">‹<span class="navtxt"> Unit ${prevOpen.k + 1}</span></button>` : ''}${nextU && unitOpen(nextU) ? `<button class="btn small" data-unit="${nextU.id}" aria-label="Next unit"><span class="navtxt">Unit ${nextU.k + 1} </span>›</button>` : ''}</div>`;
+  const s = slideOf(U, U.idea[S.slide]), seenIdea = !!up(U.id).idea, nextU = nextUnitAfter(U);
+  const prevOpen = L.slice(0, U.k).reverse().find(V => !V.soon);
+  // back to where the unit lives: the deep dive's page, the finished course's path, or the course
+  const back = X ? `<button class="btn small" data-deep="${X.id}">← ${esc(X.title)}</button>` : gradAt() ? '<button class="btn small" data-cpath>← Your course</button>' : '<button class="btn small" data-go="course">← Course</button>';
+  const crumbs = `<div class="crumbs">${back}<span class="where">${X ? 'Deep dive · ' : ''}${unitNo(U)} of ${L.length} · ${U.kind === 'skill' ? 'Skill' : U.side === 'w' ? 'White' : 'Black'}</span><span class="spacer"></span>
+    ${prevOpen ? `<button class="btn small" data-unit="${prevOpen.id}" aria-label="Previous ${uword(U)}">‹<span class="navtxt"> ${unitNo(prevOpen)}</span></button>` : ''}${nextU && unitOpen(nextU) ? `<button class="btn small" data-unit="${nextU.id}" aria-label="Next ${uword(U)}"><span class="navtxt">${unitNo(nextU)} </span>›</button>` : ''}</div>`;
   const idea = `<div class="idea"><div class="board" id="ideaBoard">${slideSVG(U, s)}</div>
     <div class="ideacap"><p class="kicker">${U.kind === 'skill' ? 'The habit' : 'The idea'} · ${S.slide + 1} of ${U.idea.length}${s.game ? ' · ' + esc(s.game) : ''}</p><h3>${esc(s.h)}</h3><p>${esc(s.t)}</p>
       <div class="ideanav"><button class="ctl" id="iPrev" aria-label="Previous picture" ${S.slide === 0 ? 'disabled' : ''}>${ICON.prev}</button>
         <span class="dots" aria-hidden="true">${U.idea.map((_, k) => `<i class="${k === S.slide ? 'cur' : (seenIdea || k < S.slide) ? 'on' : ''}"></i>`).join('')}</span>
         <button class="ctl" id="iNext" aria-label="Next picture" ${S.slide >= U.idea.length - 1 ? 'disabled' : ''}>${ICON.next}</button></div></div></div>`;
-  const lockN = COURSE.slice(0, U.k).find(V => !V.soon && !unitPassed(V));
-  const deeper = U.deeper && U.deeper.length ? `<section class="part" style="margin:14px 0 0"><div class="part-head"><div><p class="kicker">Optional</p><h3>Go deeper</h3></div><p>More lines from the same openings. Not needed to pass; come back when the core feels easy.</p><span class="count tnum">${U.deeper.length} ${U.deeper.length === 1 ? 'lesson' : 'lessons'}</span></div>
+  const lockN = L.slice(0, U.k).find(V => !V.soon && !unitPassed(V));
+  const lockTxt = !open ? (X && !gradAt() ? 'Deep dives open when you finish your first course.' : lockN ? `This ${uword(U)} opens when you pass the checkpoint in ${unitNo(lockN).toLowerCase()}, ${esc(lockN.title)}.` : '') : '';
+  const XD = !X && gradAt() ? deepFor(U) : null;
+  const deeper = U.deeper && U.deeper.length ? `<section class="part" style="margin:14px 0 0"><div class="part-head"><div><p class="kicker">${XD ? 'Deep dive' : 'Optional'}</p><h3>Go deeper</h3></div><p>${XD ? `These lessons are a deep dive in your library now, with drills, practice games and a checkpoint for each part.` : 'More lines from the same openings. Not needed to pass; come back when the core feels easy.'}</p>${XD ? `<button class="btn small primary" data-deep="${XD.id}">Open the deep dive</button>` : `<span class="count tnum">${U.deeper.length} ${U.deeper.length === 1 ? 'lesson' : 'lessons'}</span>`}</div>
       <div class="cards">${U.deeper.map(l => lessonCard(LIDX[U.side][l])).join('')}</div></section>` : '';
   view.innerHTML = `${crumbs}<div class="ugrid"><div class="bcol">${idea}</div>
-    <div class="ucol"><header class="uhead"><div class="chips">${sideChip(U)}<span class="chip">${unitNo(U)} of ${COURSE.length}</span>${passed ? '<span class="chip good">Passed</span>' : ''}</div><h2>${esc(U.title)}</h2><p class="lede">${esc(U.why)}</p>
+    <div class="ucol"><header class="uhead"><div class="chips">${sideChip(U)}${X ? `<span class="chip deep">Deep dive · ${esc(X.title)}</span>` : ''}<span class="chip">${unitNo(U)} of ${L.length}</span>${passed ? '<span class="chip good">Passed</span>' : ''}</div><h2>${esc(U.title)}</h2><p class="lede">${esc(U.why)}</p>
       ${open && nx ? `<div class="cta" style="margin-top:14px"><button class="btn primary" id="uGo">${nx.key === 'idea' ? 'Next picture' : esc(stepCta(U, nx))}</button></div>` : ''}</header>
-      ${!open && lockN ? `<p class="lockednote">This unit opens when you pass the checkpoint in ${unitNo(lockN).toLowerCase()}, ${esc(lockN.title)}.</p>` : ''}
+      ${lockTxt ? `<p class="lockednote">${lockTxt}</p>` : ''}
       <ol class="steps">${steps.map((st, k) => stepHTML(U, st, k, nx, open)).join('')}</ol>
       ${deeper}</div></div>`;
   document.getElementById('iPrev').onclick = () => ideaStep(-1);
@@ -2574,7 +2628,11 @@ function quizFinish(){
   const miss = Q.res.findIndex(r => !r);
   Object.assign(Q, {state: 'done', view: null, lastU: null, arrows: null, flash: null, hint: null, sel: null});
   if (miss >= 0){ const it = Q.items[miss], d = it.threat || it.reply; Q.k = miss; Q.arrows = it.fen ? [it.safe[0].slice(0, 4) + 'g'].concat(d ? [d.slice(0, 4) + 'r'] : []) : [it.ans.slice(0, 4) + 'g']; }
-  Prog.save(); render();
+  // the last unit's checkpoint finishes the course: straight to the big moment (the score waits one click away)
+  const grad = Q.set === 'cp' && Q.unlockedNow && !U.deep && stampGrad();
+  Prog.save();
+  if (grad){ S.view = 'grad'; setHash(); render(); window.scrollTo({top: 0, behavior: 'auto'}); return; }
+  render();
 }
 function missExplore(k){
   const Q = S.quizState, it = Q && Q.items[k]; if (!it) return;
@@ -2598,11 +2656,12 @@ function quizPanelHTML(){
   if (Q.state === 'done'){
     const score = Q.res.filter(Boolean).length, passed = score >= need, nxt = nextUnitAfter(U), opened = Q.set === 'cp' && passed && nxt && unitOpen(nxt);
     const misses = Q.items.filter((_, k) => !Q.res[k]);
-    const msg = passed ? (Q.set === 'cp' ? (opened ? `Passed. ${Q.unlockedNow ? 'New: ' : ''}${unitNo(nxt).toLowerCase()}, ${esc(nxt.title)}, is open.` : 'Passed.') : 'Set cleared.') : `Not yet: ${need} needed. Look at the ones you missed, then go again.`;
+    const fin = Q.set === 'cp' && passed && U.deep && deepDone(DEEPOF[U.deep]);   // the last part of a deep dive
+    const msg = passed ? (Q.set === 'cp' ? (opened ? `Passed. ${Q.unlockedNow ? 'New: ' : ''}${unitNo(nxt).toLowerCase()}, ${esc(nxt.title)}, is open.` : fin ? `Passed. That was the last part: you finished the deep dive into ${esc(DEEPOF[U.deep].title)}.` : !U.deep && gradAt() && Q.unlockedNow ? 'Passed. That was the last unit: your course is finished.' : 'Passed.') : 'Set cleared.') : `Not yet: ${need} needed. Look at the ones you missed, then go again.`;
     return `<div class="dpanel"><p class="kicker">${esc(U.title)} · ${quizName(Q.set)}</p><div class="qhead">${dots}</div>
       <div class="donebox ${passed ? '' : 'bad'}"><div class="bigstat"><b class="tnum">${score} of ${n}</b><span>right on the first try</span></div><p>${msg}</p>
         ${misses.length ? `<div class="slips">${misses.map(missCard).join('')}</div>` : ''}
-        <div class="lesson-actions">${opened ? `<button class="btn primary" data-unit="${nxt.id}">Go to ${unitNo(nxt).toLowerCase()}</button>` : ''}<button class="btn ${passed ? '' : 'primary'}" id="qAgain">Try again</button><button class="btn ${passed && !opened ? 'primary' : 'ghost'}" data-unit="${U.id}">Back to the unit</button></div></div></div>`;
+        <div class="lesson-actions">${opened ? `<button class="btn primary" data-unit="${nxt.id}">Go to ${unitNo(nxt).toLowerCase()}</button>` : fin ? '<button class="btn primary" data-lib>Back to the library</button>' : !U.deep && gradAt() && Q.unlockedNow ? '<button class="btn primary" data-grad>See your course complete</button>' : ''}<button class="btn ${passed ? '' : 'primary'}" id="qAgain">Try again</button><button class="btn ${passed && !opened && !fin ? 'primary' : 'ghost'}" data-unit="${U.id}">Back to the ${uword(U)}</button></div></div></div>`;
   }
   const K = skillOf(U);
   const ask = threat ? `${it.lastLabel ? `${esc(OPP)} just played: <b>${esc(lc(it.lastLabel))}</b>. ` : ''}${K.ask(it)}`
@@ -3140,19 +3199,24 @@ function start(saved){
   let h = (location.hash || '').slice(1), side = 'w';
   try { const v = localStorage.getItem(SIDE_KEY); if (v && BOOKS[v]) side = v; } catch(e){}
   const hu = h.startsWith('unit.') ? UNIT[h.slice(5)] : null; // course hashes carry no colour: a unit brings its own book
+  const hd = h.startsWith('deep.') ? DEEPOF[h.slice(5)] : null;
   if (saved && saved.side && BOOKS[saved.side]) side = saved.side;
   else if (hu){ if (hu.side && hu.kind !== 'skill') side = hu.side; }
-  else if (h === 'course'){}
+  else if (hd) side = hd.side;
+  else if (h === 'course' || h === 'course.path' || h === 'grad'){}
   else if (h.startsWith('b.')){ side = 'b'; h = h.slice(2); }
   else if (h) side = 'w';
   loadBook(side); S.chapter = savedChapter(SIDE);
   if (saved && saved.view){
-    Object.assign(S, {view: saved.view === 'quiz' ? 'unit' : saved.view === 'explore' ? (exLoad() ? 'explore' : 'course') : saved.view, unit: saved.unit && UNIT[saved.unit] ? saved.unit : null, slide: saved.slide || 0, line: saved.line && LINES[saved.line] ? saved.line : null, i: saved.i || 0, studyFrom: saved.studyFrom || 'learn'});
+    Object.assign(S, {view: saved.view === 'quiz' ? 'unit' : saved.view === 'explore' ? (exLoad() ? 'explore' : 'course') : saved.view, unit: saved.unit && UNIT[saved.unit] ? saved.unit : null, slide: saved.slide || 0, line: saved.line && LINES[saved.line] ? saved.line : null, i: saved.i || 0, studyFrom: saved.studyFrom || 'learn', deep: saved.deep && DEEPOF[saved.deep] ? saved.deep : null, coursePath: !!saved.coursePath});
     if (saved.chapter && CHAPTERS[saved.chapter]) S.chapter = saved.chapter;
     if (S.view === 'study' && !S.line) S.view = 'learn';
     if (S.view === 'unit' && !S.unit) S.view = 'course';
   }
   else if (hu){ S.unit = hu.id; S.view = hu.soon ? 'course' : 'unit'; }
+  else if (hd){ S.deep = hd.id; S.view = 'course'; }
+  else if (h === 'course.path'){ S.coursePath = true; S.view = 'course'; }
+  else if (h === 'grad') S.view = gradAt() || baseDone() ? 'grad' : 'course';
   else if (h.startsWith('line.') && LINES[h.slice(5)]){ S.line = h.slice(5); S.i = lineStart(S.line); S.view = 'study'; }
   else if (h.startsWith('learn.') && CHAPTERS[h.slice(6)]){ S.chapter = h.slice(6); S.view = 'learn'; }
   else if (h === 'explore' && exLoad()){ if (S.ex.side && BOOKS[S.ex.side] && S.ex.side !== SIDE){ loadBook(S.ex.side); S.chapter = savedChapter(SIDE); } S.view = 'explore'; }
@@ -3160,7 +3224,7 @@ function start(saved){
   Product.landing(h);
   render();
   Prog.connect(); renderAcct();
-  try { window.claude && window.claude.hot && window.claude.hot.snapshot && window.claude.hot.snapshot(() => ({side: SIDE, view: S.view, unit: S.unit, slide: S.slide, line: S.line, i: S.i, studyFrom: S.studyFrom, chapter: S.chapter})); } catch(e){}
+  try { window.claude && window.claude.hot && window.claude.hot.snapshot && window.claude.hot.snapshot(() => ({side: SIDE, view: S.view, unit: S.unit, slide: S.slide, line: S.line, i: S.i, studyFrom: S.studyFrom, chapter: S.chapter, deep: S.deep, coursePath: S.coursePath})); } catch(e){}
 }
 try { if (window.claude && window.claude.hot && window.claude.hot.ready) window.claude.hot.ready(start); else start((window.claude && window.claude.hot && window.claude.hot.data) || {}); }
 catch(e){ start({}); }

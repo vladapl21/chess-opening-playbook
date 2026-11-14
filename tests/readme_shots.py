@@ -138,6 +138,19 @@ with sync_playwright() as p:
       Prog.d.shop = {own: {'h-tophat': 1, 'c-midnight': 1}, wear: {head: ['h-tophat', 2], skin: ['c-midnight', 2]}}; Prog.save(); Badges.queue = []; Coach.hush(); go('shop'); })()""")
     pg.wait_for_timeout(500); pg.evaluate("Coach.hush()"); settle(pg)
     save(pg.screenshot(), 'shop.png', crop=(0, 0, 2560, 1700))
+    # the course finished: the big moment, then the library (a few slips on the Vienna unit's lines)
+    pg.evaluate("""(() => { const t = Date.now() - 24 * DAY, c = Prog.d.course || (Prog.d.course = {u: {}, seen: {}}); c.u = c.u || {};
+      for (const U of COURSE.filter(U => !U.soon)) c.u[U.id] = Object.assign({idea: t, spar: 3, sparGames: 3 + U.k % 3}, c.u[U.id] || {}, {pass: t + DAY * U.k, cp: U.id === 'w-sicilian' ? 5 : 6});
+      for (const id of unitAllLines(UNIT['b-vienna']).slice(0, 10)) Prog.d.lines[id] = {box: 0, seen: 3, clean: 1, last: t, due: Date.now() + DAY, v: VER[id] || 1};
+      stampGrad(); Prog.save(); Badges.queue = []; Coach.hush(); go('grad'); })()""")
+    pg.wait_for_timeout(1300); settle(pg, 200)
+    bottom = pg.evaluate("document.querySelector('.gradv').getBoundingClientRect().bottom + scrollY + 24")
+    full = pg.screenshot(full_page=True); w, h = Image.open(io.BytesIO(full)).size
+    save(full, 'grad.png', crop=(0, 0, w, min(h, round(bottom * 2))))
+    pg.evaluate("openLibrary()"); pg.wait_for_timeout(500); settle(pg)
+    bottom = pg.evaluate("document.querySelector('.libshelf').getBoundingClientRect().bottom + scrollY + 24")
+    full = pg.screenshot(full_page=True); w, h = Image.open(io.BytesIO(full)).size
+    save(full, 'library.png', crop=(0, 0, w, min(h, round(bottom * 2))))
     pg.evaluate("go('cheat')"); pg.wait_for_timeout(400); settle(pg); save(pg.screenshot(), 'cheat.png')
     pg.evaluate("go('drill')"); pg.wait_for_timeout(300)
     pg.evaluate("startPuzzle(DATA.puzzles.findIndex(p => p.id === 'gb-charizard-47'))"); pg.wait_for_timeout(500); settle(pg)

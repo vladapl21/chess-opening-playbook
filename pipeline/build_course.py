@@ -7,7 +7,7 @@ Every move path is resolved against the unit's book, so a path that leaves the r
 import json, datetime
 import paths
 import chess
-from course import UNITS, QUIZ, SKILL_IDEAS
+from course import UNITS, QUIZ, SKILL_IDEAS, DEEP
 
 BOOK = {s: json.load(open(paths.BUILD / f'data_{n}.json')) for s, n in (('w', 'white'), ('b', 'black'))}
 # skill units: positions from your own games (data/course_<skill>.json, picked by the scripts in the README)
@@ -119,9 +119,106 @@ for s in ('w', 'b'):
                and BOOK[s]['parts'][[p['id'] for p in BOOK[s]['parts']].index(l['part'])]['ch'] not in soon_ch]
     if missing: print(f'note: {s} lessons outside the course: {missing}')
 
-out = dict(units=units)
+# ---- deep dives (content/course.py DEEP): one opening each, its 'deeper' lessons in parts
+def branch_at(side, les):
+    """The lesson's main line and the index of its first new move by the other side, with your answer after it."""
+    D = BOOK[side]; N = D['nodes']; n = next(l for l in D['lines'] if l['id'] == les['lines'][0])['n']
+    for j in range(max(les.get('start', 0), 1), len(n) - 1):
+        if N[n[j]].get('w') != ME[side] and N[n[j + 1]].get('w') == ME[side]: return n, j
+    raise AssertionError(f'{les["id"]}: no move of yours after a new move')
+
+
+def decisions(side, n, frm):
+    """Positions on a line, from index frm on, where the line's next move is yours (and not a move to avoid)."""
+    N = BOOK[side]['nodes']
+    return [n[j] for j in range(frm, len(n) - 1) if N[n[j + 1]].get('w') == ME[side] and not warn(N, n[j + 1])]
+
+
+def deep_quiz(side, lids, br, want=6):
+    """Checkpoint positions: each lesson's first answer, then the first answer of each of its other lines, then the
+    later moves, taken in turn from the part's lessons."""
+    D = BOOK[side]; L = {l['id']: l for l in D['lessons']}; LN = {l['id']: l for l in D['lines']}
+    queues = []
+    for lid in lids:
+        les = L[lid]; n0, j0 = br[lid]; main = decisions(side, n0, j0); alts = []
+        for x in les['lines'][1:]:
+            n = LN[x]['n']; k = next((k for k in range(len(n)) if k >= len(n0) or n[k] != n0[k]), len(n))
+            alts.append(decisions(side, n, max(k - 1, j0)))
+        queues.append(main[:1] + [a[0] for a in alts if a] + main[1:] + [y for a in alts for y in a[1:]])
+    N = D['nodes']; out, seen, kinds = [], set(), set()
+    kind = lambda i: (N[i].get('l'), N[my_kids(side, i)[0]]['u'])        # the same reply met with the same answer counts once
+    for strict in (True, False):                                     # first a different question each time, then repeats
+        qs = [q[:] for q in queues]
+        while len(out) < want and any(qs):
+            for q in qs:
+                while q and (q[0] in seen or not my_kids(side, q[0]) or str(q[0]) not in D['legal'] or (strict and kind(q[0]) in kinds)): q.pop(0)
+                if q: i = q.pop(0); seen.add(i); kinds.add(kind(i)); out.append(i)
+                if len(out) >= want: break
+    return out
+
+
+def quiz_at(side, i, prefer):
+    D = BOOK[side]; N = D['nodes']; kids = my_kids(side, i)
+    ans = ([c for c in kids if c in prefer] or kids)[0]
+    cheat = next((c for c in D['cheat'] if c['node'] == i and c['mv'] == N[ans]['u']), None)
+    return dict(node=i, ok=[N[c]['u'] for c in kids], ans=N[ans]['u'], label=N[ans]['l'],
+                rule=cheat['rule'] if cheat else N[ans]['l'], note=N[ans].get('t', ''))
+
+
+deep, deep_units = [], []
+base_of = {U['id']: U for U in UNITS}
+for X in DEEP:
+    B = base_of[X['base']]; side = B['side']; D = BOOK[side]; N = D['nodes']
+    L = {l['id']: l for l in D['lessons']}; LN = {l['id']: l for l in D['lines']}; ok_lines = drillable(side)
+    used = [lid for P in X['parts'] for lid in P['lessons']]
+    assert sorted(used) == sorted(B['deeper']), f'{X["id"]}: the parts must hold every deeper lesson of {B["id"]} once ({sorted(set(B["deeper"]) ^ set(used))})'
+    word = 'White' if side == 'w' else 'Black'; pids = []
+    for k, P in enumerate(X['parts']):
+        pid = f'{X["id"]}-{k + 1}'; pids.append(pid)
+        mains = [m for m in (next((x for x in L[lid]['lines'] if x in ok_lines), None) for lid in P['lessons']) if m]
+        spar = sorted(x for lid in P['lessons'] for x in L[lid]['lines'] if x in ok_lines)
+        assert mains and spar, f'{pid}: nothing to drill'
+        # each lesson's own moment: its first move by the other side that no other lesson of the part shares
+        br = {}
+        for lid in P['lessons']:
+            n, j0 = branch_at(side, L[lid])
+            k = max((next((i for i in range(min(len(n), len(m))) if n[i] != m[i]), min(len(n), len(m))) for m in
+                     (branch_at(side, L[o])[0] for o in P['lessons'] if o != lid)), default=0)
+            br[lid] = (n, next((j for j in range(max(j0, k), len(n) - 1) if N[n[j]].get('w') != ME[side] and N[n[j + 1]].get('w') == ME[side]), j0))
+        # the cards: where the part's lessons split (their first moves in blue), then one per lesson with your answer
+        first_n, first_j = br[P['lessons'][0]]; at = first_n[first_j - 1]
+        tries = []
+        for lid in P['lessons']:
+            n, j = br[lid]
+            if n[j - 1] != at: continue
+            for x in L[lid]['lines']:
+                ln = LN[x]['n']
+                if at in ln:
+                    m = ln.index(at)
+                    if m + 1 < len(ln) and N[ln[m + 1]].get('w') != ME[side] and ln[m + 1] not in tries: tries.append(ln[m + 1])
+        tries = sorted(tries, key=lambda c: -(N[c].get('q') or 0))[:5]       # the most common five, so the board stays readable
+        idea = [dict(node=at, h=P['title'], t=P['t'], arrows=[N[c]['u'][:4] + 'b' for c in tries])]
+        for lid in P['lessons']:
+            n, j = br[lid]; mv = n[j + 1]
+            arrows, card = [N[mv]['u'][:4] + ('r' if warn(N, mv) else 'g')], dict(node=n[j], lesson=lid, say=N[mv]['l'])
+            if warn(N, mv):                     # a lesson about a move to drop: red for it, green for the move to play
+                good = my_kids(side, n[j]); card['avoid'] = N[mv]['l']; card['say'] = N[good[0]]['l'] if good else ''
+                if good: arrows.append(N[good[0]]['u'][:4] + 'g')
+            idea.append(dict(card, arrows=arrows))
+        q = deep_quiz(side, P['lessons'], br)
+        assert len(q) >= 4, f'{pid}: only {len(q)} checkpoint positions'
+        prefer = {i for x in spar for i in LN[x]['n']}
+        deep_units.append(dict(id=pid, deep=X['id'], kind='lessons', side=side, title=P['title'], kicker=f'{word} · {P["sub"]}', why=P['why'],
+                               lessons=P['lessons'], deeper=[], lines=mains, spar=spar, idea=idea,
+                               quiz=[quiz_at(side, i, prefer) for i in q], **{'pass': 5 if len(q) >= 6 else len(q) - 1}))
+    deep.append(dict(id=X['id'], base=X['base'], side=side, title=X['title'], name=X['name'], tag=X['tag'], why=X['why'], parts=pids))
+ids = [u['id'] for u in units] + [u['id'] for u in deep_units]
+assert len(ids) == len(set(ids)), 'unit ids collide'
+
+out = dict(units=units, deep=deep, deepUnits=deep_units)
 (paths.BUILD / 'data_course.json').write_text(json.dumps(out, separators=(',', ':')))
 n_les = sum(len(u.get('lessons', [])) for u in units)
 print(f"course: {len(units)} units ({sum(1 for u in units if u.get('soon'))} soon), {n_les} core lessons, "
       f"{sum(len(u.get('deeper', [])) for u in units)} deeper, {sum(len(u.get('quiz', [])) for u in units)} checkpoint positions, "
-      f"{sum(len(s) for u in units for s in u.get('sets', []))}+{sum(len(u.get('check', [])) for u in units)} threat positions")
+      f"{sum(len(s) for u in units for s in u.get('sets', []))}+{sum(len(u.get('check', [])) for u in units)} threat positions; "
+      f"{len(deep)} deep dives in {len(deep_units)} parts, {sum(len(u['quiz']) for u in deep_units)} checkpoint positions")
