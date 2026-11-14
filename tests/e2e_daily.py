@@ -103,7 +103,8 @@ with sync_playwright() as p:
     assert pg.evaluate("[SET.who, SET.board, document.documentElement.dataset.board, coachName()]") == ['rook', 'plum', 'plum', 'Rocco']
     pg.evaluate("Prog.d.set = {who: 'pawn', t: 1}; refresh()"); pg.wait_for_timeout(200)
     assert pg.evaluate("[SET.who, Prog.d.set.who]") == ['rook', 'rook'], 'an older copy gives way to this device'
-    pg.reload(); pg.wait_for_timeout(800); assert pg.evaluate('SET.who') == 'rook'
+    # (headless Chromium can lose a file:// page's storage written just before a scripted reload: give it a moment)
+    pg.wait_for_timeout(1200); pg.reload(); pg.wait_for_timeout(800); assert pg.evaluate('SET.who') == 'rook', pg.evaluate("[SET.who, localStorage.getItem('playbook-settings')]")
 
     # ---- the engine board steps back to move one from where you came in
     pg.evaluate("useSide('w'); openLine('fried-liver')"); pg.wait_for_timeout(400); pg.keyboard.press('End'); pg.wait_for_timeout(300)
@@ -120,7 +121,7 @@ with sync_playwright() as p:
     u = pg.evaluate("exChess().moves({verbose: true}).map(m => m.from + m.to).find(x => x !== S.ex.moves[S.ex.i])")
     pg.evaluate(f"exTry('{u[:2]}', '{u[2:4]}')"); pg.wait_for_timeout(300)
     assert pg.evaluate('[S.ex.base, S.ex.moves.length]') == [0, n - 1] and pg.locator('#xCame').count() == 0, 'a new move before the entry point clears the mark'
-    pg.reload(); pg.wait_for_timeout(800); assert pg.evaluate('S.view') == 'explore' and pg.evaluate('S.ex.start') == pg.evaluate('START_FEN')
+    pg.wait_for_timeout(1000); pg.reload(); pg.wait_for_timeout(800); assert pg.evaluate('S.view') == 'explore' and pg.evaluate('S.ex.start') == pg.evaluate('START_FEN')
 
     # ---- phone: Drill and the profile fit
     ph = b.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True, color_scheme='dark'); q = ph.new_page(); hook(q)
