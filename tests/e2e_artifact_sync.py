@@ -95,6 +95,11 @@ with sync_playwright() as p:
     assert stored()['badges'].get('l1'), 'badges are stored'
     a.evaluate("Prog.d.shop = {own: {}, wear: {head: ['crown', Date.now()]}}; Prog.save()"); a.wait_for_timeout(1200)
     assert bp.evaluate("Prog.d.shop && Prog.d.shop.wear.head[0]") == 'crown'
+    # ---- finishing the course is stamped once (the earliest stamp wins); deep dive parts travel like any unit
+    bp.evaluate("const c = Prog.d.course || (Prog.d.course = {u: {}, seen: {}}); c.u = c.u || {}; c.grad = 1700000000000; c.u['x-w-italian-1'] = {o: Date.now(), cp: 4}; Prog.save()"); bp.wait_for_timeout(1200)
+    assert a.evaluate("[Prog.d.course.grad, Prog.d.course.u['x-w-italian-1'].cp]") == [1700000000000, 4]
+    a.evaluate("Prog.d.course.grad = 1800000000000; Prog.save()"); a.wait_for_timeout(1200)
+    assert stored()['course']['grad'] == 1700000000000 and a.evaluate("Prog.d.course.grad") == 1700000000000 and bp.evaluate("Prog.d.course.grad") == 1700000000000
 
     # ---- a page from an older version writes a smaller copy: the next save on either device puts everything back
     d = stored(); old = {k: v for k, v in d.items() if k not in ('days', 'prefs', 'set', 'badges', 'shop')}; old['someday'] = {'x': 1}

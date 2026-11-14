@@ -76,6 +76,11 @@ def main():
             bad = [m for m in re.findall(r'\b[a-h][1-8]\b', t) if m not in ('f7', 'f2')] + re.findall(r'\b[KQRBN]x?[a-h][1-8]\b|O-O', t)
             assert not bad, (k, t, bad)
         assert all(x[0] in ('king', 'pawns', 'pieces', 'target', 'them', 'watch') for x in pl['b']), k
+    # the deep dives' own words (content/course.py DEEP) are checked the same way
+    for t in [x for X in C.get('deep', []) for x in (X['title'], X['name'], X['tag'], X['why'])] + \
+             [x for u in C.get('deepUnits', []) for x in (u['title'], u['kicker'], u['why'], u['idea'][0]['t'])]:
+        bad = [m for m in re.findall(r'\b[a-h][1-8]\b', t) if m not in ('f7', 'f2')] + re.findall(r'\b[KQRBN]x?[a-h][1-8]\b|O-O', t)
+        assert not bad, (t, bad)
     # the same position must get the same move whatever the move order; a pin, a guard or an attack that a label
     # speaks of must be on the board
     problems = [x for side in ('white', 'black') for x in lint_repeats(side) + lint_pins(side) + lint_labels(side)]

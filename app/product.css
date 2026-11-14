@@ -211,3 +211,59 @@ body:has(.coach:not([hidden])) .foot{padding-right:100px}
 .item .price,.item .owned,.item .wearing{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;color:var(--muted);font-weight:600} .item .wearing{color:var(--accent)}
 .item .need{font-size:12px;color:var(--muted)} .item .btn.small{min-height:32px;gap:5px} .item .btn .coin{width:15px;height:15px}
 @media (max-width:860px){ .shop{grid-template-columns:minmax(0,1fr)} .shopside{position:static} .wlock{grid-template-columns:minmax(0,1fr)} }
+/* after the first course: the big moment */
+.gradv{position:relative;display:grid;gap:22px;justify-items:center;text-align:center;overflow:hidden;background:radial-gradient(ellipse at 50% 0%,var(--oro-soft),transparent 64%),var(--surface);border:1px solid var(--line);border-radius:8px;padding:34px 22px 28px;box-shadow:var(--shadow);margin:4px 0 24px}
+.grhero{display:grid;justify-items:center;gap:6px;max-width:660px;position:relative;z-index:1}
+.grstage{display:flex;align-items:flex-end;justify-content:center;margin-bottom:8px}
+.grcoach svg{width:clamp(118px,17vw,158px);height:auto;display:block}
+.grmedal{position:relative;display:grid;place-items:center;width:clamp(92px,12vw,118px);aspect-ratio:1/1;margin:0 0 4px -14px}
+.grmedal::before{content:"";position:absolute;inset:-28%;border-radius:50%;background:repeating-conic-gradient(var(--oro-soft) 0 9deg,transparent 9deg 18deg);-webkit-mask:radial-gradient(circle,#000 30%,transparent 70%);mask:radial-gradient(circle,#000 30%,transparent 70%);animation:rays 14s linear infinite}
+.grmedal .medal{position:relative;width:80%;height:auto;display:block}
+.gradv.fresh .grmedal .medal{animation:medalIn .8s cubic-bezier(.2,1.4,.4,1) .3s both} .gradv.fresh .grcoach{animation:pop .6s cubic-bezier(.2,1.4,.4,1) both}
+.gradv h2{font-family:var(--f-display);font-weight:700;font-size:clamp(36px,6vw,64px);line-height:1;letter-spacing:-.01em;margin:4px 0 6px;text-wrap:balance}
+.gradv .lede{margin:0 auto}
+.grstats{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;width:100%;max-width:880px;position:relative;z-index:1}
+.grstats li{display:grid;gap:4px;align-content:start;background:var(--bg);border-radius:6px;padding:12px 8px;font-size:12.5px;color:var(--muted);line-height:1.3}
+.grstats b{font:700 clamp(26px,3.2vw,34px)/1 var(--f-display);color:var(--ink)} .grstats small{font-size:.55em;color:var(--muted);font-weight:600}
+.grearn{display:flex;align-items:center;gap:14px;text-align:left;background:var(--oro-soft);border-radius:6px;padding:12px 16px;width:100%;max-width:880px;position:relative;z-index:1}
+.grearn > div{flex:1;min-width:0;display:grid;gap:2px} .grearn span{font-size:13.5px;color:var(--muted)} .grearn .btn{flex:none}
+.grbadge{flex:none} .grbadge .medal{width:44px;height:52px;display:block}
+.grnext{display:flex;align-items:flex-start;gap:14px;text-align:left;width:100%;max-width:880px;border-top:1px solid var(--line);padding-top:20px;position:relative;z-index:1}
+.grnext > div{flex:1;min-width:0} .grnext p{margin:4px 0 0;max-width:70ch} .grnext .lesson-actions{margin-top:12px}
+.grback{margin:0;position:relative;z-index:1}
+/* confetti, once, when the course has just been finished */
+.grconf{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.grconf i{position:absolute;top:-16px;left:var(--x);width:8px;height:13px;border-radius:2px;opacity:0;animation:conf var(--s) cubic-bezier(.25,.6,.4,1) var(--d) 2 both}
+@keyframes conf{0%{transform:translateY(0) rotate(var(--r));opacity:1}85%{opacity:1}100%{transform:translateY(620px) rotate(calc(var(--r) + 540deg));opacity:0}}
+/* the coach's face in a circle (the library, a deep dive, the big moment) */
+.libav{flex:none;width:64px;height:64px;border-radius:50%;background:var(--accent-soft);display:grid;place-items:center;overflow:hidden;padding:7px 5px 0}
+.libav svg{width:100%;height:100%;display:block} .libav.sm{width:36px;height:36px;padding:4px 3px 0}
+/* the library */
+.libcoach{display:flex;align-items:flex-start;gap:16px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow);margin-bottom:24px}
+.libsay{flex:1;min-width:0} .libsay p{margin:4px 0 0;max-width:72ch} .libsay .lesson-actions{margin-top:12px}
+.libpicks{margin-bottom:26px} .libpicks > .kicker,.libshelf > .kicker{margin:0 0 10px}
+.dcards{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px}
+.dcard > button{display:grid;gap:12px;align-content:start;width:100%;height:100%;text-align:left;font:inherit;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px;cursor:pointer;box-shadow:var(--shadow);transition:border-color .15s,transform .15s}
+.dcard > button:hover{border-color:var(--accent);transform:translateY(-2px)} .dcard.dpick > button{border:2px solid var(--accent);padding:13px}
+.dtop{display:grid;grid-template-columns:92px minmax(0,1fr);gap:12px;align-items:center}
+.dthumb{display:block;width:92px;border-radius:3px;overflow:hidden;box-shadow:var(--shadow)} .dthumb svg{width:100%;height:auto;display:block}
+.dhead{display:grid;gap:4px;min-width:0} .dhead b{font:700 23px/1.06 var(--f-display);letter-spacing:.005em} .dtag{font-size:13px;color:var(--muted);line-height:1.35}
+.dwhy{font-size:14px;line-height:1.45}
+.dfoot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;align-self:end}
+.dmeta{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.libshelf{margin-bottom:22px} .libshelf ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.libshelf li{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:8px 12px}
+.libshelf li > div{flex:1;min-width:0;display:grid;gap:1px} .libshelf li > div span{font-size:13px;color:var(--muted)}
+.lmed{flex:none;background:none;border:0;padding:0;cursor:pointer;display:block} .lmed .medal{width:36px;height:43px;display:block}
+.libmore{margin-bottom:26px} .libmore summary{cursor:pointer;font-weight:600;color:var(--muted);padding:6px 0}
+.libmore ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}
+.libmore li button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;font:inherit;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:8px 12px;cursor:pointer}
+.libmore li button:hover{border-color:var(--accent)} .libmore li b{white-space:nowrap}
+.libmore li span:not(.chip):not(.disc){flex:1;min-width:0;font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .libmore li .lm{flex:none}
+/* a deep dive's page */
+.chip.deep{background:var(--oro-soft);color:var(--oro)} .chip.pick{background:var(--accent);color:var(--accent-ink)}
+.dfor{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:8px 12px;font-size:14px;max-width:72ch}
+.chead .dfor{color:var(--ink)}
+.chero.done.dfin{grid-template-columns:auto minmax(0,1fr)} .dmedal .medal{width:84px;height:100px;display:block}
+@media (max-width:700px){ .grstats{grid-template-columns:repeat(2,minmax(0,1fr))} .grstats li:last-child{grid-column:1/-1} .grearn{flex-wrap:wrap} .grnext{flex-direction:column}
+  .libcoach{flex-direction:column} .chero.done.dfin{grid-template-columns:minmax(0,1fr)} .libmore li span:not(.chip):not(.disc){display:none} .libmore li .lm{display:inline;margin-left:auto} }

@@ -186,7 +186,7 @@ function makeChoices(P){
 const defaultPicks = () => ({white: 'e4', blackE4: 'e5', blackD4: 'slav', order: 'leaks', depth: 'core'});
 
 /* ---- text that speaks about the house player's own games is taken out for everyone else */
-const PERS = /\b(your games?|in your game|you (lost|won|played|pushed|took|missed|resigned|blundered|had)\b|against \S+ (in|on) (jul|aug|sep|oct|nov)|both of your|you have (won|lost)|your last|this exact shot against)/i;
+const PERS = /\b(your games?|in your game|you (lost|won|played|pushed|took|missed|resigned|blundered|had|met|faced)\b|against \S+ (in|on) (jul|aug|sep|oct|nov)|both of your|you have (won|lost)|your last|this exact shot against|your study|(on|in) (jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.? \d|against [a-z][\w-]*\d[\w-]*)/i;
 function scrub(t){ if (!t || !PERS.test(t)) return t; return (t.match(/[^.!?]+[.!?]+["')]*\s*|[^.!?]+$/g) || []).filter(x => !PERS.test(x)).join('').trim(); }
 const ORIG = {};
 function depersonalise(){
@@ -538,6 +538,8 @@ const BADGES = [
   {id: 'u1', group: 'Course', name: 'First checkpoint', need: 'Pass a unit\'s checkpoint.', tier: 'bronze', glyph: 'flag', n: x => x.units, at: 1},
   {id: 'u5', group: 'Course', name: 'Five units', need: 'Pass five units of your course.', tier: 'silver', glyph: 'flag', n: x => x.units, at: 5},
   {id: 'uall', group: 'Course', name: 'Course complete', need: 'Pass every open unit of your course.', tier: 'gold', glyph: 'star', n: x => x.units, at: x => x.open},
+  {id: 'x1', group: 'Course', name: 'Deep diver', need: 'Finish a deep dive.', tier: 'silver', glyph: 'flag', n: x => x.deep, at: 1},
+  {id: 'x3', group: 'Course', name: 'Three deep dives', need: 'Finish three deep dives.', tier: 'gold', glyph: 'crown', n: x => x.deep, at: 3},
   {id: 'm10', group: 'Practice', name: 'Solid ten', need: 'Ten lines clean on four reviews in a row.', tier: 'silver', glyph: 'star', n: x => x.solid, at: 10},
   {id: 'm50', group: 'Practice', name: 'Solid fifty', need: 'Fifty lines clean on four reviews in a row.', tier: 'gold', glyph: 'star', n: x => x.solid, at: 50},
   {id: 'g10', group: 'Practice', name: 'Sparring partner', need: 'Ten practice games in the Sandbox.', tier: 'bronze', glyph: 'board', n: x => x.spar, at: 10}
@@ -546,7 +548,7 @@ const badgeNeed = (B, x) => typeof B.at === 'function' ? B.at(x) : B.at;
 function badgeStats(){
   let clean = 0, solid = 0; for (const id in (Prog.d.lines || {})){ const r = Prog.rec(id); if (!r) continue; if (r.clean) clean++; if ((r.box || 0) >= 4) solid++; }
   const open = COURSE.filter(U => !U.soon);
-  return {clean, solid, best: Daily.best(), units: open.filter(unitPassed).length, open: Math.max(1, open.length), spar: (Prog.d.sb || {}).games || 0};
+  return {clean, solid, best: Daily.best(), units: open.filter(unitPassed).length, open: Math.max(1, open.length), spar: (Prog.d.sb || {}).games || 0, deep: DEEP.filter(deepDone).length};
 }
 // a medal: two ribbons and a struck disc; the glyph is a number or a small picture. Locked ones are drawn in grey.
 function medalSVG(tier, glyph){
@@ -569,10 +571,12 @@ const Badges = {
     for (const B of BADGES) if (!have[B.id] && B.n(x) >= badgeNeed(B, x)) { have[B.id] = now; got.push(B); }
     if (!got.length && !first) return false;
     Prog.d.badges = have;
-    if (!first && got.length && PERSONA !== 'new'){ this.n++; this.queue.push(...got); if (!(S.drill && S.drill.state === 'play')) this.show(); }
+    const loud = got.filter(B => !(B.id === 'uall' && S.gradNow));
+    if (!first && loud.length && PERSONA !== 'new'){ this.n++; this.queue.push(...loud); if (!(S.drill && S.drill.state === 'play')) this.show(); }
     return true;
   },
   show(){
+    if (S.view === 'grad' || libOn()) return;                                      // the coach is on that page already; it waits
     const rank = x => x.id === 's7' ? -1 : {gold: 0, silver: 1, bronze: 2}[x.tier];   // the week that opens the wardrobe says so first
     const B = this.queue.slice().sort((a, b) => rank(a) - rank(b))[0]; if (!B) return;
     const more = this.queue.length - 1; this.queue = [];
@@ -672,13 +676,133 @@ function renderShop(){
 }
 
 /* ---- the coach: a few words in a speech bubble, bottom right. Never a hint while you are being tested. */
+/* ---- after the first course: the big moment, then a library. The coach picks three deep dives for each player: the
+   openings they meet most, weighed by how the course went there (slips in drills and practice games, the checkpoint,
+   the results in those games). The reason shown is the strongest of them. */
+const libOn = () => S.view === 'course' && !!gradAt() && !S.coursePath && !(S.deep && DEEPOF[S.deep]);
+const shareWords = s => s >= .45 ? 'Nearly half' : s >= .3 ? 'About a third' : s >= .22 ? 'About a quarter' : s >= .17 ? 'About one in five'
+  : s >= .12 ? 'About one in eight' : s >= .07 ? 'About one in twelve' : s >= .02 ? 'A few' : '';
+const chaptersOfAll = U => [...new Set(U.lessons.concat(U.deeper || []).map(l => { const L = LIDX[U.side][l], p = L && BOOKS[U.side].parts.find(x => x.id === L.part); return p && p.ch; }).filter(Boolean))];
+const dayFmt = t => new Date(t).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'});
+function deepRank(){
+  const rows = [], held = {};   // a chapter's games are shared among the units that teach it, by how many of its lessons each holds
+  for (const U of COURSE) if (U.lessons && !U.soon) for (const l of U.lessons.concat(U.deeper || [])){
+    const L = LIDX[U.side][l], p = L && BOOKS[U.side].parts.find(x => x.id === L.part); if (!p) continue;
+    const k = U.side + ':' + p.ch, h = held[k] || (held[k] = {}); h[U.id] = (h[U.id] || 0) + 1; }
+  for (const X of DEEP){
+    const B = UNIT[X.base]; if (!B || B.soon) continue;
+    const D = BOOKS[X.side], t = {n: 0, w: 0, l: 0, d: 0};
+    for (const c of chaptersOfAll(B)){ const C = D.chapters.find(x => x.id === c), st = C && C.stats, h = held[X.side + ':' + c] || {}, f = (h[B.id] || 0) / (Object.values(h).reduce((a, v) => a + v, 0) || 1);
+      if (st){ t.n += (st.n || 0) * f; t.w += (st.w || 0) * f; t.l += (st.l || 0) * f; t.d += (st.d || 0) * f; } }
+    const tot = (D.stats && D.stats.total) || D.chapters.reduce((a, C) => a + ((C.stats || {}).n || 0), 0);
+    let seen = 0, slips = 0;
+    for (const id of unitAllLines(B)){ const r = Prog.d.lines[id]; if (r){ seen += r.seen || 0; slips += Math.max(0, (r.seen || 0) - (r.clean || 0)); } }
+    const p = up(B.id), games = p.sparGames || 0, bad = Math.max(0, games - (p.spar || 0)), of = B.quiz ? B.quiz.length : 6, cp = Math.min(of, p.cp || 0), share = tot ? t.n / tot : 0;
+    const weak = .4 * (seen ? slips / seen : 0) + .25 * (games ? bad / games : 0) + .2 * Math.min(1, 3 * (of - cp) / of) + .15 * (t.n ? 1 - scoreOf(t) : .5);
+    rows.push({X, B, t, share, seen, slips, games, bad, cp, of, need: (share + .03) * (.5 + weak), done: deepDone(X), touched: deepTouched(X), cur: deepCur(X)});
+  }
+  const most = Math.max(0, ...rows.map(o => o.slips)), low = Math.min(1, ...rows.map(o => o.cp ? o.cp / o.of : 1));
+  for (const o of rows) o.why = deepWhy(o, most, low);
+  return rows.sort((a, b) => b.need - a.need);
+}
+function deepWhy(o, most, low){
+  const a = shareWords(o.share), side = o.X.side === 'w' ? 'White' : 'Black';
+  const b = o.slips >= 3 && o.slips === most ? 'you slipped on its lines more than anywhere else in your course'
+    : o.cp && o.cp < o.of && o.cp / o.of === low ? `its checkpoint was your lowest, ${o.cp} of ${o.of}`
+    : o.bad >= 2 ? `${o.bad} of your practice games there had a slip`
+    : o.slips >= 3 ? `you slipped on its lines ${o.slips} times`
+    : o.t.n >= 5 && o.t.l > o.t.w ? 'you lose more of those games than you win' : '';
+  return a && b ? `${a} of your ${side} games go this way, and ${b}.` : a ? `${a} of your ${side} games go this way.` : b ? `${b[0].toUpperCase()}${b.slice(1)}.` : 'More lines from an opening in your course.';
+}
+const deepLessons = X => X.units.reduce((a, U) => a + U.lessons.length, 0);
+// the deep dives shown: the coach's pick, then up to two already started, then the next best; the rest wait folded away
+function libCards(rank){
+  const live = rank.filter(o => !o.done), pick = live[0] || null, out = pick ? [pick] : [];
+  for (const o of live.filter(o => o.touched && o !== pick).sort((a, b) => b.touched - a.touched).slice(0, 2)) out.push(o);
+  for (const o of live) if (out.length < 3 && !out.includes(o)) out.push(o);
+  return {pick, cards: out, rest: live.filter(o => !out.includes(o))};
+}
+function deepCard(o, top){
+  const X = o.X, U0 = X.units[0], cur = o.cur;
+  const cta = o.touched && cur ? `Continue: ${unitNo(cur).toLowerCase()}` : 'Start';
+  return `<li class="dcard ${top ? 'dpick' : ''}"><button type="button" data-deep="${X.id}" aria-label="${esc(X.title)}, deep dive${top ? ', the coach\'s pick' : ''}">
+    <span class="dtop"><span class="dthumb">${slideSVG(U0, U0.idea[0], {coords: false, mini: true})}</span>
+      <span class="dhead"><span class="chips">${sideChip(U0)}${top ? `<span class="chip pick">${esc(coachName())}'s pick</span>` : o.touched ? '<span class="chip">Started</span>' : ''}</span><b>${esc(X.title)}</b><span class="dtag">${esc(X.tag)}</span></span></span>
+    <span class="dwhy">${esc(o.why)}</span>
+    <span class="dfoot"><span class="dmeta"><span class="pips" aria-hidden="true">${X.units.map(U => `<i class="${unitPassed(U) ? 'on' : ''}"></i>`).join('')}</span>${X.units.length} parts · ${deepLessons(X)} lessons</span>
+      <span class="btn small ${top ? 'primary' : ''}">${cta}</span></span></button></li>`;
+}
+function renderLibrary(){
+  const view = document.getElementById('view'), rank = deepRank(), {pick, cards, rest} = libCards(rank), done = rank.filter(o => o.done), open = COURSE.filter(U => !U.soon);
+  const say = pick ? `<section class="libcoach"><span class="libav">${knightSVG('cheer')}</span><div class="libsay"><p class="kicker">${esc(coachName())}'s pick for you</p>
+      <p><b>${pick.touched ? `Keep going with ${esc(pick.X.name)}.` : `Go deeper on ${esc(pick.X.name)} next.`}</b> ${esc(pick.why)}</p>
+      <div class="lesson-actions"><button class="btn primary" type="button" data-deep="${pick.X.id}">${pick.touched ? 'Pick up where you left off' : `Start: ${esc(pick.X.title)}`}</button></div></div></section>`
+    : `<section class="libcoach"><span class="libav">${knightSVG('cheer')}</span><div class="libsay"><p class="kicker">${esc(coachName())}</p><p><b>Every deep dive finished.</b> That's the whole library for now. Your lines stay in the Drill tab, and today's five keep them fresh.</p></div></section>`;
+  const shelf = `<section class="libshelf"><p class="kicker">Finished</p><ul>
+      <li><button type="button" class="lmed" data-grad aria-label="Your first course, complete">${medalSVG('gold', 'star')}</button><div><b>Your first course</b><span>${open.length} units · finished ${dayFmt(gradAt())}</span></div><button class="btn small" type="button" data-cpath>Review the path</button></li>
+      ${done.map(o => `<li><span class="lmed">${medalSVG('silver', 'flag')}</span><div><b>${esc(o.X.title)}</b><span>Deep dive · ${o.X.units.length} parts</span></div><button class="btn small" type="button" data-deep="${o.X.id}">Open</button></li>`).join('')}</ul></section>`;
+  const more = rest.length ? `<details class="libmore"><summary>Not these? Every other deep dive (${rest.length})</summary><ul>${rest.map(o => `<li><button type="button" data-deep="${o.X.id}">${sideChip(o.X.units[0])}<b>${esc(o.X.title)}</b><span>${esc(o.X.tag)}</span><span class="lm">${o.touched && o.cur ? `${unitNo(o.cur)} of ${o.X.units.length}` : `${o.X.units.length} parts`}</span></button></li>`).join('')}</ul></details>` : '';
+  view.innerHTML = `<div class="nudge" id="nudge" hidden></div>${changedNote()}<div class="chead"><div><p class="kicker">Course · your library</p><h2 style="font-size:clamp(30px,4vw,46px)">What's next</h2>
+      <p>You finished your first course on ${dayFmt(gradAt())}. From here it's depth: one opening at a time, picked from how your course went.</p></div></div>
+    ${say}
+    ${cards.length ? `<section class="libpicks"><p class="kicker">Picked for you</p><ul class="dcards">${cards.map((o, k) => deepCard(o, k === 0 && o === pick)).join('')}</ul></section>` : ''}
+    ${shelf}${more}`;
+  courseNotes();
+}
+// one deep dive: what it covers, why it's here for this player, the part to do next and all the parts
+function renderDeep(X){
+  const view = document.getElementById('view'), o = deepRank().find(r => r.X === X), cur = deepCur(X), word = X.side === 'w' ? 'White' : 'Black';
+  let hero;
+  if (cur){
+    const steps = unitSteps(cur), nx = steps.find(s => !s.done), open = unitOpen(cur);
+    hero = `<section class="chero"><div class="board">${slideSVG(cur, cur.idea[0])}</div>
+      <div><div class="chips">${sideChip(cur)}<span class="chip">Up next · ${unitNo(cur)} of ${X.units.length}</span></div>
+        <h3>${esc(cur.title)}</h3><p class="lede">${esc(cur.why)}</p>
+        <ol class="ministeps" aria-label="Steps in this part">${steps.map(s => `<li class="${s.done ? 'done' : s === nx ? 'next' : ''}">${s.done ? ICON.check : ''}${esc(s.title)}</li>`).join('')}</ol>
+        <div class="cta">${open ? `<button class="btn primary" id="dGo">${esc(stepCta(cur, nx))}</button>` : ''}<button class="btn" data-unit="${cur.id}">See the whole part</button></div></div></section>`;
+  } else hero = `<section class="chero done dfin"><span class="dmedal">${medalSVG('silver', 'flag')}</span><div><p class="kicker">Deep dive finished</p><h3>Every part passed.</h3><p class="lede">Its lines stay in your reviews, and today's five bring them back. The library has more picks waiting.</p><div class="cta"><button class="btn primary" data-lib>Back to the library</button></div></div></section>`;
+  view.innerHTML = `<div class="crumbs"><button class="btn small" data-lib>← Library</button><span class="where">Deep dive · ${word}</span></div>
+    <div class="chead"><div><div class="chips">${sideChip(X.units[0])}<span class="chip deep">Deep dive</span><span class="chip">${X.units.length} parts · ${deepLessons(X)} lessons</span></div>
+      <h2 style="font-size:clamp(30px,4vw,46px)">${esc(X.title)}</h2><p>${esc(X.why)}</p>${o ? `<p class="dfor"><span class="libav sm">${knightSVG('')}</span><span><b>Why it's here for you:</b> ${esc(o.why)}</span></p>` : ''}</div></div>
+    <div class="nudge" id="nudge" hidden></div>${changedNote()}${hero}<ol class="path" aria-label="Parts of this deep dive">${X.units.map(U => unitRow(U, cur)).join('')}</ol>`;
+  courseNotes();
+  const g = document.getElementById('dGo'); if (g) g.onclick = () => { const nx = unitSteps(cur).find(s => !s.done); if (nx) doStep(cur, nx.key); else openUnit(cur.id); };
+}
+// the big moment: the coach in a graduation cap, the gold medal, the numbers of the course, and what to do next
+function renderGrad(){
+  if (!gradAt()){ if (stampGrad()) Prog.save(); else { S.view = 'course'; setHash(); return renderCourse(); } }
+  const view = document.getElementById('view'), open = COURSE.filter(U => !U.soon), at = gradAt(), fresh = !!S.gradNow && !S.gradSeen && !reduced;
+  S.gradSeen = true;                                                                 // the confetti falls once
+  const cpOf = U => U.kind === 'skill' ? U.check.length : U.quiz.length;
+  const cpR = open.reduce((a, U) => a + Math.min(up(U.id).cp || 0, cpOf(U)), 0), cpN = open.reduce((a, U) => a + cpOf(U), 0);
+  const games = open.reduce((a, U) => a + (up(U.id).sparGames || 0), 0), c = Prog.d.course || {};
+  const stamps = Object.values(c.u || {}).flatMap(p => Object.values(p).filter(v => v > 1e12)).concat(Object.values(c.seen || {}).filter(v => v > 1e12));
+  const days = Math.max(1, Math.round((at - Math.min(at, ...stamps)) / DAY));
+  const pick = deepRank().find(o => !o.done), look = Object.assign({}, Shop.worn(), {head: 'h-grad'});
+  const cap = Shop.owns('h-grad') ? '' : Shop.isOpen() ? ' The graduation cap is in the shop now.' : ' The graduation cap is waiting in the shop for when the wardrobe opens (a week in a row).';
+  const bits = ['--gold', '--accent', '--rosso', '--blu', '--viola', '--oro', '--gold-2'];
+  const conf = fresh ? `<div class="grconf" aria-hidden="true">${Array.from({length: 42}, (_, k) => `<i style="--x:${(k * 37) % 100}%;--d:${(k % 7) * .17}s;--s:${2.6 + (k % 5) * .35}s;--r:${(k * 53) % 360}deg;background:var(${bits[k % bits.length]})"></i>`).join('')}</div>` : '';
+  const stat = (n, t) => `<li><b class="tnum">${n}</b><span>${t}</span></li>`;
+  view.innerHTML = `<section class="gradv ${fresh ? 'fresh' : ''}">${conf}
+    <div class="grhero"><div class="grstage"><span class="grcoach">${knightSVG('cheer', null, look)}</span><span class="grmedal">${medalSVG('gold', 'star')}</span></div>
+      <p class="kicker">Course complete · ${dayFmt(at)}</p><h2>You finished your course.</h2>
+      <p class="lede">${open.length} units, every checkpoint passed. The openings in it are yours now; next comes depth.</p></div>
+    <ul class="grstats">${stat(open.length, 'units passed')}${stat(badgeStats().clean, 'lines played clean')}${stat(`${cpR}<small>/${cpN}</small>`, 'checkpoint positions right first time')}${stat(games, games === 1 ? 'practice game' : 'practice games')}${stat(days, days === 1 ? 'day, start to finish' : 'days, start to finish')}</ul>
+    <div class="grearn"><span class="grbadge">${medalSVG('gold', 'star')}</span><div><b>New badge: Course complete</b><span>That's a shop token too.${esc(cap)}</span></div>${Shop.isOpen() && !Shop.owns('h-grad') ? '<button class="btn small" type="button" data-go="shop">Open the shop</button>' : ''}</div>
+    ${pick ? `<div class="grnext"><span class="libav">${knightSVG('')}</span><div><p class="kicker">${esc(coachName())} says</p><p><b>What next? Go deeper on ${esc(pick.X.name)}.</b> ${esc(pick.why)} Your Course tab is a library now, and I've picked three deep dives for you.</p>
+      <div class="lesson-actions"><button class="btn primary" type="button" data-deep="${pick.X.id}">Start: ${esc(pick.X.title)}</button><button class="btn" type="button" data-lib>See the library</button></div></div></div>` : ''}
+    ${S.quizState && S.quizState.state === 'done' && UNIT[S.quizState.unit] && !UNIT[S.quizState.unit].deep ? '<p class="grback"><button class="linkish" type="button" id="grQuiz">See the last checkpoint</button></p>' : ''}
+  </section>`;
+  const q = document.getElementById('grQuiz'); if (q) q.onclick = () => { S.view = 'quiz'; render(); setHash(); };
+}
+
 const Coach = {
   seen: (() => { try { return JSON.parse(localStorage.getItem('playbook-coach') || '{}'); } catch(e){ return {}; } })(), timer: null, last: null, n: 0,
   el(){ let e = document.getElementById('coach'); if (!e){ e = document.createElement('div'); e.id = 'coach'; e.className = 'coach'; document.body.appendChild(e);
       e.addEventListener('click', ev => { if (ev.target.closest('.cx')) return this.hush(); const a = ev.target.closest('[data-cgo]'); if (a){ this.hush(); return a.dataset.cgo === 'me' ? Acct.open(Cloud.user ? 'in' : 'me') : go(a.dataset.cgo); } if (ev.target.closest('.cav')) this.last && !e.querySelector('.cbub') ? this.say(this.last.t, this.last.o) : e.querySelector('.cbub') ? this.hush() : this.say(this.tip()); }); }
     return e; },
   // on the welcome, reading, findings and choice screens the coach is part of the page, so the corner one stays away
-  draw(bub){ const e = this.el(); e.hidden = !SET.coach || (PVIEWS.includes(S.view) && S.view !== 'setup'); e.classList.toggle('quiet', ['drill', 'quiz', 'sandbox', 'study', 'explore'].includes(S.view));
+  draw(bub){ const e = this.el(); e.hidden = !SET.coach || (PVIEWS.includes(S.view) && S.view !== 'setup') || S.view === 'grad' || libOn(); e.classList.toggle('quiet', ['drill', 'quiz', 'sandbox', 'study', 'explore'].includes(S.view));
     e.innerHTML = (bub || '') + `<button class="cav" type="button" aria-label="${coachName()}, your coach">${knightSVG(this.mood)}</button>`; },
   say(t, o = {}){
     if (!SET.coach) return; clearTimeout(this.timer); this.last = {t, o}; this.mood = o.mood;
@@ -698,6 +822,7 @@ const Coach = {
   onView(){
     const v = S.view, e = this.el();
     if (S.drill && S.drill.state === 'play'){ this.lastView = v; return this.hush(); } // never while a drill, a practice game or a checkpoint is being played
+    if (v === 'grad' || libOn()){ this.lastView = v; return this.hush(); }            // the coach is part of those pages
     if (Badges.queue.length && PERSONA !== 'new') return Badges.show();
     if (e.querySelector('.cbub') && this.lastView === v) return this.draw(e.querySelector('.cbub').outerHTML); this.lastView = v;
     if (v === 'reading' || v === 'choices' || v === 'built' || v === 'findings') return this.hush(); // the coach is already on the page there

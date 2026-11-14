@@ -176,6 +176,12 @@ with sync_playwright() as p:
     bp.evaluate("Prog.d.days = Object.assign(Prog.d.days || {}, {[dayKey(-1)]: ['a', 'b', 'c', 'd', 'e']}); Prog.d.shop = {own: {cap: Date.now()}, wear: {head: ['cap', Date.now()]}}; Prog.save()"); bp.wait_for_timeout(1800)
     a.evaluate("document.dispatchEvent(new Event('visibilitychange'))"); a.wait_for_timeout(900)
     assert a.evaluate("[Daily.n(dayKey(-1)), Prog.d.shop.wear.head[0], !!Prog.d.shop.own.cap]") == [5, 'cap', True]
+    # finishing the course is stamped once (the earliest stamp wins); deep dive parts travel like any unit
+    bp.evaluate("const c = Prog.d.course || (Prog.d.course = {u: {}, seen: {}}); c.u = c.u || {}; c.grad = 1700000000000; c.u['x-w-italian-1'] = {o: Date.now(), cp: 4}; Prog.save()"); bp.wait_for_timeout(1800)
+    a.evaluate("document.dispatchEvent(new Event('visibilitychange'))"); a.wait_for_timeout(900)
+    assert a.evaluate("[Prog.d.course.grad, Prog.d.course.u['x-w-italian-1'].cp]") == [1700000000000, 4]
+    a.evaluate("Prog.d.course.grad = 1800000000000; Prog.save()"); a.wait_for_timeout(1800)
+    assert S.rows[uid]['data']['course']['grad'] == 1700000000000 and a.evaluate("Prog.d.course.grad") == 1700000000000
     # a page from an older version writes a smaller copy: the next save on any device writes everything back
     row = S.rows[uid]['data']; S.rows[uid]['data'] = {k: v for k, v in row.items() if k not in ('days', 'prefs', 'set', 'shop', 'badges')}
     a.evaluate("Prog.save()"); a.wait_for_timeout(1800)

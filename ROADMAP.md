@@ -75,6 +75,13 @@ Facts that shape the design:
 - **Shop** (`SHOP`, `Shop`, `renderShop`, `gearSVG` in `app/product.js`): tokens from badges and every third day in a row, a wardrobe that opens after a week in a row, colours and gear for all three coaches.
 - **Course practice games**: the unit, its clean games and the way back sit at the top of the game's panel; free play is a wide button under the board; no opening picker during a course game.
 
+## Phase 1.10: after the course (done, November 14)
+
+- **The big moment.** The last unit's checkpoint opens a congratulations screen: the coach in a graduation cap, a gold medal, five numbers from the course, the badge and its token, and the coach's suggestion for what next (`renderGrad` in `app/product.js`). It shows once; `d.course.grad` keeps the moment (earliest wins across devices), and a course finished before this existed gets its screen the next time the Course tab opens.
+- **The library.** After that the Course tab shows the coach's pick and two more deep dives, each with one sentence on why. The others are folded away, and the first course's path and its units stay one click away (`renderLibrary`, `deepRank`). The ranking is how often the player meets the opening (a chapter's games shared between the units that teach it), weighed by slips in drills and practice games, the checkpoint, and the results in those games.
+- **Deep dives.** `DEEP` in `content/course.py` groups each unit's optional lessons into parts with hand-written titles and words. The build adds the boards: where the part's lessons split (blue arrows) and one per lesson at its own first new move (green for the answer, red for a move to leave alone). It also adds six checkpoint positions per part. Parts work like units, numbered Part 1, 2…, and open in order once the course is finished. Two badges: one deep dive, three deep dives.
+- Still to do: hand-written idea boards for the biggest deep dives (the Italian, against the Italian), a deep dive for the Slav (it has no optional lessons yet), and a short "since you finished" recap on the library.
+
 ## Phase 1.8: the daily habit (done, November 13)
 
 - **Today's five** opens the Drill tab: five lines from move one, from both books, slips first (oldest first), then changed lines, what is due, new lines from studied lessons, then new lines in course order. Any line played to its end counts toward the day; five different lines keep the streak (`Daily` and `dailyNext` in the template; `d.days` in the progress record, merged across devices as a union per day).
@@ -127,7 +134,8 @@ The original plan for this phase, for reference:
 ## Phase 4: gamification
 
 - Done (Phase 1.8): the daily goal ring, the streak, badges with the coach's medal, scarce reminder emails.
-- Still to do: a streak freeze (one a week), XP and levels, a celebration when you pass a checkpoint, a short weekly recap card, and optional sound.
+- Done (Phase 1.9 and 1.10): the shop and the coach's wardrobe; the course-complete celebration and the library.
+- Still to do: a streak freeze (one a week), XP and levels, a smaller celebration when you pass a checkpoint, a short weekly recap card, and optional sound.
 - Leagues and friends later, once other players exist.
 
 ## Phase 5: the systems library (ongoing)
