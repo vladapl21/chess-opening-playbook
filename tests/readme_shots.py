@@ -85,7 +85,7 @@ with sync_playwright() as p:
     save(pg.screenshot(), 'course.png')
     pg.evaluate("localStorage.clear()"); pg.goto(URL + '#learn'); pg.reload(); pg.wait_for_timeout(900); settle(pg)
     save(pg.screenshot(), 'learn-white.png')
-    pg.click('.sidesw [data-side="b"]'); pg.wait_for_timeout(700); settle(pg)
+    pg.click('.sidesw [data-side="b"]'); pg.wait_for_timeout(700); pg.evaluate("go('learn')"); pg.wait_for_timeout(500); settle(pg)
     save(pg.screenshot(), 'learn-black.png')
 
     # Study: the Scotch lesson, a few moves in
@@ -125,6 +125,14 @@ with sync_playwright() as p:
     pg.evaluate("go('games')"); pg.wait_for_timeout(500); settle(pg)
     full = pg.screenshot(full_page=True); w, h = Image.open(io.BytesIO(full)).size
     save(full, 'games.png', crop=(0, 0, w, min(h, 3000)))
+    # Today's five, three lines in, on a four-day streak; then the profile with a few badges
+    pg.evaluate("""(() => { const D = Prog.d.days = Prog.d.days || {}; for (let k = 1; k <= 3; k++) D[dayKey(-k)] = ['a','b','c','d','e']; D[dayKey(-5)] = ['a','b','c','d','e'];
+      D[dayKey()] = ['setup', 'center', 'grab']; S.drill = S.drillState = null; Coach.hush(); Badges.queue = []; Prog.save(); Badges.queue = []; go('drill'); })()"""); pg.wait_for_timeout(500); settle(pg)
+    pg.evaluate("Coach.hush()"); pg.wait_for_timeout(200)
+    shot = pg.screenshot(); save(shot, 'today.png', crop=(0, 0, 2560, 1500))
+    pg.evaluate("Acct.open('me')"); pg.wait_for_timeout(400); settle(pg)
+    box = pg.evaluate("(() => { const r = document.getElementById('acctPanel').getBoundingClientRect(); return [r.left, r.top, r.right, Math.min(r.bottom, innerHeight)]; })()")
+    save(pg.screenshot(), 'badges.png', crop=tuple(round(v * 2) for v in box)); pg.evaluate("Acct.close()")
     pg.evaluate("go('cheat')"); pg.wait_for_timeout(400); settle(pg); save(pg.screenshot(), 'cheat.png')
     pg.evaluate("go('drill')"); pg.wait_for_timeout(300)
     pg.evaluate("startPuzzle(DATA.puzzles.findIndex(p => p.id === 'gb-charizard-47'))"); pg.wait_for_timeout(500); settle(pg)

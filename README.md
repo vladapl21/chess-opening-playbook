@@ -16,7 +16,7 @@ One path through a White and a Black repertoire, ordered by what my games say ma
 ![Engine in the browser](https://img.shields.io/badge/in%20the%20browser-Stockfish.js%2019-2f6b52)
 ![License: MIT](https://img.shields.io/badge/license-MIT-2f6b52)
 
-<img src="docs/img/learn-white.png" alt="The Learn page of the White book: eight opening tiles showing how often each came up and the record in those games, with the Italian chapter below" width="100%">
+<img src="docs/img/learn-white.png" alt="The Italian's page in the White book, opened from Your games: the other openings as chips, the key idea on the board, three facts from the games and the lessons below" width="100%">
 
 </div>
 
@@ -35,12 +35,12 @@ Most opening courses are written for everyone. They give long lines in algebraic
 
 ## Where it is going: a playbook for any player
 
-<img src="docs/img/welcome.png" alt="The welcome screen: bring 150 games, get your playbook; three steps, the sections that open with your games, and the coach" width="100%">
+<img src="docs/img/welcome.png" alt="The welcome screen: connect your account, get your playbook; three steps, the sections that open with your games, and the coach" width="100%">
 
 Everything above was built by hand for one player. The site now has the first version of the same thing for anyone:
 
 1. **Welcome.** A new visitor sees the same tabs, with only the Sandbox open. The rest is locked until their games are in.
-2. **Bring 150 games.** A chess.com or Lichess username is enough: the page fetches the latest games itself from the sites' public APIs. A PGN file works too. Fifty games is the least that works.
+2. **Connect your account.** The sign-up form asks for a chess.com or Lichess username, and the games are read as soon as the account exists (a username can also be given later, or a PGN file dropped in). The page fetches the newest games itself from the sites' public APIs and leaves bullet out: it is too fast to show what someone knows. A repertoire needs 200 games that aren't bullet; with fewer, the page says to play some more first and remembers to check again. The app never shows these numbers: it talks about connecting an account, not about a count.
 3. **The reading screen.** A script reads every game while the board plays through them: what the player opens with, what they meet, how each opening scores, which kinds of game they win (kings on the same side or opposite sides, queens on or off, short or long games), and the exact positions where they leave the playbook. It is rules and counting ([`app/analyze.js`](app/analyze.js)): no language model and no engine.
 4. **Would you rather.** Where the player's own habit differs from what the library teaches, a card puts the two side by side with their record in each. Two more cards set the order of the course and how wide the drills go.
 5. **Their playbook.** The course is reordered by their games, every chapter shows their own record, and Your games lists where they leave the book, each with a button into the lesson.
@@ -51,7 +51,7 @@ Everything above was built by hand for one player. The site now has the first ve
 
 **What it cannot do yet.** The library is small: the e-pawn as White; the e-pawn reply, the Caro-Kann or the Sicilian against the e-pawn; the Slav setup against the d-pawn. A player who prefers something else is told that their system is still being written, and that part of their course waits. A d-pawn system for White and the English are next. Puzzles from a player's own mistakes need the engine run over their games, which is not built yet.
 
-A **coach**, one of three characters to pick from (Pip the knight, Rocco the rook, Dot the pawn), says the short things in a speech bubble at the bottom right: what a tab is for the first time it is opened, a word after a drill, why a section is locked. It never speaks during a drill or a checkpoint, and it can be switched off in **Settings**, which also has light and dark mode, text size, five board colours and the letters on the board.
+A **coach**, one of three characters to pick from (Pip the knight, Rocco the rook, Dot the pawn), says the short things in a speech bubble at the bottom right: what a tab is for the first time it is opened, a word after a drill, the end of today's five, a new badge with its medal, why a section is locked. It never speaks during a drill, a practice game or a checkpoint, and it can be switched off in **Settings**, which also has light and dark mode, text size, five board colours and the letters on the board. Settings are kept with the progress, so the coach and the look follow an account to every device. The system for each part of the repertoire is in Settings too, folded away at the bottom: switching one swaps whole course units, so it asks for the player's username first.
 
 ## At a glance
 
@@ -86,7 +86,7 @@ The course is the front page. Units alternate between White, Black and skills in
 4. **Practice games.** Three clean sandbox games where the opponent only plays this unit's lines and picks the ones I know least.
 5. **Checkpoint.** Six positions from the unit; five right on the first try opens the next unit.
 
-Optional "go deeper" lessons sit under each unit, finished units come back through the drill schedule, and everything stays in Learn for looking ahead.
+Optional "go deeper" lessons sit under each unit, finished units come back through today's five, and every lesson stays reachable from its opening's page under Your games.
 
 Three skill units sit between the opening units, each built from positions in my own games at the move where it went wrong:
 
@@ -96,11 +96,13 @@ Three skill units sit between the opening units, each built from positions in my
 
 In a practice set, every position opens on the explore board with the engine as soon as it is answered, right or wrong, with the move I tried already on the board. In a checkpoint the engine waits until the end, and the reasons are still given in words.
 
-### Learn: two books, one switch
+### Your games and the openings: two books, one switch
 
-<img src="docs/img/learn-black.png" alt="The Black book's Learn page: nine openings White played, each with frequency and record, and the Italian chapter's plan" width="100%">
+<img src="docs/img/learn-black.png" alt="The Black book's Italian page: the other openings White played as chips, the key idea and the lessons" width="100%">
 
-The **White | Black** switch swaps the whole app: board orientation, chapters, drills, games and progress. Each book remembers its own place and its own count of lines due for review. Every chapter opens with a board showing the key idea, the plan in one sentence, and three facts from the games. One example: *"37% of club players jump the knight at f7 after the small d-pawn move. Castle and it fails."* Lessons are grouped into parts and tagged **core**, **common** or **rare**, so the most frequent lines come first.
+**Your games** lists every opening in the book with how often it came up and the record in it, then what the games taught: the habits that cost points, the missed shots and the game reviews. Each opening opens its own page (the chips at the top move between them), with every lesson in it. There is no separate Learn tab: the course is the way through the lessons, and the opening pages are where to look one up.
+
+The **White | Black** switch swaps the whole app: board orientation, chapters, drills, games and progress, and it keeps the tab you are on. Each book remembers its own place. Every opening page starts with a board showing the key idea, the plan in one sentence, and three facts from the games. One example: *"37% of club players jump the knight at f7 after the small d-pawn move. Castle and it fails."* Lessons are grouped into parts and tagged **core**, **common** or **rare**, so the most frequent lines come first.
 
 ### Study: step through any line
 
@@ -124,13 +126,21 @@ A line in a book has to stop somewhere, and the position it stops in can still l
 - the other side's idea, found by asking the engine what they would play if it were their move again: a red dashed arrow, marked **Threat** when it wins something;
 - the line it expects, as a row of plain-English moves that can be played out on the board.
 
-**Play on from here** opens the explore board, where you move the pieces for both sides, or tick a box and the engine answers your moves. Step back at any point to try something else.
+**Play on from here** opens the explore board, where you move the pieces for both sides, or tick a box and the engine answers your moves. The board carries the whole game from move one: step back past the point where you came in all the way to the start, and a button brings you back to that point. A different move before it starts a new line from there.
 
-### Drill: spaced repetition, with the opponent's moves played for you
+### Drill: five lines a day
 
-<img src="docs/img/drill.png" alt="Drill view: the Berlin line, Black to move, a piece picked up with its target ringed, and filters by opening and priority" width="100%">
+<img src="docs/img/today.png" alt="Drill: today's five with the count, the streak and the last seven days, above the lines to pick by hand" width="100%">
 
-You play your side's moves from memory and the opponent's moves play themselves. You can drag or tap, and you castle by moving the king two squares or onto its rook. A wrong move gets a second try and then an arrow. Lines are scheduled in Leitner boxes: a clean run sends a line further out (1, 2, 4, 8, then 16 days), and a slip brings it back today. You can filter by opening and by priority, and start each line either from move one or from the point where it branches off lines you already know.
+The Drill tab opens on **today's five**: five lines from move one, about ten minutes. They come from both books, in this order: lines you slipped on, oldest first; lines whose moves have changed; lines that are due; new lines from lessons you have studied; then new lines in course order. Five different lines in a day keep the **streak** going (any line played to its end counts, in a unit's drill or a Sandbox game too). The tab carries a small **!** until today's five are done; there are no counts beside White and Black.
+
+<img src="docs/img/drill.png" alt="Drill view: the Berlin line, Black to move, a piece picked up with its target ringed" width="100%">
+
+You play your side's moves from memory and the opponent's moves play themselves. You can drag or tap, and you castle by moving the king two squares or onto its rook. A wrong move gets a second try and then an arrow. Lines are scheduled in Leitner boxes: a clean run sends a line further out (1, 2, 4, 8, then 16 days), and a slip brings it back today. Under **Pick lines yourself** you can still filter by opening and by priority, and start each line either from move one or from the point where it branches off lines you already know.
+
+**Badges** sit in the profile (the flame in the top corner, or the account button): lines known without a slip, streaks, course units passed, lines at full strength and practice games. Locked ones are grey with how far along you are; a new one arrives as a medal in the coach's bubble.
+
+<img src="docs/img/badges.png" alt="The profile: the streak and the last seven days, then badges in four groups, earned ones in colour and locked ones grey" width="100%">
 
 ### Sandbox: play your prep against a realistic opponent
 
@@ -150,7 +160,7 @@ At the end you get a slip report. Each mistake is shown on a mini board (red for
 
 <img src="docs/img/games.png" alt="Your games: results by opening, four patterns across games with practice buttons, and game review cards" width="100%">
 
-This page shows results by opening and four patterns that cost games, each with a practice button that drills the real positions. It also has reviews of the most instructive games. Each review has a title, the story in plain words, a replay that starts at the key moment, the better continuation, and a link to the lesson that fixes the problem.
+This page shows results by opening (each one opens that opening's page, with every lesson in it) and four patterns that cost games, each with a practice button that drills the real positions. It also has reviews of the most instructive games. Each review has a title, the story in plain words, a replay that starts at the key moment, the better continuation, and a link to the lesson that fixes the problem.
 
 <img src="docs/img/puzzle.png" alt="A missed shot from a real game set as a puzzle: Black to move, find the best move" width="100%">
 
@@ -164,7 +174,7 @@ The cheat sheet has one card per decision. The opponent's move is highlighted an
 
 ### On a phone, in light or dark
 
-<img src="docs/img/phones.png" alt="Three phone screens: the Black book's Learn page in light mode, a Slav lesson in dark mode, and the patterns from Your games" width="100%">
+<img src="docs/img/phones.png" alt="Three phone screens: an opening's page from the Black book in light mode, a Slav lesson in dark mode, and the patterns from Your games" width="100%">
 
 The layout collapses to one column on phones and follows the system's light or dark setting. The board, menus and drills all work by touch.
 
@@ -282,13 +292,14 @@ flowchart LR
 
 ## Under the hood
 
-- **One file.** The app is one HTML file of about 2 MB with both books inline: plain HTML, CSS and JavaScript, with no framework or bundler. [chess.js](https://github.com/jhlywa/chess.js) is inlined for the explore board. The only scripts loaded from elsewhere are the engine, when you ask for it, and supabase-js, on the website when accounts are set up. Fonts come from Google Fonts (Bodoni Moda, Instrument Sans, JetBrains Mono); offline, the app falls back to system fonts.
+- **One file.** The app is one HTML file of about 2 MB with both books inline: plain HTML, CSS and JavaScript, with no framework or bundler. [chess.js](https://github.com/jhlywa/chess.js) is inlined for the explore board. The only scripts loaded from elsewhere are the engine, when you ask for it, and supabase-js, on the website when accounts are set up. Fonts come from Google Fonts (Barlow Condensed, Barlow, JetBrains Mono); offline, the app falls back to system fonts.
 - **Board.** The board is SVG, drawn with an original piece set ([`app/pieces.py`](app/pieces.py)). It supports drag and tap input, legal-move hints, arrows, circles and a flipped view for Black. Legal moves are precomputed for every book position where you move, so lessons, drills and the sandbox need no chess library.
 - **Engine.** [`docs/engine`](docs/engine) holds the lite single-threaded build of [Stockfish.js](https://github.com/nmrugg/stockfish.js) 19: a 28 KB script and a 1.8 MB WebAssembly file, fetched the first time the engine is switched on and run in a web worker. The page talks to it in plain UCI text. Each position gets two searches: a short one with the move handed to the other side (their idea), then the three best moves to depth 22 or seven seconds. Results are kept for the session, so stepping back and forth is instant. The engine's moves are put into words by a small JavaScript twin of `label2.py`. The single-threaded build needs no special server headers, so it runs on GitHub Pages; it can't start from a page opened as a file, and the card says so.
 - **Two books, one engine.** `loadBook()` swaps every index (nodes, lines, lessons, chapters, whose move is whose, board orientation) when you flip the switch. Line ids never collide between the books (the build checks this), so one progress store holds both.
 - **Who is looking.** The page shows one of three things ([`app/product.js`](app/product.js)): the hand-built playbook (the personal build, and any account that had progress before personal playbooks existed), the welcome state for a player without games, or a personal playbook. The profile from the analysis is saved with the progress record, so it follows the account. For anyone but the house player, sentences about my own games are removed from the lesson notes when the page starts.
-- **Progress and accounts.** Progress is always saved in the browser first. On the website, an account (email and password through [Supabase](https://supabase.com)) keeps a copy in the cloud, so the same progress shows up on every device. Sync pulls and merges on sign-in, on load and whenever the tab comes back into view: the newest record wins for each drill line and puzzle (for a line whose moves have changed, the record made on the current moves wins over a newer one made on the old moves), and course steps keep the best result. The project URL and publishable key live in [`app/site.json`](app/site.json), the tables and row-level security in [`supabase/schema.sql`](supabase/schema.sql). When the page runs as a Claude artifact, it syncs to the artifact's own per-user storage instead.
-- **Deep links.** `#course` and `#unit.<unit-id>` open the course and a unit (a unit brings its own book). `#learn`, `#sandbox`, `#drill`, `#games`, `#cheat`, `#learn.<chapter>` and `#line.<line-id>` open the matching view. Add a `b.` prefix for the Black book, for example [`#b.learn.london`](https://vladapl21.github.io/chess-opening-playbook/#b.learn.london) or [`#b.line.bs-classical`](https://vladapl21.github.io/chess-opening-playbook/#b.line.bs-classical).
+- **Progress and accounts.** Progress is always saved in the browser first. On the website, an account (email and password through [Supabase](https://supabase.com)) keeps a copy in the cloud, so the same progress shows up on every device. Sync pulls and merges on sign-in, on load and whenever the tab comes back into view: the newest record wins for each drill line and puzzle (for a line whose moves have changed, the record made on the current moves wins over a newer one made on the old moves), course steps keep the best result, the days of the streak add up across devices, badges keep the date they were first earned, and settings take the newer copy. The project URL and publishable key live in [`app/site.json`](app/site.json), the tables and row-level security in [`supabase/schema.sql`](supabase/schema.sql). When the page runs as a Claude artifact, it syncs to the artifact's own per-user storage instead.
+- **Reminder emails.** Off unless the player turns them on (a box at sign-up, a switch in the profile). A Supabase Edge Function ([`supabase/functions/nudge`](supabase/functions/nudge)) runs every hour and sends at most one email a week: in the player's early evening, when today's five are not done, either because a streak of three days or more ends at midnight or because lines they slipped on have waited three days. Every email has a link that turns them off. Setup is under [Reminder emails](#reminder-emails).
+- **Deep links.** `#course` and `#unit.<unit-id>` open the course and a unit (a unit brings its own book). `#sandbox`, `#drill`, `#games`, `#cheat`, `#learn.<chapter>` (an opening's page) and `#line.<line-id>` open the matching view. Add a `b.` prefix for the Black book, for example [`#b.learn.london`](https://vladapl21.github.io/chess-opening-playbook/#b.learn.london) or [`#b.line.bs-classical`](https://vladapl21.github.io/chess-opening-playbook/#b.line.bs-classical).
 
 <details>
 <summary><b>Data model</b></summary>
@@ -355,6 +366,8 @@ app/
   vendor/chess.js          chess.js 0.10.3 (BSD-2-Clause), inlined into the page for the explore board
 supabase/
   schema.sql               accounts: profiles and progress tables, row-level security
+  nudge.sql                reminder emails: the log table and the hourly schedule
+  functions/nudge/         the reminder-email function: index.ts (Deno), pick.js (who gets which email), titles.json
 content/
   course.py                the course: units, idea boards, checkpoint positions
   plans.py                 the plan shown where each lesson's main line ends
@@ -391,9 +404,10 @@ docs/
   img/                     the images in this README
 tests/
   e2e_white.py, e2e_black.py, e2e_sandbox_switch.py, e2e_course.py, e2e_accounts.py, e2e_engine.py,
-  e2e_versions.py, e2e_shell.py, e2e_onboarding.py, e2e_skills.py, e2e_packs.py
+  e2e_versions.py, e2e_shell.py, e2e_onboarding.py, e2e_skills.py, e2e_packs.py, e2e_daily.py
                            end-to-end browser tests (Playwright)
   analyze_check.js         the analysis run under Node on data/games, checked against known facts
+  nudge_check.mjs          the reminder-email rules on made-up progress records
   serve.py                 serves the built page over local HTTP for the engine test and screenshots
   fake_supabase.js         stand-in for supabase-js so account tests run offline
   readme_shots.py          regenerates docs/img
@@ -439,6 +453,17 @@ python3 pipeline/lint_notes.py                         # notes that contradict t
 python3 pipeline/lint_claims.py                        # same position, different move; pins, guards, attacks not on the board
 ```
 
+### Reminder emails
+
+The reminder emails need three things outside this repository: the Supabase CLI, an email service with an API (the function uses [Resend](https://resend.com)), and a domain that service may send from. Until they are set up, the switch in the profile is stored and nothing is sent.
+
+```bash
+supabase functions deploy nudge --no-verify-jwt     # the cron call and the unsubscribe links carry their own secret
+supabase secrets set RESEND_API_KEY=… NUDGE_FROM="Pip <pip@your-domain>" NUDGE_SECRET=<a long random string> SITE_URL=https://vladapl21.github.io/chess-opening-playbook/
+```
+
+Then put the project ref and the same secret into [`supabase/nudge.sql`](supabase/nudge.sql) and run it in the SQL editor: it adds the table that logs what was sent and the hourly schedule. To see who would get which email without sending anything, post `{"dry": true}` to the function with the `x-nudge-secret` header. The rules themselves are in [`pick.js`](supabase/functions/nudge/pick.js) and checked by `node tests/nudge_check.mjs`.
+
 ### Tests
 
 ```bash
@@ -447,7 +472,7 @@ python3 -m playwright install chromium
 make test
 ```
 
-The tests drive the real page in Chromium. They visit every chapter in both books, step through lessons, and play drills by dragging and tapping (correct moves, slips, castling). They solve every puzzle and play sandbox games across every opening and odds setting, including a regression test for changing the opening mid-game. They also follow deep links, switch books back and forth with state kept, and check that the phone layout never scrolls sideways, in light and dark mode. The course test works through the first units the way a person would: the idea boards, a lesson, a drill line, a checkpoint with a deliberate miss, practice games against a unit's lines, and a threat set where wrong moves get played out and punished. The engine test serves the page over local HTTP and runs the real engine: the switch in Study, three different best moves with their arrows, the plan at the end of a line, moves for both sides on the explore board by tap and by drag, the engine answering, its line played out, a reload that keeps the position, and the note shown when the page is opened as a file. The accounts test runs two browsers against a fake Supabase server as two devices on one account: sign-up carrying local progress along, sync both ways, an outage and recovery, a second account on the same device, and the email confirmation, password reset and expired-link flows. The versions test runs the claims check on boards with a known answer, then loads the page with a record made before a line changed and checks that the line comes back as due and marked Changed, that a clean run on the new moves replaces the record, and that two devices merge to the newer version. The shell test covers the tab order, the colour switch keeping its tab, and Settings. The onboarding test is a new visitor from the welcome screen to a personal playbook, with the games in `data/games` fetched through a stand-in for chess.com and again as a PGN file on a phone. Screenshots land in `tests/out/`. To regenerate the images in this README, run `make shots`.
+The tests drive the real page in Chromium. They visit every chapter in both books, step through lessons, and play drills by dragging and tapping (correct moves, slips, castling). They solve every puzzle and play sandbox games across every opening and odds setting, including a regression test for changing the opening mid-game. They also follow deep links, switch books back and forth with state kept, and check that the phone layout never scrolls sideways, in light and dark mode. The course test works through the first units the way a person would: the idea boards, a lesson, a drill line, a checkpoint with a deliberate miss, practice games against a unit's lines, and a threat set where wrong moves get played out and punished. The engine test serves the page over local HTTP and runs the real engine: the switch in Study, three different best moves with their arrows, the plan at the end of a line, moves for both sides on the explore board by tap and by drag, the engine answering, its line played out, a reload that keeps the position, and the note shown when the page is opened as a file. The accounts test runs two browsers against a fake Supabase server as two devices on one account: sign-up carrying local progress along, sync both ways, an outage and recovery, a second account on the same device, and the email confirmation, password reset and expired-link flows. The versions test runs the claims check on boards with a known answer, then loads the page with a record made before a line changed and checks that the line comes back as due and marked Changed, that a clean run on the new moves replaces the record, and that two devices merge to the newer version. The shell test covers the tab order, the colour switch keeping its tab, and Settings. The onboarding test is a new visitor from the welcome screen to a personal playbook, with the games in `data/games` fetched through a stand-in for chess.com (first with too few of them, then again) and as a PGN file on a phone. The daily test plays today's five across both books, builds a streak, earns badges with the coach's medal held back until a line is over, takes settings from another device, and steps the explore board back to move one. The accounts test also signs a new player up with a chess username and checks that the games are read once, straight after. Screenshots land in `tests/out/`. To regenerate the images in this README, run `make shots`.
 
 ## Credits
 

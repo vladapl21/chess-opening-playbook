@@ -92,9 +92,9 @@ try:
         assert wait_depth(pg, 12)
         best = pg.evaluate('EngineUI.r.lines[0].pv[0]')
         pg.click('#engcard [data-ek="0"]'); pg.wait_for_timeout(700)
-        X = pg.evaluate('({view: S.view, moves: S.ex.moves, i: S.ex.i, title: S.ex.title})')
-        print('explore:', X)
-        assert X['view'] == 'explore' and X['moves'] == [best] and X['i'] == 1
+        X = pg.evaluate('({view: S.view, moves: S.ex.moves, i: S.ex.i, base: S.ex.base, title: S.ex.title})')
+        B = X['base']; print('explore:', {k: v for k, v in X.items() if k != 'moves'}, X['moves'][B:])
+        assert X['view'] == 'explore' and B > 0 and X['moves'][B:] == [best] and X['i'] == B + 1, 'the moves from the start come along'
         assert pg.evaluate('location.hash') == '#explore'
         assert wait_depth(pg, 12)
         assert not notation(pg.inner_text('#view')), notation(pg.inner_text('#view'))
@@ -102,24 +102,24 @@ try:
 
         # step back, then play other moves for both sides (tap-tap and drag)
         pg.keyboard.press('ArrowLeft'); pg.wait_for_timeout(250)
-        assert pg.evaluate('S.ex.i') == 0
+        assert pg.evaluate('S.ex.i') == B
         legal = pg.evaluate("exChess().moves({verbose: true}).map(m => m.from + m.to)")
         other = next(u for u in legal if u != best[:4])
         ex_move(pg, other)
-        assert pg.evaluate('S.ex.moves') == [other] and pg.evaluate('S.ex.i') == 1, pg.evaluate('S.ex.moves')
+        assert pg.evaluate('S.ex.moves.slice(S.ex.base)') == [other] and pg.evaluate('S.ex.i') == B + 1, pg.evaluate('S.ex.moves')
         reply = pg.evaluate("exChess().moves({verbose: true}).map(m => m.from + m.to)")[0]
         ex_move(pg, reply, drag=True)
-        assert pg.evaluate('S.ex.i') == 2, pg.evaluate('[S.ex.moves, S.ex.i]')
+        assert pg.evaluate('S.ex.i') == B + 2, pg.evaluate('[S.ex.moves, S.ex.i]')
         # an illegal try changes nothing
         ex_move(pg, 'a1a8')
-        assert pg.evaluate('S.ex.i') == 2
+        assert pg.evaluate('S.ex.i') == B + 2
         # the board turns around and still takes moves the right way up
         pg.click('#xFlip'); pg.wait_for_timeout(200)
         assert pg.evaluate('S.ex.flip') != pg.evaluate('FLIP')
         u3 = pg.evaluate("exChess().moves({verbose: true}).map(m => m.from + m.to)")[0]
         ex_move(pg, u3)
-        assert pg.evaluate('S.ex.i') == 3 and pg.evaluate('S.ex.moves[2]') == u3
-        assert pg.locator('.timeline .trow').count() == 3
+        assert pg.evaluate('S.ex.i') == B + 3 and pg.evaluate(f'S.ex.moves[{B + 2}]') == u3
+        assert pg.locator('.timeline .trow').count() == B + 3
 
         # the engine answers your moves when asked
         pg.check('#exAns'); pg.wait_for_timeout(200)
@@ -166,7 +166,7 @@ try:
         assert pg.locator('.plan').count() == 1, 'a finished main line shows its plan'
         pg.click('#dExplore'); pg.wait_for_timeout(500)
         last = pg.evaluate("nodeFen(LINES['setup'].n[LINES['setup'].n.length - 1])")
-        assert pg.evaluate('S.view') == 'explore' and pg.evaluate('S.ex.start') == last and pg.evaluate('S.ex.i') == 0
+        assert pg.evaluate('S.view') == 'explore' and pg.evaluate('S.ex.start') == pg.evaluate('START_FEN') and pg.evaluate('S.ex.i') == pg.evaluate('S.ex.base') > 0 and pg.evaluate('exChess().fen()') == last
         assert 'PLAN FROM THE END' in pg.inner_text('.plan').upper(), 'the plan comes along to the explore board'
         pg.click('#exBack'); pg.wait_for_timeout(300)
         assert pg.evaluate('S.view') == 'drill' and pg.evaluate('S.drill.state') == 'done'

@@ -12,6 +12,8 @@
   --sq-light:#E6ECE2; --sq-dark:#84A390; --hl:rgba(240,201,64,.55); --sel:rgba(13,106,78,.38);
   --arr-g:#11843F; --arr-r:#D2302A; --arr-b:#2F63C9; --arr-y:#E3A90E; --arr-e:#7646D6;
   --shadow:0 0 0 1px var(--line),0 2px 0 rgba(18,32,26,.05);
+  --flame:#D9541E; --flame-2:#F4A21F; --flame-ink:#FFFFFF; --flame-soft:#FBE4D7;
+  --gold:#B7860F; --gold-2:#F1CF6B; --silver:#7D8B95; --silver-2:#DCE3E8; --bronze:#9A5A2C; --bronze-2:#E3A878; --ribbon-1:#2D5DAA; --ribbon-2:#B93628; --locked:#A9B5AD; --locked-2:#EEF2EF;
   --f-display:"Barlow Condensed","Arial Narrow","Roboto Condensed",Impact,sans-serif;
   --f-body:"Barlow","Segoe UI",system-ui,-apple-system,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
@@ -23,6 +25,8 @@
   --rosso:#F2685B; --rosso-soft:#3D1C18; --oro:#E2B54C; --oro-soft:#3A2F14; --blu:#86AEF2; --blu-soft:#1B2A45; --viola:#B9A2EC; --viola-soft:#2C2342;
   --sq-light:#CFD8CC; --sq-dark:#6F8D7B; --hl:rgba(240,201,64,.5); --sel:rgba(67,192,143,.42);
   --arr-g:#1FA155; --arr-r:#E8463D; --arr-b:#4F82E6; --arr-y:#F0B92A; --arr-e:#A78BF5;
+  --flame:#FF8746; --flame-2:#FFC24A; --flame-ink:#2A1205; --flame-soft:#3B2216;
+  --gold:#E2B54C; --gold-2:#F7DF92; --silver:#A9B6BF; --silver-2:#E2E8EC; --bronze:#C9864F; --bronze-2:#EFC29C; --ribbon-1:#5F8BE0; --ribbon-2:#E2614F; --locked:#55665D; --locked-2:#1F2A25;
   --shadow:0 0 0 1px var(--line),0 2px 0 rgba(0,0,0,.35); --pico-b:drop-shadow(0 0 1px rgba(214,226,219,.95)) drop-shadow(0 0 .6px rgba(214,226,219,.95)); --scrim:rgba(0,0,0,.62); color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0D1411; --surface:#151F1A; --surface-2:#1C2822; --ink:#E4EDE8; --muted:#97ACA2; --line:#2A3832;
@@ -30,6 +34,8 @@
   --rosso:#F2685B; --rosso-soft:#3D1C18; --oro:#E2B54C; --oro-soft:#3A2F14; --blu:#86AEF2; --blu-soft:#1B2A45; --viola:#B9A2EC; --viola-soft:#2C2342;
   --sq-light:#CFD8CC; --sq-dark:#6F8D7B; --hl:rgba(240,201,64,.5); --sel:rgba(67,192,143,.42);
   --arr-g:#1FA155; --arr-r:#E8463D; --arr-b:#4F82E6; --arr-y:#F0B92A; --arr-e:#A78BF5;
+  --flame:#FF8746; --flame-2:#FFC24A; --flame-ink:#2A1205; --flame-soft:#3B2216;
+  --gold:#E2B54C; --gold-2:#F7DF92; --silver:#A9B6BF; --silver-2:#E2E8EC; --bronze:#C9864F; --bronze-2:#EFC29C; --ribbon-1:#5F8BE0; --ribbon-2:#E2614F; --locked:#55665D; --locked-2:#1F2A25;
   --shadow:0 0 0 1px var(--line),0 2px 0 rgba(0,0,0,.35); --pico-b:drop-shadow(0 0 1px rgba(214,226,219,.95)) drop-shadow(0 0 .6px rgba(214,226,219,.95)); --scrim:rgba(0,0,0,.62); color-scheme:dark}
 /* board colours (Settings): each palette has its own light and dark values */
 :root[data-board="wood"]{--sq-light:#F0DDBD;--sq-dark:#B98B63}
@@ -68,7 +74,7 @@ p{margin:0}
 .tabs button{border:0;background:none;padding:8px 14px;border-radius:3px;font-weight:600;font-size:14px;color:var(--muted);cursor:pointer;white-space:nowrap}
 .tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
 .tabs button .sm{display:none}
-.tabs button .badge,.sidesw .badge{display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:3px;background:var(--rosso);color:#fff;font-size:11px;margin-left:6px;padding:0 5px;font-family:var(--f-mono)}
+.tabs button .todo{display:inline-grid;place-items:center;width:17px;height:17px;border-radius:50%;background:var(--flame);color:var(--flame-ink);font:800 11.5px/1 var(--f-body);margin-left:6px;vertical-align:1px}
 .brandrow{display:flex;align-items:center;gap:10px 18px;flex-wrap:wrap;min-width:0}
 /* settings and the account sit in the corner of the screen, away from the chess: in the margin on a wide screen, in a slim row above the header otherwise */
 .corner{display:flex;justify-content:flex-end;align-items:center;gap:8px;min-height:36px;margin-bottom:8px}
@@ -236,6 +242,8 @@ p{margin:0}
 .trow.blk .lbl{color:var(--muted)}
 .trow .tg{display:flex;gap:4px}
 .trow .tg i{width:8px;height:8px;border-radius:50%;display:block}
+.trow.pre:not(.cur) .lbl,.trow.pre:not(.cur) .n{opacity:.62}
+.chip.came{background:var(--accent-soft);color:var(--accent)}
 .tg .key,.tg .good{background:var(--accent)} .tg .best{background:var(--blu)} .tg .mistake{background:var(--oro)} .tg .blunder,.tg .trap,.tg .warn,.tg .missed{background:var(--rosso)} .tg .mate{background:var(--ink)} .tg .fix,.tg .new,.tg .swap{background:var(--viola)} .tg .game{background:var(--oro)} .tg .draw{background:var(--muted)}
 .collapsed{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;font-size:13px;color:var(--muted);background:var(--surface-2);width:100%;border:0;text-align:left;cursor:pointer}
 .outcome{display:flex;align-items:center;gap:10px;font-size:14px;padding:10px 12px;border-radius:4px;background:var(--surface-2)}
@@ -271,6 +279,30 @@ p{margin:0}
 .donebox{display:grid;gap:10px;padding:14px;border-radius:4px;background:var(--accent-soft)}
 .donebox.bad{background:var(--oro-soft)}
 .donebox h4{font-size:17px}
+/* Today: the daily five at the top of Drill */
+.today{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.today.done{border-color:var(--accent)}
+.tring{--p:0;width:78px;height:78px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--flame) calc(var(--p) * 1%),var(--surface-2) 0)}
+.today.done .tring{background:conic-gradient(var(--accent) 100%,var(--surface-2) 0)}
+.tring i{width:62px;height:62px;border-radius:50%;background:var(--surface);display:grid;place-items:center;align-content:center;font-style:normal;line-height:1}
+.tring b{font-family:var(--f-display);font-size:28px} .tring small{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.tmain{display:grid;gap:8px;min-width:0} .tline{font-size:15px;font-weight:600}
+.tside{display:grid;gap:8px;justify-items:end}
+.streak{display:flex;align-items:center;gap:6px;margin:0;font-size:13px;color:var(--muted)} .streak b{font-family:var(--f-display);font-size:26px;line-height:1;color:var(--ink)}
+.flame{width:26px;height:26px;fill:var(--flame);flex:none} .flame .fl-in{fill:var(--flame-2)}
+.streak.zero .flame{fill:var(--locked)} .streak.zero .flame .fl-in{fill:var(--locked-2)}
+.week{display:flex;gap:5px;margin:0;padding:0;list-style:none}
+.week li{display:grid;justify-items:center;gap:3px;font-size:10.5px;color:var(--muted);font-weight:600}
+.week i{width:20px;height:20px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center}
+.week i svg{width:12px;height:12px}
+.week li.on i{background:var(--flame);color:var(--flame-ink)} .week li.now i{box-shadow:0 0 0 2px var(--flame)}
+.dmore > summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.dmore > summary::-webkit-details-marker{display:none}
+.dmore > summary::after{content:"";flex:none;width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translateY(-3px);transition:transform .15s}
+.dmore[open] > summary::after{transform:rotate(225deg) translateY(-1px)}
+.dmore > summary > span{display:grid;gap:2px} .dmore > summary b{font-size:14.5px} .dmore > summary span span{font-size:13px;color:var(--muted)}
+.dmore[open]{display:grid;gap:12px}
+@media (max-width:640px){ .sgrid.idle .ccol{order:-1} footer.foot .fcopy{margin-left:0} .today{grid-template-columns:auto minmax(0,1fr)} .tside{grid-column:1 / -1;justify-items:start;grid-template-columns:auto auto;justify-content:space-between;align-items:center;width:100%} }
 
 /* games */
 .insights{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:28px}
@@ -461,6 +493,8 @@ button.ucard:hover{border-color:var(--accent);transform:translateY(-1px)}
 .acct .av::after{content:"";position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:50%;border:2px solid var(--surface);background:var(--muted)}
 .acct.ok .av::after{background:var(--accent)} .acct.sync .av::after{background:var(--oro)} .acct.err .av::after{background:var(--rosso)}
 .acct .acctx{font-size:13px;color:var(--muted);font-weight:600}
+.mebtn{display:inline-flex;align-items:center;gap:4px;min-height:36px;padding:4px 12px 4px 8px;border-radius:18px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font:700 15px var(--f-body)}
+.mebtn .flame{width:20px;height:20px} .mebtn.zero .flame{fill:var(--locked)} .mebtn.zero .flame .fl-in{fill:var(--locked-2)} .mebtn:hover{border-color:var(--flame)}
 .gear{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--muted);display:grid;place-items:center;cursor:pointer;flex:none}
 .gear:hover{color:var(--ink);border-color:var(--accent)} .gear svg{width:19px;height:19px}
 .setsheet{width:min(480px,100%);gap:18px}
@@ -563,6 +597,8 @@ button.ucard:hover{border-color:var(--accent);transform:translateY(-1px)}
 @media (prefers-reduced-motion: reduce){.spin{animation:none}}
 
 footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
+footer.foot .fcopy{margin-left:auto}
+.chnav{display:flex;flex-wrap:wrap;gap:6px;margin:-6px 0 18px} .chnav .chip{border:0;cursor:pointer;font-size:12.5px;padding:5px 10px} .chnav .chip.on{background:var(--accent);color:var(--accent-ink)}
 
 @media (max-width: 760px){
   .lcard.feat{grid-column:auto;grid-row:auto;grid-template-columns:96px minmax(0,1fr);gap:12px;padding:12px}
@@ -637,6 +673,7 @@ footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);fo
 
 <div class="app" id="app">
   <div class="corner">
+    <button class="mebtn zero" id="meBtn" type="button" aria-haspopup="dialog" hidden><svg class="flame" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.6 2.2c.5 3-1 4.6-2.6 6.3C8.3 10.3 6.5 12.2 6.5 15.3 6.5 19 9 21.8 12 21.8s5.5-2.5 5.5-6.1c0-2.7-1.4-4.4-2.4-5.6-.2 1.4-.8 2.5-1.9 3 .6-3.6-.2-7.1-.6-10.9z"/><path class="fl-in" d="M12.2 13.2c-1.4 1.3-2.4 2.3-2.4 3.9 0 1.5 1 2.6 2.2 2.6s2.2-1.1 2.2-2.6c0-1.5-.9-2.4-2-3.9z"/></svg><b class="tnum" id="meN">0</b></button>
     <button class="gear" id="setBtn" type="button" aria-haspopup="dialog" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.5-2.4 1a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.5A7.6 7.6 0 0 0 7 6.5l-2.4-1-2 3.5 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.5 2.4-1a7.6 7.6 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.6 7.6 0 0 0 2.6-1.5l2.4 1 2-3.5z"/></svg></button>
     <button class="acct out" id="acctBtn" type="button" aria-haspopup="dialog" hidden>Sign in</button>
   </div>
@@ -647,15 +684,14 @@ footer.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);fo
         <span><span class="kicker" id="brandKick">White repertoire</span><h1 class="wordmark">The Opening <em>Playbook</em></h1></span>
       </button>
       <div class="sidesw" role="group" aria-label="Repertoire color">
-        <button data-side="w" aria-pressed="true"><i class="sw w" aria-hidden="true"></i>White<span class="badge" id="dueW" hidden>0</span></button>
-        <button data-side="b" aria-pressed="false"><i class="sw b" aria-hidden="true"></i>Black<span class="badge" id="dueB" hidden>0</span></button>
+        <button data-side="w" aria-pressed="true"><i class="sw w" aria-hidden="true"></i>White</button>
+        <button data-side="b" aria-pressed="false"><i class="sw b" aria-hidden="true"></i>Black</button>
       </div>
     </div>
     <nav class="tabs" role="tablist" aria-label="Sections">
       <button role="tab" data-view="sandbox" aria-selected="false">Sandbox</button>
       <button role="tab" data-view="course" aria-selected="true">Course</button>
-      <button role="tab" data-view="learn" aria-selected="false">Learn</button>
-      <button role="tab" data-view="drill" aria-selected="false">Drill<span class="badge" id="dueBadge" hidden>0</span></button>
+      <button role="tab" data-view="drill" aria-selected="false">Drill<span class="todo" id="drillDot" hidden title="Today's five lines are not done yet">!</span></button>
       <button role="tab" data-view="games" aria-selected="false"><span class="lg">Your games</span><span class="sm">Games</span></button>
       <button role="tab" data-view="cheat" aria-selected="false"><span class="lg">Cheat sheet</span><span class="sm">Cheats</span></button>
     </nav>
@@ -872,7 +908,7 @@ const Prog = {
     } catch(e){ this.ref = null; }
   },
   saveLocal(){ try { localStorage.setItem(PKEY, JSON.stringify(this.d)); } catch(e){} },
-  save(){ this.d.updated = Date.now(); if (Cloud.user) this.d.owner = Cloud.user.id; this.saveLocal(); this.push(); Cloud.push(); },
+  save(){ this.d.updated = Date.now(); if (Cloud.user) this.d.owner = Cloud.user.id; try { this.d.tz = Intl.DateTimeFormat().resolvedOptions().timeZone || this.d.tz; } catch(e){} this.saveLocal(); this.push(); Cloud.push(); },
   async push(){
     if (!this.ref) return;
     if (this.saving){ this.again = true; return; }
@@ -893,13 +929,64 @@ const Prog = {
     r.seen++; r.last = Date.now();
     if (clean){ r.clean++; r.box = Math.min(5, (r.box || 0) + 1); } else r.box = 0;
     r.due = Date.now() + INTERVALS[r.box] * DAY - 60e3;
-    this.d.lines[id] = r; this.save();
+    this.d.lines[id] = r; Daily.mark(id); this.save();
   },
   puz(id, ok){ const r = this.d.puz[id] || {tries: 0, ok: 0}; r.tries++; if (ok) r.ok++; r.last = Date.now(); this.d.puz[id] = r; this.save(); },
   lessonLevel(lid){ const ls = LESSONS[lid].lines.filter(x => DRILLABLE.includes(x)); if (!ls.length) return 0;
     return Math.round(ls.reduce((a, x) => a + Math.min(5, (this.rec(x) || {}).box || 0), 0) / ls.length); },
   dueCount(side){ const now = Date.now(), ids = side ? BOOKS[side].drillable : DRILLABLE; return ids.filter(id => { const r = this.rec(id); return r && r.due <= now; }).length; }
 };
+
+/* ------------------------------------------------------------------ the daily five */
+// Five different lines played to their end in a day keep the streak alive (the Drill tab serves them, but any finished
+// line counts). d.days holds the ids of the lines played on each local date; days older than two months fold to a count.
+const DAILY = 5;
+const dkey = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const dayDate = (off = 0, from) => { const d = from ? new Date(+from.slice(0, 4), +from.slice(5, 7) - 1, +from.slice(8, 10)) : new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + off); return d; };
+const dayKey = (off = 0) => dkey(dayDate(off));
+const Daily = {
+  n(k){ const v = (Prog.d.days || {})[k]; return Array.isArray(v) ? v.length : (v || 0); },
+  ids(){ const v = (Prog.d.days || {})[dayKey()]; return Array.isArray(v) ? v : []; },
+  count(){ return this.n(dayKey()); },
+  done(off = 0){ return this.n(dayKey(off)) >= DAILY; },
+  // days in a row with five lines: up to today, or up to yesterday while today is still open
+  streak(){ let k = this.done(0) ? 0 : -1, n = 0; while (this.done(k)){ n++; k--; } return n; },
+  best(){ const ks = Object.keys(Prog.d.days || {}).filter(k => this.n(k) >= DAILY).sort(); let b = 0, run = 0, prev = null;
+    for (const k of ks){ run = prev && dkey(dayDate(1, prev)) === k ? run + 1 : 1; b = Math.max(b, run); prev = k; } return b; },
+  mark(id){
+    const D = Prog.d.days || (Prog.d.days = {}), k = dayKey(), v = Array.isArray(D[k]) ? D[k] : [];
+    if (!v.includes(id)) v.push(id); D[k] = v;
+    const old = dayKey(-60); for (const x in D) if (x < old && Array.isArray(D[x])) D[x] = D[x].length;
+    return v.length;
+  }
+};
+// The next line for today's five, from either book: the oldest slips first, then lines whose moves changed, then what is
+// due, then new lines from lessons already studied, then new lines in course order. Never one already played today.
+const cmpArr = (a, b) => { for (let i = 0; i < Math.max(a.length, b.length); i++){ const d = (a[i] || 0) - (b[i] || 0); if (d) return d; } return 0; };
+function dailyNext(){
+  const today = new Set(Daily.ids()), now = Date.now(), PR = {core: 0, common: 1, rare: 2}, rank = {}, c = [];
+  let k = 0; for (const U of COURSE) if (!U.soon && U.lessons) for (const l of U.lessons.concat(U.deeper || [])) if (rank[U.side + l] === undefined) rank[U.side + l] = k++;
+  for (const s of ['w', 'b']){
+    const B = BOOKS[s], lines = B.lineMap || (B.lineMap = Object.fromEntries(B.lines.map(l => [l.id, l])));
+    for (const id of B.drillable){
+      if (today.has(id)) continue;
+      const l = lines[id], L = LIDX[s][l.lesson]; if (!L) continue;
+      const r = Prog.rec(id), cr = rank[s + L.id] === undefined ? 1e4 : rank[s + L.id], pri = PR[L.pri] === undefined ? 1 : PR[L.pri], fresh = [cr, pri, l.main ? 0 : 1];
+      let tier, key;
+      if (r && r.changed){ tier = 1; key = [cr]; }
+      else if (r && r.seen && !r.box){ tier = 0; key = [r.last || 0]; }
+      else if (r && r.due <= now){ tier = 2; key = [r.box, r.due]; }
+      else if (!r && lessonSeen(s, L.id)){ tier = 3; key = fresh; }
+      else if (!r && cr < 1e4){ tier = 4; key = fresh; }
+      else if (r){ tier = 5; key = [r.due]; }
+      else continue;
+      c.push({s, id, tier, key});
+    }
+  }
+  c.sort((a, b) => a.tier - b.tier || cmpArr(a.key, b.key));
+  const x = c[0]; if (!x) return null;
+  return {s: x.s, id: x.id, why: ['You slipped here last time', 'Changed line', 'Due for review', 'New line from a lesson you studied', 'New line', 'Extra practice'][x.tier]};
+}
 
 /* ------------------------------------------------------------------ accounts (site build only) */
 // The GitHub Pages build fills SITE from app/site.json and loads supabase-js; the claude.ai build leaves it null.
@@ -923,8 +1010,17 @@ function mergeProg(a, b){
     for (const id in (r.course.u || {})){ const x = c.u[id] || (c.u[id] = {}), y = r.course.u[id]; for (const f in y) x[f] = Math.max(x[f] || 0, y[f] || 0); }
     for (const k in (r.course.seen || {})) c.seen[k] = Math.max(c.seen[k] || 0, r.course.seen[k] || 0);
   }
+  if (r.days){
+    const d = o.days || (o.days = {}), cnt = v => Array.isArray(v) ? v.length : (v || 0);
+    for (const k in r.days){ const x = d[k], y = r.days[k];
+      d[k] = x === undefined ? (Array.isArray(y) ? y.slice() : y) : Array.isArray(x) && Array.isArray(y) ? [...new Set(x.concat(y))] : Math.max(cnt(x), cnt(y)); }
+  }
   o.updated = Math.max(o.updated || 0, r.updated || 0);
   const pk = [a.packs, r.packs].filter(Boolean).sort((x, y) => (y.updated || 0) - (x.updated || 0))[0]; if (pk) o.packs = Object.assign({}, pk);
+  const st = [a.set, r.set].filter(Boolean).sort((x, y) => (y.t || 0) - (x.t || 0))[0]; if (st) o.set = Object.assign({}, st);   // the look and the coach
+  const ml = [a.mail, r.mail].filter(Boolean).sort((x, y) => (y.t || 0) - (x.t || 0))[0]; if (ml) o.mail = Object.assign({}, ml);
+  if (r.badges){ const bd = o.badges || (o.badges = {}); for (const k in r.badges) bd[k] = bd[k] ? Math.min(bd[k], r.badges[k]) : r.badges[k]; }
+  if (r.tz && !o.tz) o.tz = r.tz;
   const me = mergeMe(a, r); if (me) o.me = JSON.parse(JSON.stringify(me)); else delete o.me;   // whose playbook this is (app/product.js)
   return o;
 }
@@ -959,6 +1055,7 @@ const Cloud = {
     if (u.email) keepEmail(u.email);
     if (u.id !== was) await this.pull();
     renderAcct();
+    if (typeof Product !== 'undefined') Product.autoConnect();   // a username given at sign-up: read the games now
   },
   // fetch the account's copy and merge it in; progress made by someone else on this device is set aside, not mixed in
   async pull(){
@@ -1034,11 +1131,18 @@ function renderNudge(){
     Acct.open(x.dataset.nudge);
   });
 }
+// Reminder emails (supabase/functions/nudge): off unless the player turns them on. At most one a week.
+function mailHTML(){
+  const on = !!(Prog.d.mail && Prog.d.mail.on);
+  return `<button type="button" class="switch" role="switch" aria-checked="${on}" data-mail><span><b>Reminder emails</b><span>At most one a week: when lines you slipped on have been waiting a few days, or your streak is about to end.</span></span><i class="knob" aria-hidden="true"></i></button>`;
+}
+// a chess username given at sign-up, kept until the games have been read (the account carries it too, in its metadata)
+const CONNECT_KEY = 'playbook-connect';
 // the sign-in sheet: modes signup, signin, forgot, newpass, check, in
 const Acct = {
-  mode: null, msg: '', bad: false, busy: false, email: '', back: null,
+  mode: null, msg: '', bad: false, busy: false, email: '', back: null, csite: 'chess.com', cuser: '',
   open(mode, msg, bad){
-    if (!Cloud.on()) return;
+    if (!Cloud.on() && mode !== 'me') return;
     if (!this.mode) this.back = document.activeElement;
     // the header button says "Sign in", so signed-out players land on sign-in; making an account is the tab beside it
     this.mode = mode || (Cloud.user ? 'in' : 'signin'); this.msg = msg || ''; this.bad = !!bad; this.busy = false;
@@ -1060,8 +1164,14 @@ const Acct = {
     const go = t => `<button class="btn primary" type="submit" ${this.busy ? 'disabled' : ''}>${this.busy ? 'One moment…' : t}</button>`;
     const tabs = `<div class="atabs" role="group" aria-label="Sign in or make an account"><button type="button" data-mode="signin" aria-pressed="${m === 'signin'}">Sign in</button><button type="button" data-mode="signup" aria-pressed="${m === 'signup'}">Create account</button></div>`;
     let h;
-    if (m === 'signup') h = `${tabs}<h2 id="acctTitle">Save your progress</h2><p>Make an account to keep your drills, course and practice games on every device. What you've done on this device comes with you.</p>${msg}
-      <form data-act="signup">${email}${pass('new-password', true)}${go('Create account')}</form>`;
+    // a player without games connects their chess account in the same form, so the games are read as soon as it exists
+    const fresh = typeof PERSONA !== 'undefined' && PERSONA === 'new';
+    const chess = fresh ? `<div class="field chessacct"><span>Your chess account</span><div class="setseg" role="group" aria-label="Where you play">${['chess.com', 'lichess'].map(x => `<button type="button" data-csite="${x}" aria-pressed="${this.csite === x}">${x === 'lichess' ? 'Lichess' : 'chess.com'}</button>`).join('')}</div>
+        <input name="chess" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Your username on ${this.csite === 'lichess' ? 'Lichess' : 'chess.com'}" value="${esc(this.cuser)}" aria-label="Your username on ${this.csite === 'lichess' ? 'Lichess' : 'chess.com'}">
+        <small>Your playbook is built from your public games there. You can leave this empty and add games later.</small></div>
+      <label class="tickrow"><input type="checkbox" name="mail" checked><span>Email me a reminder when lines I slipped on are waiting or my streak is about to end. At most once a week.</span></label>` : '';
+    if (m === 'signup') h = `${tabs}<h2 id="acctTitle">${fresh ? 'Make your account' : 'Save your progress'}</h2><p>${fresh ? 'Your playbook, drills and streak are kept with it, on every device.' : 'Make an account to keep your drills, course and practice games on every device. What you\'ve done on this device comes with you.'}</p>${msg}
+      <form data-act="signup">${email}${pass('new-password', true)}${chess}${go(fresh ? 'Create account and connect' : 'Create account')}</form>`;
     else if (m === 'signin') h = `${tabs}<h2 id="acctTitle">Welcome back</h2><p>Sign in to pick up where you left off. What you've done on this device while signed out comes with you.</p>${msg}
       <form data-act="signin">${email}${pass('current-password')}${go('Sign in')}</form><div class="alt"><button class="linkish" data-mode="forgot" type="button">Forgot your password?</button></div>`;
     else if (m === 'forgot') h = `<h2 id="acctTitle">Reset your password</h2><p>We'll email you a link. Open it in this browser to choose a new password.</p>${msg}
@@ -1069,20 +1179,25 @@ const Acct = {
     else if (m === 'newpass') h = `<h2 id="acctTitle">Choose a new password</h2>${msg}<form data-act="newpass">${pass('new-password', true)}${go('Save the password')}</form>`;
     else if (m === 'check') h = `<h2 id="acctTitle">Check your email</h2><p>We sent a confirmation link to <b>${em}</b>. Open it in this browser to finish. Your progress here stays safe in the meantime.</p>${msg}
       <div class="alt"><button class="linkish" data-mode="signin" type="button">Back to sign in</button></div>`;
+    else if (m === 'me') h = `<h2 id="acctTitle">You</h2>${typeof profileHTML === 'function' ? profileHTML() : ''}${Cloud.on() ? `<div class="alt"><span>Sign in to keep your streak and badges on every device.</span> <button class="linkish" data-mode="signin" type="button">Sign in</button></div>` : ''}`;
     else {
       const st = Cloud.state, line = st === 'sync' ? 'Saving to your account…' : st === 'err' ? `Couldn't reach your account (${esc(Cloud.err)}). Your progress is still kept on this device and will be saved when the connection is back.` : `Progress saved to your account ${Cloud.at ? ago(Cloud.at) : ''}.`;
-      h = `<h2 id="acctTitle">Your account</h2><p>Signed in as <b>${esc(u ? u.email : '')}</b>. Sign in with the same email on any device to pick up where you left off.</p>${msg}
+      h = `<h2 id="acctTitle">You</h2><p>Signed in as <b>${esc(u ? u.email : '')}</b>. Sign in with the same email on any device to pick up where you left off.</p>${msg}
+        ${typeof profileHTML === 'function' && !(typeof PERSONA !== 'undefined' && PERSONA === 'new') ? profileHTML() + mailHTML() : ''}
         <p class="syncline ${st}"><i aria-hidden="true"></i><span>${line}</span></p>
         <div class="lesson-actions"><button class="btn" data-act="sync" type="button">Sync now</button><button class="btn ghost" data-act="signout" type="button">Sign out</button></div>`;
     }
     P.innerHTML = `<button class="x" type="button" aria-label="Close" data-act="close">×</button>${h}`;
     const F = P.querySelector('form'); if (F) F.onsubmit = e => { e.preventDefault(); this.submit(F.dataset.act, new FormData(F)); };
+    P.querySelectorAll('[data-csite]').forEach(x => x.onclick = () => { const i = P.querySelector('input[name=email]'), c = P.querySelector('input[name=chess]'); if (i) this.email = i.value; if (c) this.cuser = c.value; this.csite = x.dataset.csite; this.render(); const c2 = P.querySelector('input[name=chess]'); if (c2) c2.focus(); });
     P.querySelectorAll('[data-mode]').forEach(x => x.onclick = () => {
       const i = P.querySelector('input[name=email]'); if (i) this.email = i.value;
+      const c = P.querySelector('input[name=chess]'); if (c) this.cuser = c.value;
       const tab = x.closest('.atabs'); this.open(x.dataset.mode);
       if (tab){ const t = P.querySelector(`.atabs [data-mode="${x.dataset.mode}"]`); if (t) t.focus(); }
     });
     P.querySelectorAll('button[data-act]').forEach(x => x.onclick = () => this.submit(x.dataset.act));
+    const ml = P.querySelector('[data-mail]'); if (ml) ml.onclick = () => { Prog.d.mail = {on: !(Prog.d.mail && Prog.d.mail.on), t: Date.now()}; Prog.save(); this.render(); };
   },
   async submit(act, fd){
     if (act === 'close'){ this.close(); return; }
@@ -1092,7 +1207,11 @@ const Acct = {
     let r = {error: null};
     try {
       if (act === 'signup'){
-        r = await A.signUp({email, password, options: {emailRedirectTo: SITE.home}});
+        const cu = fd ? String(fd.get('chess') || '').trim() : ''; this.cuser = cu;
+        if (fd && fd.get('mail')) Prog.d.mail = {on: true, t: Date.now()};
+        const data = cu ? {chess_site: this.csite, chess_user: cu} : {};
+        if (cu) try { localStorage.setItem(CONNECT_KEY, JSON.stringify({site: this.csite, user: cu})); } catch(e){}
+        r = await A.signUp({email, password, options: {emailRedirectTo: SITE.home, data}});
         if (!r.error){ keepEmail(email); if (r.data && r.data.session){ this.close(); toast('Account made. Your progress is saved to it now.'); return; } this.busy = false; this.mode = 'check'; this.render(); return; }
       }
       else if (act === 'signin'){
@@ -1123,25 +1242,22 @@ const TXT = {
   w: {kick: 'White repertoire', piece: 'p-wb',
       learnKick: st => `Your ${st.total} games with White · every one started with the e-pawn`, learnH: 'What Black plays against your e-pawn',
       gamesP: st => `Your last ${st.total} games with White across both accounts, July to October: ${st.wins} wins, ${st.losses} losses. Every one started with the e-pawn.`,
-      byHead: 'Black\'s reply', miss: 'Not the move from your study. Try again.', miss2: 'Not that one. The arrow shows the move from your study; play it to continue.',
-      foot: ['Italian lines from your coach\'s study (Aleks_Ra, 2022); everything else built for you. All lines checked with Stockfish 17.1.',
-             'Black\'s odds: your first move from your own games; after that from Maia, a model trained on real club games at your level.',
-             'Games: your last 76 with White across both chess.com accounts, Jul–Oct 2026.']},
+      byHead: 'Black\'s reply', miss: 'Not the move from your study. Try again.', miss2: 'Not that one. The arrow shows the move from your study; play it to continue.'},
   b: {kick: 'Black repertoire', piece: 'p-bb',
       learnKick: st => `Your ${st.total} games with Black · both accounts`, learnH: 'What White plays against you',
       gamesP: st => `Your ${st.total} games with Black across both accounts, July to October: ${st.wins} wins, ${st.losses} losses${st.draws ? `, ${st.draws} draw${st.draws === 1 ? '' : 's'}` : ''}.`,
-      byHead: 'White\'s opening', miss: 'Not the move in the guide. Try again.', miss2: 'Not that one. The arrow shows the guide\'s move; play it to continue.',
-      foot: ['Black lines built for you from your own games and checked with Stockfish 17.1.',
-             'White\'s odds: the first move from your own games; after that from Maia, a model trained on real club games at your level.',
-             'Games: your 73 with Black across both chess.com accounts, Jul–Oct 2026.']}};
+      byHead: 'White\'s opening', miss: 'Not the move in the guide. Try again.', miss2: 'Not that one. The arrow shows the guide\'s move; play it to continue.'}};
 function renderChrome(){
   const T = TXT[SIDE];
+  const mb = document.getElementById('meBtn'), st = Daily.streak(), np = typeof PERSONA !== 'undefined' && PERSONA === 'new';
+  if (mb){ mb.hidden = np; mb.classList.toggle('zero', !st); document.getElementById('meN').textContent = st; mb.setAttribute('aria-label', `Your profile: ${st} ${st === 1 ? 'day' : 'days'} in a row`); }
   document.getElementById('brandKick').textContent = T.kick;
   document.getElementById('brandPiece').setAttribute('href', '#' + T.piece);
   document.querySelectorAll('.sidesw [data-side]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.side === SIDE)));
-  for (const s of ['w', 'b']){ const el = document.getElementById(s === 'w' ? 'dueW' : 'dueB'), d = s === SIDE ? 0 : Prog.dueCount(s); el.hidden = !d; el.textContent = d; el.title = `${d} lines due`; }
-  document.getElementById('foot').innerHTML = T.foot.map(t => `<span>${esc(t)}</span>`).join('');
+  document.getElementById('foot').innerHTML = `${FOOT ? `<span class="fmine">${esc(FOOT)}</span>` : ''}<span class="fcopy">© ${new Date().getFullYear()} The Opening Playbook</span>`;
 }
+// one line about whose playbook this is (app/product.js writes it for a personal playbook), then the copyright
+let FOOT = 'Built for you from your games on both chess.com accounts, July to October 2026, and from your coach\'s Italian study.';
 const STASH = {};
 function stashSide(){ STASH[SIDE] = {view: S.view, chapter: S.chapter, line: S.line, i: S.i, studyFrom: S.studyFrom, drillState: S.drillState, sbState: S.sbState, dfilter: S.dfilter, sbSession: S.sbSession}; }
 function switchSide(side){
@@ -1167,7 +1283,7 @@ function useSide(side){
   S.drill = null; S.renderedLine = null; S.showPre = false;
   try { localStorage.setItem(SIDE_KEY, side); } catch(e){}
 }
-/* ------------------------------------------------------------------ settings (kept on this device) */
+/* ------------------------------------------------------------------ settings (kept on this device and with the progress) */
 const SET_KEY = 'playbook-settings', HOST_THEME = document.documentElement.dataset.theme || '';
 const SET = {theme: 'system', size: 'm', board: 'green', coords: true, coach: true, who: 'knight'};
 try { Object.assign(SET, JSON.parse(localStorage.getItem(SET_KEY) || '{}')); } catch(e){}
@@ -1179,7 +1295,21 @@ function applySettings(){
   if (SET.board && SET.board !== 'green') r.dataset.board = SET.board; else delete r.dataset.board;
   const app = document.getElementById('app'); if (app) app.style.zoom = SIZES[SET.size] === 1 ? '' : String(SIZES[SET.size] || 1);
 }
-function setSetting(k, v){ SET[k] = v; try { localStorage.setItem(SET_KEY, JSON.stringify(SET)); } catch(e){} applySettings(); }
+// Settings travel with the progress record (d.set), so the coach and the look follow the player to every device.
+// Each copy carries the time it was last changed; the newer one wins.
+const SET_KEYS = ['theme', 'size', 'board', 'coords', 'coach', 'who'];
+const setCopy = () => SET_KEYS.reduce((o, k) => (o[k] = SET[k], o), {t: SET.t || 0});
+function setSetting(k, v){ SET[k] = v; SET.t = Date.now(); try { localStorage.setItem(SET_KEY, JSON.stringify(SET)); } catch(e){} applySettings(); Prog.d.set = setCopy(); Prog.save(); }
+function adoptSettings(){
+  const r = Prog.d.set;
+  if (r && (r.t || 0) > (SET.t || 0)){
+    for (const k of SET_KEYS) if (r[k] !== undefined) SET[k] = r[k];
+    SET.t = r.t; try { localStorage.setItem(SET_KEY, JSON.stringify(SET)); } catch(e){}
+    applySettings(); if (typeof Coach !== 'undefined') Coach.refresh(); return true;
+  }
+  if ((SET.t || 0) > ((r && r.t) || 0)) Prog.d.set = setCopy();
+  return false;
+}
 const Settings = {
   open(){ document.getElementById('setSheet').hidden = false; this.render(); document.getElementById('setPanel').querySelector('.x').focus(); },
   close(){ document.getElementById('setSheet').hidden = true; document.getElementById('setBtn').focus(); },
@@ -1187,7 +1317,7 @@ const Settings = {
     const seg = (k, opts) => `<div class="setseg" role="group">${opts.map(([v, label]) => `<button type="button" data-set="${k}:${v}" aria-pressed="${SET[k] === v}">${label}</button>`).join('')}</div>`;
     const sw = (k, h, p) => `<button type="button" class="switch" role="switch" aria-checked="${!!SET[k]}" data-set="${k}:${SET[k] ? 0 : 1}"><span><b>${h}</b><span>${p}</span></span><i class="knob" aria-hidden="true"></i></button>`;
     document.getElementById('setPanel').innerHTML = `<button class="x" type="button" aria-label="Close" data-setx>×</button>
-      <div><p class="kicker">On this device</p><h2 id="setTitle">Settings</h2></div>
+      <div><p class="kicker">${Cloud.user || Prog.ref ? 'Saved with your progress' : 'On this device'}</p><h2 id="setTitle">Settings</h2></div>
       <div class="setrow"><b>Appearance</b>${seg('theme', [['system', 'Match device'], ['light', 'Light'], ['dark', 'Dark']])}</div>
       <div class="setrow"><b>Text size</b>${seg('size', [['s', '<span class="aa" style="font-size:13px">A</span>'], ['m', '<span class="aa" style="font-size:16px">A</span>'], ['l', '<span class="aa" style="font-size:19px">A</span>'], ['xl', '<span class="aa" style="font-size:22px">A</span>']])}<span>Boards grow with the text.</span></div>
       <div class="setrow"><b>Board colour</b><div class="swatches" role="group">${BOARDS.map(([v, label, l, d]) => `<button type="button" class="swatch" data-set="board:${v}" aria-pressed="${SET.board === v}"><i aria-hidden="true"><b style="background:${l}"></b><b style="background:${d}"></b><b style="background:${d}"></b><b style="background:${l}"></b></i>${label}</button>`).join('')}</div></div>
@@ -1207,13 +1337,13 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && !document.
 applySettings();
 
 const view = document.getElementById('view');
-const VIEWS = ['sandbox', 'course', 'learn', 'drill', 'games', 'cheat'];
+const VIEWS = ['sandbox', 'course', 'drill', 'games', 'cheat'];
 const CVIEWS = ['course', 'unit', 'quiz'];
-const tabOf = (v, from) => CVIEWS.includes(v) || (v === 'study' && from === 'unit') ? 'course' : v === 'study' ? (from || 'learn') : VIEWS.includes(v) ? v : 'course';
+const tabOf = (v, from) => CVIEWS.includes(v) || (v === 'study' && from === 'unit') ? 'course' : v === 'study' ? tabOf(from || 'learn') : v === 'learn' ? 'games' : VIEWS.includes(v) ? v : 'course';
 function setTab(v){
   const b = v === 'explore' && S.ex && S.ex.back; if (b){ v = b.view === 'explore' ? 'course' : b.view; }
   const from = b ? b.studyFrom : S.studyFrom;
-  const t = CVIEWS.includes(v) || (v === 'study' && from === 'unit') ? 'course' : v === 'study' ? (from || 'learn') : v;
+  const t = tabOf(v, from);
   document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.view === t)));
 }
 function setHash(){
@@ -1236,13 +1366,13 @@ function setChapter(id, scroll){
   if (scroll){ const el = document.getElementById('chapter'); if (el && el.getBoundingClientRect().top > window.innerHeight * 0.55) el.scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block: 'start'}); }
 }
 function openLine(lineId, i, from){ S.line = lineId; S.i = (i === undefined ? lineStart(lineId) : i); S.showPre = false; go('study', {from}); }
-function refresh(){ render(); }
+function refresh(){ adoptSettings(); render(); }
 function render(){
   const U = (S.view === 'unit' || S.view === 'quiz') && UNIT[S.unit];
   if (U && U.side && !U.soon && U.kind !== 'skill' && U.side !== SIDE) useSide(U.side);
   setPerspective(viewSide());
   setTab(S.view); renderChrome();
-  const b = document.getElementById('dueBadge'), d = Prog.dueCount(); b.hidden = !d; b.textContent = d;
+  const b = document.getElementById('drillDot'); b.hidden = Daily.done(0) || (typeof PERSONA !== 'undefined' && PERSONA === 'new');
   if (S.view === 'drill') S.drill = S.drillState; else if (S.view === 'sandbox') S.drill = S.sbState; else if (S.view === 'quiz') S.drill = S.quizState; else S.drill = null;
   if (S.view !== 'study' && S.view !== 'explore') EngineUI.detach(); // the engine only runs where it's shown
   if (S.view !== 'explore') exStopAuto();
@@ -1270,7 +1400,7 @@ document.addEventListener('click', e => {
   if (t.dataset.lesson){ const L = LESSONS[t.dataset.lesson]; openLine(L.lines[0], undefined, S.view === 'study' ? S.studyFrom : S.view); return; }
   if (t.dataset.line){ openLine(t.dataset.line, t.dataset.i !== undefined ? +t.dataset.i : undefined, S.view === 'study' ? S.studyFrom : S.view); return; }
   const g = t.dataset.go;
-  if (VIEWS.includes(g)) go(PERSONA === 'new' ? 'start' : g);
+  if (VIEWS.includes(g) || g === 'learn') go(PERSONA === 'new' ? 'start' : g);
 });
 
 /* ------------------------------------------------------------------ LEARN */
@@ -1330,10 +1460,11 @@ function chapterNotes(C){
 }
 // keep words like 'e-pawn' on one line instead of breaking at the hyphen
 const keepHyph = h => h.replace(/\b([a-h])-pawn\b/g, '<span class="nw">$1-pawn</span>');
+// an opening's page: its story, every lesson in it and the notes. Reached from Your games.
 function renderLearn(){
   const st = DATA.stats, C = CHAPTERS[S.chapter] || DATA.chapters[0];
-  let html = `<section class="reps"><p class="legendline">The bar shows how often each opening came up in your games. The numbers are your wins and losses.</p>
-    <div class="rgrid ${DATA.chapters.length === 9 ? 'n9' : ''}">${replyTiles()}</div></section><div id="chapter" class="chapter">`;
+  let html = `<div class="crumbs"><button class="btn small" data-go="games">← Your games</button><span class="where">${esc(C.name)}</span></div>
+    <nav class="chnav" aria-label="Openings">${DATA.chapters.map(c => `<button class="chip ${c.id === C.id ? 'on' : ''}" data-ch="${c.id}" ${c.id === C.id ? 'aria-current="page"' : ''}>${esc(c.name)}</button>`).join('')}</nav><div id="chapter" class="chapter">`;
   if (SIDE !== 'w' || C.id !== 'italian' || PERSONA !== 'house'){ // the Italian's own page tells the story of the house player's study
     html += chapterHero(C) + partsHTML(C) + chapterNotes(C) + '</div>';
     view.innerHTML = html; return;
@@ -1418,7 +1549,7 @@ function renderStudy(){
     if (k < order.length - 1) navNext = `<button class="btn small" data-lesson="${order[k+1]}" aria-label="Next lesson: ${esc(LESSONS[order[k+1]].title)}"><span class="navtxt">${esc(LESSONS[order[k+1]].title)} </span>›</button>`; }
   if (CU && les && CU.lessons.includes(les.id)){ const nx = CU.lessons[CU.lessons.indexOf(les.id) + 1];
     navNext = nx ? `<button class="btn small primary" id="topNext" data-lesson="${nx}" title="${esc(LESSONS[nx].title)}">Next lesson ›</button>` : `<button class="btn small primary" id="topNext" data-unit="${CU.id}">Done · back to the unit ›</button>`; }
-  const back = CU ? `<button class="btn small" data-unit="${CU.id}">← ${esc(CU.title)}</button>` : S.studyFrom === 'games' ? '<button class="btn small" data-go="games">← Your games</button>' : S.studyFrom === 'cheat' ? '<button class="btn small" data-go="cheat">← Cheat sheet</button>' : S.studyFrom === 'sandbox' ? '<button class="btn small" data-go="sandbox">← Sandbox</button>' : '<button class="btn small" data-go="learn">← All lessons</button>';
+  const back = CU ? `<button class="btn small" data-unit="${CU.id}">← ${esc(CU.title)}</button>` : S.studyFrom === 'games' ? '<button class="btn small" data-go="games">← Your games</button>' : S.studyFrom === 'cheat' ? '<button class="btn small" data-go="cheat">← Cheat sheet</button>' : S.studyFrom === 'sandbox' ? '<button class="btn small" data-go="sandbox">← Sandbox</button>' : `<button class="btn small" data-go="learn">← ${esc(((lessonOf(S.line) && chapterOf(lessonOf(S.line))) || {name: 'The opening'}).name)}</button>`;
   // reaching the last move of a lesson's main line counts as studying it
   const atEnd = !!les && !!line.main && S.i === line.n.length - 1;
   if (atEnd) markSeen(les.id);
@@ -1512,11 +1643,11 @@ function renderStudy(){
   view.querySelectorAll('[data-step]').forEach(b => b.onclick = () => jump(+b.dataset.step));
   const dt = document.getElementById('drillThis'); if (dt) dt.onclick = () => startDrillLine(S.line, '', CU ? CU.id : null);
   const tn = document.getElementById('topNext'); if (tn) tn.onclick = () => markSeen(les.id);   // moving on from the top counts as having studied it
-  document.getElementById('exHere').onclick = () => exploreFrom(nodeFen(idx), exOpts({}));
+  document.getElementById('exHere').onclick = () => exploreNode(idx, exOpts({}));
   document.getElementById('cEng').onclick = () => { EngineUI.set(!engOn); renderStudy(); };
   if (engOn) EngineUI.attach({fen: nodeFen(idx), card: 'engcard', board: 'sb', bar: 'sbar', text: 'stext', flip: FLIP,
-    pick: u => exploreFrom(nodeFen(idx), exOpts({moves: [u]})),
-    acts: [{id: 'eLine', t: 'Play the line it expects', go: pv => exploreFrom(nodeFen(idx), exOpts({moves: pv.slice(0, 10), i: 0, auto: true}))}]});
+    pick: u => exploreNode(idx, exOpts({moves: [u]})),
+    acts: [{id: 'eLine', t: 'Play the line it expects', go: pv => exploreNode(idx, exOpts({moves: pv.slice(0, 10), i: 0, auto: true}))}]});
   else EngineUI.detach();
   const tl = view.querySelector('.timeline'), cur = view.querySelector('.trow.cur');
   if (tl && tl.scrollHeight > tl.clientHeight + 4){
@@ -1541,6 +1672,7 @@ function togglePlay(){
   step(1);
 }
 document.getElementById('acctBtn').addEventListener('click', () => Acct.open());
+document.getElementById('meBtn').addEventListener('click', () => Acct.open(Cloud.user ? 'in' : 'me'));
 document.getElementById('acctSheet').addEventListener('click', e => { if (e.target.id === 'acctSheet') Acct.close(); });
 document.addEventListener('keydown', e => {
   if (Acct.mode){ if (e.key === 'Escape'){ e.preventDefault(); Acct.close(); } return; } // the sign-in sheet owns the keyboard while open
@@ -1573,11 +1705,11 @@ function nextSmart(exclude){
   const soon = el.slice().sort((a, b) => Prog.rec(a).due - Prog.rec(b).due);
   return soon.length ? {id: soon[0], why: 'Extra practice (nothing due)'} : null;
 }
-function startDrillLine(id, why, unit){
+function startDrillLine(id, why, unit, o = {}){
   const line = LINES[id];
-  const s0 = S.dfilter.from === 'start' ? 0 : lineStart(id);
+  const s0 = o.from0 || S.dfilter.from === 'start' ? 0 : lineStart(id);
   if (!why && Prog.stale(id)) why = 'This line has changed since you last drilled it. If a move is new to you, two tries and the arrow shows it.';
-  S.drill = S.drillState = {kind: 'line', id, i: s0, s0, mistakes: 0, tries: 0, sel: null, busy: false, msg: why || '', state: 'play', hint: null, flash: null, unit: unit || null};
+  S.drill = S.drillState = {kind: 'line', id, i: s0, s0, mistakes: 0, tries: 0, sel: null, busy: false, msg: why || '', state: 'play', hint: null, flash: null, unit: unit || null, daily: !!o.daily};
   S.view = 'drill'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
   setTimeout(drillAdvance, 450);
 }
@@ -1623,7 +1755,7 @@ function tryMove(from, to){
   if (exp.includes(u)){
     if (D.kind === 'puz'){
       D.state = 'done'; const P = DATA.puzzles[D.k]; if (D.tries === 0) Prog.puz(P.id, true);
-      const fen = fenAfter(dNode(), u);
+      const fen = puzAfter(dNode(), u);
       D.after = {fen, u}; D.flash = {sq: to, ok: true}; D.msg = '';
       renderDrillBoard({u, meta: {}}); renderDrillPanel(); return;
     }
@@ -1641,7 +1773,7 @@ function tryMove(from, to){
     setTimeout(() => { if (S.drill === D && D.flash && !D.flash.ok){ D.flash = null; renderDrillBoard(); } }, 650);
   }
 }
-function fenAfter(idx, u){ return applyMove(N[idx].f, u); } // puzzle reveal
+function puzAfter(idx, u){ return applyMove(N[idx].f, u); } // puzzle reveal (fenAfter, below, replays moves from a full position)
 function finishLine(){
   const D = S.drill; D.state = 'done';
   Prog.record(D.id, D.mistakes === 0);
@@ -1682,15 +1814,17 @@ function drillPanelHTML(){
   if (D.state === 'done'){
     const r = Prog.rec(D.id), clean = D.mistakes === 0, days = INTERVALS[r.box];
     const CU = D.unit && UNIT[D.unit], nxU = CU ? unitNextLine(CU, D.id) : null;
+    const dk = Daily.count(), left = Math.max(0, DAILY - dk);
     const acts = CU ? `${nxU ? `<button class="btn primary" id="dNextU">Next line in this unit</button>` : ''}<button class="btn ${nxU ? '' : 'primary'}" data-unit="${CU.id}">Back to the unit</button><button class="btn" id="dAgain">Again</button>`
+      : D.daily ? (left ? `<button class="btn primary" id="dDaily">Next line · ${dk + 1} of ${DAILY}</button><button class="btn" id="dAgain">Again</button>` : `<button class="btn primary" id="dDaily">Keep going</button><button class="btn" id="dToday">Done for today</button>`)
       : `<button class="btn primary" id="dNext">Next line</button><button class="btn" id="dAgain">Again</button><button class="btn ghost" data-line="${D.id}">Study it</button>`;
     const pl = line.main ? planFor(L.id) : null;
-    const cnote = CU ? ` ${CU.lines.filter(lineClean).length} of ${CU.lines.length} main lines in this unit are clean.` : '';
+    const cnote = CU ? ` ${CU.lines.filter(lineClean).length} of ${CU.lines.length} main lines in this unit are clean.` : D.daily ? (left ? ` Today: ${dk} of ${DAILY}.` : ` That's today's five: ${Daily.streak()} ${Daily.streak() === 1 ? 'day' : 'days'} in a row.`) : '';
     doneBox = `<div class="donebox ${clean ? '' : 'bad'}"><h4>${clean ? 'Clean run.' : `Done, with ${D.mistakes} ${D.mistakes === 1 ? 'slip' : 'slips'}.`}</h4>
       <p>${clean ? `This line comes back in ${days} ${days === 1 ? 'day' : 'days'}.` : 'This line stays in today\'s review until you get it clean.'} Ends: ${esc(line.main ? (L.outcome || '') : ((evalInfo(N[n[n.length-1]].e) || {}).txt || ''))}.${cnote}</p>
       <div class="lesson-actions">${acts}<button class="btn ghost" id="dExplore">Play on with the engine</button></div></div>${planCardHTML(pl)}`;
   }
-  return `<div class="dpanel"><p class="kicker">${D.unit && UNIT[D.unit] ? 'Course · ' + esc(UNIT[D.unit].title) + ' · ' : ''}${esc(L.title)}${line.main ? '' : ' · ' + esc(line.title)}${D.msgWhy ? ' · ' + esc(D.msgWhy) : ''}</p><h3>Play ${MYC}'s moves from memory</h3>
+  return `<div class="dpanel"><p class="kicker">${D.unit && UNIT[D.unit] ? 'Course · ' + esc(UNIT[D.unit].title) + ' · ' : D.daily ? 'Today · ' : ''}${esc(L.title)}${line.main ? '' : ' · ' + esc(line.title)}${D.msgWhy ? ' · ' + esc(D.msgWhy) : ''}</p><h3>Play ${MYC}'s moves from memory</h3>
     <div class="progressbar" aria-hidden="true"><i style="width:${pct}%"></i></div>
     ${status ? `<div class="status ${D.busy ? 'wait' : ''} ${D.tries ? 'bad' : ''}"><span class="bub"></span>${status}</div>` : ''}
     <p class="feedback">${D.msg || (D.i === D.s0 ? `${OPP}'s moves play automatically. Drag a piece or tap it, then tap where it goes.` : '&nbsp;')}</p>${doneBox}</div>`;
@@ -1699,12 +1833,33 @@ function renderDrillPanel(){ const el = document.getElementById('dpanel'); if (e
 function wireDrillPanel(){
   const D = S.drill;
   const nx = document.getElementById('dNext'); if (nx) nx.onclick = () => { const s = nextSmart(D.id); if (s){ startDrillLine(s.id); S.drill.msgWhy = s.why; renderDrillPanel(); } };
-  const ag = document.getElementById('dAgain'); if (ag) ag.onclick = () => startDrillLine(D.id, '', D.unit);
+  const ag = document.getElementById('dAgain'); if (ag) ag.onclick = () => startDrillLine(D.id, '', D.unit, {from0: D.s0 === 0, daily: D.daily});
+  const dd = document.getElementById('dDaily'); if (dd) dd.onclick = dailyGo;
+  const dt = document.getElementById('dToday'); if (dt) dt.onclick = () => { S.drill = S.drillState = null; renderDrill(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'}); };
   const nu = document.getElementById('dNextU'); if (nu) nu.onclick = () => { const s = unitNextLine(UNIT[D.unit], D.id); if (s) startDrillLine(s, '', D.unit); };
   const np = document.getElementById('nextPuz'); if (np) np.onclick = () => startPuzzle(D.k + 1);
   const de = document.getElementById('dExplore'); if (de) de.onclick = () => { const line = LINES[D.id], L = lessonOf(D.id), idx = line.n[line.n.length - 1];
-    exploreFrom(nodeFen(idx), {title: `${L.title} · end of the ${line.main ? 'main line' : 'line'}`, plan: line.main && planFor(L.id) ? {side: SIDE, lesson: L.id} : null}); };
-  const pe = document.getElementById('pExplore'); if (pe) pe.onclick = () => { const P = DATA.puzzles[D.k]; exploreFrom(nodeFen(P.node), {moves: D.after ? [D.after.u] : [], title: `Missed shot · ${P.title}`}); };
+    exploreNode(idx, {title: `${L.title} · end of the ${line.main ? 'main line' : 'line'}`, plan: line.main && planFor(L.id) ? {side: SIDE, lesson: L.id} : null}); };
+  const pe = document.getElementById('pExplore'); if (pe) pe.onclick = () => { const P = DATA.puzzles[D.k]; exploreNode(P.node, {moves: D.after ? [D.after.u] : [], title: `Missed shot · ${P.title}`}); };
+}
+// today's five: the next line, in whichever book it lives, played from move one
+function dailyGo(){
+  const x = dailyNext(); if (!x){ toast('Nothing left to drill today.'); return; }
+  if (x.s !== SIDE) useSide(x.s);
+  startDrillLine(x.id, '', null, {from0: true, daily: true}); S.drill.msgWhy = x.why; renderDrillPanel();
+}
+const FLAME = '<svg class="flame" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.6 2.2c.5 3-1 4.6-2.6 6.3C8.3 10.3 6.5 12.2 6.5 15.3 6.5 19 9 21.8 12 21.8s5.5-2.5 5.5-6.1c0-2.7-1.4-4.4-2.4-5.6-.2 1.4-.8 2.5-1.9 3 .6-3.6-.2-7.1-.6-10.9z"/><path class="fl-in" d="M12.2 13.2c-1.4 1.3-2.4 2.3-2.4 3.9 0 1.5 1 2.6 2.2 2.6s2.2-1.1 2.2-2.6c0-1.5-.9-2.4-2-3.9z"/></svg>';
+// the Today card at the top of Drill: today's count, the streak and the last seven days
+function todayHTML(){
+  const k = Daily.count(), st = Daily.streak(), done = k >= DAILY, D = S.drill, playing = !!D;
+  const week = [-6, -5, -4, -3, -2, -1, 0].map(o => { const d = dayDate(o), on = Daily.done(o);
+    return `<li class="${on ? 'on' : ''} ${o === 0 ? 'now' : ''}" title="${d.toLocaleDateString(undefined, {weekday: 'long', month: 'short', day: 'numeric'})}${on ? ': five lines' : ''}"><i>${on ? ICON.check : ''}</i><span>${d.toLocaleDateString(undefined, {weekday: 'narrow'})}</span></li>`; }).join('');
+  const line = done ? 'Today\'s five are done. Anything more is a bonus.' : k ? `${DAILY - k} more ${DAILY - k === 1 ? 'line' : 'lines'} today to ${st ? 'keep' : 'start'} your streak.` : 'Five lines from move one, the ones you slipped on first. About ten minutes.';
+  const cta = playing ? '' : `<button class="btn primary" id="dailyGo">${done ? 'Keep going' : k ? `Next line · ${k + 1} of ${DAILY}` : 'Start today\'s five'}</button>`;
+  return `<section class="today ${done ? 'done' : ''}" aria-label="Today's practice">
+    <div class="tring" style="--p:${Math.min(100, Math.round(k / DAILY * 100))}" aria-label="${Math.min(k, DAILY)} of ${DAILY} lines today"><i><b class="tnum">${Math.min(k, DAILY)}</b><small>of ${DAILY}</small></i></div>
+    <div class="tmain"><p class="kicker">Today</p><p class="tline">${line}</p>${cta ? `<div class="lesson-actions">${cta}</div>` : ''}</div>
+    <div class="tside"><p class="streak ${st ? '' : 'zero'}">${FLAME}<b class="tnum">${st}</b><span>${st === 1 ? 'day' : 'days'} in a row</span></p><ol class="week" aria-label="The last seven days">${week}</ol></div></section>`;
 }
 function fmtDue(r){ if (!r) return 'new'; if (r.changed) return 'changed'; const d = r.due - Date.now(); if (d <= 0) return 'due'; const days = Math.ceil(d / DAY); return `in ${days}d`; }
 function renderDrill(){
@@ -1721,25 +1876,28 @@ function renderDrill(){
   }).join('');
   const D = S.drill;
   const boardHTML = D ? '' : boardSVG(N[0].f, {coords: true});
-  view.innerHTML = `  <div class="sgrid">
+  view.innerHTML = `  <div class="sgrid ${D ? '' : 'idle'}">
     <div class="bcol"><div class="board ${D && D.state === 'play' ? 'input' : ''}" id="db">${boardHTML}</div>
-      ${D ? '' : '<p class="evaltext">Pick what to drill and the board comes alive.</p>'}</div>
+      ${D ? '' : '<p class="evaltext">Five lines a day, played from move one. Slips come back first.</p>'}</div>
     <div class="ccol">
       <div id="dpanel">${D ? drillPanelHTML() : ''}</div>
+      ${todayHTML()}
+      <details class="dmore" ${S.dmore ? 'open' : ''}><summary><span><b>Pick lines yourself</b><span>${due} due · ${fresh} not started · ${mastered} solid</span></span></summary>
       <div class="dpanel">
-        <div class="queue"><div><b class="tnum">${due}</b><span>due now</span></div><div><b class="tnum">${fresh}</b><span>not started</span></div><div><b class="tnum">${mastered}</b><span>solid (4+ clean)</span></div></div>
-        <div class="lesson-actions"><button class="btn primary" id="smart">${due ? 'Review what\'s due' : 'Start next line'}</button><button class="btn" id="shots">Missed shots from your games (${DATA.puzzles.length})</button></div>
+        <div class="lesson-actions"><button class="btn" id="smart">${due ? 'Review what\'s due' : 'Start next line'}</button>${DATA.puzzles.length ? `<button class="btn" id="shots">Missed shots from your games</button>` : ''}</div>
         <div><p class="kicker" style="margin-bottom:6px">Which opening</p><div class="seg">${segBtn('ch','all','All')}${DATA.chapters.map(C => segBtn('ch', C.id, esc(C.name))).join('')}</div></div>
         <div><div class="seg">${segBtn('pri','all','Any priority')}${segBtn('pri','core','Core')}${segBtn('pri','common','Common')}${segBtn('pri','rare','Rare')}</div></div>
         <div><p class="kicker" style="margin-bottom:6px">Start each line</p><div class="seg">${segBtn('from','branch','Where it branches')}${segBtn('from','start','From move 1')}</div></div>
       </div>
-      <div class="dpanel"><p class="kicker">Every line · tap one to drill it</p><div class="mtable">${rows}</div></div>
+      <div class="dpanel"><p class="kicker">Every line · tap one to drill it</p><div class="mtable">${rows}</div></div></details>
     </div></div>`;
   if (D) renderDrillBoard();
   wireDrillPanel();
   if (D && D.kind === 'line' && D.state === 'play' && D.busy){ D.busy = false; setTimeout(drillAdvance, 300); }
+  const dg = document.getElementById('dailyGo'); if (dg) dg.onclick = dailyGo;
+  const dm = view.querySelector('.dmore'); if (dm) dm.ontoggle = () => { S.dmore = dm.open; };
   document.getElementById('smart').onclick = () => { const s = nextSmart(); if (s){ startDrillLine(s.id); S.drill.msgWhy = s.why; renderDrillPanel(); } };
-  document.getElementById('shots').onclick = () => startPuzzle(0);
+  const sh = document.getElementById('shots'); if (sh) sh.onclick = () => startPuzzle(0);
   view.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { const [k, v] = b.dataset.f.split(':'); S.dfilter[k] = v; renderDrill(); });
   view.querySelectorAll('[data-drill]').forEach(b => b.onclick = () => startDrillLine(b.dataset.drill));
   wireBoardInput();
@@ -1968,7 +2126,7 @@ function wireSbPanel(){
   const a = document.getElementById('sbAgain'); if (a) a.onclick = () => { const D = S.drill; if (D && D.kind === 'sb' && D.scope.startsWith('u:')) sbStart(D.scope, D.odds); else sbStart(); };
   const dr = document.getElementById('sbDrill'); if (dr && S.drill && S.drill.line) dr.onclick = () => startDrillLine(S.drill.line);
   const ex = document.getElementById('sbExplore'); if (ex && S.drill) ex.onclick = () => { const D = S.drill, lid = D.line, L = lid ? lessonOf(lid) : null;
-    exploreFrom(nodeFen(D.node), {title: `Practice game · ${L ? L.title : 'end of your prep'}`, plan: L && LINES[lid].main && planFor(L.id) ? {side: SIDE, lesson: L.id} : null}); };
+    exploreNode(D.node, {title: `Practice game · ${L ? L.title : 'end of your prep'}`, plan: L && LINES[lid].main && planFor(L.id) ? {side: SIDE, lesson: L.id} : null}); };
 }
 function sbSideHTML(){
   const segBtn = (key, val, label) => `<button data-sbf="${key}:${val}" aria-pressed="${SBS[key] === val}">${label}</button>`;
@@ -2033,7 +2191,7 @@ function renderGames(){
   const st = DATA.stats, maxn = Math.max(...DATA.chapters.map(c => c.stats.n));
   const byOpening = DATA.chapters.map(C => { const s = C.stats, pct = Math.round(s.w / Math.max(1, s.n) * 100);
     return `<button class="orow2" data-ch="${C.id}"><span class="on">${esc(C.name)}</span><span class="ob"><i style="width:${Math.round(s.n / maxn * 100)}%"></i></span><span class="tnum">${s.n}</span><span class="tnum">${s.w}–${s.l}</span><span class="tnum op2 ${pct >= 60 ? 'good' : pct < 50 ? 'bad' : ''}">${pct}%</span></button>`; }).join('');
-  view.innerHTML = `    <div class="panel" style="margin-bottom:24px"><h3>By opening</h3><div class="otable"><div class="orow2 head" aria-hidden="true"><span>${esc(TXT[SIDE].byHead)}</span><span>How often</span><span>Games</span><span>Record</span><span style="text-align:right">Won</span></div>${byOpening}</div></div>
+  view.innerHTML = `    <div class="panel" style="margin-bottom:24px"><h3>Your openings</h3><p class="legendline" style="margin:4px 0 10px">Open one for every lesson in it.</p><div class="otable"><div class="orow2 head" aria-hidden="true"><span>${esc(TXT[SIDE].byHead)}</span><span>How often</span><span>Games</span><span>Record</span><span style="text-align:right">Won</span></div>${byOpening}</div></div>
     <div class="insights">${(DATA.insights || []).map(insight).join('')}</div>
     <div class="gcards">${cards}</div>`;
   view.querySelectorAll('[data-puz]').forEach(b => b.onclick = () => startPuzzle(+b.dataset.puz));
@@ -2374,7 +2532,7 @@ function missExplore(k){
   const Q = S.quizState, it = Q && Q.items[k]; if (!it) return;
   const U = UNIT[Q.unit];
   if (it.ff) exploreFrom(it.ff, {title: `${U.title} · vs ${it.opp}, ${it.date}`, side: it.me || SIDE, flip: it.me === 'b'});
-  else exploreFrom(nodeFen(it.node), {title: `${U.title} · ${it.rule}`});
+  else exploreNode(it.node, {title: `${U.title} · ${it.rule}`});
 }
 function missCard(it){
   const k = S.quizState ? S.quizState.items.indexOf(it) : -1, ex = k >= 0 && (it.ff || it.node !== undefined) ? `<button class="linkish" type="button" data-miss="${k}">Play on with the engine</button>` : '';
@@ -2451,6 +2609,11 @@ function nodeFen(idx){
   const ch = new Chess(); for (let k = us.length - 1; k >= 0; k--) ch.move(uciObj(us[k]));
   const f = ch.fen(); _ff.set(key, f); return f;
 }
+// the moves from the start of the game to a book position
+function nodeUcis(idx){ const us = []; for (let i = idx; N[i] && N[i].p !== null && N[i].p !== undefined; i = N[i].p) us.push(N[i].u); return us.reverse(); }
+const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+// the explore board at a book position, with the moves that led there
+function exploreNode(idx, o = {}){ exploreFrom(nodeFen(idx), Object.assign({pre: nodeUcis(idx)}, o)); }
 // the same position with the other side to move: what would they do if they could move twice?
 function nullFen(fen){ const p = fen.split(' '); p[1] = p[1] === 'w' ? 'b' : 'w'; p[3] = '-'; return p.join(' '); }
 const scoreNum = s => typeof s === 'string' ? (parseInt(s.slice(1), 10) > 0 ? 1 : -1) * (100000 - 100 * Math.abs(parseInt(s.slice(1), 10))) : s;
@@ -2750,16 +2913,18 @@ function planCardHTML(p, kick){
 const EXK = 'playbook-explore';
 function backHere(){ return {view: S.view, line: S.line, i: S.i, studyFrom: S.studyFrom, unit: S.unit, side: SIDE}; }
 // o: {moves, i, title, plan, flip, side, auto}
+// o.pre: the moves from the start of the game to `fen`. With them the board can step back to move 1, and the list
+// marks the move where the player came in.
 function exploreFrom(fen, o = {}){
   stopPlay(); exStopAuto();
-  const ms = (o.moves || []).slice();
-  S.ex = {start: fen, moves: ms, i: o.i !== undefined ? o.i : ms.length, flip: o.flip !== undefined ? o.flip : FLIP, side: o.side || viewSide(), back: o.back || backHere(),
-    title: o.title || '', plan: o.plan || null, answer: false, sel: null, busy: false, auto: null, anim: o.i === undefined && ms.length ? ms[ms.length - 1] : null};
+  const pre = (o.pre || []).slice(), own = (o.moves || []).slice(), ms = pre.concat(own);
+  S.ex = {start: pre.length ? START_FEN : fen, base: pre.length, moves: ms, i: pre.length + (o.i !== undefined ? o.i : own.length), flip: o.flip !== undefined ? o.flip : FLIP, side: o.side || viewSide(), back: o.back || backHere(),
+    title: o.title || '', plan: o.plan || null, answer: false, sel: null, busy: false, auto: null, anim: o.i === undefined && own.length ? ms[ms.length - 1] : null};
   exSave(); S.view = 'explore'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
   if (o.auto) exAutoPlay();
 }
-function exSave(){ const X = S.ex; if (!X) return; try { sessionStorage.setItem(EXK, JSON.stringify({start: X.start, moves: X.moves, i: X.i, flip: X.flip, side: X.side, back: X.back, title: X.title, plan: X.plan})); } catch(e){} }
-function exLoad(){ try { const v = JSON.parse(sessionStorage.getItem(EXK) || 'null'); if (v && v.start && new Chess().validate_fen(v.start).valid){ S.ex = Object.assign({answer: false, sel: null, busy: false, auto: null, anim: null}, v); return true; } } catch(e){} return false; }
+function exSave(){ const X = S.ex; if (!X) return; try { sessionStorage.setItem(EXK, JSON.stringify({start: X.start, base: X.base || 0, moves: X.moves, i: X.i, flip: X.flip, side: X.side, back: X.back, title: X.title, plan: X.plan})); } catch(e){} }
+function exLoad(){ try { const v = JSON.parse(sessionStorage.getItem(EXK) || 'null'); if (v && v.start && new Chess().validate_fen(v.start).valid){ S.ex = Object.assign({answer: false, sel: null, busy: false, auto: null, anim: null, base: 0}, v); return true; } } catch(e){} return false; }
 function exChess(upto){ const X = S.ex, ch = new Chess(X.start); for (const u of X.moves.slice(0, upto === undefined ? X.i : upto)) if (!ch.move(uciObj(u))) break; return ch; }
 const _exw = {key: '', words: []};
 function exWords(){ const X = S.ex, key = X.start + '|' + X.moves.join(' '); if (_exw.key !== key){ _exw.key = key; _exw.words = lineWords(X.start, X.moves, 400); } return _exw.words; }
@@ -2781,7 +2946,7 @@ function exAnimate(u, back){
 function exPush(u, byUser){
   const X = S.ex; if (!X) return;
   if (X.i < X.moves.length && X.moves[X.i] === u) X.i++;
-  else { X.moves = X.moves.slice(0, X.i).concat([u]); X.i = X.moves.length; }
+  else { if (X.i < (X.base || 0)) X.base = 0; X.moves = X.moves.slice(0, X.i).concat([u]); X.i = X.moves.length; }
   X.anim = u; X.sel = null; exSave();
   if (byUser && X.answer && !exChess().game_over()){ X.busy = true; renderExplore(); exReply(); return; }
   renderExplore();
@@ -2839,13 +3004,13 @@ function renderExplore(){
   const over = ch.in_checkmate() ? `Checkmate. ${turnW ? 'Black' : 'White'} wins.` : ch.in_stalemate() ? 'Stalemate: a draw.' : ch.in_threefold_repetition() ? 'Same position three times: a draw.' : ch.insufficient_material() ? 'Not enough pieces left to mate: a draw.' : ch.in_draw() ? 'A draw.' : '';
   const status = over || (X.busy ? 'The engine is choosing its reply…' : X.auto ? 'Playing the engine\'s line…' : `${turnW ? 'White' : 'Black'} to move`);
   const plan = X.plan ? (BOOKS[X.plan.side] && BOOKS[X.plan.side].lessons.find(l => l.id === X.plan.lesson)) : null;
-  const rows = words.map((w, k) => `<li><button class="trow ${w.white === (ME === 1) ? 'you' : 'blk'} ${k === X.i - 1 ? 'cur' : ''}" data-xi="${k + 1}"><span class="n">${w.no}${w.white ? '' : '…'}</span>${pieceIcon(w.pc, w.white)}<span class="lbl">${esc(w.label)}</span><span class="tg"></span></button></li>`).join('');
+  const B = X.base || 0, rows = words.map((w, k) => `<li><button class="trow ${w.white === (ME === 1) ? 'you' : 'blk'} ${k === X.i - 1 ? 'cur' : ''} ${k < B - 1 ? 'pre' : ''}" data-xi="${k + 1}"><span class="n">${w.no}${w.white ? '' : '…'}</span>${pieceIcon(w.pc, w.white)}<span class="lbl">${esc(w.label)}</span><span class="tg">${k === B - 1 ? '<span class="chip came">You came in here</span>' : ''}</span></button></li>`).join('');
   view.innerHTML = `<div class="crumbs"><button class="btn small" id="exBack">← Back</button><span class="where">${esc(X.title || 'Explore')}</span></div>
   <div class="sgrid">
     <div class="bcol">
       <div class="board-wrap"><div class="evalbar ${X.flip ? 'flip' : ''}" id="xbar" aria-hidden="true"><div class="fill" style="height:50%"></div><div class="mid"></div></div><div class="board ${X.busy || X.auto ? '' : 'input'}" id="xb"></div></div>
       <div class="controls">
-        <button class="ctl" id="xFirst" aria-label="Back to where you started" ${X.i === 0 ? 'disabled' : ''}>${ICO.first}</button>
+        <button class="ctl" id="xFirst" aria-label="Back to the start of the game" ${X.i === 0 ? 'disabled' : ''}>${ICO.first}</button>
         <button class="ctl" id="xPrev" aria-label="Back one move" ${X.i === 0 ? 'disabled' : ''}>${ICO.prev}</button>
         <button class="ctl play" id="xPlay" aria-label="${X.auto ? 'Stop' : 'Play the moves forward'}" aria-pressed="${!!X.auto}" ${X.i >= n && !X.auto ? 'disabled' : ''}>${X.auto ? ICO.pause : ICO.play}</button>
         <button class="ctl" id="xNext" aria-label="Forward one move" ${X.i >= n ? 'disabled' : ''}>${ICO.next}</button>
@@ -2853,6 +3018,7 @@ function renderExplore(){
         <button class="ctl" id="xFlip" aria-label="Turn the board around">${ICO.flip}</button>
       </div>
       <p class="evaltext" id="xeval">&nbsp;</p>
+      ${B && X.i !== B && X.moves.length >= B ? `<button class="btn small" id="xCame">Back to where you came in</button>` : ''}
     </div>
     <div class="ccol">
       <div class="dpanel"><p class="kicker">Explore · moves for both sides</p><h3>Play on from here</h3>
@@ -2873,6 +3039,7 @@ function renderExplore(){
   document.getElementById('xLast').onclick = () => { exStopAuto(); exStep(999); };
   document.getElementById('xPlay').onclick = () => { if (X.auto){ exStopAuto(); renderExplore(); } else exAutoPlay(); };
   document.getElementById('xFlip').onclick = () => { X.flip = !X.flip; exSave(); renderExplore(); };
+  const xc = document.getElementById('xCame'); if (xc) xc.onclick = () => { exStopAuto(); exStep(B - X.i); };
   document.getElementById('exAns').onchange = e => { X.answer = e.target.checked; if (X.answer && !over && !X.busy && turnW !== (ME === 1)){ X.busy = true; renderExplore(); exReply(); } };
   view.querySelectorAll('[data-xi]').forEach(b => b.onclick = () => { exStopAuto(); const k = +b.dataset.xi; exStep(k - X.i); });
   const tl = view.querySelector('.timeline'), cur = view.querySelector('.timeline .trow.cur');
@@ -2881,7 +3048,7 @@ function renderExplore(){
   if (X.busy) return; // the engine is busy choosing a reply; analysis resumes after it
   EngineUI.attach({fen, card: 'engcard', board: 'xb', bar: 'xbar', text: 'xeval', flip: X.flip,
     pick: u => { exStopAuto(); exPush(u, true); },
-    acts: [{id: 'eLine', t: 'Play the line on the board', go: pv => { if (!pv.length) return; X.moves = X.moves.slice(0, X.i).concat(pv.slice(0, 10)); exSave(); exAutoPlay(); }}]});
+    acts: [{id: 'eLine', t: 'Play the line on the board', go: pv => { if (!pv.length) return; if (X.i < (X.base || 0)) X.base = 0; X.moves = X.moves.slice(0, X.i).concat(pv.slice(0, 10)); exSave(); exAutoPlay(); }}]});
 }
 function wireExInput(){
   const el = document.getElementById('xb'); if (!el) return;
@@ -2921,7 +3088,7 @@ function wireExInput(){
 
 /* ------------------------------------------------------------------ boot */
 function start(saved){
-  Prog.load(); Cloud.init(); Product.boot();
+  Prog.load(); adoptSettings(); Cloud.init(); Product.boot();
   let h = (location.hash || '').slice(1), side = 'w';
   try { const v = localStorage.getItem(SIDE_KEY); if (v && BOOKS[v]) side = v; } catch(e){}
   const hu = h.startsWith('unit.') ? UNIT[h.slice(5)] : null; // course hashes carry no colour: a unit brings its own book
@@ -2941,7 +3108,7 @@ function start(saved){
   else if (h.startsWith('line.') && LINES[h.slice(5)]){ S.line = h.slice(5); S.i = lineStart(S.line); S.view = 'study'; }
   else if (h.startsWith('learn.') && CHAPTERS[h.slice(6)]){ S.chapter = h.slice(6); S.view = 'learn'; }
   else if (h === 'explore' && exLoad()){ if (S.ex.side && BOOKS[S.ex.side] && S.ex.side !== SIDE){ loadBook(S.ex.side); S.chapter = savedChapter(SIDE); } S.view = 'explore'; }
-  else if (VIEWS.includes(h)) S.view = h;
+  else if (VIEWS.includes(h) || h === 'learn') S.view = h;   // #learn: the openings, now under Your games
   Product.landing(h);
   render();
   Prog.connect(); renderAcct();

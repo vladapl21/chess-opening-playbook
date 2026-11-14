@@ -85,6 +85,11 @@ def main():
     wl, bl = {l['id'] for l in W['lines']}, {l['id'] for l in B['lines']}
     assert not (wl & bl), sorted(wl & bl)[:10]
     assert not ({p['id'] for p in W['puzzles']} & {p['id'] for p in B['puzzles']})
+    # the reminder emails name lessons, not moves: line id -> lesson title, for supabase/functions/nudge
+    titles = {l['id']: L['title'] for D in (W, B) for L in D['lessons'] for l in D['lines'] if l['lesson'] == L['id']}
+    tj = paths.ROOT / 'supabase' / 'functions' / 'nudge' / 'titles.json'
+    text = json.dumps(titles, sort_keys=True, separators=(',', ':'), ensure_ascii=False) + '\n'
+    if not tj.exists() or tj.read_text() != text: tj.write_text(text)
 
     dump = lambda d: json.dumps(d, separators=(',', ':')).replace('</', '<\\/')
     tpl = (paths.APP / 'template.html').read_text()
