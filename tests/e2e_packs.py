@@ -1,7 +1,7 @@
 """Systems (packs): the library holds two answers to the e-pawn for Black, and a player has one of them.
 
 - With nothing chosen, the playbook is what it always was: no Caro-Kann anywhere.
-- Choosing the Caro-Kann in Settings swaps the chapters, the course units, the drills, the cheat sheet and the Sandbox.
+- Choosing the Caro-Kann in Settings swaps the chapters, the course units, the drills, the cards at a glance and the Sandbox.
 - Progress in the other system is kept, and switching back brings everything back.
 - A new player who already plays the Caro-Kann is offered it, and gets it."""
 from playwright.sync_api import sync_playwright
@@ -66,7 +66,7 @@ with sync_playwright() as p:
     assert pg.evaluate("Prog.rec('bi-main').clean") == 1, 'progress in the other system is kept'
     assert pg.evaluate("[PICKS.blackE4, Prog.d.packs.blackE4]") == ['caro', 'caro']
 
-    # the Caro-Kann is a full part of the book: chapter page, lesson with a plan, drill, cheat sheet, course unit, Sandbox
+    # the Caro-Kann is a full part of the book: chapter page, lesson with a plan, drill, cards at a glance, course unit, Sandbox
     pg.evaluate("useSide('b'); S.chapter = 'caro'; go('learn')"); pg.wait_for_timeout(500)
     txt = pg.inner_text('#view'); assert 'against the e-pawn' in txt and 'The e-pawn pushes past' in txt and 'Take, then the bishop out' in txt
     pg.screenshot(path=out + 'p_chapter.png', full_page=True)
@@ -74,7 +74,10 @@ with sync_playwright() as p:
     assert 'Dark bishop, castle, then the c-pawn' in pg.inner_text('#view'); pg.screenshot(path=out + 'p_lesson.png')
     pg.evaluate("startDrillLine('bck-main-bd3')"); pg.wait_for_timeout(600); assert drill_clean(pg) == 'done'
     assert pg.evaluate("Prog.rec('bck-main-bd3').clean") == 1
-    pg.evaluate("go('cheat')"); pg.wait_for_timeout(400); ch = pg.inner_text('#view'); assert 'Bishop out before the e-pawn' in ch and 'Mirror the bishop' not in ch
+    pg.evaluate("S.lview = 'glance'; S.chapter = 'caro'; go('learn')"); pg.wait_for_timeout(400); ch = pg.inner_text('#view')
+    assert pg.locator('#view .ccard').count() == pg.evaluate("glanceCards(CHAPTERS.caro).length") > 0 and 'Mirror the bishop' not in ch
+    glance = pg.evaluate("DATA.chapters.flatMap(C => glanceCards(C)).map(c => c.rule)"); assert 'Bishop out before the e-pawn' in glance and 'Mirror the bishop' not in glance
+    pg.evaluate("S.lview = 'lessons'")
     pg.evaluate("go('course')"); pg.wait_for_timeout(400); pg.evaluate("S.unit = 'b-caro'; S.slide = 0; go('unit')"); pg.wait_for_timeout(500)
     assert 'Two pawn moves, every game' in pg.inner_text('#view'); pg.screenshot(path=out + 'p_unit.png')
     seen = set()

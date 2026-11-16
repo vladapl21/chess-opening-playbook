@@ -1,5 +1,5 @@
 /* A stand-in for supabase-js in the browser tests. It exposes the same calls the app uses
-   (auth.signUp, signInWithPassword, signOut, resetPasswordForEmail, updateUser, onAuthStateChange,
+   (auth.signUp, signInWithPassword, signOut, resetPasswordForEmail, updateUser, getUser, onAuthStateChange,
    from(table).select().eq().maybeSingle(), from(table).upsert()) and sends each one to a fake server
    that the Playwright test runs, so two browser contexts behave like two devices on one account. */
 (function(){
@@ -26,6 +26,8 @@
         return {data: {subscription: {unsubscribe(){ const i = listeners.indexOf(cb); if (i >= 0) listeners.splice(i, 1); }}}};
       },
       async getSession(){ await ready; return {data: {session}, error: null}; },
+      // the user as the server has it now (app_metadata is set on the server only, never by the page)
+      async getUser(){ await ready; const r = await call('user'); return {data: {user: r.user || null}, error: r.error || null}; },
       async signUp({email, password, options}){
         const r = await call('signup', {email, password, redirect: options && options.emailRedirectTo, data: (options && options.data) || {}});
         if (r.error) return {data: {user: null, session: null}, error: r.error};

@@ -26,7 +26,10 @@ class Server:
 
     def session(self, u):
         t = secrets.token_hex(8); self.tokens[t] = u['id']
-        return {'access_token': t, 'user': {'id': u['id'], 'email': u['email'], 'user_metadata': u.get('meta', {})}}
+        return {'access_token': t, 'user': self.public(u)}
+
+    def public(self, u):
+        return {'id': u['id'], 'email': u['email'], 'user_metadata': u.get('meta', {}), 'app_metadata': u.get('app', {})}
 
     def handle(self, path, b):
         uid = self.tokens.get(b.get('token'))
@@ -54,6 +57,9 @@ class Server:
             if not uid: return {'error': {'message': 'Auth session missing!'}}
             next(u for u in self.users.values() if u['id'] == uid)['password'] = b['password']
             return {}
+        if path == 'user':
+            if not uid: return {'error': {'message': 'Auth session missing!'}}
+            return {'user': self.public(next(u for u in self.users.values() if u['id'] == uid))}
         if self.down: return {'error': {'message': 'Failed to fetch'}}
         if path == 'select':
             if not uid or b['filters'].get('user_id') != uid: return {'row': None}
@@ -172,10 +178,12 @@ with sync_playwright() as p:
     for pg in (a, bp):
         pg.evaluate("document.dispatchEvent(new Event('visibilitychange'))")
         pg.wait_for_function("SET.who === 'rook' && SET.board === 'plum'", timeout=8000)
-    # the streak, badges and worn coach items travel too
-    bp.evaluate("Prog.d.days = Object.assign(Prog.d.days || {}, {[dayKey(-1)]: ['a', 'b', 'c', 'd', 'e']}); Prog.d.shop = {own: {cap: Date.now()}, wear: {head: ['cap', Date.now()]}}; Prog.save()"); bp.wait_for_timeout(1800)
+    # the streak, badges, worn coach items and the level last celebrated travel too
+    bp.evaluate("Prog.d.days = Object.assign(Prog.d.days || {}, {[dayKey(-1)]: ['a', 'b', 'c', 'd', 'e']}); Prog.d.shop = {own: {cap: Date.now()}, wear: {head: ['cap', Date.now()]}}; Prog.d.lvl = 7; Prog.save()"); bp.wait_for_timeout(1800)
     a.evaluate("document.dispatchEvent(new Event('visibilitychange'))"); a.wait_for_timeout(900)
-    assert a.evaluate("[Daily.n(dayKey(-1)), Prog.d.shop.wear.head[0], !!Prog.d.shop.own.cap]") == [5, 'cap', True]
+    assert a.evaluate("[Daily.n(dayKey(-1)), Prog.d.shop.wear.head[0], !!Prog.d.shop.own.cap, Prog.d.lvl]") == [5, 'cap', True, 7]
+    a.evaluate("Prog.d.lvl = 3; Prog.save()"); a.wait_for_timeout(1800)
+    assert S.rows[uid]['data']['lvl'] == 7 and a.evaluate('Prog.d.lvl') == 7, 'the highest level celebrated wins'
     # finishing the course is stamped once (the earliest stamp wins); deep dive parts travel like any unit
     bp.evaluate("const c = Prog.d.course || (Prog.d.course = {u: {}, seen: {}}); c.u = c.u || {}; c.grad = 1700000000000; c.u['x-w-italian-1'] = {o: Date.now(), cp: 4}; Prog.save()"); bp.wait_for_timeout(1800)
     a.evaluate("document.dispatchEvent(new Event('visibilitychange'))"); a.wait_for_timeout(900)
@@ -183,10 +191,10 @@ with sync_playwright() as p:
     a.evaluate("Prog.d.course.grad = 1800000000000; Prog.save()"); a.wait_for_timeout(1800)
     assert S.rows[uid]['data']['course']['grad'] == 1700000000000 and a.evaluate("Prog.d.course.grad") == 1700000000000
     # a page from an older version writes a smaller copy: the next save on any device writes everything back
-    row = S.rows[uid]['data']; S.rows[uid]['data'] = {k: v for k, v in row.items() if k not in ('days', 'prefs', 'set', 'shop', 'badges')}
+    row = S.rows[uid]['data']; S.rows[uid]['data'] = {k: v for k, v in row.items() if k not in ('days', 'prefs', 'set', 'shop', 'badges', 'lvl')}
     a.evaluate("Prog.save()"); a.wait_for_timeout(1800)
     row = S.rows[uid]['data']; print('after an older copy and one save:', sorted(row.keys()))
-    assert all(k in row for k in ('days', 'prefs', 'shop', 'badges')) and row['prefs']['who'][0] == 'rook' and row['prefs']['board'][0] == 'plum'
+    assert all(k in row for k in ('days', 'prefs', 'shop', 'badges', 'lvl')) and row['prefs']['who'][0] == 'rook' and row['prefs']['board'][0] == 'plum'
 
     # ---- the account copy can't be reached: the app says so, keeps working, and catches up later
     S.down = True
@@ -255,6 +263,41 @@ with sync_playwright() as p:
     assert bp.evaluate('Acct.mode') == 'signin'
     assert bp.evaluate('document.documentElement.scrollWidth') <= 390
     bp.screenshot(path=out + 'acct_phone_signin.png')
+
+    # ---- a switch only the server can hand out (app_metadata, which no page can write): anyone else sees nothing,
+    # metadata a user can set does not count, and the switched-on page works on a copy that never reaches the account
+    S.confirm = False
+    O = b.new_context(viewport={'width': 1280, 'height': 860}); wire(O); o = O.new_page(); hook(o, 'O')
+    o.goto(APP + '#course'); o.wait_for_timeout(900)
+    sheet(o, 'signup', 'someone@example.com', 'just a player'); assert synced(o)
+    oid = o.evaluate('Cloud.user.id'); S.users['someone@example.com']['meta']['playbook_owner'] = True   # set by the user: worth nothing
+    o.reload(); o.wait_for_timeout(1200); assert synced(o)
+    o.click('h1'); o.keyboard.type('admin'); o.wait_for_timeout(300)
+    o.click('#setBtn'); o.wait_for_timeout(200)
+    assert not o.evaluate('Owner.can || Owner.on') and o.locator('[data-own], #opill').count() == 0 and 'admin' not in o.inner_text('body').lower()
+    o.keyboard.press('Escape'); o.wait_for_timeout(100)
+    o.evaluate("markSeen('setup')"); o.wait_for_timeout(1500); assert S.rows[oid]['data']['course']['seen'].get('setup')
+    S.users['someone@example.com']['app'] = {'playbook_owner': True}                                    # set on the server
+    o.reload(); o.wait_for_timeout(1200); assert synced(o)
+    o.wait_for_function('Owner.can === true', timeout=5000)
+    o.click('#setBtn'); o.wait_for_timeout(200); assert o.locator('#setPanel [data-own]').count() == 1
+    o.keyboard.press('Escape'); o.wait_for_timeout(100)
+    before = json.dumps(S.rows[oid]['data'], sort_keys=True)
+    o.click('h1'); o.keyboard.type('admin'); o.wait_for_timeout(300)
+    assert o.evaluate('Owner.on') and o.locator('#opill').is_visible() and o.evaluate('Shop.balance()') == float('inf')
+    o.evaluate("OwnerUI.act('course')"); o.wait_for_timeout(500)
+    assert o.evaluate('!!gradAt()') and o.evaluate("COURSE.filter(U => !U.soon).every(unitPassed)")
+    o.evaluate("Prog.record('center', true)"); o.wait_for_timeout(1800)
+    assert json.dumps(S.rows[oid]['data'], sort_keys=True) == before, 'nothing done in admin mode reaches the account'
+    o.reload(); o.wait_for_timeout(1500); o.wait_for_function('Owner.on === true', timeout=5000)   # the switch stays on across a reload
+    assert o.evaluate('!!gradAt()'), 'the copy is kept on this device'
+    o.click('h1'); o.keyboard.type('admin'); o.wait_for_timeout(800)
+    assert not o.evaluate('Owner.on') and not o.evaluate('gradAt()') and o.evaluate("lessonSeen('w', 'setup')") and not o.evaluate("Prog.rec('center')"), 'back to the real progress'
+    o.evaluate("markSeen('grab')"); o.wait_for_timeout(1500); assert S.rows[oid]['data']['course']['seen'].get('grab') and not S.rows[oid]['data']['course'].get('grad')
+    o.click('h1'); o.keyboard.type('admin'); o.wait_for_timeout(300); assert o.evaluate('Owner.on')
+    o.click('#acctBtn'); o.click('#acctPanel [data-act="signout"]'); o.wait_for_timeout(400)
+    assert not o.evaluate('Owner.on || Owner.can') and o.locator('#opill').count() == 0, 'signing out ends it'
+    print('owner switch: server-marked account only, never written to the account')
 
     # ---- the claude.ai build and an unconfigured site have no account features at all
     D = b.new_context(viewport={'width': 1280, 'height': 860}); wire(D, PLAIN)

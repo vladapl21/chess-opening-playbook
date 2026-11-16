@@ -69,6 +69,14 @@ Facts that shape the design:
 - Settings and the account button moved out of the header into the corner of the screen; the header fits one row on an ordinary monitor and centres its rows when it has to wrap.
 - A lesson opened from a course unit has "Next lesson" at the top. The Sandbox has "Free play: pick openings" to leave a course practice game.
 
+## Phase 1.11: levels, and a calmer Your games (done, November 15)
+
+- **Levels.** Everything practised earns points: 10 for a line without a slip (4 with one), 5 for a lesson studied, 5 for a practice game, 15 for a day with today's five, 40 for a checkpoint. Each level asks for a little more (45 points to level 2, then 60, 75…). The level sits in the corner with a small bar; points float up from it and a new level drops a card, held back while a line is being played (`XP` and `Level` in the template, `Lv` in `app/product.js`). Points are worked out from the record, never stored; `d.lvl` keeps the highest level celebrated (the higher wins across devices), and a line whose moves change keeps the points it earned (`ps`, `pc` on the line's record).
+- **The shop opens at level 5** instead of after a week in a row, and every level from 5 on is a token.
+- **Your games opens on one grid.** A switch above it (your openings, missed shots, game reviews) shows one part at a time. Each opening is a tile in the old cheat-sheet look: their move highlighted, the answer as a green arrow, the games and the record, and how many of its lines are known. Game reviews are a list that opens at the key moment. A player's own Your games has the same switch: every opening in their playbook for both colours (including the ones not met yet), where they leave the book, and the recent games with where they score. Its table no longer pushes the page sideways on a phone.
+- **No cheat sheet tab.** Each opening's page has a switch between its lessons and the opening at a glance, the same cards as before (`glanceHTML`). Old `#cheat` links open an opening's page at a glance.
+- **Not done: more theory.** The book builders need python-chess, Stockfish and the Maia net, and this round's environment couldn't install them. The next lines to write are the ones under Phase 5, "Next", starting with the Caro-Kann gaps that `check_black.py` lists.
+
 ## Phase 1.9: sync, the shop, course games (done, November 14)
 
 - **Everything follows the account.** Settings keep a time per setting; worn items per slot; every save reads and merges first; unknown fields are carried along. The claude.ai copy used to replace one device's progress with the other's newer copy and never heard the other device while open: it now merges and listens (`Prog.take`). `tests/e2e_artifact_sync.py` and the accounts test check two devices for both.
@@ -135,7 +143,8 @@ The original plan for this phase, for reference:
 
 - Done (Phase 1.8): the daily goal ring, the streak, badges with the coach's medal, scarce reminder emails.
 - Done (Phase 1.9 and 1.10): the shop and the coach's wardrobe; the course-complete celebration and the library.
-- Still to do: a streak freeze (one a week), XP and levels, a smaller celebration when you pass a checkpoint, a short weekly recap card, and optional sound.
+- Done (Phase 1.11): points and levels, the shop at level 5.
+- Still to do: a streak freeze (one a week), a smaller celebration when you pass a checkpoint, a short weekly recap card, and optional sound.
 - Leagues and friends later, once other players exist.
 
 ## Phase 5: the systems library (ongoing)
