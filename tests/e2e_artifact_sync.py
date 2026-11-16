@@ -1,7 +1,7 @@
 """The claude.ai copy on two devices: the page keeps its progress in the artifact's database (window.claude.use('db')).
 A stand-in for that database is shared by two browser contexts, so this is two devices on one claude.ai account.
 Everything a player sets or earns must arrive on the other device: the coach, the look, the streak, badges, lines,
-worn coach items; and a page that writes an older, smaller copy must not wipe what the other device added."""
+worn coach items, the level; and a page that writes an older, smaller copy must not wipe what the other device added."""
 import json, tempfile
 from pathlib import Path
 from playwright.sync_api import sync_playwright
@@ -9,7 +9,10 @@ from e2e_white import out
 
 ROOT = Path(__file__).resolve().parents[1]
 BODY = (ROOT / 'data' / 'build' / 'playbook.html').read_text()
-HEAD = '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"></head><body>\n'
+# the skeleton claude.ai wraps the page in, with its small reset (hidden means hidden)
+HEAD = ('<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;'
+        'padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;'
+        'font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>\n')
 page_file = Path(tempfile.mkdtemp()) / 'index.html'
 page_file.write_text(HEAD + BODY + '\n</body></html>')
 URL = page_file.as_uri()
@@ -22,7 +25,7 @@ FAKE = """
   const freeze = o => { if (o && typeof o === 'object'){ Object.freeze(o); for (const k in o) freeze(o[k]); } return o; };
   const snap = v => ({exists: v !== null, data: () => v === null ? undefined : freeze(JSON.parse(v))});
   window.claude = {use: async name => {
-    if (name === 'user') return {id: async () => 'viewer-1', isOwner: () => true};
+    if (name === 'user') return {id: async () => window.__viewer, isOwner: async () => window.__owner};
     if (name !== 'db') return null;
     return {doc: path => ({
       get: async () => snap(await window.__dbGet(path)),
@@ -36,8 +39,10 @@ FAKE = """
 errors = []
 
 
-def device(b, name):
+def device(b, name, viewer='viewer-1', owner=True):
+    """A browser on the claude.ai copy: the artifact's owner by default, or someone it was shared with."""
     ctx = b.new_context(viewport={'width': 1280, 'height': 860})
+    ctx.add_init_script(f"window.__viewer = {json.dumps(viewer)}; window.__owner = {'true' if owner else 'false'};")
     ctx.expose_binding('__dbGet', lambda src, path: DB.get(path))
     ctx.expose_binding('__dbSet', lambda src, path, text: (DB.__setitem__(path, text), writes.append((name, path))))
     ctx.add_init_script(FAKE)
@@ -100,13 +105,37 @@ with sync_playwright() as p:
     assert a.evaluate("[Prog.d.course.grad, Prog.d.course.u['x-w-italian-1'].cp]") == [1700000000000, 4]
     a.evaluate("Prog.d.course.grad = 1800000000000; Prog.save()"); a.wait_for_timeout(1200)
     assert stored()['course']['grad'] == 1700000000000 and a.evaluate("Prog.d.course.grad") == 1700000000000 and bp.evaluate("Prog.d.course.grad") == 1700000000000
+    # ---- the level last celebrated: the highest wins
+    bp.evaluate("Prog.d.lvl = 9; Prog.save()"); bp.wait_for_timeout(1200)
+    assert a.evaluate('Prog.d.lvl') == 9
+    a.evaluate("Prog.d.lvl = 2; Prog.save()"); a.wait_for_timeout(1200)
+    assert stored()['lvl'] == 9 and a.evaluate('Prog.d.lvl') == 9
+
+    # ---- the artifact's owner has a switch nobody else has: it works on a copy that is never written to the database,
+    # while what other devices write keeps arriving underneath and is there when the switch goes off
+    a.wait_for_function('Owner.can === true', timeout=5000)
+    n0 = len([w for w in writes if w[0] == 'A']); before = DB['data/users/viewer-1/italian-progress']
+    a.click('h1'); a.keyboard.type('admin'); a.wait_for_timeout(300)
+    assert a.evaluate('Owner.on') and a.locator('#opill').is_visible()
+    a.evaluate("OwnerUI.act('badges'); OwnerUI.act('course'); Prog.record('grab', true)"); a.wait_for_timeout(1200)
+    assert len([w for w in writes if w[0] == 'A']) == n0 and DB['data/users/viewer-1/italian-progress'] == before, 'admin mode writes nothing'
+    assert not bp.evaluate("Prog.rec('grab')") and bp.evaluate("Object.keys(Prog.d.badges).length") < a.evaluate("Object.keys(Prog.d.badges).length")
+    bp.evaluate("Prog.record('moller-bf6', true)"); bp.wait_for_timeout(1200)
+    assert not a.evaluate("Prog.rec('moller-bf6')"), 'the copy is not touched by the other device'
+    a.click('h1'); a.keyboard.type('admin'); a.wait_for_timeout(600)
+    assert not a.evaluate('Owner.on') and a.evaluate("(Prog.rec('moller-bf6') || {}).seen") == 1 and not a.evaluate("Prog.rec('grab')") and a.locator('#opill').count() == 0
+    # someone the copy was shared with: no switch, no sign of one
+    c = device(b, 'C', viewer='viewer-2', owner=False); c.wait_for_timeout(600)
+    c.click('h1'); c.keyboard.type('admin'); c.wait_for_timeout(300); c.click('#setBtn'); c.wait_for_timeout(200)
+    assert not c.evaluate('Owner.can || Owner.on') and c.locator('[data-own], #opill').count() == 0 and 'admin' not in c.inner_text('body').lower()
+    c.context.close()
 
     # ---- a page from an older version writes a smaller copy: the next save on either device puts everything back
-    d = stored(); old = {k: v for k, v in d.items() if k not in ('days', 'prefs', 'set', 'badges', 'shop')}; old['someday'] = {'x': 1}
+    d = stored(); old = {k: v for k, v in d.items() if k not in ('days', 'prefs', 'set', 'badges', 'shop', 'lvl')}; old['someday'] = {'x': 1}
     DB['data/users/viewer-1/italian-progress'] = json.dumps(old); a.wait_for_timeout(700)
     a.evaluate("Prog.save()"); a.wait_for_timeout(900)
     d = stored(); print('after a smaller copy and one save:', sorted(d.keys()))
-    assert all(k in d for k in ('days', 'prefs', 'badges', 'shop', 'someday')) and d['prefs']['who'][0] == 'pawn'
+    assert all(k in d for k in ('days', 'prefs', 'badges', 'shop', 'lvl', 'someday')) and d['prefs']['who'][0] == 'pawn'
     assert a.evaluate("Prog.d.someday && Prog.d.someday.x") == 1, 'a field this version does not know is kept'
 
     # ---- the explore screen is not disturbed by another device: no re-render while a line is being played

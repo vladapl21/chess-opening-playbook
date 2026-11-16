@@ -36,11 +36,11 @@ with sync_playwright() as p:
 
     pg.goto(URL); pg.wait_for_timeout(1000)
     assert pg.evaluate('[PERSONA, S.view]') == ['new', 'start']
-    assert pg.locator('.tabs button.lock').count() == 5 and 'lock' not in (pg.get_attribute('.tabs [data-view="sandbox"]', 'class') or '')
+    assert pg.locator('.tabs button.lock').count() == 4 and 'lock' not in (pg.get_attribute('.tabs [data-view="sandbox"]', 'class') or '')
     w0 = pg.inner_text('.whero'); assert 'Connect your account' in w0 and not any(x in w0 for x in ('150', '200', '50 games')), w0
     assert pg.is_hidden('#meBtn') and pg.is_hidden('#drillDot'), 'no streak or drill mark before there is anything to drill'
     pg.screenshot(path=out + 'o_start.png', full_page=True)
-    for v in ('course', 'drill', 'games', 'cheat', 'shop'):
+    for v in ('course', 'drill', 'games', 'shop'):
         pg.click(f'.tabs [data-view="{v}"]'); pg.wait_for_timeout(250)
         assert pg.locator('.plocked').count() == 1 and pg.locator('#view .urow, #view .rtile, #view .mrow').count() == 0, v
     pg.screenshot(path=out + 'o_locked.png')
@@ -116,15 +116,23 @@ with sync_playwright() as p:
     pg.evaluate("go('learn')"); pg.wait_for_timeout(400)
     assert pg.locator('.chnav [data-ch]').count() >= 5 and pg.locator('.changes').count() == 0 and pg.evaluate('tabOf(S.view)') == 'games'
     pg.click('.tabs [data-view="games"]'); pg.wait_for_timeout(500)
-    assert pg.locator('.leaks .leak').count() >= 4 and pg.locator('.gtable tbody tr').count() == 40
-    print('first leak:', pg.inner_text('.leaks .leak >> nth=0').replace('\n', ' | ')[:170])
+    # Your games opens on the openings, every one in the playbook for both colours; the rest is one click away
+    n_open = pg.evaluate('BOOKS.w.chapters.length + BOOKS.b.chapters.length')
+    assert pg.locator('.otile').count() == n_open and pg.locator('.leak, .gtable').count() == 0 and pg.locator('[data-gseg]').count() == 3
+    assert pg.locator('.otile:has-text("Not met yet")').count() == n_open - pg.evaluate("Object.keys(Product.me().P.white.systems).filter(id => BOOKS.w.chapters.some(c => c.id === id)).length + Object.keys(Product.me().P.black.systems).filter(id => BOOKS.b.chapters.some(c => c.id === id)).length")
     pg.screenshot(path=out + 'o_games.png', full_page=True)
-    pg.click('.leaks .leak [data-leak] >> nth=0'); pg.wait_for_timeout(500)
+    pg.click('[data-gseg="games"]'); pg.wait_for_timeout(300)
+    assert pg.locator('.gtable tbody tr').count() == 40 and pg.locator('.factl li').count() >= 1
+    pg.click('[data-gseg="leaks"]'); pg.wait_for_timeout(300)
+    assert pg.locator('.leaks .leak').count() >= 4
+    print('first leak:', pg.inner_text('.leaks .leak >> nth=0').replace('\n', ' | ')[:170])
+    pg.screenshot(path=out + 'o_games_leaks.png', full_page=True)
+    pg.click('.leaks [data-leak] >> nth=0'); pg.wait_for_timeout(500)
     assert pg.evaluate('S.view') == 'study', 'a leak opens its lesson'
     # no text about the house player's games is left anywhere in either book
     left = pg.evaluate("['w','b'].flatMap(s => BOOKS[s].nodes.filter(n => n.t && PERS.test(n.t)).map(n => n.t).concat(BOOKS[s].lessons.filter(l => PERS.test(l.why || '')).map(l => l.why)))")
     print('personal sentences left:', len(left), left[:2]); assert not left
-    notation = pg.evaluate("(() => { go('games'); const t = document.getElementById('view').innerText; return (t.match(/\\b[KQRBN]?x?[a-h][1-8]\\b/g) || []).filter(x => x !== 'f7' && x !== 'f2'); })()")
+    notation = pg.evaluate("(() => { let t = ''; for (const g of ['open', 'leaks', 'games']){ S.gseg = g; go('games'); t += document.getElementById('view').innerText; } return (t.match(/\\b[KQRBN]?x?[a-h][1-8]\\b/g) || []).filter(x => x !== 'f7' && x !== 'f2'); })()")
     print('notation on the games page:', notation); assert not notation
     pg.click('.tabs [data-view="drill"]'); pg.wait_for_timeout(300); assert pg.evaluate("S.dfilter.pri") == 'core'
 

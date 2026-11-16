@@ -17,7 +17,7 @@ with sync_playwright() as p:
     ctx = b.new_context(viewport={'width': 1280, 'height': 900})
     pg = ctx.new_page(); hook(pg); pg.goto(URL); pg.wait_for_timeout(1000)
     tabs = [t.split('\n')[0].strip() for t in pg.locator('.tabs button').all_inner_texts()]
-    print('tabs:', tabs); assert tabs[:2] == ['Sandbox', 'Course'] and tabs[2].startswith('Drill') and tabs[3] == 'Your games' and tabs[5] == 'Shop' and len(tabs) == 6
+    print('tabs:', tabs); assert tabs[:2] == ['Sandbox', 'Course'] and tabs[2].startswith('Drill') and tabs[3] == 'Your games' and tabs[4] == 'Shop' and len(tabs) == 5
 
     # the colour switch stays on the tab: Drill on White, Course on Black, then switch back and forth
     pg.click('.tabs [data-view="drill"]'); pg.wait_for_timeout(300)
@@ -26,7 +26,7 @@ with sync_playwright() as p:
     pg.click('.tabs [data-view="course"]'); pg.wait_for_timeout(300)
     pg.click('.sidesw [data-side="w"]'); pg.wait_for_timeout(400)
     assert pg.evaluate('[SIDE, S.view]') == ['w', 'course'] and tab(pg) == 'Course', pg.evaluate('[SIDE, S.view]')
-    for v in ('sandbox', 'games', 'cheat'):
+    for v in ('sandbox', 'games'):
         pg.click(f'.tabs [data-view="{v}"]'); pg.wait_for_timeout(300)
         pg.click('.sidesw [data-side="b"]'); pg.wait_for_timeout(400)
         assert pg.evaluate('[SIDE, S.view]') == ['b', v], (v, pg.evaluate('[SIDE, S.view]'))
@@ -41,6 +41,10 @@ with sync_playwright() as p:
     pg.click('.sidesw [data-side="w"]'); pg.wait_for_timeout(400)
     assert pg.evaluate('[SIDE, S.view, S.line]') == ['w', 'study', 'setup']
     print('switch keeps the tab')
+    # the cheat sheet lives on each opening's page now: an old link opens that page at a glance, under Your games
+    lp = ctx.new_page(); hook(lp); lp.goto(URL + '#cheat'); lp.wait_for_timeout(900)
+    assert lp.evaluate('[S.view, S.lview]') == ['learn', 'glance'] and tab(lp) == 'Your games' and lp.locator('#view .ccard').count() > 0
+    lp.close()
 
     # settings
     pg.evaluate("go('learn')"); pg.wait_for_timeout(300)
@@ -76,14 +80,14 @@ with sync_playwright() as p:
     c2 = b.new_context(viewport={'width': 390, 'height': 844}); ph = c2.new_page(); hook(ph)
     ph.add_init_script("localStorage.setItem('playbook-settings', JSON.stringify({size: 'xl', board: 'plum'}))")
     ph.goto(URL); ph.wait_for_timeout(900)
-    for v in ('sandbox', 'course', 'learn', 'drill', 'games', 'cheat'):
+    for v in ('sandbox', 'course', 'learn', 'drill', 'games', 'shop'):
         ph.evaluate(f"go('{v}')"); ph.wait_for_timeout(350)
         w = ph.evaluate('document.documentElement.scrollWidth'); print('  phone xl', v, w); assert w <= 390, (v, w)
     ph.click('#setBtn'); ph.wait_for_timeout(300); ph.screenshot(path=out + 's_settings_phone.png')
     assert ph.evaluate("document.getElementById('setPanel').scrollWidth <= document.getElementById('setPanel').clientWidth + 1")
 
     # ---- layout: one header row on an ordinary monitor, settings and account out of the way, rows centred when they wrap
-    for w, one in ((1280, True), (1440, True), (1000, False)):
+    for w, one in ((1280, True), (1440, True), (1000, True), (820, False)):   # five tabs: one row down to about 1000px
         lp = b.new_page(viewport={'width': w, 'height': 800}); hook(lp); lp.goto(URL); lp.wait_for_timeout(800)
         m = lp.evaluate("(() => { const r = x => document.querySelector(x).getBoundingClientRect(), t = r('.tabs'), br = r('.brandrow'), c = r('#setBtn'), h = r('.top'); return {one: Math.abs(t.top + t.height / 2 - (br.top + br.height / 2)) < 12, gearAbove: c.bottom <= h.top + 1, gearRight: c.right, mid: Math.abs((t.left + t.right) / 2 - innerWidth / 2), tabsRight: t.right, inHeader: !!document.querySelector('.top #setBtn, .top #acctBtn')}; })()")
         print('header at', w, m); assert m['one'] == one and m['gearAbove'] and not m['inHeader'] and m['gearRight'] >= (m['tabsRight'] if one else w - 60) - 2

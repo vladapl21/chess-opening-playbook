@@ -13,8 +13,11 @@ errors = []
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'pipeline'))
 import paths                                              # noqa: E402  (puts pipeline/ and content/ on the path)
-import chess                                              # noqa: E402
-from lint_claims import pins, lint_labels, lint_pins, lint_repeats     # noqa: E402
+try:
+    import chess                                          # noqa: E402
+    from lint_claims import pins, lint_labels, lint_pins, lint_repeats     # noqa: E402
+except ImportError:                                       # no python-chess here: see part 1
+    chess = None
 
 
 def hook(pg):
@@ -42,16 +45,23 @@ def after(sans):
     return b
 
 
-# ---- 1. the claims check
-no_pin = after('d4 d5 c4 c6 Nf3 Nf6 Bg5')            # the e-pawn is still behind the knight: nothing is pinned
-assert not pins(no_pin), [chess.square_name(a) + '<' + chess.square_name(b) for a, b in pins(no_pin)]
-real = after('d4 d5 c4 e6 Nc3 Nf6 Bg5')              # the e-pawn has moved: the queen is behind the knight
-assert (chess.F6, chess.G5) in pins(real)
-king = after('e4 e5 Nf3 Nc6 Bb5 d6 d4')              # knight pinned to the king
-assert (chess.C6, chess.B5) in pins(king)
-for side in ('white', 'black'):
-    assert lint_repeats(side) == [] and lint_pins(side) == [] and lint_labels(side) == [], side
-print('claims: bishop at the knight with the pawn behind it is no pin; both books clean')
+# ---- 1. the claims check. Without python-chess it can't run; the books must then be the ones it last passed
+# (data/build/lint.ok, written by assemble.py), the same rule assemble.py follows.
+if chess:
+    no_pin = after('d4 d5 c4 c6 Nf3 Nf6 Bg5')            # the e-pawn is still behind the knight: nothing is pinned
+    assert not pins(no_pin), [chess.square_name(a) + '<' + chess.square_name(b) for a, b in pins(no_pin)]
+    real = after('d4 d5 c4 e6 Nc3 Nf6 Bg5')              # the e-pawn has moved: the queen is behind the knight
+    assert (chess.F6, chess.G5) in pins(real)
+    king = after('e4 e5 Nf3 Nc6 Bb5 d6 d4')              # knight pinned to the king
+    assert (chess.C6, chess.B5) in pins(king)
+    for side in ('white', 'black'):
+        assert lint_repeats(side) == [] and lint_pins(side) == [] and lint_labels(side) == [], side
+    print('claims: bishop at the knight with the pawn behind it is no pin; both books clean')
+else:
+    import hashlib
+    books = hashlib.sha256((paths.BUILD / 'data_white.json').read_bytes() + (paths.BUILD / 'data_black.json').read_bytes()).hexdigest()
+    assert (paths.BUILD / 'lint.ok').read_text().strip() == books, 'python-chess is missing and the books changed since the claims check last passed'
+    print('claims: python-chess is missing here; the books are the ones the check last passed')
 
 # ---- 2. line versions
 vers = json.load(open(paths.DATA / 'line_versions.json'))

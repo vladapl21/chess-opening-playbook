@@ -93,22 +93,29 @@ with sync_playwright() as p:
         r = play_sandbox(pg, 0.1, f'b {scope}/{odds}'); assert r['state'] == 'done'
         first = pg.evaluate("N[S.drill.hist[1]].l")
         assert pg.evaluate(f"inScope(S.drill.hist[S.drill.hist.length-1], '{scope}')"), scope
-    # ---- games + cheat
+    # ---- Your games: the openings, then the shots and the reviews behind the switch; each opening at a glance
     pg.click('.tabs button[data-view="games"]'); pg.wait_for_timeout(400)
-    print('insights', pg.locator('.insight').count(), '| cards', pg.locator('.gcard').count(), '| table rows', pg.locator('.orow2').count() - 1)
-    assert pg.locator('.insight').count() == 4 and pg.locator('.gcard').count() == 11
+    pg.click('[data-gseg="open"]'); pg.wait_for_timeout(300)
+    print('openings', pg.locator('.otile').count(), '| switch', pg.locator('[data-gseg]').all_inner_texts())
+    assert pg.locator('.otile').count() == pg.evaluate('DATA.chapters.length') == 9
     pg.screenshot(path=out + 'b_games.png', full_page=True)
-    pg.locator('.insight .btn').nth(3).click(); pg.wait_for_timeout(400)
-    print('insight replay ->', pg.inner_text('.crumbs .where'))
+    pg.click('[data-gseg="shots"]'); pg.wait_for_timeout(300); assert pg.locator('.mshot').count() == 4
+    pg.locator('.mshot').nth(3).click(); pg.wait_for_timeout(400)
+    print('shot ->', pg.evaluate('[S.view, S.drill && S.drill.kind]'))
     pg.click('.tabs button[data-view="games"]'); pg.wait_for_timeout(300)
+    pg.click('[data-gseg="games"]'); pg.wait_for_timeout(300); assert pg.locator('.grev').count() == 11
     for k in range(11):
-        pg.locator('.gcard .btn.primary').nth(k).click(); pg.wait_for_timeout(250)
+        pg.locator('.grev').nth(k).click(); pg.wait_for_timeout(250)
         assert pg.evaluate("S.view") == 'study'
         pg.click('[data-go="games"]'); pg.wait_for_timeout(200)
-    pg.click('.tabs button[data-view="cheat"]'); pg.wait_for_timeout(300)
-    print('cheat cards', pg.locator('.ccard').count(), '| first:', pg.locator('.ccard .if').first.inner_text())
-    pg.screenshot(path=out + 'b_cheat.png')
-    pg.locator('.ccard').nth(20).click(); pg.wait_for_timeout(300); print('cheat ->', pg.inner_text('.crumbs .where'))
+    pg.click('[data-gseg="open"]'); pg.wait_for_timeout(200); pg.click('.otile[data-ch="slav"]'); pg.wait_for_timeout(300)
+    pg.click('[data-lview="glance"]'); pg.wait_for_timeout(300)
+    print('slav at a glance', pg.locator('.ccard').count(), '| first:', pg.locator('.ccard .if').first.inner_text())
+    assert pg.locator('.ccard').count() == pg.evaluate('glanceCards(CHAPTERS.slav).length') >= 10
+    pg.screenshot(path=out + 'b_glance.png')
+    pg.locator('.ccard').nth(9).click(); pg.wait_for_timeout(300); print('card ->', pg.inner_text('.crumbs .where'))
+    assert pg.evaluate('S.view') == 'study'
+    pg.evaluate("S.lview = 'lessons'")
     # ---- switch back: White state restored, Black state kept
     pg.click('.tabs button[data-view="drill"]'); pg.wait_for_timeout(200)
     pg.click('.sidesw [data-side="w"]'); pg.wait_for_timeout(500)
@@ -142,9 +149,12 @@ with sync_playwright() as p:
         q.evaluate("openLine('bs-classical')"); q.wait_for_timeout(400)
         for _ in range(5): q.keyboard.press('ArrowRight'); q.wait_for_timeout(100)
         q.screenshot(path=out + f'b_phone_study_{scheme}.png')
-        for v in ['drill', 'sandbox', 'games', 'cheat']:
+        for v in ['drill', 'sandbox', 'games', 'learn']:
             q.evaluate(f"go('{v}')"); q.wait_for_timeout(300)
             ow = q.evaluate('document.documentElement.scrollWidth'); assert ow <= 390, (v, ow)
+        q.evaluate("S.lview = 'glance'; go('learn')"); q.wait_for_timeout(300)
+        ow = q.evaluate('document.documentElement.scrollWidth'); assert ow <= 390, ('glance', ow)
+        q.evaluate("S.lview = 'lessons'")
         q.evaluate("go('games')"); q.wait_for_timeout(300); q.screenshot(path=out + f'b_phone_games_{scheme}.png', full_page=True)
         ph.close()
     print('ERRORS:', errors[:10])

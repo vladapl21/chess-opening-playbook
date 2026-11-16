@@ -273,6 +273,7 @@ const Product = {
   pool: '', msg: null, busy: false, site: 'chess.com', names: null, user: '', draft: null, cards: null, ci: 0, picks: null,
   me(){ return Prog.d.me || {}; },
   boot(){
+    Lv.boot();
     PERSONA = personaOf(Prog.d);
     if (SITE && !meOf(Prog.d)) Prog.d.me = {state: 'new', since: Date.now()};
     if (PERSONA !== 'house') depersonalise();
@@ -316,13 +317,13 @@ const Product = {
         <div class="cta">${cta}<button class="btn ghost" data-view="sandbox">Try the sandbox first</button></div></div>
       <div class="wart"><div class="board">${boardSVG(w.fen, {coords: false, last: w.last, arrows: ['c4f7r'], flip: false})}</div><p class="wbub">${short ? `Not enough games yet. Play some more and I'll be here.` : `Hi, I'm ${coachName()}. Connect your account and I'll show you your openings.`}</p><div class="wcoach cface">${knightSVG()}</div></div></section>
       <ol class="steps3">${li(1, 'Make an account', 'So your playbook follows you to every device.')}${li(2, 'Connect your chess account', 'Your chess.com or Lichess username. Only your public games are read.')}${li(3, 'Pick your lines', 'A few would-you-rather questions, then your course opens.')}</ol>
-      <div><p class="kicker" style="margin-bottom:10px">Opens with your games</p><div class="lockgrid">${lock('course', 'Course', 'One path, ordered by what your games say matters most.')}${lock('drill', 'Drill', 'Five lines a day from memory. Slips come back first.')}${lock('games', 'Your games', 'Results by opening, every lesson, and where you leave the book.')}${lock('cheat', 'Cheat sheet', 'One card per decision.')}</div></div>`;
+      <div><p class="kicker" style="margin-bottom:10px">Opens with your games</p><div class="lockgrid">${lock('course', 'Course', 'One path, ordered by what your games say matters most.')}${lock('drill', 'Drill', 'Five lines a day from memory. Slips come back first.')}${lock('games', 'Your games', 'Results by opening, every lesson, and where you leave the book.')}${lock('shop', 'Shop', 'A new look for your coach, bought with what you earn.')}</div></div>`;
   },
   locked(tab){
     const T = {course: ['Your course', 'One path through your openings, in the order your games say matters most: the idea, the lines, a drill, practice games and a checkpoint for each.'],
       drill: ['Drill', 'Five lines a day from memory, the ones you slipped on first. Do them every day to keep your streak.'],
-      games: ['Your games', 'Your results by opening, every lesson in each one, and the exact positions where you leave your playbook most often.'], cheat: ['Cheat sheet', 'One card per decision: their move, your answer.'],
-      shop: ['Shop', 'A wardrobe for your coach, bought with tokens from badges and days in a row.']}[tab] || ['This section', ''];
+      games: ['Your games', 'Your results by opening, every lesson in each one, and the exact positions where you leave your playbook most often.'],
+      shop: ['Shop', 'A wardrobe for your coach. It opens at level 5; tokens come from levels, badges and days in a row.']}[tab] || ['This section', ''];
     const out = this.signedOut(), idx = [LINES[DATA.lessons[0].lines[0]].n.slice(-1)[0], LINES[DATA.lessons[1].lines[0]].n.slice(-1)[0], LINES[DATA.lessons[2].lines[0]].n.slice(-1)[0]];
     view.innerHTML = `<div class="pv"><section class="plocked"><div class="lk">${ICON.lock}</div><p class="kicker">Locked until your games are in</p><h3>${T[0]}</h3><p>${T[1]}</p>
       <div class="cta">${out ? `<button class="btn primary" data-acct="signup">Create your account</button>` : `<button class="btn primary" data-pgo="setup">Connect your account</button>`}<button class="btn" data-view="sandbox">Open the sandbox</button></div>
@@ -440,9 +441,10 @@ const Product = {
     const ch = new Chess(); let prev = null; for (let k = us.length - 1; k >= 0; k--) prev = ch.move(uciObj(us[k]));
     const mv = ch.move(uciObj(L.uci)); if (mv) ch.undo(); const words = mv ? moveWords(ch, mv, prev) : 'another move';
     const les = new Set(D.lessons.map(l => l.id)), ln = bk ? D.lines.find(l => les.has(l.lesson) && l.n.includes(kid)) : null, line = ln ? ln.id : null;
-    return `<div class="leak"><div class="thumb">${boardSVG(n.f, {mini: true, coords: false, flip: L.side === 'b', arrows: [L.uci.slice(0, 4) + 'r'].concat(bk ? [bk.u.slice(0, 4) + 'g'] : [])})}</div>
+    const open = btn && line, tag = open ? `button type="button" data-leak="${L.side}:${line}:${kid}"` : 'div';
+    return `<${tag} class="leak"><div class="thumb">${boardSVG(n.f, {mini: true, coords: false, flip: L.side === 'b', arrows: [L.uci.slice(0, 4) + 'r'].concat(bk ? [bk.u.slice(0, 4) + 'g'] : [])})}</div>
       <div><p><b>${plural(L.n, 'time')}</b> · you scored ${rec(L)}</p><p>You played: <b>${esc(lc(words))}</b>.${bk ? ` The playbook plays: <b>${esc(lc(bk.l || 'the green arrow'))}</b>.` : ''}</p>
-      ${btn && line ? `<button class="btn small" data-leak="${L.side}:${line}:${kid}" style="margin-top:8px">Open the lesson</button>` : ''}</div></div>`;
+      ${open ? '<span class="lgo">Open the lesson ›</span>' : ''}</div></${open ? 'button' : 'div'}>`;
   },
   findingsHTML(){
     const P = this.me().P; if (!P) return this.startHTML();
@@ -487,21 +489,28 @@ const Product = {
       <p class="lede">Your course is ordered by your own games, every chapter shows your own record, and Your games shows where you leave the book.</p>
       <div class="cta"><button class="btn primary" data-open style="min-height:48px;padding:12px 24px;font-size:16px">Open my course</button></div></section>`;
   },
-  /* -- Your games, for a player with a profile */
+  /* -- Your games, for a player with a profile. The same switch as the house page: your openings (both colours, every
+     one in the playbook, the ones met most first), where you leave the book, and the recent games with where you score. */
   games(){
-    const P = this.me().P, cn = (s, id) => (BOOKS[s].chapters.find(c => c.id === id) || {}).name || '';
-    const col = (s, side) => { const max = Math.max(1, ...Object.values(side.systems).map(t => t.n));
-      return Object.entries(side.systems).sort((a, b) => b[1].n - a[1].n).map(([id, t]) => `<button class="brow" data-pch="${s}:${id}" style="border:0;background:none;padding:0;text-align:left;cursor:pointer;font:inherit;color:inherit"><span class="bn">${esc(cn(s, id))}</span><span class="br">${plural(t.n, 'game')} · ${rec(t)}</span><span class="bb"><i style="width:${Math.max(3, pc(t.n, max))}%"></i></span></button>`).join(''); };
-    const day = t => t ? new Date(t).toLocaleDateString(undefined, {month: 'short', day: 'numeric'}) : '';
-    const rows = P.games.slice(0, 40).map(g => `<tr><td>${day(g.t)}</td><td>${g.me === 'w' ? 'White' : 'Black'}</td><td>${esc(g.opp)}${g.oe ? ` <span style="color:var(--muted)">${g.oe}</span>` : ''}</td><td><span class="chip ${g.r === 1 ? 'win' : g.r === 0 ? 'loss' : 'draw'}">${g.r === 1 ? 'Won' : g.r === 0 ? 'Lost' : 'Draw'}</span></td><td>${esc(g.ch ? cn(g.me, g.ch) : 'Outside the playbook')}</td><td>${g.ch ? plural(Math.floor(g.bp / 2), 'move') + ' in the book' : ''}</td></tr>`).join('');
-    const tile = (b, s) => `<div class="tile"><b>${b}</b><span>${s}</span></div>`;
-    view.innerHTML = `<div class="pv"><div class="chead"><div><p class="kicker">Your games${P.user ? ' · ' + esc(P.user) : ''}</p><h2 style="font-size:clamp(30px,4vw,44px)">What actually happened</h2><p>Your games, read without an engine: what you met, how it went, and where your moves and your playbook part ways. Open an opening for every lesson in it.</p></div>
-        <button class="btn" data-pgo="setup">Read my newer games</button></div>
-      <div class="tiles">${tile(P.n, 'games')}${tile(rec(P.all), 'wins and losses')}${tile(P.rating || '–', `${P.tc} rating`)}${tile(P.leaks.length, 'spots where you leave the book')}</div>
-      <div class="fgrid"><div class="pcard"><p class="kicker">With White · ${rec(P.white.all)}</p><div class="bars">${col('w', P.white)}</div></div><div class="pcard"><p class="kicker">With Black · ${rec(P.black.all)}</p><div class="bars">${col('b', P.black)}</div></div></div>
-      ${P.leaks.length ? `<div><div class="sechead"><h2>Where you leave your playbook</h2><p>The same position, the same different move. Red is what you played, green is the playbook.</p></div><div class="leaks">${P.leaks.slice(0, 8).map(L => this.leakHTML(L, true)).join('')}</div></div>` : ''}
-      ${P.facts.length ? `<div class="pcard"><p class="kicker">Where you score</p><ul class="factl">${P.facts.map(f => `<li><b>${f.big}</b><span>${esc(f.text)}</span></li>`).join('')}</ul></div>` : ''}
-      <div><div class="sechead"><h2>Recent games</h2></div><div class="gwrap pcard" style="padding:6px 10px"><table class="gtable"><thead><tr><th>Date</th><th>Colour</th><th>Opponent</th><th>Result</th><th>Opening</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div></div>`;
+    const P = this.me().P, day = t => t ? new Date(t).toLocaleDateString(undefined, {month: 'short', day: 'numeric'}) : '';
+    const cn = (s, id) => (BOOKS[s].chapters.find(c => c.id === id) || {}).name || '';
+    const group = s => { const side = s === 'w' ? P.white : P.black, sys = side.systems || {}, n = id => (sys[id] || {}).n || 0;
+      const cs = BOOKS[s].chapters.slice().sort((a, b) => n(b.id) - n(a.id));
+      return `<div class="ogroup"><p class="kicker">With ${s === 'w' ? 'White' : 'Black'}${side.all && side.all.n ? ` · ${plural(side.all.n, 'game')} · ${rec(side.all)}` : ''}</p><div class="otiles">${cs.map(C => openTile(s, C, sys[C.id], `data-pch="${s}:${C.id}"`)).join('')}</div></div>`; };
+    const leaks = P.leaks.slice(0, 8), games = P.games.slice(0, 40);
+    const segs = [['open', 'Your openings', BOOKS.w.chapters.length + BOOKS.b.chapters.length, 'Openings'], ['leaks', 'Where you leave the book', leaks.length, 'Off the book'], ['games', 'Recent games', games.length, 'Games']].filter(x => x[0] === 'open' || x[2]);
+    const seg = segs.some(x => x[0] === S.gseg) ? S.gseg : 'open';
+    const rows = games.map(g => `<tr><td>${day(g.t)}</td><td>${g.me === 'w' ? 'White' : 'Black'}</td><td>${esc(g.opp)}${g.oe ? ` <span style="color:var(--muted)">${g.oe}</span>` : ''}</td><td><span class="chip ${g.r === 1 ? 'win' : g.r === 0 ? 'loss' : 'draw'}">${g.r === 1 ? 'Won' : g.r === 0 ? 'Lost' : 'Draw'}</span></td><td>${esc(g.ch ? cn(g.me, g.ch) || 'Outside the playbook' : 'Outside the playbook')}</td><td>${g.ch ? plural(Math.floor(g.bp / 2), 'move') + ' in the book' : ''}</td></tr>`).join('');
+    const body = seg === 'leaks' ? `<p class="legendline">The same position, the same different move. Red is what you played, green is the playbook.</p><div class="leaks">${leaks.map(L => this.leakHTML(L, true)).join('')}</div>`
+      : seg === 'games' ? `${P.facts.length ? `<div class="pcard"><p class="kicker">Where you score</p><ul class="factl">${P.facts.map(f => `<li><b>${f.big}</b><span>${esc(f.text)}</span></li>`).join('')}</ul></div>` : ''}
+          <div class="gwrap pcard" style="padding:6px 10px"><table class="gtable"><thead><tr><th>Date</th><th>Colour</th><th>Opponent</th><th>Result</th><th>Opening</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`
+      : `<p class="legendline">Their move is highlighted. The green arrow is your answer. Open one for its lessons and every position in it.</p>${group('w')}${group('b')}`;
+    const num = (b, w) => `<span><b class="tnum">${b}</b> ${w}</span>`;
+    view.innerHTML = `<div class="pv"><div class="chead ghd"><div><p class="kicker">Your games${P.user ? ' · ' + esc(P.user) : ''}</p><h2 style="font-size:clamp(30px,4vw,44px)">What actually happened</h2>
+        <p class="grec">${num(P.n, P.n === 1 ? 'game' : 'games')}${num(P.all.w, P.all.w === 1 ? 'win' : 'wins')}${num(P.all.l, P.all.l === 1 ? 'loss' : 'losses')}${P.all.d ? num(P.all.d, P.all.d === 1 ? 'draw' : 'draws') : ''}${P.rating ? num(P.rating, `${P.tc} rating`) : ''}</p></div>
+        <button class="btn small" data-pgo="setup">Read my newer games</button></div>
+      <div class="pgbody">${segHTML(segs, seg, 'gseg')}<div class="gbody">${body}</div></div></div>`;
+    view.querySelectorAll('[data-gseg]').forEach(b => b.onclick = () => { S.gseg = b.dataset.gseg; this.games(); });
     this.wire();
   },
   wire(){
@@ -577,11 +586,11 @@ const Badges = {
   },
   show(){
     if (S.view === 'grad' || libOn()) return;                                      // the coach is on that page already; it waits
-    const rank = x => x.id === 's7' ? -1 : {gold: 0, silver: 1, bronze: 2}[x.tier];   // the week that opens the wardrobe says so first
+    const rank = x => ({gold: 0, silver: 1, bronze: 2})[x.tier];
     const B = this.queue.slice().sort((a, b) => rank(a) - rank(b))[0]; if (!B) return;
     const more = this.queue.length - 1; this.queue = [];
     if (!SET.coach){ toast(`New badge: ${B.name}${more ? ` and ${more} more` : ''}.`); return; }
-    Coach.say(`${B.need} ${more ? `And ${more} more ${more === 1 ? 'badge' : 'badges'} with it: ${more + 1} shop tokens.` : 'That\'s a shop token too.'}${B.id === 's7' ? ' And my wardrobe is open now.' : ''}`, {mood: 'cheer', stay: true, head: `New badge: ${B.name}`, art: `<span class="cmedal">${medalSVG(B.tier, B.glyph)}</span>`, cta: B.id === 's7' ? ['shop', 'Open the shop'] : ['me', 'See your badges']});
+    Coach.say(`${B.need} ${more ? `And ${more} more ${more === 1 ? 'badge' : 'badges'} with it: ${more + 1} shop tokens.` : 'That\'s a shop token too.'}`, {mood: 'cheer', stay: true, head: `New badge: ${B.name}`, art: `<span class="cmedal">${medalSVG(B.tier, B.glyph)}</span>`, cta: ['me', 'See your badges']});
   }
 };
 // the profile: the streak, the last seven days and every badge, earned or not
@@ -591,7 +600,11 @@ function profileHTML(){
   const week = [-6, -5, -4, -3, -2, -1, 0].map(o => { const d = dayDate(o), on = Daily.done(o); return `<li class="${on ? 'on' : ''} ${o === 0 ? 'now' : ''}"><i>${on ? ICON.check : ''}</i><span>${d.toLocaleDateString(undefined, {weekday: 'narrow'})}</span></li>`; }).join('');
   const one = B => { const at = have[B.id], need = badgeNeed(B, x), cur = Math.min(need, B.n(x));
     return `<li class="bdg ${at ? 'got' : 'lock'}" title="${esc(B.need)}">${medalSVG(at ? B.tier : 'locked', B.glyph)}<b>${esc(B.name)}</b><span>${at ? 'Earned ' + new Date(at).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'}) : esc(B.need)}</span>${at ? '' : `<i class="bprog" aria-hidden="true"><i style="width:${Math.round(cur / need * 100)}%"></i></i>`}</li>`; };
-  return `<div class="prof"><div class="pstreak ${st ? '' : 'zero'}">${FLAME}<div><b class="tnum">${st}</b><span>${st === 1 ? 'day' : 'days'} in a row</span></div><p>Best: ${best} · today: ${k} of ${DAILY} lines</p></div>
+  const L = Level.of(), pts = [['A line without a slip', XP.clean], ['A line with a slip', XP.slip], ['A lesson studied', XP.lesson], ['A practice game', XP.game], ['Today\'s five', XP.day], ['A checkpoint passed', XP.pass]];
+  return `<div class="prof"><div class="plevel"><span class="lvc big tnum">${L.n}</span><div><b>Level ${L.n}</b><span class="tnum">${L.into} of ${L.need} points to level ${L.n + 1}</span><span class="lvbar wide" aria-hidden="true"><i style="width:${Math.round(L.into / L.need * 100)}%"></i></span>
+      ${L.n < SHOP_AT ? `<span class="lvnote">The shop opens at level ${SHOP_AT}.</span>` : ''}</div></div>
+    <details class="pxp"><summary>How points add up</summary><ul>${pts.map(([t, n]) => `<li><span>${t}</span><b class="tnum">+${n}</b></li>`).join('')}</ul></details>
+    <div class="pstreak ${st ? '' : 'zero'}">${FLAME}<div><b class="tnum">${st}</b><span>${st === 1 ? 'day' : 'days'} in a row</span></div><p>Best: ${best} · today: ${k} of ${DAILY} lines</p></div>
     <ol class="week" aria-label="The last seven days">${week}</ol>
     <div class="bdgs"><p class="kicker">Badges · ${got} of ${BADGES.length}</p>${groups.map(g => `<div><p class="bgh">${esc(g)}</p><ul class="bgrid">${BADGES.filter(B => B.group === g).map(one).join('')}</ul></div>`).join('')}</div></div>`;
 }
@@ -627,14 +640,14 @@ const Shop = {
   runs(){ const ks = Object.keys(Prog.d.days || {}).filter(k => Daily.n(k) >= DAILY).sort(), out = []; let prev = null;
     for (const k of ks){ if (prev && dkey(dayDate(1, prev)) === k) out[out.length - 1]++; else out.push(1); prev = k; } return out; },
   earned(){ const have = Prog.d.badges || {}, r = this.runs();
-    return {badges: BADGES.filter(B => have[B.id]).length, streak: r.reduce((a, n) => a + Math.floor(n / 3), 0), week: Math.max(0, ...r) >= 7 ? 1 : 0}; },
+    return {badges: BADGES.filter(B => have[B.id]).length, streak: r.reduce((a, n) => a + Math.floor(n / 3), 0), week: Math.max(0, ...r) >= 7 ? 1 : 0, level: Math.max(0, Level.n() - SHOP_AT + 1)}; },
   spent(){ return Object.keys(this.st().own).reduce((a, id) => a + ((SHOP.find(i => i.id === id) || {}).price || 0), 0); },
-  total(){ const e = this.earned(); return e.badges + e.streak + e.week; },
-  balance(){ return Math.max(0, this.total() - this.spent()); },
-  isOpen(){ return Math.max(...this.runs(), 0) >= 7; },
+  total(){ const e = this.earned(); return e.badges + e.streak + e.week + e.level; },
+  balance(){ return Owner.on ? Infinity : Math.max(0, this.total() - this.spent()); },
+  isOpen(){ return Owner.on || Level.n() >= SHOP_AT; },
   owns(id){ return id === 'c-classic' || !!this.st().own[id]; },
   worn(){ const w = (Prog.d.shop || {}).wear || {}, g = s => (w[s] || [])[0] || null; return {skin: g('skin') || 'c-classic', head: g('head'), face: g('face'), neck: g('neck')}; },
-  lockOf(I){ if (!I.price) return ''; if (!this.isOpen()) return 'week'; if (I.needs && !(Prog.d.badges || {})[I.needs]) return 'badge'; return ''; },
+  lockOf(I){ if (!I.price || Owner.on) return ''; if (!this.isOpen()) return 'level'; if (I.needs && !(Prog.d.badges || {})[I.needs]) return 'badge'; return ''; },
   put(id){ const I = SHOP.find(x => x.id === id); if (!I || !this.owns(id)) return; this.st().wear[I.slot] = [id, Date.now()]; Prog.save(); },
   off(slot){ this.st().wear[slot] = [slot === 'skin' ? 'c-classic' : null, Date.now()]; Prog.save(); },
   buy(id){
@@ -649,24 +662,24 @@ function renderShop(){
   const card = I => {
     const lk = Shop.lockOf(I), own = Shop.owns(I.id), on = L[I.slot] === I.id, B = I.needs && BADGES.find(x => x.id === I.needs);
     const look = Object.assign({}, L, {[I.slot]: I.id});
-    const needB = B && !(Prog.d.badges || {})[B.id];
+    const needB = B && !(Prog.d.badges || {})[B.id] && !Owner.on;
     const act = needB ? `<span class="need">Needs the badge “${esc(B.name)}”</span>` : lk ? '' : on ? (I.slot === 'skin' && I.id === 'c-classic' ? '<span class="wearing">Wearing</span>' : `<button class="btn small" data-off="${I.slot}">Take off</button>`)
       : own ? `<button class="btn small" data-wear="${I.id}">Wear</button>` : `<button class="btn small primary" data-buy="${I.id}" ${bal < I.price ? 'disabled' : ''}>${COIN}${I.price}</button>`;
-    return `<li class="item ${lk ? 'lock' : ''} ${on ? 'on' : ''}"><span class="ipv">${knightSVG('', who, look)}</span><b>${esc(I.name)}</b>${own && !on && I.id !== 'c-classic' ? '<span class="owned">Yours</span>' : !own && lk === 'week' && I.price && !needB ? `<span class="price">${COIN}${I.price}</span>` : ''}${act}</li>`;
+    return `<li class="item ${lk ? 'lock' : ''} ${on ? 'on' : ''}"><span class="ipv">${knightSVG('', who, look)}</span><b>${esc(I.name)}</b>${own && !on && I.id !== 'c-classic' ? '<span class="owned">Yours</span>' : !own && lk === 'level' && I.price && !needB ? `<span class="price">${COIN}${I.price}</span>` : ''}${act}</li>`;
   };
-  const days = Array.from({length: 7}, (_, k) => `<i class="${k < Math.min(7, st) ? 'on' : ''}"></i>`).join('');
-  view.innerHTML = `<div class="chead"><div><p class="kicker">Shop</p><h2 style="font-size:clamp(30px,4vw,46px)">${esc(coachName())}'s wardrobe</h2><p>Tokens come from badges and from days in a row. Spend them on a new look for your coach.</p></div></div>
+  const lv = Level.of(), toGo = Array.from({length: Math.max(0, SHOP_AT - lv.n)}, (_, k) => Level.step(lv.n + k)).reduce((a, v) => a + v, 0) - lv.into;
+  view.innerHTML = `<div class="chead"><div><p class="kicker">Shop</p><h2 style="font-size:clamp(30px,4vw,46px)">${esc(coachName())}'s wardrobe</h2><p>Tokens come from badges, from levels and from days in a row. Spend them on a new look for your coach.</p></div></div>
     <div class="shop">
       <aside class="shopside">
         <div class="mannequin">${knightSVG('cheer', who, L)}</div>
-        <p class="bal">${COIN}<b class="tnum">${bal}</b><span>${bal === 1 ? 'token' : 'tokens'}</span></p>
-        <ul class="earn"><li><span>Badges</span><b class="tnum">${e.badges}</b></li><li><span>Every three days in a row</span><b class="tnum">${e.streak}</b></li><li><span>Your first full week</span><b class="tnum">${e.week}</b></li>${Shop.spent() ? `<li class="sp"><span>Spent</span><b class="tnum">−${Shop.spent()}</b></li>` : ''}</ul>
+        <p class="bal">${COIN}<b class="tnum">${bal === Infinity ? '∞' : bal}</b><span>${bal === 1 ? 'token' : 'tokens'}</span></p>
+        <ul class="earn"><li><span>Badges</span><b class="tnum">${e.badges}</b></li><li><span>Levels from ${SHOP_AT} on</span><b class="tnum">${e.level}</b></li><li><span>Every three days in a row</span><b class="tnum">${e.streak}</b></li><li><span>Your first full week</span><b class="tnum">${e.week}</b></li>${Shop.spent() ? `<li class="sp"><span>Spent</span><b class="tnum">−${Shop.spent()}</b></li>` : ''}</ul>
         <p class="nextt">${st ? `${toNext === 3 ? 'Three' : toNext === 2 ? 'Two' : 'One'} more ${toNext === 1 ? 'day' : 'days'} in a row for the next token.` : 'Five lines today starts a streak: every third day in a row is a token.'}</p>
         <div class="coachpick mini">${COACHES.map(c => `<button type="button" data-coachwho="${c.id}" aria-pressed="${who === c.id}"><span class="cface">${knightSVG('', c.id, L)}</span><b>${c.name}</b></button>`).join('')}</div>
       </aside>
       <div class="shopmain">
-        ${open ? '' : `<section class="wlock"><div><p class="kicker">Locked</p><h3>The wardrobe opens after a week in a row</h3><p>Five lines a day for seven days running, and every item here can be bought. Your tokens wait for you until then.</p></div>
-          <div class="wdays" aria-label="${Math.min(7, st)} of 7 days">${days}<span>${best >= 7 ? '' : `${Math.min(7, st)} of 7`}</span></div></section>`}
+        ${open ? '' : `<section class="wlock"><div><p class="kicker">Locked</p><h3>The wardrobe opens at level ${SHOP_AT}</h3><p>Every line you play earns points toward your next level. You're level ${lv.n}: ${toGo} more ${toGo === 1 ? 'point' : 'points'} and every item here can be bought. Your tokens wait for you until then.</p></div>
+          <div class="wlv" aria-label="Level ${lv.n} of ${SHOP_AT}">${Array.from({length: SHOP_AT}, (_, k) => `<i class="${k < lv.n ? 'on' : ''}">${k + 1}</i>`).join('')}</div></section>`}
         ${SLOTS.map(([slot, name]) => `<section class="slot"><h3>${name}</h3><ul class="items">${SHOP.filter(I => I.slot === slot).map(card).join('')}</ul></section>`).join('')}
       </div>
     </div>`;
@@ -779,7 +792,7 @@ function renderGrad(){
   const stamps = Object.values(c.u || {}).flatMap(p => Object.values(p).filter(v => v > 1e12)).concat(Object.values(c.seen || {}).filter(v => v > 1e12));
   const days = Math.max(1, Math.round((at - Math.min(at, ...stamps)) / DAY));
   const pick = deepRank().find(o => !o.done), look = Object.assign({}, Shop.worn(), {head: 'h-grad'});
-  const cap = Shop.owns('h-grad') ? '' : Shop.isOpen() ? ' The graduation cap is in the shop now.' : ' The graduation cap is waiting in the shop for when the wardrobe opens (a week in a row).';
+  const cap = Shop.owns('h-grad') ? '' : Shop.isOpen() ? ' The graduation cap is in the shop now.' : ` The graduation cap is waiting in the shop, which opens at level ${SHOP_AT}.`;
   const bits = ['--gold', '--accent', '--rosso', '--blu', '--viola', '--oro', '--gold-2'];
   const conf = fresh ? `<div class="grconf" aria-hidden="true">${Array.from({length: 42}, (_, k) => `<i style="--x:${(k * 37) % 100}%;--d:${(k % 7) * .17}s;--s:${2.6 + (k % 5) * .35}s;--r:${(k * 53) % 360}deg;background:var(${bits[k % bits.length]})"></i>`).join('')}</div>` : '';
   const stat = (n, t) => `<li><b class="tnum">${n}</b><span>${t}</span></li>`;
@@ -815,7 +828,7 @@ const Coach = {
   tip(){
     const T = {start: 'Connect your chess account and I\'ll build your course around your games.', setup: 'A username is the quickest way. I only read your public games.', sandbox: 'Play your side. The other side answers the way club players really do.',
       course: 'Work down the path. Each checkpoint you pass opens the next unit.', learn: 'Pick a lesson, then step through it with the arrow keys.', drill: 'Five lines a day keeps your streak. The ones you slipped on come first.',
-      games: 'This is where your moves and your playbook part ways.', cheat: 'Their move is highlighted. The green arrow is your answer.', study: 'Step through with the arrow keys. Switch the engine on under the board if a position looks scary.'};
+      games: 'Your openings, with your record in each. Open one for its lessons and every position in it at a glance.', study: 'Step through with the arrow keys. Switch the engine on under the board if a position looks scary.'};
     return T[S.view] || T[tabOf(S.view, S.studyFrom)] || 'Keep going.';
   },
   // called after every full render: at most one thing to say, and only the first time
@@ -834,14 +847,15 @@ const Coach = {
       return this.hush();
     }
     if (PERSONA === 'ready' && v === 'course' && this.once('ready-course', 'This is your course, in the order your games asked for. Start with the unit at the top.')) return;
-    if (['course', 'learn', 'drill', 'games', 'cheat', 'sandbox'].includes(v) && this.once('tab-' + v, this.tip())) return;
+    if (['course', 'learn', 'drill', 'games', 'sandbox'].includes(v) && this.once('tab-' + v, this.tip())) return;
     this.hush();
   },
   // the fifth line of the day
   daily(){
     const st = Daily.streak(), week = st === 7 && Math.max(0, ...Shop.runs().slice(0, -1)) < 7;
-    if (week) return this.say(`Seven days in a row. My wardrobe is open now, and that's two tokens for the week plus one for the first full week.`, {mood: 'cheer', stay: true, head: 'A week in a row', art: `<span class="cflame">${FLAME}<b>${st}</b></span>`, cta: ['shop', 'Open the shop']});
-    this.say(st > 1 ? `That's today's five. ${st} days in a row${st % 3 === 0 ? ', and every third day is a shop token' : ''}: come back tomorrow for ${st + 1}.` : `That's today's five, and day one of your streak. Five more tomorrow keeps it going.`, {mood: 'cheer', ms: 9000, art: `<span class="cflame">${FLAME}<b>${st}</b></span>`, cta: st % 3 === 0 ? ['shop', 'Open the shop'] : null});
+    const sh = Shop.isOpen() ? ['shop', 'Open the shop'] : null;
+    if (week) return this.say(`Seven days in a row. That's two tokens for the week, plus one for your first full week.`, {mood: 'cheer', stay: true, head: 'A week in a row', art: `<span class="cflame">${FLAME}<b>${st}</b></span>`, cta: sh});
+    this.say(st > 1 ? `That's today's five. ${st} days in a row${st % 3 === 0 ? ', and every third day is a shop token' : ''}: come back tomorrow for ${st + 1}.` : `That's today's five, and day one of your streak. Five more tomorrow keeps it going.`, {mood: 'cheer', ms: 9000, art: `<span class="cflame">${FLAME}<b>${st}</b></span>`, cta: st % 3 === 0 ? sh : null});
   },
   event(kind, ok){
     if (kind === 'line' && S.view === 'drill'){ this.n++;
@@ -868,4 +882,107 @@ Prog.record = function(id, clean){
 };
 // every save is a moment something may have been earned
 const save0 = Prog.save.bind(Prog);
-Prog.save = function(){ save0(); if (Badges.check()) save0(); };
+Prog.save = function(){ save0(); const b = Badges.check(), l = Lv.check(); if (b || l) save0(); };
+/* ---- levels, as the player sees them: the chip top right (filled by renderChrome), the points that float up from it
+   after a line, and the moment a new level is reached. Level and XP live in the template; d.lvl is the highest level
+   already celebrated, so a level reached on another device is not celebrated twice. */
+const Lv = {
+  last: null, pending: 0,
+  // on opening: the points so far, and (the first time after an update) the level reached so far, without fanfare
+  boot(){ this.sync(); if (Prog.d.lvl === undefined) Prog.d.lvl = Level.n(); },
+  // progress merged in from elsewhere (another device, or the switch into admin mode) moves the points without anything
+  // being played here: no points float up, and a level reached that way is not celebrated again
+  sync(){ this.last = Level.xp(); const n = Level.n(); if (Prog.d.lvl !== undefined && n > Prog.d.lvl) Prog.d.lvl = n; },
+  paint(){
+    const L = Level.of(), i = document.getElementById('lvI'), n = document.getElementById('lvN'), b = document.getElementById('lvBtn');
+    if (n) n.textContent = L.n; if (i) i.style.width = Math.round(L.into / L.need * 100) + '%';
+    if (b) b.setAttribute('aria-label', `Level ${L.n}: ${L.into} of ${L.need} points to level ${L.n + 1}`);
+  },
+  // after every save: points gained since the last look, and a new level if there is one
+  check(){
+    const L = Level.of(), quiet = PERSONA === 'new';
+    if (Prog.d.lvl === undefined){ Prog.d.lvl = L.n; this.last = L.xp; this.paint(); return true; }
+    const gain = this.last === null ? 0 : L.xp - this.last; this.last = L.xp; this.paint();
+    if (gain > 0 && !quiet) this.float(gain);
+    if (L.n <= Prog.d.lvl) return false;
+    const was = Prog.d.lvl; Prog.d.lvl = L.n;
+    if (!quiet){ this.shop = this.shop || (was < SHOP_AT && L.n >= SHOP_AT); if (S.drill && S.drill.state === 'play') this.pending = L.n; else this.up(L.n); }
+    return true;
+  },
+  float(n){
+    const b = document.getElementById('lvBtn'); if (!b || b.hidden || reduced) return;
+    const f = document.createElement('span'); f.className = 'xpf tnum'; f.textContent = '+' + n; f.setAttribute('aria-hidden', 'true');
+    b.appendChild(f); setTimeout(() => f.remove(), 1500);
+  },
+  // the moment: the chip pulses and a card drops from it. Level 5 opens the shop, so that one waits to be closed.
+  up(n){
+    this.pending = 0;
+    const b = document.getElementById('lvBtn'); if (b){ b.classList.remove('lvpop'); void b.offsetWidth; b.classList.add('lvpop'); }
+    const shop = this.shop && !Owner.on, L = Level.of(), old = document.getElementById('lvup'); if (old) old.remove(); this.shop = false;
+    const el = document.createElement('div'); el.id = 'lvup'; el.className = 'lvup'; el.setAttribute('role', 'status');
+    el.innerHTML = `<div class="lvring" aria-hidden="true"><span class="tnum">${n}</span>${Array.from({length: 10}, (_, k) => `<i style="--a:${k * 36}deg"></i>`).join('')}</div>
+      <div class="lvsay"><p class="kicker">Level up</p><b>Level ${n}</b><span>${shop ? 'The shop is open. Your tokens can buy your coach a new look, and every level from here on is another token.' : n > SHOP_AT ? `That's a shop token too. ${L.need - L.into} points to level ${n + 1}.` : `${L.need - L.into} points to level ${n + 1}.${n < SHOP_AT ? ` The shop opens at level ${SHOP_AT}.` : ''}`}</span>
+        ${shop ? '<button class="btn small primary" type="button" data-go="shop">Open the shop</button>' : ''}</div>
+      <button class="x" type="button" aria-label="Close">×</button>`;
+    document.body.appendChild(el);
+    el.querySelector('.x').onclick = () => el.remove();
+    el.addEventListener('click', e => { if (e.target.closest('[data-go]')){ el.remove(); go('shop'); } });
+    if (!shop) setTimeout(() => { if (el.isConnected) el.classList.add('out'); setTimeout(() => el.remove(), 400); }, 5200);
+  }
+};
+/* ---- the owner's panel, in admin mode only (Owner in the template decides who may switch it on). On a computer the
+   word "admin" typed anywhere outside a text box switches it; Settings has the same switch for the owner. For anyone
+   else the word does nothing and nothing is shown. */
+const OwnerUI = {
+  keys: '',
+  paint(){
+    let pill = document.getElementById('opill');
+    if (!Owner.on){ if (pill) pill.remove(); const p = document.getElementById('opanel'); if (p) p.remove(); return; }
+    if (!pill){ pill = document.createElement('button'); pill.id = 'opill'; pill.type = 'button'; pill.className = 'opill'; pill.innerHTML = '<i aria-hidden="true"></i>Admin';
+      pill.onclick = () => this.toggle(); document.body.appendChild(pill); }
+  },
+  toggle(){ const p = document.getElementById('opanel'); if (p) return p.remove(); this.open(); },
+  open(){
+    const acts = [['course', 'Finish the course', 'Every unit passed: the big moment, then the library'], ['deep', 'Finish every deep dive', 'Every part of every deep dive passed'],
+      ['fresh', 'Start the course over', 'No unit passed, no lesson studied'], ['level', 'Level up', 'Enough points for the next level'],
+      ['week', 'Seven days in a row', 'Today\'s five on each of the last seven days'], ['badges', 'Every badge', 'All of them, quietly'],
+      ['copy', 'Fresh copy of my progress', 'Throw this copy away and start again from your real progress']];
+    const el = document.createElement('div'); el.id = 'opanel'; el.className = 'opanel'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Admin mode');
+    el.innerHTML = `<div class="ohead"><div><b>Admin mode</b><span>A copy of your progress. Nothing here reaches your account. Every unit and part is open, the shop is free.</span></div><button class="x" type="button" aria-label="Close">×</button></div>
+      <div class="oacts">${acts.map(([k, h, p]) => `<button type="button" data-oact="${k}"><b>${h}</b><span>${p}</span></button>`).join('')}</div>
+      <button type="button" class="btn small" data-oact="off">Back to normal mode</button>`;
+    document.body.appendChild(el);
+    el.onclick = e => { if (e.target.closest('.x')) return el.remove(); const b = e.target.closest('[data-oact]'); if (b){ el.remove(); this.act(b.dataset.oact); } };
+  },
+  act(k){
+    const t = Date.now(), c = Prog.d.course || (Prog.d.course = {u: {}, seen: {}}); c.u = c.u || {}; c.seen = c.seen || {};
+    const pass = U => { const p = c.u[U.id] || (c.u[U.id] = {}), of = U.kind === 'skill' ? U.check.length : U.quiz.length;
+      Object.assign(p, {idea: p.idea || t, pass: p.pass || t, cp: Math.max(p.cp || 0, of), spar: Math.max(p.spar || 0, SPAR), sparGames: Math.max(p.sparGames || 0, SPAR)});
+      for (const l of (U.lessons || [])) c.seen[l] = c.seen[l] || t; };
+    if (k === 'off') return Owner.leave();
+    if (k === 'copy') return Owner.reset();
+    if (k === 'course' || k === 'deep'){ COURSE.filter(U => !U.soon).forEach(pass);
+      if (k === 'deep'){ if (!gradAt()) stampGrad(); DEEP.forEach(X => X.units.forEach(pass)); }
+      Prog.save(); S.deep = null; S.coursePath = false; return go('course', {top: true}); }
+    if (k === 'fresh'){ Prog.d.course = {u: {}, seen: {}}; Prog.save(); S.deep = null; S.coursePath = false; return go('course', {top: true}); }
+    if (k === 'level'){ const L = Level.of(); Prog.d.xpb = (Prog.d.xpb || 0) + L.need - L.into; Prog.save(); return; }
+    if (k === 'week'){ const ids = DRILLABLE.slice(0, DAILY), D = Prog.d.days || (Prog.d.days = {}); for (let o = 0; o > -7; o--) D[dayKey(o)] = ids.slice(); Prog.save(); renderChrome(); return; }
+    if (k === 'badges'){ const h = Prog.d.badges || (Prog.d.badges = {}); for (const B of BADGES) h[B.id] = h[B.id] || t; Prog.save(); return render(); }
+  }
+};
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey || !e.key || e.key.length !== 1) return;
+  if (e.target && e.target.closest && e.target.closest('input,textarea,select,[contenteditable]')) return;
+  OwnerUI.keys = (OwnerUI.keys + e.key.toLowerCase()).slice(-10);
+  if (!OwnerUI.keys.endsWith('admin') || !Owner.can) return;
+  OwnerUI.keys = ''; if (Owner.on) Owner.leave(); else Owner.enter(); toast(Owner.on ? 'Admin mode on' : 'Admin mode off');
+});
+const render1 = render;
+render = function(){ render1(); OwnerUI.paint(); };
+// a level reached while a line was being played waits for the line to end
+const record1 = Prog.record;
+Prog.record = function(id, clean){ record1.call(Prog, id, clean); if (Lv.pending && !(S.drill && S.drill.state === 'play')) Lv.up(Lv.pending); };
+const refreshSoon0 = refreshSoon, refresh0 = refresh;
+refreshSoon = function(){ Lv.sync(); Lv.paint(); refreshSoon0(); };
+refresh = function(){ Lv.sync(); refresh0(); };
+

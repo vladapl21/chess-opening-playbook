@@ -1,4 +1,4 @@
-"""End-to-end checks for the White book: chapters, study, sandbox, drill, games, cheat sheet (desktop, phone, dark)."""
+"""End-to-end checks for the White book: chapters, study, sandbox, drill, Your games, the openings at a glance (desktop, phone, dark)."""
 import os, sys, random
 from pathlib import Path
 from playwright.sync_api import sync_playwright
@@ -124,9 +124,28 @@ if __name__ == '__main__':
         pg.click('.tabs button[data-view="sandbox"]'); pg.wait_for_timeout(300)
         print('sandbox kept state:', pg.evaluate("S.drill && S.drill.kind"))
         pg.click('.tabs button[data-view="games"]'); pg.wait_for_timeout(400)
+        # Your games: the openings first, as tiles; shots and game reviews behind a switch
+        assert pg.locator('.otile').count() == pg.evaluate('DATA.chapters.length') and pg.locator('.mshot, .grev').count() == 0
+        known, total = pg.evaluate("[chLines('w', CHAPTERS.sic).filter(lineClean).length, chLines('w', CHAPTERS.sic).length]"); print('sicilian lines known:', known, 'of', total)
+        assert f'{known} of {total} lines' in pg.inner_text('.otile[data-ch="sic"]')
         pg.screenshot(path=out + 'v2_games.png', full_page=True)
-        pg.click('.tabs button[data-view="cheat"]'); pg.wait_for_timeout(400)
-        pg.screenshot(path=out + 'v2_cheat.png')
+        pg.click('[data-gseg="shots"]'); pg.wait_for_timeout(300); assert pg.locator('.mshot').count() == 4
+        pg.click('[data-gseg="games"]'); pg.wait_for_timeout(300); assert pg.locator('.grev').count() == pg.evaluate('DATA.games.length')
+        pg.screenshot(path=out + 'v2_games_reviews.png', full_page=True)
+        pg.locator('.grev').nth(2).click(); pg.wait_for_timeout(300); assert pg.evaluate('[S.view, S.studyFrom]') == ['study', 'games']
+        pg.click('.crumbs [data-go="games"]'); pg.wait_for_timeout(300); assert pg.locator('.grev').count() > 0, 'back on the same part of the page'
+        pg.click('[data-gseg="open"]'); pg.wait_for_timeout(300)
+        pg.click('.otile[data-ch="italian"]'); pg.wait_for_timeout(400)
+        assert pg.evaluate('[S.view, S.chapter]') == ['learn', 'italian'] and pg.locator('[data-lview]').count() == 2
+        pg.click('[data-lview="glance"]'); pg.wait_for_timeout(300)
+        n_glance = pg.locator('#view .ccard').count(); print('italian at a glance:', n_glance); assert n_glance == pg.evaluate('glanceCards(CHAPTERS.italian).length') >= 20
+        assert pg.locator('#view .lcard').count() == 0
+        pg.screenshot(path=out + 'v2_glance.png')
+        pg.locator('#view .ccard').nth(6).click(); pg.wait_for_timeout(300); assert pg.evaluate('[S.view, S.studyFrom]') == ['study', 'learn']
+        pg.click('.crumbs [data-go="learn"]'); pg.wait_for_timeout(300); assert pg.locator('#view .ccard').count() == n_glance
+        pg.click('[data-lview="lessons"]'); pg.wait_for_timeout(300); assert pg.locator('#view .lcard').count() > 0
+        # every opening has its cards, and together they are the old cheat sheet
+        assert pg.evaluate('DATA.chapters.reduce((a, C) => a + glanceCards(C).length, 0)') == pg.evaluate('DATA.cheat.length')
         # puzzles all solvable
         pg.click('.tabs button[data-view="drill"]'); pg.wait_for_timeout(300)
         n = pg.evaluate('DATA.puzzles.length'); solved = 0
@@ -151,9 +170,15 @@ if __name__ == '__main__':
         play_sandbox(pg, 0.3, 'phone')
         print('m sandbox scrollWidth', pg.evaluate('document.documentElement.scrollWidth'))
         pg.screenshot(path=out + 'v2_m_sb_report.png', full_page=True)
-        for v in ['games', 'cheat', 'drill']:
+        for v in ['games', 'drill']:
             pg.evaluate(f"document.querySelector('.tabs button[data-view=\"{v}\"]').click()"); pg.wait_for_timeout(400)
             print(f'm {v} scrollWidth', pg.evaluate('document.documentElement.scrollWidth'))
+        for g in ['shots', 'games', 'open']:
+            pg.evaluate(f"S.gseg = '{g}'; go('games')"); pg.wait_for_timeout(300)
+            w = pg.evaluate('document.documentElement.scrollWidth'); print(f'm games/{g} scrollWidth', w); assert w <= 390
+        pg.evaluate("S.lview = 'glance'; S.chapter = 'italian'; go('learn')"); pg.wait_for_timeout(400)
+        w = pg.evaluate('document.documentElement.scrollWidth'); print('m glance scrollWidth', w); assert w <= 390
+        pg.screenshot(path=out + 'v2_m_glance.png', full_page=True); pg.evaluate("S.lview = 'lessons'")
         pg.screenshot(path=out + 'v2_m_drill.png')
         pg.evaluate("document.querySelector('.tabs button[data-view=\"games\"]').click()"); pg.wait_for_timeout(400)
         pg.screenshot(path=out + 'v2_m_games.png', full_page=True)

@@ -122,21 +122,33 @@ with sync_playwright() as p:
     full = pg.screenshot(full_page=True); w, h = Image.open(io.BytesIO(full)).size
     save(full, 'sandbox.png', crop=(0, 0, w, min(h, round(bottom * 2))))
 
-    pg.evaluate("go('games')"); pg.wait_for_timeout(500); settle(pg)
+    # level 5: the chip in the corner and the card that opens the shop (a few lines known, a week of days)
+    pg.evaluate("""(() => { const now = Date.now(), D = Prog.d.days = Prog.d.days || {}; for (let k = 1; k <= 8; k++) D[dayKey(-k)] = ['a','b','c','d','e'];
+      for (const id of BOOKS.b.drillable){ if (Level.n() >= 5) break; Prog.d.lines[id] = {box: 2, seen: 2, clean: 2, last: now, due: now + 2 * DAY, v: VER[id] || 1}; }
+      S.drill = S.drillState = S.sbState = null; Prog.d.lvl = 4; Badges.queue = []; Coach.hush(); go('course'); Prog.save(); Badges.queue = []; Coach.hush(); })()""")
+    pg.wait_for_timeout(1400); pg.evaluate("Coach.hush()"); settle(pg, 200)
+    box = pg.evaluate("(() => { const c = document.getElementById('lvup').getBoundingClientRect(), b = document.getElementById('lvBtn').getBoundingClientRect(); return [Math.min(c.left, b.left) - 24, 0, innerWidth, c.bottom + 24]; })()")
+    save(pg.screenshot(), 'levels.png', crop=tuple(round(v * 2) for v in box))
+    pg.evaluate("const el = document.getElementById('lvup'); if (el) el.remove()")
+    # Your games: some of every opening's lines known (a different share in each), the openings first
+    pg.evaluate("""(() => { const now = Date.now(), share = [.6, .35, .5, .25, .45, .15, .3, .55];
+      useSide('w'); DATA.chapters.forEach((C, k) => { const ls = chLines('w', C); ls.slice(0, Math.round(ls.length * share[k % share.length])).forEach(id => Prog.d.lines[id] = {box: 1, seen: 1, clean: 1, last: now, due: now + DAY, v: VER[id] || 1}); });
+      Prog.d.lvl = Level.n(); Prog.save(); Badges.queue = []; Coach.hush(); S.gseg = 'open'; go('games'); })()"""); pg.wait_for_timeout(500); pg.evaluate("Coach.hush()"); settle(pg)
+    bottom = pg.evaluate("document.querySelector('.otiles').getBoundingClientRect().bottom + scrollY + 24")
     full = pg.screenshot(full_page=True); w, h = Image.open(io.BytesIO(full)).size
-    save(full, 'games.png', crop=(0, 0, w, min(h, 3000)))
+    save(full, 'games.png', crop=(0, 0, w, min(h, round(bottom * 2)))); pg.evaluate("useSide('b')")
     # Today's five, three lines in, on a four-day streak; then the profile with a few badges
-    pg.evaluate("""(() => { const D = Prog.d.days = Prog.d.days || {}; for (let k = 1; k <= 3; k++) D[dayKey(-k)] = ['a','b','c','d','e']; D[dayKey(-5)] = ['a','b','c','d','e'];
+    pg.evaluate("""(() => { const D = Prog.d.days = {}; for (let k = 1; k <= 3; k++) D[dayKey(-k)] = ['a','b','c','d','e']; D[dayKey(-5)] = ['a','b','c','d','e'];
       D[dayKey()] = ['setup', 'center', 'grab']; S.drill = S.drillState = null; Coach.hush(); Badges.queue = []; Prog.save(); Badges.queue = []; go('drill'); })()"""); pg.wait_for_timeout(500); settle(pg)
     pg.evaluate("Coach.hush()"); pg.wait_for_timeout(200)
     shot = pg.screenshot(); save(shot, 'today.png', crop=(0, 0, 2560, 1500))
     pg.evaluate("Acct.open('me')"); pg.wait_for_timeout(400); settle(pg)
     box = pg.evaluate("(() => { const r = document.getElementById('acctPanel').getBoundingClientRect(); return [r.left, r.top, r.right, Math.min(r.bottom, innerHeight)]; })()")
     save(pg.screenshot(), 'badges.png', crop=tuple(round(v * 2) for v in box)); pg.evaluate("Acct.close()")
-    # the shop, a week in: a top hat and the midnight colour on the coach
-    pg.evaluate("""(() => { const D = Prog.d.days; for (let k = 1; k <= 8; k++) D[dayKey(-k)] = ['a','b','c','d','e'];
-      Prog.d.shop = {own: {'h-tophat': 1, 'c-midnight': 1}, wear: {head: ['h-tophat', 2], skin: ['c-midnight', 2]}}; Prog.save(); Badges.queue = []; Coach.hush(); go('shop'); })()""")
-    pg.wait_for_timeout(500); pg.evaluate("Coach.hush()"); settle(pg)
+    # the shop: a top hat and the midnight colour on the coach
+    pg.evaluate("""(() => { const el = document.getElementById('lvup'); if (el) el.remove(); const D = Prog.d.days; for (let k = 1; k <= 8; k++) D[dayKey(-k)] = ['a','b','c','d','e'];
+      Prog.d.lvl = Level.n(); Prog.d.shop = {own: {'h-tophat': 1, 'c-midnight': 1}, wear: {head: ['h-tophat', 2], skin: ['c-midnight', 2]}}; Prog.save(); Badges.queue = []; Coach.hush(); go('shop'); })()""")
+    pg.wait_for_timeout(500); pg.evaluate("Coach.hush(); const el = document.getElementById('lvup'); if (el) el.remove()"); settle(pg)
     save(pg.screenshot(), 'shop.png', crop=(0, 0, 2560, 1700))
     # the course finished: the big moment, then the library (a few slips on the Vienna unit's lines)
     pg.evaluate("""(() => { const t = Date.now() - 24 * DAY, c = Prog.d.course || (Prog.d.course = {u: {}, seen: {}}); c.u = c.u || {};
@@ -151,13 +163,15 @@ with sync_playwright() as p:
     bottom = pg.evaluate("document.querySelector('.libshelf').getBoundingClientRect().bottom + scrollY + 24")
     full = pg.screenshot(full_page=True); w, h = Image.open(io.BytesIO(full)).size
     save(full, 'library.png', crop=(0, 0, w, min(h, round(bottom * 2))))
-    pg.evaluate("go('cheat')"); pg.wait_for_timeout(400); settle(pg); save(pg.screenshot(), 'cheat.png')
+    pg.evaluate("useSide('w'); S.chapter = 'italian'; S.lview = 'glance'; go('learn')"); pg.wait_for_timeout(500)
+    pg.evaluate("window.scrollTo(0, document.querySelector('#chapter > .gseg').getBoundingClientRect().top + scrollY - 16)"); settle(pg)
+    save(pg.screenshot(), 'glance.png'); pg.evaluate("S.lview = 'lessons'; useSide('b')")
     pg.evaluate("go('drill')"); pg.wait_for_timeout(300)
     pg.evaluate("startPuzzle(DATA.puzzles.findIndex(p => p.id === 'gb-charizard-47'))"); pg.wait_for_timeout(500); settle(pg)
     save(pg.screenshot(), 'puzzle.png')
     ctx.close()
 
-    # Three phones: Learn (light), a lesson (dark), Your games (light)
+    # Three phones: Learn (light), a lesson (dark), the openings in Your games (light)
     phones = []
     for scheme, hash_ in [('light', '#b.learn'), ('dark', '#b.line.bsl-slow'), ('light', '#b.games')]:
         c = b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=2, color_scheme=scheme, is_mobile=True, has_touch=True)
@@ -166,7 +180,7 @@ with sync_playwright() as p:
             for _ in range(12): q.keyboard.press('ArrowRight'); q.wait_for_timeout(90)
             q.evaluate("window.scrollTo(0, document.querySelector('.lhead').getBoundingClientRect().top + scrollY - 14)")
         if hash_.endswith('games'):
-            q.evaluate("window.scrollTo(0, document.querySelector('.insight').getBoundingClientRect().top + scrollY - 16)")
+            q.evaluate("window.scrollTo(0, document.querySelector('.gseg').getBoundingClientRect().top + scrollY - 16)")
         q.wait_for_timeout(300); phones.append(Image.open(io.BytesIO(q.screenshot())).convert('RGB')); c.close()
     pw, ph = phones[0].size; pad, gap = 60, 56
     canvas = Image.new('RGB', (pad * 2 + pw * 3 + gap * 2, pad * 2 + ph), (206, 217, 208))

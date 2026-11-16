@@ -6,7 +6,10 @@ app/site.json has a project URL and publishable key)."""
 import hashlib, json
 import paths
 from pieces import piece_svg_inner
-from lint_claims import lint_labels, lint_pins, lint_repeats
+try:
+    from lint_claims import lint_labels, lint_pins, lint_repeats
+except ImportError:     # no python-chess here: only books that already passed the check below can be assembled
+    lint_labels = lint_pins = lint_repeats = None
 
 VERSIONS = paths.DATA / 'line_versions.json'
 
@@ -83,8 +86,18 @@ def main():
         assert not bad, (t, bad)
     # the same position must get the same move whatever the move order; a pin, a guard or an attack that a label
     # speaks of must be on the board
-    problems = [x for side in ('white', 'black') for x in lint_repeats(side) + lint_pins(side) + lint_labels(side)]
-    assert not problems, '\n' + '\n'.join(problems)
+    # data/build/lint.ok keeps the hash of the books that last passed, so a machine without python-chess can still
+    # assemble the page from books that are already checked (and refuses books that changed since)
+    books = hashlib.sha256((paths.BUILD / 'data_white.json').read_bytes() + (paths.BUILD / 'data_black.json').read_bytes()).hexdigest()
+    ok = paths.BUILD / 'lint.ok'
+    if lint_repeats:
+        problems = [x for side in ('white', 'black') for x in lint_repeats(side) + lint_pins(side) + lint_labels(side)]
+        assert not problems, '\n' + '\n'.join(problems)
+        if not ok.exists() or ok.read_text().strip() != books: ok.write_text(books + '\n')
+    else:
+        assert ok.exists() and ok.read_text().strip() == books, \
+            'python-chess is missing and the books changed since pipeline/lint_claims.py last passed: install it to check them'
+        print('python-chess is missing: the books are unchanged since they last passed the check, so it is not run again')
     changed = stamp_versions((W, B))
     # progress records are shared between the books, so ids must never collide
     wl, bl = {l['id'] for l in W['lines']}, {l['id'] for l in B['lines']}

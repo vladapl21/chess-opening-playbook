@@ -310,37 +310,52 @@ p{margin:0}
 .dmore[open]{display:grid;gap:12px}
 @media (max-width:640px){ .sgrid.idle .ccol{order:-1} footer.foot .fcopy{margin-left:0} .today{grid-template-columns:auto minmax(0,1fr)} .tside{grid-column:1 / -1;justify-items:start;grid-template-columns:auto auto;justify-content:space-between;align-items:center;width:100%} }
 
-/* games */
-.insights{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:28px}
-.insight{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px}
-.insight .big{font-family:var(--f-display);font-size:44px;line-height:1;font-weight:700;color:var(--rosso)}
-.insight .big small{font-family:var(--f-body);font-size:14px;font-weight:600;letter-spacing:.02em;color:var(--muted);margin-left:8px}
-.insight h3{font-size:18px;margin:4px 0 6px;line-height:1.25}
-.insight p{color:var(--muted);font-size:14px}
-.gcards{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
-.gcard{display:grid;grid-template-columns:180px minmax(0,1fr);gap:20px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;align-items:start}
-.gcard p{max-width:72ch}
-.gcard h4{font-family:var(--f-display);font-size:24px;font-weight:700;line-height:1.15;margin:8px 0 6px}
-.gcard p{font-size:13.5px;color:var(--muted)}
-.gcard .acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+/* Your games: a switch, then one grid */
+.ghd{margin-bottom:16px}
+.grec{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:8px;color:var(--muted);font-size:15px}
+.grec b{font-family:var(--f-display);font-size:24px;font-weight:700;color:var(--ink);margin-right:5px}
+.gseg{display:inline-flex;flex-wrap:wrap;gap:4px;background:var(--surface-2);padding:4px;border-radius:5px;margin:0 0 18px;max-width:100%}
+.gseg button{display:inline-flex;align-items:center;gap:8px;border:0;background:none;padding:8px 14px;border-radius:4px;font-weight:650;font-size:14px;color:var(--muted);cursor:pointer;white-space:nowrap}
+.gseg button:hover{color:var(--ink)}
+.gseg button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.gseg button span{font-size:12px;font-weight:700;min-width:22px;padding:1px 7px;border-radius:9px;background:var(--surface);color:var(--muted);text-align:center}
+.gseg button[aria-selected="true"] span{background:var(--accent-soft);color:var(--accent)}
+.gseg i{font-style:normal} .gseg .sm{display:none}
+.chapter > .gseg{margin:30px 0 26px}
+.otiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.otile{display:grid;grid-template-rows:auto 1fr;gap:10px;padding:10px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);cursor:pointer;min-width:0;font:inherit;color:inherit;transition:border-color .15s,transform .15s}
+.otile:hover{border-color:var(--accent);transform:translateY(-1px)}
+.otx{display:flex;flex-direction:column;gap:5px;min-width:0}
+.otx b{font-family:var(--f-display);font-size:23px;font-weight:700;line-height:1.05}
+.omove{font-size:12.5px;color:var(--muted);line-height:1.35}
+.orec{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--muted);margin-top:auto;padding-top:4px}
+.orec .good{color:var(--accent);font-weight:650} .orec .bad{color:var(--rosso);font-weight:650}
+.oknow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
+.obar{height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden}
+.obar i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.mshots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.mshot{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;align-items:center;padding:14px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);cursor:pointer;font:inherit;color:inherit;transition:border-color .15s}
+.mshot:hover{border-color:var(--accent)}
+.mtx{display:grid;gap:5px;min-width:0}
+.mbig{font-family:var(--f-display);font-size:42px;line-height:1;font-weight:700;color:var(--rosso)}
+.mbig small{font-family:var(--f-body);font-size:13.5px;font-weight:600;color:var(--muted);margin-left:8px}
+.mtx b{font-size:17px;line-height:1.25}
+.mpara{color:var(--muted);font-size:13.5px}
+.mgo{color:var(--accent);font-weight:650;font-size:13.5px;margin-top:2px}
+.grevs{display:grid;grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:8px}
+.grev{display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:14px;align-items:center;padding:9px 12px 9px 9px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);cursor:pointer;font:inherit;color:inherit;transition:border-color .15s}
+.grev:hover{border-color:var(--accent)}
+.gtx{display:grid;gap:3px;min-width:0}
+.gtop{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);font-weight:600}
+.gtx b{font-size:16px;line-height:1.25}
+.gmeta{font-size:12.5px;color:var(--muted)}
+.ggo{color:var(--muted)} .ggo svg{width:18px;height:18px;display:block} .grev:hover .ggo{color:var(--accent)}
 .nw{white-space:nowrap}
 .sechead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:6px 0 14px}
 .sechead h2{font-family:var(--f-display);font-size:32px;font-weight:700;letter-spacing:.005em}
 .sechead p{color:var(--muted);max-width:60ch}
 
-/* by-opening table */
-.otable{display:grid;gap:2px}
-.orow2{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,2fr) 44px 56px 48px;gap:10px;align-items:center;padding:7px 8px;border-radius:3px;background:none;border:0;text-align:left;cursor:pointer;font-size:14px;width:100%}
-.orow2:hover{background:var(--surface-2)}
-.orow2.head{cursor:default;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
-.orow2.head:hover{background:none}
-.orow2 .ob{height:8px;border-radius:2px;background:var(--surface-2);overflow:hidden}
-.orow2 .ob i{display:block;height:100%;background:var(--accent);border-radius:2px}
-.orow2 .on{font-weight:600}
-.orow2 .op2{text-align:right;font-family:var(--f-mono);font-size:12.5px}
-.orow2 .op2.good{color:var(--accent)} .orow2 .op2.bad{color:var(--rosso)}
-
-/* cheat sheet */
+/* an opening at a glance (it was the cheat sheet) */
 .cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
 .ccard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px;text-align:left;cursor:pointer;display:grid;gap:8px}
 .ccard:hover{border-color:var(--accent)}
@@ -348,22 +363,6 @@ p{margin:0}
 .ccard .then{font-size:14.5px;font-weight:650;line-height:1.3}
 .ccard .then::before{content:"→ ";color:var(--accent)}
 
-/* opening picker */
-.reps{margin-bottom:30px}
-.reps .sechead{margin-bottom:12px}
-.rgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.rgrid.n9{grid-template-columns:repeat(3,minmax(0,1fr))}
-.rtile{display:grid;grid-template-columns:64px minmax(0,1fr);gap:10px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:9px;cursor:pointer;transition:border-color .15s,transform .15s;min-width:0}
-.rtile:hover{border-color:var(--accent);transform:translateY(-1px)}
-.rtile[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent);background:var(--accent-soft)}
-.rtile .thumb{border-radius:3px}
-.rtx{display:grid;gap:4px;min-width:0}
-.rtx b{font-size:14.5px;font-weight:650;line-height:1.2}
-.rtx .rmove{font-size:12px;color:var(--muted);line-height:1.3}
-.rbar{height:5px;border-radius:2px;background:var(--surface-2);overflow:hidden}
-.rtile[aria-pressed="true"] .rbar{background:var(--surface)}
-.rbar i{display:block;height:100%;background:var(--accent);border-radius:2px}
-.rnum{display:flex;justify-content:space-between;gap:6px;font-size:11.5px;color:var(--muted)}
 .chapter{scroll-margin-top:16px}
 .facts{list-style:none;margin:0;padding:0;display:grid;gap:10px}
 .facts li{display:grid;grid-template-columns:minmax(0,1fr);gap:2px;padding:12px 14px;border-radius:4px;background:var(--surface);border:1px solid var(--line)}
@@ -507,6 +506,11 @@ button.ucard:hover{border-color:var(--accent);transform:translateY(-1px)}
 .acct.ok .av::after{background:var(--accent)} .acct.sync .av::after{background:var(--oro)} .acct.err .av::after{background:var(--rosso)}
 .acct .acctx{font-size:13px;color:var(--muted);font-weight:600}
 .mebtn{display:inline-flex;align-items:center;gap:4px;min-height:36px;padding:4px 12px 4px 8px;border-radius:18px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font:700 15px var(--f-body)}
+.lvbtn{position:relative;display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:3px 12px 3px 4px;border-radius:18px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font:inherit}
+.lvbtn:hover{border-color:var(--accent)}
+.lvc{display:grid;place-items:center;min-width:28px;height:28px;padding:0 4px;border-radius:14px;background:var(--accent);color:var(--accent-ink);font:700 16px/1 var(--f-display)}
+.lvt{display:grid;gap:4px;justify-items:start} .lvw{font:700 10px/1 var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lvbar{display:block;width:54px;height:5px;border-radius:3px;background:var(--surface-2);overflow:hidden} .lvbar i{display:block;height:100%;width:0;border-radius:3px;background:var(--accent);transition:width .7s cubic-bezier(.2,.8,.3,1)}
 .mebtn .flame{width:20px;height:20px} .mebtn.zero .flame{fill:var(--locked)} .mebtn.zero .flame .fl-in{fill:var(--locked-2)} .mebtn:hover{border-color:var(--flame)}
 .gear{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--muted);display:grid;place-items:center;cursor:pointer;flex:none}
 .gear:hover{color:var(--ink);border-color:var(--accent)} .gear svg{width:19px;height:19px}
@@ -626,8 +630,8 @@ footer.foot .fcopy{margin-left:auto}
   .sgrid{grid-template-columns:minmax(0,1fr);gap:20px}
   .sgrid.study{grid-template-areas:"head" "board" "coach";grid-template-rows:auto}
   .bcol{position:static;max-width:560px;width:100%;margin:0 auto}
-  .changes,.insights{grid-template-columns:minmax(0,1fr)}
-  .rgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .changes{grid-template-columns:minmax(0,1fr)}
+  .mshots{grid-template-columns:minmax(0,1fr)}
   .chero,.ugrid{grid-template-columns:minmax(0,1fr);gap:22px}
   .chero > .board{max-width:360px}
   .ugrid .bcol{max-width:520px}
@@ -636,12 +640,13 @@ footer.foot .fcopy{margin-left:auto}
   .stats{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   .stats .stat:last-child{grid-column:1/-1}
   .lcard{grid-template-columns:76px minmax(0,1fr)}
-  .insight{grid-template-columns:96px minmax(0,1fr)}
   .navtxt{display:none}
   .lcard.wide{grid-template-columns:96px minmax(0,1fr)}
-  .gcard h4{font-size:19px}
-  .insight .big{font-size:34px}
-  .gcard{grid-template-columns:96px minmax(0,1fr)}
+  .gseg{display:flex;flex-wrap:nowrap} .gseg button{flex:1 1 0;min-width:0;justify-content:center;padding:8px 6px;font-size:13px} .gseg button span,.gseg .lg{display:none} .gseg .sm{display:inline}
+  .otiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px} .otile{padding:8px;gap:8px} .otx b{font-size:19px} .omove{display:none} .orec{font-size:12px}
+  .mshot{grid-template-columns:96px minmax(0,1fr);gap:12px;padding:12px} .mbig{font-size:32px} .mtx b{font-size:15.5px}
+  .grevs{grid-template-columns:minmax(0,1fr)} .grev{grid-template-columns:56px minmax(0,1fr) auto;gap:10px;padding:8px 10px 8px 8px} .gtx b{font-size:14.5px}
+  .cgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px} .ccard{padding:8px} .ccard .then{font-size:13.5px}
   .wordmark{font-size:21px}
   .tabs{width:100%}
   .tabs button{flex:1 1 auto;padding:8px 4px;font-size:13.5px}
@@ -650,20 +655,9 @@ footer.foot .fcopy{margin-left:auto}
   .trow{grid-template-columns:38px 22px minmax(0,1fr) auto}
   .feed li{grid-template-columns:34px 22px minmax(0,1fr) auto;padding:7px 10px}
   .orow{grid-template-columns:22px minmax(0,1fr) 56px 34px}
-  .rgrid,.rgrid.n9{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
-  .rgrid.n9 .rtile:last-child{grid-column:1/-1}
   .brandrow{width:100%;justify-content:space-between}
-  .rtile{grid-template-columns:44px minmax(0,1fr);gap:8px;padding:8px}
-  .rtx b{font-size:13.5px}
-  .rtx .rmove{display:none}
-  .rnum{font-size:11px}
-  .orow2{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 48px 44px;gap:8px;font-size:13px}
-  .orow2 > :nth-child(3){display:none}
-  .orow2.head{font-size:10.5px;letter-spacing:.06em}
   .tabs button .lg{display:none}
   .tabs button .sm{display:inline}
-  .rpct{display:none}
-  .rnum span{white-space:nowrap}
   .queue b{font-size:20px}
   .lhead .why{display:none}
   .lhead h2{font-size:26px}
@@ -686,6 +680,7 @@ footer.foot .fcopy{margin-left:auto}
 
 <div class="app" id="app">
   <div class="corner">
+    <button class="lvbtn" id="lvBtn" type="button" aria-haspopup="dialog" hidden><span class="lvc tnum" id="lvN">1</span><span class="lvt"><span class="lvw">Level</span><span class="lvbar" aria-hidden="true"><i id="lvI"></i></span></span></button>
     <button class="mebtn zero" id="meBtn" type="button" aria-haspopup="dialog" hidden><svg class="flame" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.6 2.2c.5 3-1 4.6-2.6 6.3C8.3 10.3 6.5 12.2 6.5 15.3 6.5 19 9 21.8 12 21.8s5.5-2.5 5.5-6.1c0-2.7-1.4-4.4-2.4-5.6-.2 1.4-.8 2.5-1.9 3 .6-3.6-.2-7.1-.6-10.9z"/><path class="fl-in" d="M12.2 13.2c-1.4 1.3-2.4 2.3-2.4 3.9 0 1.5 1 2.6 2.2 2.6s2.2-1.1 2.2-2.6c0-1.5-.9-2.4-2-3.9z"/></svg><b class="tnum" id="meN">0</b></button>
     <button class="gear" id="setBtn" type="button" aria-haspopup="dialog" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.5-2.4 1a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.5A7.6 7.6 0 0 0 7 6.5l-2.4-1-2 3.5 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.5 2.4-1a7.6 7.6 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.6 7.6 0 0 0 2.6-1.5l2.4 1 2-3.5z"/></svg></button>
     <button class="acct out" id="acctBtn" type="button" aria-haspopup="dialog" hidden>Sign in</button>
@@ -706,7 +701,6 @@ footer.foot .fcopy{margin-left:auto}
       <button role="tab" data-view="course" aria-selected="true">Course</button>
       <button role="tab" data-view="drill" aria-selected="false">Drill<span class="todo" id="drillDot" hidden title="Today's five lines are not done yet">!</span></button>
       <button role="tab" data-view="games" aria-selected="false"><span class="lg">Your games</span><span class="sm">Games</span></button>
-      <button role="tab" data-view="cheat" aria-selected="false"><span class="lg">Cheat sheet</span><span class="sm">Cheats</span></button>
       <button role="tab" data-view="shop" aria-selected="false"><span class="lg">Shop</span><span class="sm">Shop</span></button>
     </nav>
   </header>
@@ -917,6 +911,7 @@ const Prog = {
       const uid = await user.id(); if (!uid) return;
       this.ref = db.doc('data/users/' + uid + '/italian-progress');
       this.take(await this.ref.get(), true);
+      try { Owner.art = !!(typeof user.isOwner === 'function' && await user.isOwner()); } catch(e){} Owner.check();
       if (typeof this.ref.onSnapshot === 'function' && !this.unsub) this.unsub = this.ref.onSnapshot(sn => this.take(sn, false), () => {});
     } catch(e){ this.ref = null; }
   },
@@ -924,13 +919,14 @@ const Prog = {
   // something the stored one lacks is written back.
   take(snap, first){
     const r = snap && snap.exists ? snap.data() : null;
+    if (Owner.on){ if (r && r.lines){ Owner.real = mergeProg(Owner.real, r); try { localStorage.setItem(PKEY, JSON.stringify(Owner.real)); } catch(e){} } return; }
     if (r && r.lines){ const m = mergeProg(this.d, r); if (canon(m) !== canon(this.d)){ this.d = m; this.saveLocal(); refreshSoon(); } }
     if (first && this.d.updated && (!r || canon(this.d) !== canon(r))) this.push();
   },
-  saveLocal(){ try { localStorage.setItem(PKEY, JSON.stringify(this.d)); } catch(e){} },
+  saveLocal(){ try { localStorage.setItem(Owner.on ? OKEY : PKEY, JSON.stringify(this.d)); } catch(e){} },
   save(){ this.d.updated = Date.now(); if (Cloud.user) this.d.owner = Cloud.user.id; try { this.d.tz = Intl.DateTimeFormat().resolvedOptions().timeZone || this.d.tz; } catch(e){} this.saveLocal(); this.push(); Cloud.push(); },
   async push(){
-    if (!this.ref) return;
+    if (!this.ref || Owner.on) return;
     if (this.saving){ this.again = true; return; }
     this.saving = true;
     try {
@@ -948,7 +944,8 @@ const Prog = {
   staleCount(side){ return (side ? BOOKS[side].drillable : BOOKS.w.drillable.concat(BOOKS.b.drillable)).filter(id => this.stale(id)).length; },
   record(id, clean){
     let r = this.d.lines[id];
-    if (!r || this.stale(id)) r = {box: 0, seen: 0, clean: 0};
+    if (!r || this.stale(id)){ const o = r; r = {box: 0, seen: 0, clean: 0};
+      if (o && (o.seen || o.ps)){ r.ps = (o.ps || 0) + (o.seen || 0); r.pc = (o.pc || 0) + (o.clean || 0); } }
     if (VER[id]) r.v = VER[id];
     r.seen++; r.last = Date.now();
     if (clean){ r.clean++; r.box = Math.min(5, (r.box || 0) + 1); } else r.box = 0;
@@ -959,6 +956,43 @@ const Prog = {
   lessonLevel(lid){ const ls = LESSONS[lid].lines.filter(x => DRILLABLE.includes(x)); if (!ls.length) return 0;
     return Math.round(ls.reduce((a, x) => a + Math.min(5, (this.rec(x) || {}).box || 0), 0) / ls.length); },
   dueCount(side){ const now = Date.now(), ids = side ? BOOKS[side].drillable : DRILLABLE; return ids.filter(id => { const r = this.rec(id); return r && r.due <= now; }).length; }
+};
+
+/* ------------------------------------------------------------------ the owner's tools */
+// For the claude.ai copy's owner, and on the site for an account marked in Supabase (app_metadata.playbook_owner,
+// which only the project can set). Nobody else is shown anything. Switched on, the page works on a copy of the
+// progress kept on this device (OKEY) and never written to the account: everything opens, the shop is free, and
+// app/product.js adds a panel to finish the course, add levels and so on. Switched off, the real record comes back.
+const OKEY = PKEY + ':o';
+const Owner = {
+  can: false, on: false, art: false, real: null, asked: null, marked: null,
+  wanted(){ try { return localStorage.getItem(OKEY + ':on') === '1'; } catch(e){ return false; } },
+  async check(){
+    const flag = u => !!(u && u.app_metadata && u.app_metadata.playbook_owner === true);
+    let can = this.art;
+    if (!can && Cloud.user){ can = flag(Cloud.user);
+      if (!can && Cloud.sb && this.asked !== Cloud.user.id){ this.asked = Cloud.user.id;     // the token may predate the mark
+        try { const r = await Cloud.sb.auth.getUser(); can = flag(r && r.data && r.data.user); if (can) this.marked = Cloud.user.id; } catch(e){} }
+      if (!can && this.marked === Cloud.user.id) can = true; }
+    this.can = can;
+    if (can && this.wanted() && !this.on) this.enter(); else if (!can && this.on) this.leave(true);
+  },
+  enter(){
+    if (!this.can || this.on) return;
+    let copy = null; try { copy = JSON.parse(localStorage.getItem(OKEY) || 'null'); } catch(e){}
+    this.real = Prog.d; Prog.d = copy && copy.lines ? copy : JSON.parse(JSON.stringify(Prog.d)); this.on = true;
+    try { localStorage.setItem(OKEY + ':on', '1'); } catch(e){}
+    refresh();
+  },
+  leave(keepWish){
+    if (!this.on) return;
+    Prog.d = this.real || Prog.d; this.real = null; this.on = false;
+    if (!keepWish) try { localStorage.removeItem(OKEY + ':on'); } catch(e){}
+    refresh(); Cloud.pull();
+    if (Prog.ref) Prog.ref.get().then(sn => Prog.take(sn, false)).catch(() => {});
+  },
+  // a fresh copy of the real progress (the test copy is thrown away)
+  reset(){ if (!this.on) return; Prog.d = JSON.parse(JSON.stringify(this.real)); Prog.saveLocal(); refresh(); }
 };
 
 /* ------------------------------------------------------------------ the daily five */
@@ -984,6 +1018,29 @@ const Daily = {
     return v.length;
   }
 };
+/* ------------------------------------------------------------------ levels */
+// Experience is worked out from the progress, never stored, so every device shows the same level. A line played to its
+// end is 10 points without a slip and 4 with one; a lesson studied 5; a practice game 5; a checkpoint passed 40; a day
+// with today's five 15. Each level needs 15 more than the one before (45, 60, 75…). Level 5 opens the shop.
+// d.lvl only remembers the highest level already celebrated (merged as the larger), so the moment shows once.
+const XP = {clean: 10, slip: 4, lesson: 5, game: 5, pass: 40, day: 15};
+const Level = {
+  xp(d = Prog.d){
+    let x = 0;
+    for (const r of Object.values(d.lines || {})){ const s = (r.seen || 0) + (r.ps || 0), c = Math.min(s, (r.clean || 0) + (r.pc || 0)); x += c * XP.clean + (s - c) * XP.slip; }
+    const c = d.course || {};
+    x += Object.keys(c.seen || {}).length * XP.lesson;
+    for (const id in (c.u || {})) if (c.u[id].pass) x += XP.pass;
+    x += ((d.sb || {}).games || 0) * XP.game;
+    for (const k in (d.days || {})){ const v = d.days[k]; if ((Array.isArray(v) ? v.length : v || 0) >= DAILY) x += XP.day; }
+    return x + (d.xpb || 0);
+  },
+  step: n => 30 + 15 * n,
+  of(x = this.xp()){ let n = 1, base = 0; while (x >= base + this.step(n)){ base += this.step(n); n++; } return {n, into: x - base, need: this.step(n), xp: x}; },
+  n(){ return this.of().n; }
+};
+const SHOP_AT = 5;
+
 // The next line for today's five, from either book: the oldest slips first, then lines whose moves changed, then what is
 // due, then new lines from lessons already studied, then new lines in course order. Never one already played today.
 const cmpArr = (a, b) => { for (let i = 0; i < Math.max(a.length, b.length); i++){ const d = (a[i] || 0) - (b[i] || 0); if (d) return d; } return 0; };
@@ -1019,7 +1076,7 @@ const SITE = /*__SITE__*/null;
 const canon = o => JSON.stringify(o, (k, v) => v && typeof v === 'object' && !Array.isArray(v) ? Object.keys(v).sort().reduce((a, x) => (a[x] = v[x], a), {}) : v);
 const newer = (x, y) => !x ? y : !y ? x : (y.v || 1) !== (x.v || 1) ? ((y.v || 1) > (x.v || 1) ? y : x) : (y.last || 0) > (x.last || 0) ? y : x;
 // two copies of the progress object -> one: newest record per line and puzzle, best of everything else
-const KNOWN = new Set(['lines', 'puz', 'sb', 'course', 'days', 'updated', 'packs', 'set', 'prefs', 'mail', 'badges', 'tz', 'me', 'owner', 'shop']);
+const KNOWN = new Set(['lines', 'puz', 'sb', 'course', 'days', 'updated', 'packs', 'set', 'prefs', 'mail', 'badges', 'tz', 'me', 'owner', 'shop', 'lvl']);
 function mergeProg(a, b){
   const o = JSON.parse(JSON.stringify(a || {})), r = JSON.parse(JSON.stringify(b || {}));
   a = a || {};
@@ -1051,6 +1108,7 @@ function mergeProg(a, b){
     for (const k in (y.wear || {})) if (!sh.wear[k] || (y.wear[k][1] || 0) > (sh.wear[k][1] || 0)) sh.wear[k] = y.wear[k]; }
   const ml = [a.mail, r.mail].filter(Boolean).sort((x, y) => (y.t || 0) - (x.t || 0))[0]; if (ml) o.mail = Object.assign({}, ml);
   if (r.badges){ const bd = o.badges || (o.badges = {}); for (const k in r.badges) bd[k] = bd[k] ? Math.min(bd[k], r.badges[k]) : r.badges[k]; }
+  if (r.lvl) o.lvl = Math.max(o.lvl || 0, r.lvl);   // the highest level already celebrated
   if (r.tz && !o.tz) o.tz = r.tz;
   for (const k in r) if (!KNOWN.has(k) && (!(k in o) || (r.updated || 0) > (a.updated || 0))) o[k] = r[k];
   const me = mergeMe(a, r); if (me) o.me = JSON.parse(JSON.stringify(me)); else delete o.me;   // whose playbook this is (app/product.js)
@@ -1083,15 +1141,16 @@ const Cloud = {
       else toast('Your email is confirmed and you\'re signed in.');
     }
     if (ev === 'PASSWORD_RECOVERY' && u) Acct.open('newpass');
-    if (!u){ this.state = 'out'; renderAcct(); return; }
+    if (!u){ this.state = 'out'; renderAcct(); Owner.check(); return; }
     if (u.email) keepEmail(u.email);
     if (u.id !== was) await this.pull();
+    Owner.check();
     renderAcct();
     if (typeof Product !== 'undefined') Product.autoConnect();   // a username given at sign-up: read the games now
   },
   // fetch the account's copy and merge it in; progress made by someone else on this device is set aside, not mixed in
   async pull(){
-    if (!this.user || this.pulling) return;
+    if (!this.user || this.pulling || Owner.on) return;
     this.pulling = true; this.state = 'sync'; renderAcct();
     try {
       const {data, error} = await this.sb.from('progress').select('data').eq('user_id', this.user.id).maybeSingle();
@@ -1110,7 +1169,7 @@ const Cloud = {
     } catch(e){ this.state = 'err'; this.err = (e && e.message) || 'Couldn\'t reach your account.'; }
     this.pulling = false; renderAcct();
   },
-  push(){ if (!this.user) return; clearTimeout(this.timer); this.timer = setTimeout(() => this.write(), 1200); },
+  push(){ if (!this.user || Owner.on) return; clearTimeout(this.timer); this.timer = setTimeout(() => this.write(), 1200); },
   async write(){
     if (!this.user) return;
     if (this.writing){ this.again = true; return; }
@@ -1287,6 +1346,9 @@ function renderChrome(){
   const T = TXT[SIDE];
   const mb = document.getElementById('meBtn'), st = Daily.streak(), np = typeof PERSONA !== 'undefined' && PERSONA === 'new';
   if (mb){ mb.hidden = np; mb.classList.toggle('zero', !st); document.getElementById('meN').textContent = st; mb.setAttribute('aria-label', `Your profile: ${st} ${st === 1 ? 'day' : 'days'} in a row`); }
+  const lb = document.getElementById('lvBtn'), L = Level.of();
+  if (lb){ lb.hidden = np; document.getElementById('lvN').textContent = L.n; document.getElementById('lvI').style.width = Math.round(L.into / L.need * 100) + '%';
+    lb.setAttribute('aria-label', `Level ${L.n}: ${L.into} of ${L.need} points to level ${L.n + 1}`); }
   document.getElementById('brandKick').textContent = T.kick;
   document.getElementById('brandPiece').setAttribute('href', '#' + T.piece);
   document.querySelectorAll('.sidesw [data-side]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.side === SIDE)));
@@ -1365,12 +1427,14 @@ const Settings = {
       <div class="setrow"><b>Board colour</b><div class="swatches" role="group">${BOARDS.map(([v, label, l, d]) => `<button type="button" class="swatch" data-set="board:${v}" aria-pressed="${SET.board === v}"><i aria-hidden="true"><b style="background:${l}"></b><b style="background:${d}"></b><b style="background:${d}"></b><b style="background:${l}"></b></i>${label}</button>`).join('')}</div></div>
       ${sw('coords', 'Letters and numbers on the board', 'The small file and rank marks along the edge.')}
       ${sw('coach', 'Coach', 'A few words from your coach at the moments that matter.')}
-      ${typeof coachPickHTML === 'function' ? `<div class="setrow"><b>Your coach</b>${coachPickHTML()}</div>` : ''}${typeof packRowsHTML === 'function' ? packRowsHTML() : ''}`;
+      ${typeof coachPickHTML === 'function' ? `<div class="setrow"><b>Your coach</b>${coachPickHTML()}</div>` : ''}${typeof packRowsHTML === 'function' ? packRowsHTML() : ''}
+      ${Owner.can ? `<button type="button" class="switch" role="switch" aria-checked="${Owner.on}" data-own><span><b>Admin mode</b><span>Everything open, the shop free, and tools to jump ahead. It works on a copy of your progress: nothing done here is saved to your account.</span></span><i class="knob" aria-hidden="true"></i></button>` : ''}`;
   }
 };
 document.getElementById('setBtn').addEventListener('click', () => Settings.open());
 document.getElementById('setSheet').addEventListener('click', e => {
   if (e.target.id === 'setSheet' || e.target.closest('[data-setx]')){ Settings.close(); return; }
+  if (e.target.closest('[data-own]')){ if (Owner.on) Owner.leave(); else Owner.enter(); Settings.render(); return; }
   const t = e.target.closest('[data-set]'); if (!t) return;
   const [k, v] = t.dataset.set.split(':'); setSetting(k, k === 'coords' || k === 'coach' ? v === '1' : v);
   Settings.render(); if (k === 'coords') render(); if (k === 'coach' && typeof Coach !== 'undefined') Coach.refresh();
@@ -1379,7 +1443,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && !document.
 applySettings();
 
 const view = document.getElementById('view');
-const VIEWS = ['sandbox', 'course', 'drill', 'games', 'cheat', 'shop'];
+const VIEWS = ['sandbox', 'course', 'drill', 'games', 'shop'];
 const CVIEWS = ['course', 'unit', 'quiz', 'grad'];
 const tabOf = (v, from) => CVIEWS.includes(v) || (v === 'study' && from === 'unit') ? 'course' : v === 'study' ? tabOf(from || 'learn') : v === 'learn' ? 'games' : VIEWS.includes(v) ? v : 'course';
 function setTab(v){
@@ -1397,7 +1461,7 @@ function go(v, opts = {}){
   stopPlay();
   const prevView = S.view;
   if (v === 'study'){ S.view = 'study'; if (opts.from) S.studyFrom = opts.from; }
-  else { S.view = v; S.studyFrom = v === 'games' ? 'games' : v === 'cheat' ? 'cheat' : v === 'sandbox' ? 'sandbox' : CVIEWS.includes(v) ? 'unit' : 'learn'; }
+  else { S.view = v; S.studyFrom = v === 'games' ? 'games' : v === 'sandbox' ? 'sandbox' : CVIEWS.includes(v) ? 'unit' : 'learn'; }
   render(); if (prevView !== S.view || opts.top) window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
   setHash();
 }
@@ -1428,7 +1492,6 @@ function render(){
   else if (S.view === 'drill') renderDrill();
   else if (S.view === 'sandbox') renderSandbox();
   else if (S.view === 'games') renderGames();
-  else if (S.view === 'cheat') renderCheat();
   else if (S.view === 'shop') renderShop();
   else if (S.view === 'grad') renderGrad();
   else if (S.view === 'explore') renderExplore();
@@ -1474,13 +1537,6 @@ function lessonCard(L, variant){
   return `<button class="lcard ${variant || ''}" data-lesson="${L.id}">${thumb(idx, o)}<div><div class="chips">${chips.join('')}</div><h4>${esc(L.title)}</h4><p>${esc(L.sub)}</p>${variant ? `<p class="lwhy">${esc(L.why)}</p>` : ''}
     <div class="meta"><span class="pips" title="Drill progress" aria-label="Drill progress ${lvl} of 5">${[1,2,3,4,5].map(k => `<i class="${k <= lvl ? 'on' : ''}"></i>`).join('')}</span><span>${nl} ${nl === 1 ? 'line' : 'lines'}${often ? ' · ' + often : ''}</span></div></div></button>`;
 }
-function replyTiles(){
-  const tot = DATA.stats.total, maxn = Math.max(...DATA.chapters.map(c => c.stats.n));
-  return DATA.chapters.map(C => {
-    const st = C.stats, o = nodeBoardOpts(C.tile, {coords: false});
-    return `<button class="rtile" data-ch="${C.id}" aria-pressed="${S.chapter === C.id}" aria-label="${esc(C.name)}: ${st.n} of your games">${thumb(C.tile, o)}<span class="rtx"><b>${esc(C.name)}</b><span class="rmove">${esc(C.move)}</span><span class="rbar" aria-hidden="true"><i style="width:${Math.max(4, Math.round(st.n / maxn * 100))}%"></i></span><span class="rnum tnum"><span><span class="rpct">${Math.round(st.n / tot * 100)}% · </span>${st.n} ${st.n === 1 ? 'game' : 'games'}</span><span>${st.w}–${st.l}</span></span></span></button>`;
-  }).join('');
-}
 function partsHTML(C){
   let html = '';
   for (const pid of C.parts){
@@ -1511,14 +1567,21 @@ function chapterNotes(C){
 }
 // keep words like 'e-pawn' on one line instead of breaking at the hyphen
 const keepHyph = h => h.replace(/\b([a-h])-pawn\b/g, '<span class="nw">$1-pawn</span>');
-// an opening's page: its story, every lesson in it and the notes. Reached from Your games.
+// below an opening's hero: its lessons (and the notes), or every decision in it at a glance
+function learnBody(C, notes){
+  const nL = DATA.lessons.filter(l => C.parts.includes(l.part)).length, nG = glanceCards(C).length;
+  const lv = S.lview === 'glance' && nG ? 'glance' : 'lessons';
+  return (nG ? segHTML([['lessons', 'Lessons', nL], ['glance', 'At a glance', nG]], lv, 'lview') : '') + (lv === 'glance' ? glanceHTML(C) : partsHTML(C) + notes);
+}
+function wireLearn(){ view.querySelectorAll('[data-lview]').forEach(b => b.onclick = () => { S.lview = b.dataset.lview; renderLearn(); }); }
+// an opening's page: its story, every lesson in it and the notes, and every decision at a glance. Reached from Your games.
 function renderLearn(){
   const st = DATA.stats, C = CHAPTERS[S.chapter] || DATA.chapters[0];
   let html = `<div class="crumbs"><button class="btn small" data-go="games">← Your games</button><span class="where">${esc(C.name)}</span></div>
     <nav class="chnav" aria-label="Openings">${DATA.chapters.map(c => `<button class="chip ${c.id === C.id ? 'on' : ''}" data-ch="${c.id}" ${c.id === C.id ? 'aria-current="page"' : ''}>${esc(c.name)}</button>`).join('')}</nav><div id="chapter" class="chapter">`;
   if (SIDE !== 'w' || C.id !== 'italian' || PERSONA !== 'house'){ // the Italian's own page tells the story of the house player's study
-    html += chapterHero(C) + partsHTML(C) + chapterNotes(C) + '</div>';
-    view.innerHTML = html; return;
+    html += chapterHero(C) + learnBody(C, chapterNotes(C)) + '</div>';
+    view.innerHTML = html; wireLearn(); return;
   }
   const heroIdx = LINES['setup'].n[LINES['setup'].n.length - 1];
   html += `<section class="hero">
@@ -1534,8 +1597,7 @@ function renderLearn(){
       </div>
       <div class="cta"><button class="btn primary" data-lesson="setup">Start with the setup</button><button class="btn" data-sbch="italian">Spar in the Sandbox</button><button class="btn ghost" data-drillch="italian">Drill this opening</button></div>
     </div></section>`;
-  html += partsHTML(C);
-  html += `<section class="changes">
+  html += learnBody(C, `<section class="changes">
     <div class="panel"><h3>Where I changed your study</h3><ul>
       <li><b>Trap II, after the queen pin:</b> the bishop goes to the center, not the pawn push (which fails to a pawn kick). Your study's own d-pawn chapter already does this. <button class="linkish" data-lesson="trap-d6">Open</button></li>
       <li><b>Trap III, the center branch:</b> take the knight before pushing your pawn. <button class="linkish" data-line="trap-ne7-d5">Open</button></li>
@@ -1549,9 +1611,9 @@ function renderLearn(){
       <li><b>Bishop steps back before taking:</b> a club-level slip with a bishop sacrifice on f7. <button class="linkish" data-lesson="bb6-early">Open</button></li>
       <li><b>Other fourth moves</b> and <b>the Hungarian</b>: same plan, quick answers. <button class="linkish" data-lesson="other-4th">Open</button></li>
       <li><b>Fried Liver king moves</b> you'll actually see: the king running home or to the corner. <button class="linkish" data-line="fl-ke8">Open</button></li>
-    </ul></div></section></div>`;
+    </ul></div></section>`) + '</div>';
   view.innerHTML = html;
-  document.getElementById('heroReplay').onclick = heroReplay;
+  document.getElementById('heroReplay').onclick = heroReplay; wireLearn();
 }
 let heroTimer = null;
 function heroReplay(){
@@ -1600,7 +1662,7 @@ function renderStudy(){
     if (k < order.length - 1) navNext = `<button class="btn small" data-lesson="${order[k+1]}" aria-label="Next lesson: ${esc(LESSONS[order[k+1]].title)}"><span class="navtxt">${esc(LESSONS[order[k+1]].title)} </span>›</button>`; }
   if (CU && les && CU.lessons.includes(les.id)){ const nx = CU.lessons[CU.lessons.indexOf(les.id) + 1];
     navNext = nx ? `<button class="btn small primary" id="topNext" data-lesson="${nx}" title="${esc(LESSONS[nx].title)}">Next lesson ›</button>` : `<button class="btn small primary" id="topNext" data-unit="${CU.id}">Done · back to the ${uword(CU)} ›</button>`; }
-  const back = CU ? `<button class="btn small" data-unit="${CU.id}">← ${esc(CU.title)}</button>` : S.studyFrom === 'games' ? '<button class="btn small" data-go="games">← Your games</button>' : S.studyFrom === 'cheat' ? '<button class="btn small" data-go="cheat">← Cheat sheet</button>' : S.studyFrom === 'sandbox' ? '<button class="btn small" data-go="sandbox">← Sandbox</button>' : `<button class="btn small" data-go="learn">← ${esc(((lessonOf(S.line) && chapterOf(lessonOf(S.line))) || {name: 'The opening'}).name)}</button>`;
+  const back = CU ? `<button class="btn small" data-unit="${CU.id}">← ${esc(CU.title)}</button>` : S.studyFrom === 'games' ? '<button class="btn small" data-go="games">← Your games</button>' : S.studyFrom === 'sandbox' ? '<button class="btn small" data-go="sandbox">← Sandbox</button>' : `<button class="btn small" data-go="learn">← ${esc(((lessonOf(S.line) && chapterOf(lessonOf(S.line))) || {name: 'The opening'}).name)}</button>`;
   // reaching the last move of a lesson's main line counts as studying it
   const atEnd = !!les && !!line.main && S.i === line.n.length - 1;
   if (atEnd) markSeen(les.id);
@@ -1724,6 +1786,7 @@ function togglePlay(){
 }
 document.getElementById('acctBtn').addEventListener('click', () => Acct.open());
 document.getElementById('meBtn').addEventListener('click', () => Acct.open(Cloud.user ? 'in' : 'me'));
+document.getElementById('lvBtn').addEventListener('click', () => Acct.open(Cloud.user ? 'in' : 'me'));
 document.getElementById('acctSheet').addEventListener('click', e => { if (e.target.id === 'acctSheet') Acct.close(); });
 document.addEventListener('keydown', e => {
   if (Acct.mode){ if (e.key === 'Escape'){ e.preventDefault(); Acct.close(); } return; } // the sign-in sheet owns the keyboard while open
@@ -2224,51 +2287,84 @@ function renderSandbox(){
 }
 
 /* ------------------------------------------------------------------ GAMES */
+// Your games opens on one grid: your openings, each a tile in the look of the old cheat sheet (their move highlighted,
+// your answer as the green arrow) with how often you met it, your record and how many of its lines you know. A switch
+// above the grid brings up the shots you missed or the game reviews instead, so the page never shows all three at once.
+// A tile opens the opening's page (renderLearn): every lesson in it, and every decision in it at a glance.
+// a switch between the parts of a page: [key, label, count, short label for a phone]
+function segHTML(segs, cur, attr){
+  return `<div class="gseg" role="tablist">${segs.map(([k, label, n, short]) => `<button role="tab" type="button" data-${attr}="${k}" aria-selected="${k === cur}">${short ? `<i class="lg">${esc(label)}</i><i class="sm">${esc(short)}</i>` : esc(label)}${n !== undefined ? `<span class="tnum">${n}</span>` : ''}</button>`).join('')}</div>`;
+}
+// the lines of an opening that a drill can ask for. s is the book, so a tile can show the other colour's opening too.
+function chLines(s, C){
+  const D = BOOKS[s], les = new Set(D.lessons.filter(l => C.parts.includes(l.part)).map(l => l.id));
+  return D.lines.filter(l => les.has(l.lesson) && D.drillSet.has(l.id)).map(l => l.id);
+}
+function chTileBoard(s, C){
+  const nodes = BOOKS[s].nodes, me = s === 'w' ? 1 : 0, nd = nodes[C.tile];
+  let at = C.tile, ans = null;
+  if (nd.u && nd.w === me && nd.p !== null && nd.p !== undefined){ ans = nd; at = nd.p; }   // the tile is your move: show the position before it
+  else ans = (nd.k || []).map(c => nodes[c]).find(k => k.w === me) || null;
+  const pn = nodes[at], o = {mini: true, coords: false, flip: s === 'b', aria: C.name};
+  if (pn.u) o.last = [pn.u.slice(0, 2), pn.u.slice(2, 4)];
+  if (ans) o.arrows = [ans.u.slice(0, 4) + 'g'];
+  return `<div class="thumb">${boardSVG(pn.f, o)}</div>`;
+}
+function openTile(s, C, st, attr){
+  const ls = chLines(s, C), known = ls.filter(lineClean).length, met = st && st.n;
+  const pct = met ? Math.round((st.w + (st.d || 0) / 2) / st.n * 100) : 0;
+  const rec = met ? `${st.w}–${st.l}${st.d ? '–' + st.d : ''}` : '';
+  return `<button class="otile" type="button" ${attr}>${chTileBoard(s, C)}<span class="otx"><b>${esc(C.name)}</b><span class="omove">${esc(C.move)}</span>
+    <span class="orec">${met ? `<span class="tnum">${st.n} ${st.n === 1 ? 'game' : 'games'}</span><span class="tnum ${pct >= 60 ? 'good' : pct < 50 ? 'bad' : ''}">${rec}</span>` : '<span>Not met yet</span>'}</span>
+    <span class="oknow" title="Lines you have played from memory without a slip"><span class="obar" aria-hidden="true"><i style="width:${ls.length ? Math.round(known / ls.length * 100) : 0}%"></i></span><span class="tnum">${known} of ${ls.length} lines</span></span></span></button>`;
+}
+function shotTile(I){
+  let idx, attr; const o = {coords: false};
+  if (I.puz !== undefined){ const P = DATA.puzzles[I.puz]; if (!P) return ''; idx = P.node; o.arrows = [P.ok[0] + 'g']; attr = `data-puz="${I.puz}"`; }
+  else { const L = LINES[I.game]; if (!L) return ''; idx = L.n[I.at]; attr = `data-line="${I.game}" data-i="${I.at}"`; }
+  const nd = N[idx]; if (nd.u) o.last = [nd.u.slice(0, 2), nd.u.slice(2, 4)];
+  return `<button class="mshot" type="button" ${attr}>${thumb(idx, o)}<span class="mtx"><span class="mbig tnum">${esc(I.big)}<small>${esc(I.unit || '')}</small></span><b>${esc(I.h)}</b><span class="mpara">${esc(I.p)}</span><span class="mgo">${I.puz !== undefined ? 'Practice the shots' : 'Replay the game'} ›</span></span></button>`;
+}
+function gameRow(G){
+  const main = LINES[G.lines[0]];
+  const tagged = t => G.moments.find(m => (N[main.n[m]].g || []).some(x => t.includes(x)));
+  const firstMiss = tagged(['missed']) || tagged(['blunder']) || tagged(['good', 'key']) || G.moments[0];
+  const at = Math.max(0, firstMiss - 1), idx = main.n[at];
+  const o = nodeBoardOpts(idx, {coords: false}), better = DATA.lines.find(l => l.lesson === G.id && !l.main && l.at === firstMiss);
+  o.arrows = [(better ? N[better.n[at + 1]].u : N[main.n[firstMiss]].u).slice(0, 4) + 'g'];
+  const L = LESSONS[G.lesson], C = L ? chapterOf(L) : null, res = G.result === 'W' ? ['win', 'Win'] : G.result === 'L' ? ['loss', 'Loss'] : ['draw', 'Draw'];
+  return `<button class="grev" type="button" data-line="${G.id}" data-i="${at}">${thumb(idx, o)}<span class="gtx"><span class="gtop"><span class="chip ${res[0]}">${res[1]}</span>${C ? `<span>${esc(C.name)}</span>` : ''}</span>
+    <b>${esc(G.title)}</b><span class="gmeta">${esc(G.date)} · vs ${esc(G.opp)} (${G.oppElo}) · ${esc(G.acct)}</span></span><span class="ggo" aria-hidden="true">${ICON.next}</span></button>`;
+}
 function renderGames(){
-  const pz = id => DATA.puzzles.findIndex(p => p.game === id);
-  const insight = I => {
-    let idx, o = {coords: false}, btn;
-    if (I.puz !== undefined){ const P = DATA.puzzles[I.puz]; if (!P) return ''; idx = P.node; o.arrows = [P.ok[0] + 'g']; btn = `<button class="btn small primary" data-puz="${I.puz}">Practice the shots</button>`; }
-    else { const L = LINES[I.game]; if (!L) return ''; idx = L.n[I.at]; btn = `<button class="btn small primary" data-line="${I.game}" data-i="${I.at}">Replay the game</button>`; }
-    const nd = N[idx]; if (nd.u) o.last = [nd.u.slice(0,2), nd.u.slice(2,4)];
-    return `<div class="insight">${thumb(idx, o)}<div><div class="big tnum">${esc(I.big)}${I.unit ? `<small>${esc(I.unit)}</small>` : ''}</div><h3>${esc(I.h)}</h3><p>${esc(I.p)}</p><div class="lesson-actions" style="margin-top:10px">${btn}</div></div></div>`; };
-  const cards = DATA.games.map(G => {
-    const main = LINES[G.lines[0]];
-    const tagged = t => G.moments.find(m => (N[main.n[m]].g || []).some(x => t.includes(x)));
-    const firstMiss = tagged(['missed']) || tagged(['blunder']) || tagged(['good', 'key']) || G.moments[0];
-    const at = Math.max(0, firstMiss - 1), idx = main.n[at];
-    const o = nodeBoardOpts(idx, {coords: false}); const better = DATA.lines.find(l => l.lesson === G.id && !l.main && l.at === firstMiss);
-    o.arrows = [(better ? N[better.n[at + 1]].u : N[main.n[firstMiss]].u).slice(0, 4) + 'g'];
-    const L = LESSONS[G.lesson], C = L ? chapterOf(L) : null;
-    return `<article class="gcard">${thumb(idx, o)}<div><div class="chips"><span class="chip ${G.result === 'W' ? 'win' : G.result === 'L' ? 'loss' : ''}">${G.result === 'W' ? 'Win' : G.result === 'L' ? 'Loss' : 'Draw'}</span>${C ? `<span class="chip">${esc(C.name)}</span>` : ''}<span class="chip">${esc(G.date)} · ${esc(G.acct)}</span><span class="chip">vs ${esc(G.opp)} (${G.oppElo})</span></div>
-      <h4>${esc(G.title)}</h4><p>${esc(G.summary)}</p><div class="acts"><button class="btn small primary" data-line="${G.id}" data-i="${at}">Replay from the key moment</button>${G.lesson ? `<button class="btn small" data-lesson="${G.lesson}">Related lesson</button>` : ''}</div></div></article>`;
-  }).join('');
-  const st = DATA.stats, maxn = Math.max(...DATA.chapters.map(c => c.stats.n));
-  const byOpening = DATA.chapters.map(C => { const s = C.stats, pct = Math.round(s.w / Math.max(1, s.n) * 100);
-    return `<button class="orow2" data-ch="${C.id}"><span class="on">${esc(C.name)}</span><span class="ob"><i style="width:${Math.round(s.n / maxn * 100)}%"></i></span><span class="tnum">${s.n}</span><span class="tnum">${s.w}–${s.l}</span><span class="tnum op2 ${pct >= 60 ? 'good' : pct < 50 ? 'bad' : ''}">${pct}%</span></button>`; }).join('');
-  view.innerHTML = `    <div class="panel" style="margin-bottom:24px"><h3>Your openings</h3><p class="legendline" style="margin:4px 0 10px">Open one for every lesson in it.</p><div class="otable"><div class="orow2 head" aria-hidden="true"><span>${esc(TXT[SIDE].byHead)}</span><span>How often</span><span>Games</span><span>Record</span><span style="text-align:right">Won</span></div>${byOpening}</div></div>
-    <div class="insights">${(DATA.insights || []).map(insight).join('')}</div>
-    <div class="gcards">${cards}</div>`;
+  const st = DATA.stats, ins = (DATA.insights || []).filter(I => I.puz === undefined ? LINES[I.game] : DATA.puzzles[I.puz]);
+  const segs = [['open', 'Your openings', DATA.chapters.length, 'Openings'], ['shots', 'Missed shots', ins.length, 'Shots'], ['games', 'Game reviews', DATA.games.length, 'Reviews']].filter(x => x[0] === 'open' || x[2]);
+  const seg = segs.some(x => x[0] === S.gseg) ? S.gseg : 'open';
+  const body = seg === 'shots' ? `<div class="mshots">${ins.map(shotTile).join('')}</div>`
+    : seg === 'games' ? `<div class="grevs">${DATA.games.map(gameRow).join('')}</div>`
+    : `<p class="legendline">${OPP}'s move is highlighted. The green arrow is your answer. Open one for its lessons and every position in it.</p><div class="otiles">${DATA.chapters.map(C => openTile(SIDE, C, C.stats, `data-ch="${C.id}"`)).join('')}</div>`;
+  view.innerHTML = `<div class="chead ghd"><div><p class="kicker">Your games · both accounts, July to October</p><h2>${st.total} games with ${MYC}</h2>
+      <p class="grec"><span><b class="tnum">${st.wins}</b> ${st.wins === 1 ? 'win' : 'wins'}</span><span><b class="tnum">${st.losses}</b> ${st.losses === 1 ? 'loss' : 'losses'}</span>${st.draws ? `<span><b class="tnum">${st.draws}</b> ${st.draws === 1 ? 'draw' : 'draws'}</span>` : ''}</p></div></div>
+    ${segHTML(segs, seg, 'gseg')}<div class="gbody">${body}</div>`;
+  view.querySelectorAll('[data-gseg]').forEach(b => b.onclick = () => { S.gseg = b.dataset.gseg; renderGames(); });
   view.querySelectorAll('[data-puz]').forEach(b => b.onclick = () => startPuzzle(+b.dataset.puz));
 }
 
-/* ------------------------------------------------------------------ CHEAT SHEET */
-function renderCheat(){
-  const groups = {};
-  for (const c of DATA.cheat){ const L = LESSONS[c.lesson]; (groups[L.part] = groups[L.part] || []).push(c); }
-  let html = `<p class="legendline">${OPP}'s move is highlighted. The green arrow is your answer.</p>
-    <div class="seg" style="margin-bottom:22px">${DATA.chapters.map(C => `<button data-jump="${C.id}">${esc(C.name)}</button>`).join('')}</div>`;
-  for (const C of DATA.chapters){
-    const cs = C.parts.flatMap(p => groups[p] || []); if (!cs.length) continue;
-    html += `<section class="part" id="cs-${C.id}" style="scroll-margin-top:16px"><div class="part-head"><div><p class="kicker">${esc(C.move)}</p><h3>${esc(C.name)}</h3></div></div><div class="cgrid">${cs.map(c => {
-      const nd = N[c.node], o = {coords: false, arrows: [c.mv.slice(0, 4) + 'g']};
-      if (nd.u) o.last = [nd.u.slice(0, 2), nd.u.slice(2, 4)];
-      const lid = LESSONS[c.lesson].lines.find(id => LINES[id].n.includes(c.child)) || LESSONS[c.lesson].lines[0];
-      const iAt = Math.max(0, LINES[lid].n.indexOf(c.node));
-      return `<button class="ccard" data-line="${lid}" data-i="${iAt}">${thumb(c.node, o)}<span class="if">${nd.u ? ((nd.l.startsWith(OPP) ? '' : (isMine(nd) ? 'You: ' : OPP + ': ')) + esc(nd.l)) : 'Start'}</span><span class="then">${esc(c.rule)}</span></button>`; }).join('')}</div></section>`;
-  }
-  view.innerHTML = html;
-  view.querySelectorAll('[data-jump]').forEach(b => b.onclick = () => { const el = document.getElementById('cs-' + b.dataset.jump); if (el) el.scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block: 'start'}); });
+/* ------------------------------------------------------------------ AT A GLANCE */
+// Every decision in an opening, one card each: their move highlighted, your answer as the green arrow and the rule in a
+// few words. Part of the opening's page (it used to be a tab of its own, the cheat sheet).
+function glanceCards(C){
+  const cs = DATA.cheat.filter(c => LESSONS[c.lesson] && C.parts.includes(LESSONS[c.lesson].part));
+  return C.parts.flatMap(pid => cs.filter(c => LESSONS[c.lesson].part === pid));
+}
+function glanceHTML(C){
+  const cs = glanceCards(C); if (!cs.length) return '';
+  return `<p class="legendline">${OPP}'s move is highlighted. The green arrow is your answer. Tap a card to open it in its lesson.</p><div class="cgrid">${cs.map(c => {
+    const nd = N[c.node], o = {coords: false, arrows: [c.mv.slice(0, 4) + 'g']};
+    if (nd.u) o.last = [nd.u.slice(0, 2), nd.u.slice(2, 4)];
+    const lid = LESSONS[c.lesson].lines.find(id => LINES[id].n.includes(c.child)) || LESSONS[c.lesson].lines[0];
+    const iAt = Math.max(0, LINES[lid].n.indexOf(c.node));
+    return `<button class="ccard" data-line="${lid}" data-i="${iAt}">${thumb(c.node, o)}<span class="if">${nd.u ? ((nd.l.startsWith(OPP) ? '' : (isMine(nd) ? 'You: ' : OPP + ': ')) + esc(nd.l)) : 'Start'}</span><span class="then">${esc(c.rule)}</span></button>`; }).join('')}</div>`;
 }
 
 /* ------------------------------------------------------------------ COURSE */
@@ -2328,7 +2424,7 @@ const unitPassed = U => !U.soon && !!up(U.id).pass;
 const baseDone = () => { const open = COURSE.filter(U => !U.soon); return open.length > 0 && open.every(unitPassed); };
 const gradAt = () => (Prog.d.course || {}).grad || 0;
 function stampGrad(){ if (gradAt() || !baseDone()) return false; const c = Prog.d.course || (Prog.d.course = {u: {}, seen: {}}); c.grad = Date.now(); S.gradNow = true; return true; }
-function unitOpen(U){ if (U.soon || (U.deep && !gradAt())) return false; for (const V of listOf(U)){ if (V === U) return true; if (!V.soon && !unitPassed(V)) return false; } return false; }
+function unitOpen(U){ if (U.soon) return false; if (Owner.on) return true; if (U.deep && !gradAt()) return false; for (const V of listOf(U)){ if (V === U) return true; if (!V.soon && !unitPassed(V)) return false; } return false; }
 const currentUnit = () => COURSE.find(U => !U.soon && !unitPassed(U)) || null;
 const nextUnitAfter = U => listOf(U).slice(U.k + 1).find(V => !V.soon) || null;
 const deepDone = X => X.units.every(unitPassed);
@@ -3208,6 +3304,8 @@ function start(saved){
   else if (h) side = 'w';
   loadBook(side); S.chapter = savedChapter(SIDE);
   if (saved && saved.view){
+    if (saved.view === 'cheat'){ saved.view = 'learn'; S.lview = 'glance'; }   // the cheat sheet is now part of each opening's page
+    if (saved.studyFrom === 'cheat') saved.studyFrom = 'learn';
     Object.assign(S, {view: saved.view === 'quiz' ? 'unit' : saved.view === 'explore' ? (exLoad() ? 'explore' : 'course') : saved.view, unit: saved.unit && UNIT[saved.unit] ? saved.unit : null, slide: saved.slide || 0, line: saved.line && LINES[saved.line] ? saved.line : null, i: saved.i || 0, studyFrom: saved.studyFrom || 'learn', deep: saved.deep && DEEPOF[saved.deep] ? saved.deep : null, coursePath: !!saved.coursePath});
     if (saved.chapter && CHAPTERS[saved.chapter]) S.chapter = saved.chapter;
     if (S.view === 'study' && !S.line) S.view = 'learn';
@@ -3221,6 +3319,7 @@ function start(saved){
   else if (h.startsWith('learn.') && CHAPTERS[h.slice(6)]){ S.chapter = h.slice(6); S.view = 'learn'; }
   else if (h === 'explore' && exLoad()){ if (S.ex.side && BOOKS[S.ex.side] && S.ex.side !== SIDE){ loadBook(S.ex.side); S.chapter = savedChapter(SIDE); } S.view = 'explore'; }
   else if (VIEWS.includes(h) || h === 'learn') S.view = h;   // #learn: the openings, now under Your games
+  else if (h === 'cheat'){ S.view = 'learn'; S.lview = 'glance'; }   // the old cheat sheet: an opening's page, at a glance
   Product.landing(h);
   render();
   Prog.connect(); renderAcct();
