@@ -63,7 +63,7 @@ L('ph-nd7', 'e5x-phil', 'Knight to the side: the f7 shot', 'Bishop out, and the 
         ('ph-nd7-ngf6', 'Both knights out: the queen trap', J(PH, "Nd7 Bc4 Ngf6 dxe5 dxe5 Ng5")),
         ('ph-nd7-be7', 'Bishop out: queen to the center', J(PH, "Nd7 Bc4 Be7 dxe5 dxe5 Qd5")),
         ('ph-nd7-c6', 'Pawn to the side', J(PH, "Nd7 Bc4 c6 Ng5 Nh6 O-O"))],
-  why='You missed this exact shot against Nona_Zulfa on Oct 14.', outcome='You win material on f7', tags=['game'])
+  why='You missed this exact shot against Nona_Zulfa.', outcome='You win material on f7', tags=['game'])
 L('ph-nc6', 'e5x-phil', 'The knight defends', 'Push past it and grab space', 'rare',
   J(PH, "Nc6 d5 Nce7 c4"),
   why='Black\'s knight blocks its own c-pawn.', outcome='More space for you')
@@ -144,7 +144,7 @@ L('ck-takes', 'caro-main', 'Black lets you take the bishop', 'Your knight takes 
   J(CKX, "Bf5 Ng3 e6 Nxf5 exf5 Nf3 Nf6 Bd3"),
   alts=[('ck-takes-nf6', 'Knight out: the bishop hangs', J(CKX, "Bf5 Ng3 Nf6 Nxf5 e6 Ne3")),
         ('ck-takes-qa5', 'The queen-check rescue', J(CKX, "Bf5 Ng3 Nf6 Nxf5 Qa5+ Bd2 Qxf5 Nf3"))],
-  why='You won a whole piece this way against ykayyy in July.', outcome='Two bishops for you, weak pawns for Black', tags=['game'])
+  why='You won a whole piece this way against ykayyy.', outcome='Two bishops for you, weak pawns for Black', tags=['game'])
 L('ck-nf6', 'caro-other4', 'Knight trade, broken pawns', 'Take the knight, then bishop and queen at the king', 'core',
   J(CKX, "Nf6 Nxf6+ exf6 c3 Bd6 Bd3 O-O Ne2 Re8 Qc2"),
   alts=[('ck-nf6-be7', 'Quiet bishop', J(CKX, "Nf6 Nxf6+ exf6 c3 Be7 Bd3 O-O Ne2 Re8 Qc2")),
@@ -286,7 +286,7 @@ L('sd-c6', 'scandi-other', 'The pawn gambit', 'Take it and keep it', 'rare',
   J(SD, "c6 dxc6 Nxc6 Nf3 e5 Nc3"),
   alts=[('sd-c6-nf6', 'Knight out', J(SD, "c6 dxc6 Nxc6 Nf3 Nf6 Bb5")),
         ('sd-c6-bg4', 'Bishop pins', J(SD, "c6 dxc6 Nxc6 Nf3 Bg4 h3"))],
-  why='You lost to this in July. Take the pawn, develop, don\'t rush.', outcome='A pawn up', tags=['game'])
+  why='You lost a game to this. Take the pawn, develop, don\'t rush.', outcome='A pawn up', tags=['game'])
 
 # ============================================================== Pirc and Modern
 PD = "e4 d6 d4"
@@ -309,7 +309,7 @@ L('pc-modern', 'pirc-150', 'Bishop first: the Modern', 'Same setup, same plan', 
 L('pc-e5', 'pirc-other', 'Black strikes with the e-pawn', 'Trade queens: Black can\'t castle', 'common',
   J(PD, "e5 dxe5 dxe5 Qxd8+ Kxd8 Bc4"),
   alts=[('pc-e5-nc6', 'Knight hits your pawn: take another', J(PD, "e5 dxe5 Nc6 exd6 Bxd6 Nc3"))],
-  why='You met this in July. Take the pawn; Black doesn\'t get enough for it.', outcome='Black\'s king is stuck in the middle', tags=['game'])
+  why='You have met this. Take the pawn; Black doesn\'t get enough for it.', outcome='Black\'s king is stuck in the middle', tags=['game'])
 L('pc-other', 'pirc-other', 'Other second moves', 'Big center, knights out, castle', 'rare',
   J(PD, "e6 Nf3 d5 e5"),
   alts=[('pc-other-c6', 'The c-pawn', J(PD, "c6 Nf3 Nf6 Nc3")),
@@ -355,7 +355,7 @@ L('rr-owen', 'rare-all', 'Bishop to the long diagonal', 'Guard your e-pawn with 
         ('rr-owen-bb4', 'Bishop check', J("e4 b6 d4 Bb7 Bd3 e6 Nf3 Bb4+ c3")),
         ('rr-owen-g6', 'Double fianchetto', J("e4 b6 d4 Bb7 Bd3 g6 Nf3 Bg7 O-O")),
         ('rr-owen-nf6', 'Knight hits your e-pawn', J("e4 b6 d4 Bb7 Bd3 Nf6 Qe2"))],
-  why='You lost your e-pawn and the game in 6 moves against this in October.', outcome='A big center, safely guarded', tags=['game'])
+  why='You lost your e-pawn and the game in 6 moves against this.', outcome='A big center, safely guarded', tags=['game'])
 L('rr-nimzo', 'rare-all', 'Knight first', 'Knight out too; often you are back in the Italian', 'common',
   J("e4 Nc6 Nf3 e5 Bc4"),
   alts=[('rr-nimzo-d5', 'Pawn strike', J("e4 Nc6 Nf3 d5 exd5 Qxd5 Nc3 Qd8 d4")),

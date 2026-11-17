@@ -129,7 +129,7 @@ for G in BM.GAMES:
             cur = add_node(cur, before, mv, bb.copy(), lab, nt); ids_.append(cur); prev = mv; pcap = before.is_capture(mv)
         glines.append(dict(id=aid, lesson=G['id'], title=atitle, n=ids_, main=0, at=ply))
     lines.extend(glines)
-    games_out.append(dict(id=G['id'], opp=G['opp'], oppElo=G['opp_elo'], meElo=G['me_elo'], result=G['result'], tc=G['tc'], date=G['date'], acct=G['acct'],
+    games_out.append(dict(id=G['id'], opp=G['opp'], oppElo=G['opp_elo'], meElo=G['me_elo'], result=G['result'], tc=G['tc'],
                           title=G['title'], lesson=G['lesson'], summary=G['summary'], lines=[l['id'] for l in glines], moments=sorted(G['moments'].keys())))
 lesson_ids = {l['id'] for l in lesson_out}
 for G in BM.GAMES: assert G['lesson'] in lesson_ids, G['lesson']

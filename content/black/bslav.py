@@ -116,7 +116,7 @@ L('bln-main', 'bln-main', 'Copy the bishop', 'Bishop out, e-pawn, trade White\'s
         ('bln-main-c3b', 'Small c-pawn before the knight', J(SL, "c3 e6 Nf3 Bd6 Bxd6 Qxd6")),
         ('bln-main-nd2', 'Queen\'s knight first', J(SL, "Nd2 e6 Ngf3 Bd6 Bxd6 Qxd6")),
         ('bln-main-nf3b', 'Knight before the small e-pawn', J(SD, "Bf4 Nf6 Nf3 Bf5 e3 e6 Bd3 Bxd3 Qxd3 Bd6"))],
-  why='Mirror White, trade both bishops, and the game is equal and calm. In July this setup beat a London player in fourteen moves.', outcome='Equal; nothing to fear', tags=['game'])
+  why='Mirror White, trade both bishops, and the game is equal and calm. This setup has beaten a London player in fourteen moves.', outcome='Equal; nothing to fear', tags=['game'])
 L('bln-c4', 'bln-main', 'The c-pawn push: same bishop offer', 'E-pawn, offer the dark bishops, queen takes back, then the c-pawn guards your d-pawn', 'common',
   J(SL, "c4 e6 Nc3 Bd6 Bxd6 Qxd6 Nf3 c6"),
   alts=[('bln-c4-kick', 'Pawn hits your queen: step aside', J(SL, "c4 e6 Nc3 Bd6 Bxd6 Qxd6 c5 Qe7")),

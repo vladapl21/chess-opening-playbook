@@ -305,3 +305,63 @@ body:has(.coach:not([hidden])) .foot{padding-right:100px}
 button.leak{text-align:left;cursor:pointer;font:inherit;color:inherit;width:100%;transition:border-color .15s} button.leak:hover{border-color:var(--accent)}
 .leak .lgo{display:inline-block;margin-top:6px;color:var(--accent);font-weight:650;font-size:13.5px}
 .pgbody .gbody{display:grid;gap:16px}
+
+/* the daily drops: five more coach colours, and the gear they bring */
+.sk-mint{--kb:var(--sk-mint);--km:var(--sk-mint-2)} .sk-ocean{--kb:var(--sk-ocean);--km:var(--sk-ocean-2)} .sk-rose{--kb:var(--sk-rose);--km:var(--sk-rose-2)}
+.sk-slate{--kb:var(--sk-slate);--km:var(--sk-slate-2)} .sk-sand{--kb:var(--sk-sand);--km:var(--sk-sand-2)}
+.g-cloth{fill:var(--surface);stroke:var(--gear-ink);stroke-width:.9} .g-steel{fill:var(--surface-2);stroke:var(--gear-ink);stroke-width:.9}
+.g-halo{fill:none;stroke:var(--oro);stroke-width:2.2} .g-vine{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linecap:round}
+.g-bone{fill:none;stroke:var(--surface);stroke-width:1.2;stroke-linecap:round} .g-chain2{fill:none;stroke:var(--oro);stroke-width:1.5;stroke-dasharray:1.8 1.1;stroke-linecap:round}
+.g-heart{fill:var(--rosso);stroke:var(--gear-ink);stroke-width:.8;stroke-linejoin:round} .g-star{fill:var(--oro);stroke:var(--gear-ink);stroke-width:.8;stroke-linejoin:round}
+.g-lensr{fill:var(--surface);fill-opacity:.18;stroke:var(--rosso);stroke-width:1.8} .g-wirer{fill:none;stroke:var(--rosso);stroke-width:1.6;stroke-linecap:round}
+/* today's drops, above the switch between the shop and the locker */
+.sdrop{display:grid;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:inset 4px 0 0 var(--oro)}
+.sdhd{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap} .sdhd h3{margin:2px 0 0;font-size:19px}
+.sdt{font-size:13px;font-weight:650;color:var(--oro);background:var(--oro-soft);padding:4px 10px;border-radius:12px;white-space:nowrap}
+.sdrops{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))} .sdi .ipv{width:104px;height:104px} .sdday{font-size:12px;color:var(--oro);font-weight:650}
+.sdnext{background:transparent;border-style:dashed} .sdnext .ipv{position:relative} .sdnext .ipv svg{opacity:.22;filter:grayscale(1)}
+.sdnext .ipv i{position:absolute;inset:0;display:grid;place-items:center;font:700 44px/1 var(--f-display);font-style:normal;color:var(--oro)}
+@media (max-width:620px){ .sdrops{grid-template-columns:repeat(2,minmax(0,1fr))} .sdi .ipv{width:88px;height:88px} .mannequin svg{width:min(140px,44%)}
+  .sdnext{grid-column:1 / -1;grid-template-columns:48px minmax(0,1fr);justify-items:start;align-items:center;column-gap:12px;row-gap:0;padding:8px 12px;text-align:left}
+  .sdnext .ipv{width:48px;height:48px;grid-row:span 3} .sdnext .ipv i{font-size:26px} }
+.sdn{margin:0;font-size:13px;color:var(--muted)} .snone{color:var(--muted);margin:0}
+.item .need i{display:block;font-style:normal;margin-top:2px;font-weight:650}
+.shopmain > .gseg{margin:0}
+/* the coach's note in the drill panel when a line ends */
+.coachnote{display:grid;grid-template-columns:46px minmax(0,1fr);gap:10px;align-items:start;margin:10px 0 4px;padding:10px 12px;background:var(--accent-soft);border-radius:var(--r);font-size:14px}
+.coachnote .cnface{display:block;width:46px;height:46px;border-radius:50%;background:var(--surface);overflow:hidden;padding:3px 2px 0} .coachnote .cnface svg{width:100%;height:100%}
+.coachnote .cntx b{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:2px} .coachnote .cntx p{margin:0} .coachnote .linkish{margin-top:6px}
+.coachnote:has(.cntx:only-child){grid-template-columns:minmax(0,1fr)}
+/* the monthly recap, a part of Your games */
+.sgdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--flame);margin-left:-2px}
+.rcstat{display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 16px;margin:0 0 18px}
+.rcstat b{display:block;font-size:14.5px} .rcstat span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+.rcnav{display:flex;align-items:center;gap:10px;margin:0 0 14px} .rcnav h3{margin:0;font-size:24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap} .rcnav .btn svg{width:18px;height:18px}
+.rcnav .btn{min-width:38px;padding-inline:8px}
+.rctiles{list-style:none;margin:0 0 16px;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.rctiles li{display:grid;align-content:start;gap:3px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.rclab{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:650}
+.rctiles b{font:700 32px/1.1 var(--f-display);color:var(--ink)} .rcsub{font-size:12.5px;color:var(--muted)}
+.rcd{font-size:12.5px;font-weight:650;color:var(--muted)} .rcd i{font-style:normal;font-size:10px;margin-right:4px} .rcd.up{color:var(--accent)} .rcd.dn{color:var(--rosso)}
+.rcgrid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;margin:0 0 16px;align-items:start} .rcgrid:empty{display:none}
+.rcchart{position:relative;margin-top:8px} .rcchart svg{display:block;width:100%;height:auto;overflow:visible}
+.rcg{stroke:var(--line);stroke-width:1} .rcax{fill:var(--muted);font-size:11px;font-family:var(--f-body)}
+.rcl{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round} .rcp{fill:var(--surface);stroke:var(--accent);stroke-width:2} .rcp.end{fill:var(--accent)}
+.rch{fill:transparent;cursor:pointer} .rch:focus{outline:none} .rch:focus-visible{stroke:var(--ink);stroke-width:1.5}
+.rctip{position:absolute;width:90px;text-align:center;background:var(--ink);color:var(--bg);font-size:12px;font-weight:650;padding:4px 6px;border-radius:4px;pointer-events:none;white-space:nowrap}
+.rcnone{color:var(--muted);margin:8px 0 0;font-size:14px}
+.rcli{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:8px;font-size:14.5px} .rcli li{position:relative;padding-left:22px}
+.rcli li::before{content:"";position:absolute;left:2px;top:.42em;border:6px solid transparent} .rcli.up li::before{border-bottom:9px solid var(--accent);border-top:0;top:.38em} .rcli.dn li::before{border-top:9px solid var(--rosso);border-bottom:0;top:.5em}
+.rcsh{margin:16px 0 0;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:650}
+.rcprac{margin:0 0 16px} .rcnote{margin:4px 0 12px;color:var(--muted);font-size:13.5px}
+.rcrows{display:grid;gap:6px}
+.rcrow{display:grid;grid-template-columns:minmax(0,1.3fr) repeat(3,minmax(0,1fr));gap:4px 12px;align-items:center;width:100%;text-align:left;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:10px 12px}
+button.rcrow{cursor:pointer} button.rcrow:hover{border-color:var(--accent)}
+.rcnm b{display:block;font-size:14.5px} .rcnm i,.rcv i{font-style:normal;color:var(--muted);font-size:12.5px} .rcv{font-size:13.5px} .rcv em{font-style:normal;font-weight:700} .rcv em.up{color:var(--accent)} .rcv em.dn{color:var(--rosso)}
+.rchl{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:14px} .rchl li{display:grid;gap:2px} .rchl b{font-size:15px} .rchl span:not(.rclab){font-size:13.5px;color:var(--muted)} .rchl .linkish{justify-self:start;margin-top:2px}
+.rcleak{grid-template-columns:minmax(0,1fr);margin-top:10px}
+.rchist tr.on td{font-weight:700} .rchist .linkish{font-weight:inherit}
+.rcempty{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px}
+.rcempty .cface{width:64px;flex:none} .rcempty h3{margin:0 0 4px} .rcempty p{margin:0;color:var(--muted);font-size:14px}
+@media (max-width:860px){ .rctiles{grid-template-columns:repeat(2,minmax(0,1fr))} .rcgrid{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:620px){ .rcrow{grid-template-columns:minmax(0,1fr) auto} .rcrow .rcnm{grid-column:1 / -1} .rcrow .rcv:last-child{grid-column:1 / -1} .rctiles b{font-size:27px} .rcnav h3{font-size:20px} }

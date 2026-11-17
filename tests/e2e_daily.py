@@ -98,6 +98,44 @@ with sync_playwright() as p:
     pg.keyboard.press('Escape'); pg.wait_for_timeout(200); assert pg.evaluate('Acct.mode') is None
     assert pg.evaluate("mergeProg({badges: {l1: 5}}, {badges: {l1: 3, l10: 9}}).badges") == {'l1': 3, 'l10': 9}
 
+    # ---- the coach's note when a drill line ends: the move that caught you, what you played, what the book says about
+    # that move, the same move counted when it catches you again, and a word when it holds; a checkpoint names the lesson
+    def play_slip(at=None, bad=None):
+        for _ in range(200):
+            st = pg.evaluate('({state: S.drill.state, busy: S.drill.busy, i: S.drill.i})')
+            if st['state'] == 'done': return
+            if st['busy']: pg.wait_for_timeout(120); continue
+            u = pg.evaluate('N[LINES[S.drill.id].n[S.drill.i + 1]].u')
+            if at is not None and st['i'] + 1 == at: u, at = bad, None
+            pg.evaluate(f"tryMove('{u[:2]}', '{u[2:4]}')"); pg.wait_for_timeout(650)
+    pick = pg.evaluate("""(() => { useSide('w'); for (const id of DRILLABLE){ const n = LINES[id].n; for (let i = 1; i < n.length; i++){ if (!isMine(N[n[i]])) continue;
+        const w = (N[n[i - 1]].k || []).map(c => N[c]).find(x => (x.g || []).includes('warn') && x.t && x.u.length === 4); if (w) return [id, i, w.u]; } } return null; })()""")
+    print('a line with a known mistake beside it:', pick); lid, at, bad = pick
+    notes = []
+    for k, slip in enumerate((True, True, False)):
+        pg.evaluate(f"Coach.hush(); startDrillLine('{lid}', '', null, {{from0: true}})"); pg.wait_for_timeout(500)
+        assert pg.locator('.coachnote').count() == 0, 'nothing while the line is played'
+        play_slip(at if slip else None, bad); pg.wait_for_timeout(400)
+        notes.append(pg.inner_text('.coachnote') if pg.locator('.coachnote').count() else ''); print(f'note {k}:', notes[-1].replace('\n', ' | '))
+    mv = (at + 1) // 2
+    assert f'Move {mv} caught you' in notes[0] and 'You played:' in notes[0] and 'known mistake' in notes[0] and pg.evaluate(f"Prog.rec('{lid}').sl[{at}]") == 2
+    assert f'Move {mv} has caught you twice now' in notes[1] and f'Study move {mv}' in notes[1]
+    assert f'Move {mv} held this time' in notes[2]
+    assert not any(__import__('re').search(r'\b[KQRBN]?[a-h]x?[a-h]?[1-8]\b', __import__('re').sub(r'\b(f7|f2)\b', '', t)) for t in notes), 'no notation in the notes'
+    pg.screenshot(path=out + 'd_note.png')
+    uid = pg.evaluate("COURSE.find(U => !U.soon && U.lessons && U.side === 'w').id"); pg.evaluate(f"startQuiz('{uid}', 'cp')"); pg.wait_for_timeout(600)
+    for _ in range(80):
+        q = pg.evaluate("({state: S.quizState.state, busy: S.quizState.busy})")
+        if q['state'] == 'done': break
+        if q['busy']: pg.wait_for_timeout(150); continue
+        if q['state'] == 'shown': pg.click('#qNext'); pg.wait_for_timeout(250); continue
+        mv2 = pg.evaluate("(() => { const Q = S.quizState, it = Q.items[Q.k], L = DATA.legal[String(it.node)] || []; return Q.tries ? it.ans : (L.find(m => !it.ok.includes(m) && m.length === 4) || it.ans); })()")
+        pg.evaluate(f"quizTry('{mv2}', '{mv2[2:4]}')"); pg.wait_for_timeout(400)
+    qn = pg.inner_text('.coachnote'); print('checkpoint note:', qn.replace('\n', ' | '))
+    assert 'misses are from' in qn and pg.locator('.coachnote [data-lesson]').count() == 1
+    pg.click('.coachnote [data-lesson]'); pg.wait_for_timeout(400); assert pg.evaluate('S.view') in ('study', 'learn'), pg.evaluate('S.view')
+    pg.evaluate("S.drill = S.drillState = S.quizState = null; go('course')"); pg.wait_for_timeout(300)
+
     # ---- settings from another device: the newer copy wins, the coach changes face
     pg.evaluate("Prog.d.prefs = Object.assign({}, Prog.d.prefs, {board: ['plum', Date.now() + 1000], who: ['rook', Date.now() + 1000]}); refresh()"); pg.wait_for_timeout(300)
     assert pg.evaluate("[SET.who, SET.board, document.documentElement.dataset.board, coachName()]") == ['rook', 'plum', 'plum', 'Rocco']

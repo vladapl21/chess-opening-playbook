@@ -118,7 +118,8 @@ with sync_playwright() as p:
     pg.click('.tabs [data-view="games"]'); pg.wait_for_timeout(500)
     # Your games opens on the openings, every one in the playbook for both colours; the rest is one click away
     n_open = pg.evaluate('BOOKS.w.chapters.length + BOOKS.b.chapters.length')
-    assert pg.locator('.otile').count() == n_open and pg.locator('.leak, .gtable').count() == 0 and pg.locator('[data-gseg]').count() == 3
+    assert pg.locator('.otile').count() == n_open and pg.locator('.leak, .gtable').count() == 0 and pg.locator('[data-gseg]').count() == 4
+    assert pg.locator('[data-gseg="recap"]').count() == 1 and pg.evaluate('Recap.aid()') == 'chess.com:vladapl', 'the monthly recap reads the account the playbook was built from'
     assert pg.locator('.otile:has-text("Not met yet")').count() == n_open - pg.evaluate("Object.keys(Product.me().P.white.systems).filter(id => BOOKS.w.chapters.some(c => c.id === id)).length + Object.keys(Product.me().P.black.systems).filter(id => BOOKS.b.chapters.some(c => c.id === id)).length")
     pg.screenshot(path=out + 'o_games.png', full_page=True)
     pg.click('[data-gseg="games"]'); pg.wait_for_timeout(300)

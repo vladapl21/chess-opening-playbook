@@ -55,7 +55,8 @@ with sync_playwright() as p:
     assert pg.evaluate("PICKS.blackE4 || null") is None and pg.locator('#repName').count() == 1, 'a tap alone switches nothing'
     pg.fill('#repName', 'somebody'); assert pg.is_disabled('.repask [type=submit]')
     pg.screenshot(path=out + 'p_confirm.png')
-    pg.fill('#repName', 'VladAPL'); assert not pg.is_disabled('.repask [type=submit]')
+    pg.fill('#repName', 'vladapl'); assert pg.is_disabled('.repask [type=submit]'), 'only the house account confirms'
+    pg.fill('#repName', 'Aqua_Alpaca'); assert not pg.is_disabled('.repask [type=submit]')
     pg.evaluate("window.__before = 1"); pg.click('.repask [type=submit]')
     pg.wait_for_function("typeof __before === 'undefined' && typeof COURSE !== 'undefined' && typeof PERSONA !== 'undefined'"); pg.wait_for_timeout(900)
     print('after the switch:', pg.evaluate("[localStorage.getItem('playbook-packs'), JSON.stringify(Prog.d.packs), JSON.stringify(PICKS), PERSONA, performance.getEntriesByType('navigation')[0].type]"))
