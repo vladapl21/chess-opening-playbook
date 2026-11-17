@@ -184,8 +184,8 @@ const Analyze = (() => {
       bucket('length', g.plies < 50 ? 'short' : g.plies <= 90 ? 'middle' : 'long', r);
       if (g.oppElo && g.elo) bucket('opponent', g.oppElo - g.elo > 25 ? 'higher rated' : g.elo - g.oppElo > 25 ? 'lower rated' : 'about level', r);
       if (r === 0) bucket('losses', g.onTime ? 'on time' : g.plies < 50 ? 'before move 25' : 'later', 0);
-      P.games.push({t: g.t, me: g.me, r, opp: g.opp || '', oe: g.oppElo, e: g.elo, pl: g.plies, ch: inBook ? w.ch : null, bp: w.ply, by: w.by, nd: w.node, u: w.by ? w.uci : '', url: g.url,
-        o: g.sans.slice(0, 8).join(' ')});
+      P.games.push({t: g.t, me: g.me, r, opp: g.opp || '', oe: g.oppElo, e: g.elo, tc: g.tc, pl: g.plies, ch: inBook ? w.ch : null, bp: w.ply, by: w.by === 'me' && !w.hasBook ? 'end' : w.by, nd: w.node, u: w.by ? w.uci : '', url: g.url,
+        o: g.sans.slice(0, 8).join(' '), ot: g.onTime ? 1 : 0});
     });
     for (const s of [P.white, P.black]) for (const k in s.systems){ const t = s.systems[k]; t.depth = Math.round(t.depth / t.n * 10) / 10; }
     const rank = o => Object.values(o).sort((a, b) => b.n - a.n || b.l - a.l);

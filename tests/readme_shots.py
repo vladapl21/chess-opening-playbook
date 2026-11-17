@@ -64,6 +64,42 @@ def tap(pg, uci):
     x, y = xy(pg, uci[2:4]); pg.mouse.click(x, y)
 
 
+def months_of_games():
+    """The house account's games (data/games) re-dated into this month and the two before, as chess.com serves them."""
+    import re, random, datetime
+    G = ['[Event ' + g for g in (ROOT / 'data/games/aqua_alpaca.pgn').read_text().split('[Event ')[1:]]
+    t = datetime.datetime.now(datetime.timezone.utc); rnd = random.Random(4)
+    ym = [((t.year * 12 + t.month - 1 - n) // 12, (t.year * 12 + t.month - 1 - n) % 12 + 1) for n in range(3)]
+    def redate(g, y, m, d, elo):
+        side = 'White' if '[White "aqua_alpaca"]' in g else 'Black'
+        return re.sub(rf'\[{side}Elo "\d+"\]', f'[{side}Elo "{elo}"]', re.sub(r'\[Date "[^"]*"\]', f'[Date "{y}.{m:02d}.{d:02d}"]', g))
+    days = max(1, t.day - 1)
+    return {f'{ym[2][0]}/{ym[2][1]:02d}': [redate(g, *ym[2], 1 + i % 28, 900 + i * 2 + rnd.randint(-6, 6)) for i, g in enumerate(G[:30])],
+            f'{ym[1][0]}/{ym[1][1]:02d}': [redate(g, *ym[1], 1 + i % 28, 935 + i * 2 + rnd.randint(-8, 8)) for i, g in enumerate(G[5:50])],
+            f'{ym[0][0]}/{ym[0][1]:02d}': [redate(g, *ym[0], 1 + i % days, 1010 + i * 2 + rnd.randint(-5, 5)) for i, g in enumerate(G[10:40])]}
+
+
+def chesscom(months):
+    import json
+    def route(r):
+        k = '/'.join(r.request.url.split('/')[-2:])
+        if '/player/aqua_alpaca/games/' in r.request.url and k in months:
+            return r.fulfill(status=200, content_type='application/json', body=json.dumps({'games': [{'rules': 'chess', 'time_class': 'blitz', 'pgn': g} for g in months[k]]}))
+        r.fulfill(status=404, content_type='application/json', body='{}')
+    return route
+
+
+def play_drill(pg, bad=None):
+    """Play the drill line to its end; at index bad[0] play the move bad[1] once instead of the book's."""
+    for _ in range(200):
+        st = pg.evaluate('({state: S.drill.state, busy: S.drill.busy, i: S.drill.i})')
+        if st['state'] == 'done': return
+        if st['busy']: pg.wait_for_timeout(120); continue
+        u = pg.evaluate('N[LINES[S.drill.id].n[S.drill.i + 1]].u')
+        if bad and st['i'] + 1 == bad[0]: u, bad = bad[1], None
+        pg.evaluate(f"tryMove('{u[:2]}', '{u[2:4]}')"); pg.wait_for_timeout(650)
+
+
 def idle(pg):
     for _ in range(40):
         if not pg.evaluate('S.drill && S.drill.busy'): return
@@ -72,7 +108,7 @@ def idle(pg):
 
 with sync_playwright() as p:
     b = launch(p)
-    ctx = b.new_context(viewport={'width': 1280, 'height': 860}, device_scale_factor=2); local_fonts(ctx)
+    ctx = b.new_context(viewport={'width': 1280, 'height': 860}, device_scale_factor=2); local_fonts(ctx); ctx.route('https://api.chess.com/**', chesscom(months_of_games()))
     pg = ctx.new_page(); errors = []; pg.on('pageerror', lambda e: errors.append(str(e)))
 
     # Course: unit 1 passed, unit 2 under way
@@ -150,6 +186,19 @@ with sync_playwright() as p:
       Prog.d.lvl = Level.n(); Prog.d.shop = {own: {'h-tophat': 1, 'c-midnight': 1}, wear: {head: ['h-tophat', 2], skin: ['c-midnight', 2]}}; Prog.save(); Badges.queue = []; Coach.hush(); go('shop'); })()""")
     pg.wait_for_timeout(500); pg.evaluate("Coach.hush(); const el = document.getElementById('lvup'); if (el) el.remove()"); settle(pg)
     save(pg.screenshot(), 'shop.png', crop=(0, 0, 2560, 1700))
+    # the monthly recap: the month that has just ended, beside the one before it, with the lines drilled
+    pg.evaluate("""(() => { const ids = BOOKS.w.drillable.slice(0, 60).concat(BOOKS.b.drillable.slice(0, 60)), D = Prog.d.days;
+      for (let k = 18; k <= 46; k++) if (!D[dayKey(-k)]) D[dayKey(-k)] = ids.slice((k * 7) % 110, (k * 7) % 110 + 5); Prog.save(); Badges.queue = []; })()"""); pg.wait_for_timeout(300)
+    pg.evaluate("document.querySelectorAll('#lvup').forEach(e => e.remove()); Coach.hush(); S.gseg = 'recap'; Recap.sel = null; go('games')"); pg.wait_for_function('!Recap.busy && !!(Prog.d.recap || {}).chk', timeout=60000)
+    pg.evaluate("Coach.hush(); renderGames(); window.scrollTo(0, document.querySelector('.gseg').getBoundingClientRect().top + scrollY - 16)"); settle(pg)
+    bottom = pg.evaluate("document.querySelector('.rcprac').getBoundingClientRect().bottom + 24")
+    save(pg.screenshot(full_page=False), 'recap.png', crop=(0, 0, 2560, min(1720, round(bottom * 2))))
+    # the coach after a slip in a drill: the same move has caught you twice, what the book says about it, and why
+    for k in range(2):
+        pg.evaluate("useSide('w'); startDrillLine('traxler', '', null, {from0: true})"); pg.wait_for_timeout(600); play_drill(pg, (9, 'g5f7')); pg.wait_for_timeout(500)
+    pg.evaluate("Coach.hush(); window.scrollTo(0, 0)"); settle(pg)
+    box = pg.evaluate("(() => { const b = document.querySelector('#db').getBoundingClientRect(), d = document.querySelector('.donebox').getBoundingClientRect(); return [b.left - 16, b.top - 16, d.right + 16, Math.max(b.bottom, d.bottom) + 16]; })()")
+    save(pg.screenshot(), 'slip.png', crop=tuple(round(v * 2) for v in box))
     # the course finished: the big moment, then the library (a few slips on the Vienna unit's lines)
     pg.evaluate("""(() => { const t = Date.now() - 24 * DAY, c = Prog.d.course || (Prog.d.course = {u: {}, seen: {}}); c.u = c.u || {};
       for (const U of COURSE.filter(U => !U.soon)) c.u[U.id] = Object.assign({idea: t, spar: 3, sparGames: 3 + U.k % 3}, c.u[U.id] || {}, {pass: t + DAY * U.k, cp: U.id === 'w-sicilian' ? 5 : 6});

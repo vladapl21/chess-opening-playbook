@@ -110,6 +110,11 @@ with sync_playwright() as p:
     assert a.evaluate('Prog.d.lvl') == 9
     a.evaluate("Prog.d.lvl = 2; Prog.save()"); a.wait_for_timeout(1200)
     assert stored()['lvl'] == 9 and a.evaluate('Prog.d.lvl') == 9
+    # ---- monthly recaps (made on the website, kept with the progress): each month's newest summary wins
+    bp.evaluate("Prog.d.recap = {m: {'2026-10': {a: 'chess.com:aqua_alpaca', at: 5, fin: true, all: [40, 24, 15, 1]}}, chk: 5, seen: '2026-09'}; Prog.save()"); bp.wait_for_timeout(1200)
+    assert a.evaluate("[Prog.d.recap.m['2026-10'].all[0], Prog.d.recap.seen]") == [40, '2026-09']
+    a.evaluate("Prog.d.recap.m['2026-10'] = {a: 'chess.com:aqua_alpaca', at: 2, fin: true, all: [1, 0, 1, 0]}; Prog.d.recap.seen = '2026-10'; Prog.save()"); a.wait_for_timeout(1200)
+    assert stored()['recap']['m']['2026-10']['all'][0] == 40 and stored()['recap']['seen'] == '2026-10' and bp.evaluate("Prog.d.recap.seen") == '2026-10'
 
     # ---- the artifact's owner has a switch nobody else has: it works on a copy that is never written to the database,
     # while what other devices write keeps arriving underneath and is there when the switch goes off
@@ -131,11 +136,11 @@ with sync_playwright() as p:
     c.context.close()
 
     # ---- a page from an older version writes a smaller copy: the next save on either device puts everything back
-    d = stored(); old = {k: v for k, v in d.items() if k not in ('days', 'prefs', 'set', 'badges', 'shop', 'lvl')}; old['someday'] = {'x': 1}
+    d = stored(); old = {k: v for k, v in d.items() if k not in ('days', 'prefs', 'set', 'badges', 'shop', 'lvl', 'recap')}; old['someday'] = {'x': 1}
     DB['data/users/viewer-1/italian-progress'] = json.dumps(old); a.wait_for_timeout(700)
     a.evaluate("Prog.save()"); a.wait_for_timeout(900)
     d = stored(); print('after a smaller copy and one save:', sorted(d.keys()))
-    assert all(k in d for k in ('days', 'prefs', 'badges', 'shop', 'lvl', 'someday')) and d['prefs']['who'][0] == 'pawn'
+    assert all(k in d for k in ('days', 'prefs', 'badges', 'shop', 'lvl', 'recap', 'someday')) and d['prefs']['who'][0] == 'pawn'
     assert a.evaluate("Prog.d.someday && Prog.d.someday.x") == 1, 'a field this version does not know is kept'
 
     # ---- the explore screen is not disturbed by another device: no re-render while a line is being played

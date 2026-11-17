@@ -4,7 +4,7 @@
 
 Every move path is resolved against the unit's book, so a path that leaves the repertoire fails the build.
 """
-import json, datetime
+import json
 import paths
 import chess
 from course import UNITS, QUIZ, SKILL_IDEAS, DEEP
@@ -38,10 +38,6 @@ def my_kids(side, i):
     return [c for c in N[i].get('k', []) if c < D['repCount'] and N[c].get('w') == ME[side] and not warn(N, c)]
 
 
-def short_date(d):
-    return datetime.date(*map(int, d.split('.'))).strftime('%b %-d')
-
-
 def slide(side, s):
     out = dict(node=node_at(side, s['path']), h=s['h'], t=s['t'])
     if s.get('arrows'): out['arrows'] = s['arrows']
@@ -65,7 +61,7 @@ def threat_item(t):
     return dict(id=t['id'], fen=t['fen'].split()[0], ff=t['fen'], me=t['me'], last=t['last'], lastLabel=t['lastLabel'], safe=t['safe'], legal=t['legal'],
                 played=t['played'], playedLabel=t['playedLabel'], reply=t['reply'], replyLabel=t['replyLabel'],
                 threat=t['threat'], threatLabel=t['threatLabel'], refute=t['refute'], fine=t.get('fine', []),
-                opp=t['opp'], date=short_date(t['date']), **({'best': t['best']} if 'best' in t else {}))
+                opp=t['opp'], **({'best': t['best']} if 'best' in t else {}))
 
 
 units, seen_lessons = [], {}
@@ -88,7 +84,7 @@ for U in UNITS:
             if c.get('show') == 'keep': return [e['safe'][0][:4] + 'g', e['played'][:4] + 'b']
             return [(e['threat'] or e['reply'])[:4] + 'r']
         u['idea'] = [dict(fen=e['fen'].split()[0], me=e['me'], last=e['last'], h=c['h'], t=c['t'], arrows=card_arrows(e, c),
-                          game=f"vs {e['opp']}, {short_date(e['date'])}")
+                          game=f"vs {e['opp']}")
                      for e, c in zip(ex, cards)]
         u['sets'] = [[threat_item(t) for t in s] for s in T['sets']]
         u['check'] = [threat_item(t) for t in T['check']]

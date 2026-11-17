@@ -184,6 +184,13 @@ with sync_playwright() as p:
     assert a.evaluate("[Daily.n(dayKey(-1)), Prog.d.shop.wear.head[0], !!Prog.d.shop.own.cap, Prog.d.lvl]") == [5, 'cap', True, 7]
     a.evaluate("Prog.d.lvl = 3; Prog.save()"); a.wait_for_timeout(1800)
     assert S.rows[uid]['data']['lvl'] == 7 and a.evaluate('Prog.d.lvl') == 7, 'the highest level celebrated wins'
+    # monthly recaps: each month's newest summary, the last check and the last month opened
+    bp.evaluate("Prog.d.recap = {m: {'2026-10': {a: 'chess.com:aqua_alpaca', at: 5, fin: true, all: [40, 24, 15, 1]}, '2026-09': {a: 'chess.com:aqua_alpaca', at: 9, fin: true, all: [30, 17, 13, 0]}}, chk: 9, seen: '2026-09'}; Prog.save()"); bp.wait_for_timeout(1800)
+    a.evaluate("document.dispatchEvent(new Event('visibilitychange'))"); a.wait_for_timeout(900)
+    assert a.evaluate("[Prog.d.recap.m['2026-10'].all[0], Prog.d.recap.chk, Prog.d.recap.seen]") == [40, 9, '2026-09']
+    a.evaluate("Prog.d.recap.m['2026-10'] = {a: 'chess.com:aqua_alpaca', at: 7, fin: true, all: [41, 25, 15, 1]}; Prog.d.recap.m['2026-09'].at = 1; Prog.d.recap.m['2026-09'].all = [1, 0, 1, 0]; Prog.d.recap.seen = '2026-10'; Prog.save()"); a.wait_for_timeout(1800)
+    r = S.rows[uid]['data']['recap']; print('recap after both:', {k: v['all'][0] for k, v in r['m'].items()}, r['seen'])
+    assert r['m']['2026-10']['all'][0] == 41 and r['m']['2026-09']['all'][0] == 30 and r['seen'] == '2026-10' and r['chk'] == 9, 'the newer copy of each month wins'
     # finishing the course is stamped once (the earliest stamp wins); deep dive parts travel like any unit
     bp.evaluate("const c = Prog.d.course || (Prog.d.course = {u: {}, seen: {}}); c.u = c.u || {}; c.grad = 1700000000000; c.u['x-w-italian-1'] = {o: Date.now(), cp: 4}; Prog.save()"); bp.wait_for_timeout(1800)
     a.evaluate("document.dispatchEvent(new Event('visibilitychange'))"); a.wait_for_timeout(900)
@@ -191,10 +198,10 @@ with sync_playwright() as p:
     a.evaluate("Prog.d.course.grad = 1800000000000; Prog.save()"); a.wait_for_timeout(1800)
     assert S.rows[uid]['data']['course']['grad'] == 1700000000000 and a.evaluate("Prog.d.course.grad") == 1700000000000
     # a page from an older version writes a smaller copy: the next save on any device writes everything back
-    row = S.rows[uid]['data']; S.rows[uid]['data'] = {k: v for k, v in row.items() if k not in ('days', 'prefs', 'set', 'shop', 'badges', 'lvl')}
+    row = S.rows[uid]['data']; S.rows[uid]['data'] = {k: v for k, v in row.items() if k not in ('days', 'prefs', 'set', 'shop', 'badges', 'lvl', 'recap')}
     a.evaluate("Prog.save()"); a.wait_for_timeout(1800)
     row = S.rows[uid]['data']; print('after an older copy and one save:', sorted(row.keys()))
-    assert all(k in row for k in ('days', 'prefs', 'shop', 'badges', 'lvl')) and row['prefs']['who'][0] == 'rook' and row['prefs']['board'][0] == 'plum'
+    assert all(k in row for k in ('days', 'prefs', 'shop', 'badges', 'lvl', 'recap')) and row['prefs']['who'][0] == 'rook' and row['prefs']['board'][0] == 'plum'
 
     # ---- the account copy can't be reached: the app says so, keeps working, and catches up later
     S.down = True

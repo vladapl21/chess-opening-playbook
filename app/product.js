@@ -47,7 +47,7 @@ const FACES = {
 };
 // What the coach wears (the Shop tab). Colours are CSS tokens; each piece is drawn once around its own anchor and
 // placed on each character: hats on the head, glasses over the eyes, ties at the neck.
-const SKINS = {'c-midnight': 'mid', 'c-ruby': 'ruby', 'c-plum': 'plum', 'c-tangerine': 'tang', 'c-gold': 'gold'};
+const SKINS = {'c-midnight': 'mid', 'c-ruby': 'ruby', 'c-plum': 'plum', 'c-tangerine': 'tang', 'c-gold': 'gold', 'c-mint': 'mint', 'c-ocean': 'ocean', 'c-rose': 'rose', 'c-slate': 'slate', 'c-sand': 'sand'};
 const SPOT = {
   knight: {head: 'translate(35.5 11.5) rotate(16) scale(.78)', eyes: [[28.5, 21, 5]], side: true, neck: 'translate(30.5 39.5) rotate(-18) scale(.8)'},
   rook: {head: 'translate(32 7.4)', eyes: [[25, 35.5, 5.2], [39, 35.5, 5.2]], neck: 'translate(32 28.6) scale(.9)'},
@@ -60,12 +60,26 @@ const HATS = {
   'h-tophat': '<rect class="g-ink" x="-7.5" y="-15.5" width="15" height="14.5" rx="1.2"/><rect class="g-ros" x="-7.5" y="-5.6" width="15" height="2.8"/><rect class="g-ink" x="-12.5" y="-2" width="25" height="3.2" rx="1.6"/>',
   'h-wizard': '<path class="g-vio" d="M-11 0Q-4-8 1.5-23.5Q5.5-9 11 0Z"/><ellipse class="g-vio2" cx="0" cy="0" rx="13.5" ry="2.4"/><path class="g-oro" d="M1.5-13.8l1.2 2.5 2.7.4-2 1.9.5 2.7-2.4-1.3-2.4 1.3.5-2.7-2-1.9 2.7-.4z"/>',
   'h-grad': '<path class="g-ink" d="M-7.5-1v-5.5h15V-1q-7.5 3.2-15 0z"/><path class="g-ink" d="M-14.5-7.2L0-11.8L14.5-7.2L0-2.6Z"/><path class="g-tass" d="M0-7.2L9.5-5.8V1.6"/><circle class="g-oro" cx="9.5" cy="2.4" r="1.6"/>',
-  'h-crown': '<path class="g-oro g-edge2" d="M-10.5 0L-12-11.5L-5.8-5.8L0-13.8L5.8-5.8L12-11.5L10.5 0Z"/><circle class="g-ros" cx="0" cy="-4" r="1.7"/><circle class="g-blu" cx="-6.2" cy="-3" r="1.2"/><circle class="g-blu" cx="6.2" cy="-3" r="1.2"/>'
+  'h-crown': '<path class="g-oro g-edge2" d="M-10.5 0L-12-11.5L-5.8-5.8L0-13.8L5.8-5.8L12-11.5L10.5 0Z"/><circle class="g-ros" cx="0" cy="-4" r="1.7"/><circle class="g-blu" cx="-6.2" cy="-3" r="1.2"/><circle class="g-blu" cx="6.2" cy="-3" r="1.2"/>',
+  // the daily drops
+  'h-beret': '<path class="g-ros" d="M-11.5-.6C-14-7.8-3.5-12.2 6.4-10.6C13.6-9.4 15.2-4.6 11-1.2Q0-3.6-11.5-.6Z"/><path class="g-wire" d="M-.6-11.4l.7-2.8"/>',
+  'h-chef': '<circle class="g-cloth" cx="-5.6" cy="-10" r="5"/><circle class="g-cloth" cx="5.6" cy="-10" r="5"/><circle class="g-cloth" cx="0" cy="-12.6" r="6"/><rect class="g-cloth" x="-8.2" y="-7.4" width="16.4" height="7.4" rx="1.2"/>',
+  'h-cowboy': '<path class="g-oro g-edge2" d="M-7-2.4L-6.2-11.6Q-3.2-14 0-11.2Q3.2-14 6.2-11.6L7-2.4Z"/><rect class="g-ink" x="-7" y="-5.4" width="14" height="2.4"/><path class="g-oro g-edge2" d="M-16.5-3.6Q-15 1.8 0 1.4Q15 1.8 16.5-3.6Q11-.4 0-.8Q-11-.4-16.5-3.6Z"/>',
+  'h-halo': '<ellipse class="g-halo" cx="0" cy="-10.5" rx="10" ry="2.8"/>',
+  'h-pirate': '<path class="g-ink" d="M-14.5-1.4Q-10-13.6 0-13Q10-13.6 14.5-1.4Q0-5.2-14.5-1.4Z"/><circle class="g-surf" cx="0" cy="-8.4" r="2.1"/><path class="g-bone" d="M-2.6-4.4l5.2-1.8M2.6-4.4l-5.2-1.8"/>',
+  'h-propeller': '<path class="g-blu" d="M-10.5 0C-10.5-12.5 10.5-12.5 10.5 0Z"/><path class="g-ros" d="M-3.6 0C-3.4-9.6 3.4-9.6 3.6 0Z"/><path class="g-wire" d="M0-9.4V-13"/><ellipse class="g-oro" cx="-4.3" cy="-13.4" rx="4.3" ry="1.3"/><ellipse class="g-ros" cx="4.3" cy="-13.4" rx="4.3" ry="1.3"/><circle class="g-ink" cx="0" cy="-13.4" r="1.2"/>',
+  'h-viking': '<path class="g-cloth" d="M-9.8-5.6Q-14.6-9-15.8-15.6Q-11-12.4-8-8.4Z"/><path class="g-cloth" d="M9.8-5.6Q14.6-9 15.8-15.6Q11-12.4 8-8.4Z"/><path class="g-steel" d="M-10.5 0C-10.5-13 10.5-13 10.5 0Z"/><rect class="g-steel" x="-11.2" y="-2.6" width="22.4" height="3.6" rx="1.2"/><circle class="g-ink" cx="-5.6" cy="-.8" r=".8"/><circle class="g-ink" cx="0" cy="-.8" r=".8"/><circle class="g-ink" cx="5.6" cy="-.8" r=".8"/>',
+  'h-flower': '<path class="g-vine" d="M-11.5-1Q0-5.6 11.5-1"/><circle class="g-ros" cx="-8.2" cy="-2.6" r="2.6"/><circle class="g-oro" cx="-2.8" cy="-4" r="2.6"/><circle class="g-vio" cx="2.8" cy="-4" r="2.6"/><circle class="g-ros" cx="8.2" cy="-2.6" r="2.6"/><circle class="g-surf" cx="-8.2" cy="-2.6" r=".9"/><circle class="g-ros" cx="-2.8" cy="-4" r=".9"/><circle class="g-surf" cx="2.8" cy="-4" r=".9"/><circle class="g-surf" cx="8.2" cy="-2.6" r=".9"/>'
 };
 const NECKS = {
   'n-bowtie': '<path class="g-ros" d="M0 0L-7.5-4.6V4.6ZM0 0L7.5-4.6V4.6Z"/><circle class="g-ros2" cx="0" cy="0" r="2"/>',
   'n-scarf': '<rect class="g-blu" x="-12.5" y="-3.2" width="25" height="6.4" rx="3.2"/><path class="g-dash2" d="M-6-3v6M0-3v6M6-3v6"/><path class="g-blu" d="M4.5 1.5l2.5 11.5 5-1.2-2.6-10.8z"/>',
-  'n-medal': '<path class="g-rib1" d="M-4.5-3.5L-.6 6.5H2.4L-1.5-3.5Z"/><path class="g-rib2" d="M4.5-3.5L.6 6.5H-2.4L1.5-3.5Z"/><circle class="g-oro g-edge2" cx="0" cy="9.6" r="4.4"/>'
+  'n-medal': '<path class="g-rib1" d="M-4.5-3.5L-.6 6.5H2.4L-1.5-3.5Z"/><path class="g-rib2" d="M4.5-3.5L.6 6.5H-2.4L1.5-3.5Z"/><circle class="g-oro g-edge2" cx="0" cy="9.6" r="4.4"/>',
+  // the daily drops
+  'n-tie': '<path class="g-blu g-edge2" d="M-1.8 1.4H1.8L3.4 10.6L0 13.8L-3.4 10.6Z"/><path class="g-dash2" d="M-2.2 5.6l4.4-1.6M-2.8 9l5.4-2"/><path class="g-blu g-edge2" d="M-2.6-2.6H2.6L1.8 1.4H-1.8Z"/>',
+  'n-lei': [[-11, -.6, 'ros'], [-7.4, 1.6, 'oro'], [-3.7, 3, 'vio'], [0, 3.5, 'ros'], [3.7, 3, 'oro'], [7.4, 1.6, 'vio'], [11, -.6, 'ros']].map(([x, y, c]) => `<circle class="g-${c}" cx="${x}" cy="${y}" r="2.6"/><circle class="g-surf" cx="${x}" cy="${y}" r=".8"/>`).join(''),
+  'n-chain': '<path class="g-chain2" d="M-10.5-2.4Q0 10.5 10.5-2.4"/><circle class="g-oro g-edge2" cx="0" cy="6.6" r="2.8"/>',
+  'n-stripe': '<rect class="g-ros" x="-12.5" y="-3.2" width="25" height="6.4" rx="3.2"/><path class="g-dash2" d="M-6-3v6M0-3v6M6-3v6"/><path class="g-ros" d="M4.5 1.5l2.5 11.5 5-1.2-2.6-10.8z"/><path class="g-dash2" d="M5.6 6.2l4-1M6.5 10.2l4-1"/>'
 };
 function gearSVG(who, L){
   const P = SPOT[who] || SPOT.knight, E = P.eyes; let s = '';
@@ -73,6 +87,11 @@ function gearSVG(who, L){
   if (L.face === 'f-glasses') s += E.map(([x, y, r]) => `<circle class="g-lens" cx="${x}" cy="${y}" r="${r + 1.6}"/>`).join('') + (E.length > 1 ? `<path class="g-wire" d="M${E[0][0] + E[0][2] + 1.6} ${E[0][1]}H${E[1][0] - E[1][2] - 1.6}"/>` : `<path class="g-wire" d="M${E[0][0] + E[0][2] + 1.5} ${E[0][1] - .6}L${E[0][0] + 13} ${E[0][1] - 2}"/>`);
   if (L.face === 'f-shades') s += E.map(([x, y, r]) => `<rect class="g-shade" x="${x - r - 1.8}" y="${y - r + .2}" width="${2 * r + 3.6}" height="${2 * r - .6}" rx="${r - .4}"/><path class="g-glint" d="M${x - r + .4} ${y - 1.6}l2.4-2.2"/>`).join('') + (E.length > 1 ? `<path class="g-wire" d="M${E[0][0] + E[0][2] + 1.8} ${E[0][1] - 1}H${E[1][0] - E[1][2] - 1.8}"/>` : `<path class="g-wire" d="M${E[0][0] + E[0][2] + 1.8} ${E[0][1] - 1}L${E[0][0] + 13} ${E[0][1] - 2.4}"/>`);
   if (L.face === 'f-monocle'){ const [x, y, r] = E[E.length - 1]; s += `<circle class="g-mono" cx="${x}" cy="${y}" r="${r + 1.4}"/><path class="g-chain" d="M${x + r * .7} ${y + r + .6}q3 6 -1 12"/>`; }
+  const bridge = (cls, k) => E.length > 1 ? `<path class="${cls}" d="M${E[0][0] + E[0][2] + k} ${E[0][1] - .6}H${E[1][0] - E[1][2] - k}"/>` : `<path class="${cls}" d="M${E[0][0] + E[0][2] + k} ${E[0][1] - .6}L${E[0][0] + 13} ${E[0][1] - 2.2}"/>`;
+  const f = n => Math.round(n * 100) / 100;
+  if (L.face === 'f-hearts') s += E.map(([x, y, r]) => { const h = r + 1.8; return `<path class="g-heart" d="M${f(x)} ${f(y + h * .95)}C${f(x - h * 2)} ${f(y - h * .1)} ${f(x - h * 1.05)} ${f(y - h * 1.75)} ${f(x)} ${f(y - h * .55)}C${f(x + h * 1.05)} ${f(y - h * 1.75)} ${f(x + h * 2)} ${f(y - h * .1)} ${f(x)} ${f(y + h * .95)}Z"/>`; }).join('') + bridge('g-wire', 2.2);
+  if (L.face === 'f-stars') s += E.map(([x, y, r]) => { const R = r + 2.6, q = R * .45; return `<path class="g-star" d="M${Array.from({length: 10}, (_, k) => { const a = -Math.PI / 2 + k * Math.PI / 5, d = k % 2 ? q : R; return `${f(x + d * Math.cos(a))} ${f(y + d * Math.sin(a))}`; }).join('L')}Z"/>`; }).join('') + bridge('g-wire', 1.4);
+  if (L.face === 'f-redspecs') s += E.map(([x, y, r]) => `<circle class="g-lensr" cx="${x}" cy="${y}" r="${r + 1.6}"/>`).join('') + bridge('g-wirer', 1.6);
   if (L.head && HATS[L.head]) s += `<g transform="${P.head}">${HATS[L.head]}</g>`;
   return s;
 }
@@ -133,7 +152,7 @@ const Rep = {ask: null, open: false};
 const slotName = slot => slot === 'white' ? 'With White' : slot === 'blackE4' ? 'Against the e-pawn' : 'Against the d-pawn';
 function repNames(){
   const me = meOf(Prog.d) || {}, out = [(me.P || {}).user, (me.src || {}).user];
-  if (PERSONA === 'house') for (const D of [BOOKS.w, BOOKS.b]) for (const G of (D.games || [])) out.push(G.acct);
+  if (PERSONA === 'house') out.push(HOUSE_ACCT.user);   // the house playbook's own account
   return [...new Set(out.filter(Boolean).map(x => String(x).toLowerCase()))];
 }
 function packRowsHTML(){
@@ -227,10 +246,8 @@ function applyProfile(me){
         {big: String(Math.max(1, Math.round(t.depth / 2))), text: 'moves, on average, before the game left the playbook'}] : [{big: '0', text: 'of your games went here so far'}];
     }
   }
-  const ts = (P.games || []).map(g => g.t).filter(Boolean), a = new Date(Math.min(...ts)), z = new Date(Math.max(...ts)), mo = (d, y) => d.toLocaleDateString(undefined, y ? {month: 'long', year: 'numeric'} : {month: 'long'});
-  const span = !ts.length ? '' : mo(a, 1) === mo(z, 1) ? mo(z, 1) : a.getFullYear() === z.getFullYear() ? `${mo(a)} to ${mo(z, 1)}` : `${mo(a, 1)} to ${mo(z, 1)}`;
   const site = (me.src || {}).site === 'lichess' ? 'Lichess' : (me.src || {}).site === 'chess.com' ? 'chess.com' : '';
-  FOOT = `${P.user ? P.user + '\'s playbook' : 'Your playbook'}, built from your${site ? ' ' + site : ''} games${span ? ', ' + span : ''}.`;
+  FOOT = `${P.user ? P.user + '\'s playbook' : 'Your playbook'}, built from your${site ? ' ' + site : ''} games.`;
   const skills = COURSE.map((U, k) => U.kind === 'skill' ? [k, U] : null).filter(Boolean), open = COURSE.filter(U => U.kind !== 'skill');
   for (const U of open){
     const side = U.side === 'w' ? P.white : P.black, word = U.side === 'w' ? 'White' : 'Black', t = {n: 0, w: 0, l: 0, d: 0, depth: 0};
@@ -492,26 +509,29 @@ const Product = {
   /* -- Your games, for a player with a profile. The same switch as the house page: your openings (both colours, every
      one in the playbook, the ones met most first), where you leave the book, and the recent games with where you score. */
   games(){
-    const P = this.me().P, day = t => t ? new Date(t).toLocaleDateString(undefined, {month: 'short', day: 'numeric'}) : '';
+    const P = this.me().P;
     const cn = (s, id) => (BOOKS[s].chapters.find(c => c.id === id) || {}).name || '';
     const group = s => { const side = s === 'w' ? P.white : P.black, sys = side.systems || {}, n = id => (sys[id] || {}).n || 0;
       const cs = BOOKS[s].chapters.slice().sort((a, b) => n(b.id) - n(a.id));
       return `<div class="ogroup"><p class="kicker">With ${s === 'w' ? 'White' : 'Black'}${side.all && side.all.n ? ` · ${plural(side.all.n, 'game')} · ${rec(side.all)}` : ''}</p><div class="otiles">${cs.map(C => openTile(s, C, sys[C.id], `data-pch="${s}:${C.id}"`)).join('')}</div></div>`; };
     const leaks = P.leaks.slice(0, 8), games = P.games.slice(0, 40);
     const segs = [['open', 'Your openings', BOOKS.w.chapters.length + BOOKS.b.chapters.length, 'Openings'], ['leaks', 'Where you leave the book', leaks.length, 'Off the book'], ['games', 'Recent games', games.length, 'Games']].filter(x => x[0] === 'open' || x[2]);
+    if (Recap.on()) segs.push(['recap', 'Monthly recap', undefined, 'Recap']);
     const seg = segs.some(x => x[0] === S.gseg) ? S.gseg : 'open';
-    const rows = games.map(g => `<tr><td>${day(g.t)}</td><td>${g.me === 'w' ? 'White' : 'Black'}</td><td>${esc(g.opp)}${g.oe ? ` <span style="color:var(--muted)">${g.oe}</span>` : ''}</td><td><span class="chip ${g.r === 1 ? 'win' : g.r === 0 ? 'loss' : 'draw'}">${g.r === 1 ? 'Won' : g.r === 0 ? 'Lost' : 'Draw'}</span></td><td>${esc(g.ch ? cn(g.me, g.ch) || 'Outside the playbook' : 'Outside the playbook')}</td><td>${g.ch ? plural(Math.floor(g.bp / 2), 'move') + ' in the book' : ''}</td></tr>`).join('');
-    const body = seg === 'leaks' ? `<p class="legendline">The same position, the same different move. Red is what you played, green is the playbook.</p><div class="leaks">${leaks.map(L => this.leakHTML(L, true)).join('')}</div>`
+    const rows = games.map(g => `<tr><td>${g.me === 'w' ? 'White' : 'Black'}</td><td>${esc(g.opp)}${g.oe ? ` <span style="color:var(--muted)">${g.oe}</span>` : ''}</td><td><span class="chip ${g.r === 1 ? 'win' : g.r === 0 ? 'loss' : 'draw'}">${g.r === 1 ? 'Won' : g.r === 0 ? 'Lost' : 'Draw'}</span></td><td>${esc(g.ch ? cn(g.me, g.ch) || 'Outside the playbook' : 'Outside the playbook')}</td><td>${g.ch ? plural(Math.floor(g.bp / 2), 'move') + ' in the book' : ''}</td></tr>`).join('');
+    const body = seg === 'recap' ? Recap.html() : seg === 'leaks' ? `<p class="legendline">The same position, the same different move. Red is what you played, green is the playbook.</p><div class="leaks">${leaks.map(L => this.leakHTML(L, true)).join('')}</div>`
       : seg === 'games' ? `${P.facts.length ? `<div class="pcard"><p class="kicker">Where you score</p><ul class="factl">${P.facts.map(f => `<li><b>${f.big}</b><span>${esc(f.text)}</span></li>`).join('')}</ul></div>` : ''}
-          <div class="gwrap pcard" style="padding:6px 10px"><table class="gtable"><thead><tr><th>Date</th><th>Colour</th><th>Opponent</th><th>Result</th><th>Opening</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`
+          <div class="gwrap pcard" style="padding:6px 10px"><table class="gtable"><thead><tr><th>Colour</th><th>Opponent</th><th>Result</th><th>Opening</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`
       : `<p class="legendline">Their move is highlighted. The green arrow is your answer. Open one for its lessons and every position in it.</p>${group('w')}${group('b')}`;
     const num = (b, w) => `<span><b class="tnum">${b}</b> ${w}</span>`;
+    if (Recap.on()) segs[segs.length - 1][4] = Recap.fresh();      // after the body: opening a finished month marks it seen
     view.innerHTML = `<div class="pv"><div class="chead ghd"><div><p class="kicker">Your games${P.user ? ' · ' + esc(P.user) : ''}</p><h2 style="font-size:clamp(30px,4vw,44px)">What actually happened</h2>
         <p class="grec">${num(P.n, P.n === 1 ? 'game' : 'games')}${num(P.all.w, P.all.w === 1 ? 'win' : 'wins')}${num(P.all.l, P.all.l === 1 ? 'loss' : 'losses')}${P.all.d ? num(P.all.d, P.all.d === 1 ? 'draw' : 'draws') : ''}${P.rating ? num(P.rating, `${P.tc} rating`) : ''}</p></div>
         <button class="btn small" data-pgo="setup">Read my newer games</button></div>
       <div class="pgbody">${segHTML(segs, seg, 'gseg')}<div class="gbody">${body}</div></div></div>`;
     view.querySelectorAll('[data-gseg]').forEach(b => b.onclick = () => { S.gseg = b.dataset.gseg; this.games(); });
-    this.wire();
+    this.wire(); if (seg === 'recap') Recap.wire(view);
+    Recap.auto();
   },
   wire(){
     view.querySelectorAll('[data-acct]').forEach(b => b.onclick = () => Acct.open(b.dataset.acct));
@@ -534,24 +554,24 @@ const Product = {
 
 /* ---- badges: earned from the progress, kept with it (d.badges: id -> when), shown in the profile. Locked ones are grey. */
 const BADGES = [
-  {id: 'l1', group: 'Lines you know', name: 'First line', need: 'Play a line from memory without a slip.', tier: 'bronze', glyph: '1', n: x => x.clean, at: 1},
-  {id: 'l10', group: 'Lines you know', name: 'Ten lines', need: 'Ten lines played without a slip.', tier: 'bronze', glyph: '10', n: x => x.clean, at: 10},
-  {id: 'l25', group: 'Lines you know', name: 'Twenty-five lines', need: 'Twenty-five lines played without a slip.', tier: 'silver', glyph: '25', n: x => x.clean, at: 25},
-  {id: 'l50', group: 'Lines you know', name: 'Fifty lines', need: 'Fifty lines played without a slip.', tier: 'silver', glyph: '50', n: x => x.clean, at: 50},
-  {id: 'l100', group: 'Lines you know', name: 'A hundred lines', need: 'A hundred lines played without a slip.', tier: 'gold', glyph: '100', n: x => x.clean, at: 100},
-  {id: 'l250', group: 'Lines you know', name: 'The whole library', need: 'Two hundred and fifty lines played without a slip.', tier: 'gold', glyph: '250', n: x => x.clean, at: 250},
-  {id: 's3', group: 'Streak', name: 'Three in a row', need: 'Five lines a day, three days running.', tier: 'bronze', glyph: 'flame', n: x => x.best, at: 3},
-  {id: 's7', group: 'Streak', name: 'A full week', need: 'Five lines a day for a week.', tier: 'silver', glyph: 'flame', n: x => x.best, at: 7},
-  {id: 's30', group: 'Streak', name: 'A month', need: 'Five lines a day for thirty days.', tier: 'gold', glyph: 'flame', n: x => x.best, at: 30},
-  {id: 's100', group: 'Streak', name: 'A hundred days', need: 'Five lines a day for a hundred days.', tier: 'gold', glyph: 'crown', n: x => x.best, at: 100},
-  {id: 'u1', group: 'Course', name: 'First checkpoint', need: 'Pass a unit\'s checkpoint.', tier: 'bronze', glyph: 'flag', n: x => x.units, at: 1},
-  {id: 'u5', group: 'Course', name: 'Five units', need: 'Pass five units of your course.', tier: 'silver', glyph: 'flag', n: x => x.units, at: 5},
-  {id: 'uall', group: 'Course', name: 'Course complete', need: 'Pass every open unit of your course.', tier: 'gold', glyph: 'star', n: x => x.units, at: x => x.open},
-  {id: 'x1', group: 'Course', name: 'Deep diver', need: 'Finish a deep dive.', tier: 'silver', glyph: 'flag', n: x => x.deep, at: 1},
-  {id: 'x3', group: 'Course', name: 'Three deep dives', need: 'Finish three deep dives.', tier: 'gold', glyph: 'crown', n: x => x.deep, at: 3},
-  {id: 'm10', group: 'Practice', name: 'Solid ten', need: 'Ten lines clean on four reviews in a row.', tier: 'silver', glyph: 'star', n: x => x.solid, at: 10},
-  {id: 'm50', group: 'Practice', name: 'Solid fifty', need: 'Fifty lines clean on four reviews in a row.', tier: 'gold', glyph: 'star', n: x => x.solid, at: 50},
-  {id: 'g10', group: 'Practice', name: 'Sparring partner', need: 'Ten practice games in the Sandbox.', tier: 'bronze', glyph: 'board', n: x => x.spar, at: 10}
+  {id: 'l1', did: 'Your first line from memory without a slip.', group: 'Lines you know', name: 'First line', need: 'Play a line from memory without a slip.', tier: 'bronze', glyph: '1', n: x => x.clean, at: 1},
+  {id: 'l10', did: 'Ten lines from memory without a slip.', group: 'Lines you know', name: 'Ten lines', need: 'Ten lines played without a slip.', tier: 'bronze', glyph: '10', n: x => x.clean, at: 10},
+  {id: 'l25', did: 'Twenty-five lines from memory without a slip.', group: 'Lines you know', name: 'Twenty-five lines', need: 'Twenty-five lines played without a slip.', tier: 'silver', glyph: '25', n: x => x.clean, at: 25},
+  {id: 'l50', did: 'Fifty lines from memory without a slip.', group: 'Lines you know', name: 'Fifty lines', need: 'Fifty lines played without a slip.', tier: 'silver', glyph: '50', n: x => x.clean, at: 50},
+  {id: 'l100', did: 'A hundred lines from memory without a slip.', group: 'Lines you know', name: 'A hundred lines', need: 'A hundred lines played without a slip.', tier: 'gold', glyph: '100', n: x => x.clean, at: 100},
+  {id: 'l250', did: 'Two hundred and fifty lines without a slip: the whole library.', group: 'Lines you know', name: 'The whole library', need: 'Two hundred and fifty lines played without a slip.', tier: 'gold', glyph: '250', n: x => x.clean, at: 250},
+  {id: 's3', did: 'Five lines a day, three days running.', group: 'Streak', name: 'Three in a row', need: 'Five lines a day, three days running.', tier: 'bronze', glyph: 'flame', n: x => x.best, at: 3},
+  {id: 's7', did: 'Five lines a day for a whole week.', group: 'Streak', name: 'A full week', need: 'Five lines a day for a week.', tier: 'silver', glyph: 'flame', n: x => x.best, at: 7},
+  {id: 's30', did: 'Five lines a day for thirty days.', group: 'Streak', name: 'A month', need: 'Five lines a day for thirty days.', tier: 'gold', glyph: 'flame', n: x => x.best, at: 30},
+  {id: 's100', did: 'Five lines a day for a hundred days.', group: 'Streak', name: 'A hundred days', need: 'Five lines a day for a hundred days.', tier: 'gold', glyph: 'crown', n: x => x.best, at: 100},
+  {id: 'u1', did: 'Your first checkpoint, passed.', group: 'Course', name: 'First checkpoint', need: 'Pass a unit\'s checkpoint.', tier: 'bronze', glyph: 'flag', n: x => x.units, at: 1},
+  {id: 'u5', did: 'Five units of your course, passed.', group: 'Course', name: 'Five units', need: 'Pass five units of your course.', tier: 'silver', glyph: 'flag', n: x => x.units, at: 5},
+  {id: 'uall', did: 'Every open unit of your course, passed.', group: 'Course', name: 'Course complete', need: 'Pass every open unit of your course.', tier: 'gold', glyph: 'star', n: x => x.units, at: x => x.open},
+  {id: 'x1', did: 'Your first deep dive, finished.', group: 'Course', name: 'Deep diver', need: 'Finish a deep dive.', tier: 'silver', glyph: 'flag', n: x => x.deep, at: 1},
+  {id: 'x3', did: 'Three deep dives, finished.', group: 'Course', name: 'Three deep dives', need: 'Finish three deep dives.', tier: 'gold', glyph: 'crown', n: x => x.deep, at: 3},
+  {id: 'm10', did: 'Ten lines clean on four reviews in a row.', group: 'Practice', name: 'Solid ten', need: 'Ten lines clean on four reviews in a row.', tier: 'silver', glyph: 'star', n: x => x.solid, at: 10},
+  {id: 'm50', did: 'Fifty lines clean on four reviews in a row.', group: 'Practice', name: 'Solid fifty', need: 'Fifty lines clean on four reviews in a row.', tier: 'gold', glyph: 'star', n: x => x.solid, at: 50},
+  {id: 'g10', did: 'Ten practice games in the Sandbox.', group: 'Practice', name: 'Sparring partner', need: 'Ten practice games in the Sandbox.', tier: 'bronze', glyph: 'board', n: x => x.spar, at: 10}
 ];
 const badgeNeed = (B, x) => typeof B.at === 'function' ? B.at(x) : B.at;
 function badgeStats(){
@@ -590,7 +610,7 @@ const Badges = {
     const B = this.queue.slice().sort((a, b) => rank(a) - rank(b))[0]; if (!B) return;
     const more = this.queue.length - 1; this.queue = [];
     if (!SET.coach){ toast(`New badge: ${B.name}${more ? ` and ${more} more` : ''}.`); return; }
-    Coach.say(`${B.need} ${more ? `And ${more} more ${more === 1 ? 'badge' : 'badges'} with it: ${more + 1} shop tokens.` : 'That\'s a shop token too.'}`, {mood: 'cheer', stay: true, head: `New badge: ${B.name}`, art: `<span class="cmedal">${medalSVG(B.tier, B.glyph)}</span>`, cta: ['me', 'See your badges']});
+    Coach.say(`${B.did || B.need} ${more ? `And ${more} more ${more === 1 ? 'badge' : 'badges'} with it: ${more + 1} shop tokens.` : 'That\'s a shop token too.'}`, {mood: 'cheer', stay: true, head: `New badge: ${B.name}`, art: `<span class="cmedal">${medalSVG(B.tier, B.glyph)}</span>`, cta: ['me', 'See your badges']});
   }
 };
 // the profile: the streak, the last seven days and every badge, earned or not
@@ -609,8 +629,10 @@ function profileHTML(){
     <div class="bdgs"><p class="kicker">Badges · ${got} of ${BADGES.length}</p>${groups.map(g => `<div><p class="bgh">${esc(g)}</p><ul class="bgrid">${BADGES.filter(B => B.group === g).map(one).join('')}</ul></div>`).join('')}</div></div>`;
 }
 
-/* ---- the shop. Tokens are worked out from the progress (badges earned, days in a row) minus what has been bought,
-   so every device shows the same number. d.shop.own: item -> when bought; d.shop.wear: slot -> [item, when]. */
+/* ---- the shop. Tokens are worked out from the progress (badges earned, days in a row, levels) minus what has been
+   bought, so every device shows the same number. d.shop.own: item -> when bought; d.shop.wear: slot -> [item, when].
+   Items with `daily` are drops: each comes out only on those days of the week (0 is Sunday), two a day, and is gone
+   at midnight unless it was bought; a bought drop stays in the locker like everything else. */
 const SHOP = [
   {id: 'c-classic', slot: 'skin', name: 'Classic', price: 0},
   {id: 'c-midnight', slot: 'skin', name: 'Midnight', price: 2},
@@ -630,8 +652,29 @@ const SHOP = [
   {id: 'f-monocle', slot: 'face', name: 'Monocle', price: 2, needs: 'm10'},
   {id: 'n-bowtie', slot: 'neck', name: 'Bow tie', price: 1},
   {id: 'n-scarf', slot: 'neck', name: 'Scarf', price: 2},
-  {id: 'n-medal', slot: 'neck', name: 'Medal', price: 2, needs: 'u1'}
+  {id: 'n-medal', slot: 'neck', name: 'Medal', price: 2, needs: 'u1'},
+  {id: 'h-halo', slot: 'head', name: 'Halo', price: 4, daily: [0]},
+  {id: 'c-rose', slot: 'skin', name: 'Rose', price: 3, daily: [0]},
+  {id: 'h-flower', slot: 'head', name: 'Flower crown', price: 2, daily: [0, 2]},
+  {id: 'n-tie', slot: 'neck', name: 'Necktie', price: 2, daily: [1]},
+  {id: 'c-ocean', slot: 'skin', name: 'Ocean', price: 3, daily: [1]},
+  {id: 'h-viking', slot: 'head', name: 'Viking helmet', price: 3, daily: [1]},
+  {id: 'h-beret', slot: 'head', name: 'Beret', price: 2, daily: [2]},
+  {id: 'n-stripe', slot: 'neck', name: 'Striped scarf', price: 2, daily: [2]},
+  {id: 'f-redspecs', slot: 'face', name: 'Red specs', price: 2, daily: [2, 4]},
+  {id: 'c-mint', slot: 'skin', name: 'Mint', price: 3, daily: [3]},
+  {id: 'h-pirate', slot: 'head', name: 'Pirate hat', price: 3, daily: [3]},
+  {id: 'n-chain', slot: 'neck', name: 'Gold chain', price: 3, daily: [3]},
+  {id: 'h-chef', slot: 'head', name: 'Chef\'s hat', price: 2, daily: [4]},
+  {id: 'c-slate', slot: 'skin', name: 'Slate', price: 3, daily: [4]},
+  {id: 'h-propeller', slot: 'head', name: 'Propeller beanie', price: 2, daily: [5]},
+  {id: 'f-stars', slot: 'face', name: 'Star glasses', price: 3, daily: [5]},
+  {id: 'n-lei', slot: 'neck', name: 'Flower lei', price: 2, daily: [5, 6]},
+  {id: 'h-cowboy', slot: 'head', name: 'Cowboy hat', price: 3, daily: [6]},
+  {id: 'f-hearts', slot: 'face', name: 'Heart shades', price: 2, daily: [6]},
+  {id: 'c-sand', slot: 'skin', name: 'Sand', price: 3, daily: [6]}
 ];
+const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const SLOTS = [['skin', 'Colours'], ['head', 'Hats'], ['face', 'Glasses'], ['neck', 'Round the neck']];
 const COIN = '<svg class="coin" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9"/><circle class="c2" cx="10" cy="10" r="6.4"/><path class="c3" d="M10 5.6l1.3 2.7 3 .4-2.2 2.1.5 2.9L10 12.3l-2.6 1.4.5-2.9-2.2-2.1 3-.4z"/></svg>';
 const Shop = {
@@ -640,14 +683,27 @@ const Shop = {
   runs(){ const ks = Object.keys(Prog.d.days || {}).filter(k => Daily.n(k) >= DAILY).sort(), out = []; let prev = null;
     for (const k of ks){ if (prev && dkey(dayDate(1, prev)) === k) out[out.length - 1]++; else out.push(1); prev = k; } return out; },
   earned(){ const have = Prog.d.badges || {}, r = this.runs();
-    return {badges: BADGES.filter(B => have[B.id]).length, streak: r.reduce((a, n) => a + Math.floor(n / 3), 0), week: Math.max(0, ...r) >= 7 ? 1 : 0, level: Math.max(0, Level.n() - SHOP_AT + 1)}; },
+    return {badges: BADGES.filter(B => have[B.id]).length, streak: r.reduce((a, n) => a + Math.floor(n / 3), 0), level: Math.max(0, Level.n() - SHOP_AT + 1)}; },
   spent(){ return Object.keys(this.st().own).reduce((a, id) => a + ((SHOP.find(i => i.id === id) || {}).price || 0), 0); },
-  total(){ const e = this.earned(); return e.badges + e.streak + e.week + e.level; },
+  total(){ const e = this.earned(); return e.badges + e.streak + e.level; },
+  // today's two drops: set by the date, so every device shows the same two. A drop bought on an earlier day leaves the
+  // rotation, so the shelf only offers what the player doesn't have yet; one bought today stays on today's shelf.
+  on(d){
+    const wd = d.getDay(), start = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(), own = this.st().own;
+    const wk = Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / DAY + 3) / 7);    // weeks, Monday to Sunday
+    const pool = SHOP.filter(I => I.daily && I.daily.includes(wd) && !(own[I.id] && own[I.id] < start)), k = pool.length ? wk % pool.length : 0;
+    return Array.from({length: Math.min(2, pool.length)}, (_, i) => pool[(k + i) % pool.length]);
+  },
+  today(){ return this.on(new Date()); },
+  tomorrow(){ const n = new Date(); return this.on(new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1, 12)); },
+  endsIn(){ const d = new Date(), m = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1).getTime() - d.getTime(), h = Math.floor(m / 36e5), mi = Math.max(1, Math.floor(m % 36e5 / 6e4));
+    return h ? `${h} h ${mi} min` : `${mi} min`; },
   balance(){ return Owner.on ? Infinity : Math.max(0, this.total() - this.spent()); },
   isOpen(){ return Owner.on || Level.n() >= SHOP_AT; },
   owns(id){ return id === 'c-classic' || !!this.st().own[id]; },
   worn(){ const w = (Prog.d.shop || {}).wear || {}, g = s => (w[s] || [])[0] || null; return {skin: g('skin') || 'c-classic', head: g('head'), face: g('face'), neck: g('neck')}; },
-  lockOf(I){ if (!I.price || Owner.on) return ''; if (!this.isOpen()) return 'level'; if (I.needs && !(Prog.d.badges || {})[I.needs]) return 'badge'; return ''; },
+  lockOf(I){ if (!I.price || Owner.on) return ''; if (!this.isOpen()) return 'level'; if (I.needs && !(Prog.d.badges || {})[I.needs]) return 'badge';
+    if (I.daily && !this.owns(I.id) && !this.today().includes(I)) return 'gone'; return ''; },
   put(id){ const I = SHOP.find(x => x.id === id); if (!I || !this.owns(id)) return; this.st().wear[I.slot] = [id, Date.now()]; Prog.save(); },
   off(slot){ this.st().wear[slot] = [slot === 'skin' ? 'c-classic' : null, Date.now()]; Prog.save(); },
   buy(id){
@@ -655,40 +711,62 @@ const Shop = {
     this.st().own[id] = Date.now(); this.st().wear[I.slot] = [id, Date.now()]; Prog.save(); return true;
   }
 };
-// the shop page: the coach in what they wear, the tokens and where they come from, then every item by slot
+// the shop page: the coach in what they wear and the tokens, today's two drops, then a switch between the items for sale
+// and the locker (everything bought, drops included, to wear or take off)
 function renderShop(){
   const view = document.getElementById('view'), bal = Shop.balance(), e = Shop.earned(), open = Shop.isOpen(), L = Shop.worn(), who = coachWho().id;
-  const st = Daily.streak(), toNext = 3 - (st % 3), best = Math.max(0, ...Shop.runs());
-  const card = I => {
-    const lk = Shop.lockOf(I), own = Shop.owns(I.id), on = L[I.slot] === I.id, B = I.needs && BADGES.find(x => x.id === I.needs);
-    const look = Object.assign({}, L, {[I.slot]: I.id});
-    const needB = B && !(Prog.d.badges || {})[B.id] && !Owner.on;
-    const act = needB ? `<span class="need">Needs the badge “${esc(B.name)}”</span>` : lk ? '' : on ? (I.slot === 'skin' && I.id === 'c-classic' ? '<span class="wearing">Wearing</span>' : `<button class="btn small" data-off="${I.slot}">Take off</button>`)
-      : own ? `<button class="btn small" data-wear="${I.id}">Wear</button>` : `<button class="btn small primary" data-buy="${I.id}" ${bal < I.price ? 'disabled' : ''}>${COIN}${I.price}</button>`;
-    return `<li class="item ${lk ? 'lock' : ''} ${on ? 'on' : ''}"><span class="ipv">${knightSVG('', who, look)}</span><b>${esc(I.name)}</b>${own && !on && I.id !== 'c-classic' ? '<span class="owned">Yours</span>' : !own && lk === 'level' && I.price && !needB ? `<span class="price">${COIN}${I.price}</span>` : ''}${act}</li>`;
+  const st = Daily.streak(), toNext = 3 - (st % 3), drops = Shop.today(), next = Shop.tomorrow(), tab = S.shopTab === 'locker' ? 'locker' : 'shop', have = Prog.d.badges || {};
+  const card = (I, drop) => {
+    const lk = Shop.lockOf(I), own = Shop.owns(I.id), on = L[I.slot] === I.id, B = I.needs && BADGES.find(x => x.id === I.needs), needB = B && !have[B.id] && !Owner.on;
+    const look = Object.assign({}, L, {[I.slot]: I.id}), x = needB ? badgeStats() : null;
+    const act = needB ? `<span class="need">Needs the badge “${esc(B.name)}”<i>${Math.min(B.n(x), badgeNeed(B, x))} of ${badgeNeed(B, x)}</i></span>` : lk ? (drop && lk === 'level' ? `<span class="need">Opens at level ${SHOP_AT}</span>` : '')
+      : on ? (I.slot === 'skin' && I.id === 'c-classic' ? '<span class="wearing">Wearing</span>' : `<button class="btn small" data-off="${I.slot}">Take off</button>`)
+      : own ? `<button class="btn small" data-wear="${I.id}">Wear</button>`
+      : `<button class="btn small primary" data-buy="${I.id}" ${bal < I.price ? 'disabled' : ''} aria-label="Buy ${esc(I.name)} for ${I.price} ${I.price === 1 ? 'token' : 'tokens'}">${COIN}${I.price}</button>`;
+    const tag = drop && own ? '<span class="owned">In your locker</span>' : own && !on && I.id !== 'c-classic' && !drop ? '' : !own && lk === 'level' && I.price && !needB ? `<span class="price">${COIN}${I.price}</span>` : '';
+    const days = drop ? `<span class="sdday">${I.daily.length === 1 ? WEEKDAYS[I.daily[0]] + 's only' : I.daily.map(d => WEEKDAYS[d] + 's').join(' and ')}</span>` : '';
+    return `<li class="item ${drop ? 'sdi' : ''} ${lk && lk !== 'gone' ? 'lock' : ''} ${on ? 'on' : ''}"><span class="ipv">${knightSVG('', who, look)}</span><b>${esc(I.name)}</b>${days}${tag}${act}</li>`;
   };
+  const sale = SHOP.filter(I => !Shop.owns(I.id) && (!I.daily || Owner.on)), locker = SHOP.filter(I => Shop.owns(I.id));
+  const list = tab === 'locker' ? locker : sale;
+  const groups = SLOTS.map(([slot, name]) => [name, list.filter(I => I.slot === slot)]).filter(([, l]) => l.length);
   const lv = Level.of(), toGo = Array.from({length: Math.max(0, SHOP_AT - lv.n)}, (_, k) => Level.step(lv.n + k)).reduce((a, v) => a + v, 0) - lv.into;
+  const dropNote = !drops.length ? 'Every drop for today is already in your locker.' : drops.every(I => Shop.owns(I.id)) ? `${drops.length === 1 ? 'It\'s' : 'Both are'} yours now, in your locker for good.` : 'What isn\'t bought by midnight goes back in the box, and tomorrow the shelf holds something else.';
   view.innerHTML = `<div class="chead"><div><p class="kicker">Shop</p><h2 style="font-size:clamp(30px,4vw,46px)">${esc(coachName())}'s wardrobe</h2><p>Tokens come from badges, from levels and from days in a row. Spend them on a new look for your coach.</p></div></div>
     <div class="shop">
       <aside class="shopside">
         <div class="mannequin">${knightSVG('cheer', who, L)}</div>
         <p class="bal">${COIN}<b class="tnum">${bal === Infinity ? '∞' : bal}</b><span>${bal === 1 ? 'token' : 'tokens'}</span></p>
-        <ul class="earn"><li><span>Badges</span><b class="tnum">${e.badges}</b></li><li><span>Levels from ${SHOP_AT} on</span><b class="tnum">${e.level}</b></li><li><span>Every three days in a row</span><b class="tnum">${e.streak}</b></li><li><span>Your first full week</span><b class="tnum">${e.week}</b></li>${Shop.spent() ? `<li class="sp"><span>Spent</span><b class="tnum">−${Shop.spent()}</b></li>` : ''}</ul>
+        <ul class="earn"><li><span>Badges</span><b class="tnum">${e.badges}</b></li><li><span>Levels from ${SHOP_AT} on</span><b class="tnum">${e.level}</b></li><li><span>Every third day in a row</span><b class="tnum">${e.streak}</b></li></ul>
         <p class="nextt">${st ? `${toNext === 3 ? 'Three' : toNext === 2 ? 'Two' : 'One'} more ${toNext === 1 ? 'day' : 'days'} in a row for the next token.` : 'Five lines today starts a streak: every third day in a row is a token.'}</p>
         <div class="coachpick mini">${COACHES.map(c => `<button type="button" data-coachwho="${c.id}" aria-pressed="${who === c.id}"><span class="cface">${knightSVG('', c.id, L)}</span><b>${c.name}</b></button>`).join('')}</div>
       </aside>
       <div class="shopmain">
         ${open ? '' : `<section class="wlock"><div><p class="kicker">Locked</p><h3>The wardrobe opens at level ${SHOP_AT}</h3><p>Every line you play earns points toward your next level. You're level ${lv.n}: ${toGo} more ${toGo === 1 ? 'point' : 'points'} and every item here can be bought. Your tokens wait for you until then.</p></div>
           <div class="wlv" aria-label="Level ${lv.n} of ${SHOP_AT}">${Array.from({length: SHOP_AT}, (_, k) => `<i class="${k < lv.n ? 'on' : ''}">${k + 1}</i>`).join('')}</div></section>`}
-        ${SLOTS.map(([slot, name]) => `<section class="slot"><h3>${name}</h3><ul class="items">${SHOP.filter(I => I.slot === slot).map(card).join('')}</ul></section>`).join('')}
+        <section class="sdrop" aria-label="Today only">
+          <div class="sdhd"><div><p class="kicker">Today only · ${WEEKDAYS[new Date().getDay()]}</p><h3>${drops.length ? `${drops.length === 1 ? 'One drop' : 'Two drops'}, gone at midnight` : 'Nothing left to drop today'}</h3></div><span class="sdt tnum" id="dropT">${Shop.endsIn()} left</span></div>
+          ${drops.length || next.length ? `<ul class="items sdrops">${drops.map(I => card(I, true)).join('')}${next.length ? `<li class="item sdi sdnext"><span class="ipv">${knightSVG('', who, {skin: 'c-classic'})}<i aria-hidden="true">?</i></span><b>Tomorrow</b><span class="sdday">${WEEKDAYS[(new Date().getDay() + 1) % 7]}</span><span class="need">${next.length === 1 ? 'One new drop' : 'Two new drops'}</span></li>` : ''}</ul>` : ''}
+          <p class="sdn">${dropNote}</p>
+        </section>
+        ${segHTML([['shop', 'Shop', sale.length], ['locker', 'Your locker', locker.length]], tab, 'shoptab')}
+        ${groups.length ? groups.map(([name, l]) => `<section class="slot"><h3>${name}</h3><ul class="items">${l.map(I => card(I, false)).join('')}</ul></section>`).join('')
+          : `<p class="snone">${tab === 'locker' ? 'Nothing here yet. What you buy goes in your locker.' : 'You have everything in the shop. Two new drops come out every day.'}</p>`}
       </div>
     </div>`;
-  view.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => { const I = SHOP.find(x => x.id === b.dataset.buy); if (Shop.buy(I.id)){ renderShop(); Coach.say(`${I.name}? Suits me. Thank you.`, {mood: 'cheer', ms: 5000}); } });
+  Shop.day = dayKey();
+  view.querySelectorAll('[data-shoptab]').forEach(b => b.onclick = () => { S.shopTab = b.dataset.shoptab; renderShop(); });
+  view.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => { const I = SHOP.find(x => x.id === b.dataset.buy); if (Shop.buy(I.id)){ renderShop(); Coach.bought(I); } });
   view.querySelectorAll('[data-wear]').forEach(b => b.onclick = () => { Shop.put(b.dataset.wear); renderShop(); Coach.refresh(); });
   view.querySelectorAll('[data-off]').forEach(b => b.onclick = () => { Shop.off(b.dataset.off); renderShop(); Coach.refresh(); });
 }
+// the countdown on today's drops, and a fresh shelf after midnight
+setInterval(() => {
+  if (S.view !== 'shop') return;
+  if (Shop.day && Shop.day !== dayKey()) return renderShop();
+  const t = document.getElementById('dropT'); if (t) t.textContent = `${Shop.endsIn()} left`;
+}, 30000);
 
-/* ---- the coach: a few words in a speech bubble, bottom right. Never a hint while you are being tested. */
 /* ---- after the first course: the big moment, then a library. The coach picks three deep dives for each player: the
    openings they meet most, weighed by how the course went there (slips in drills and practice games, the checkpoint,
    the results in those games). The reason shown is the strongest of them. */
@@ -809,29 +887,76 @@ function renderGrad(){
   const q = document.getElementById('grQuiz'); if (q) q.onclick = () => { S.view = 'quiz'; render(); setHash(); };
 }
 
+/* ---- the coach. A few words in a speech bubble, bottom right, or a note in the drill panel when a line ends. It speaks
+   when something happened (a line played, today's five, a badge, a new recap, something bought) and, once a day per
+   tab, when there is something worth knowing there, always about this player's own lines and games. The first visit
+   to a tab says what the tab is for. Never while a drill, a practice game or a checkpoint is being played, and never
+   a move before the line is over. A tap anywhere else closes the bubble; a tap on the coach brings it back. */
+const lineTitleOf = (s, id) => { const B = BOOKS[s], l = (B.lineMap || (B.lineMap = Object.fromEntries(B.lines.map(x => [x.id, x]))))[id], L = l && LIDX[s][l.lesson];
+  return L ? (l.main ? L.title : `${L.title}: ${lc(l.title)}`) : ''; };
 const Coach = {
-  seen: (() => { try { return JSON.parse(localStorage.getItem('playbook-coach') || '{}'); } catch(e){ return {}; } })(), timer: null, last: null, n: 0,
+  seen: (() => { try { return JSON.parse(localStorage.getItem('playbook-coach') || '{}'); } catch(e){ return {}; } })(), timer: null, last: null,
   el(){ let e = document.getElementById('coach'); if (!e){ e = document.createElement('div'); e.id = 'coach'; e.className = 'coach'; document.body.appendChild(e);
-      e.addEventListener('click', ev => { if (ev.target.closest('.cx')) return this.hush(); const a = ev.target.closest('[data-cgo]'); if (a){ this.hush(); return a.dataset.cgo === 'me' ? Acct.open(Cloud.user ? 'in' : 'me') : go(a.dataset.cgo); } if (ev.target.closest('.cav')) this.last && !e.querySelector('.cbub') ? this.say(this.last.t, this.last.o) : e.querySelector('.cbub') ? this.hush() : this.say(this.tip()); }); }
+      e.addEventListener('click', ev => { if (ev.target.closest('.cx')) return this.hush(); const a = ev.target.closest('[data-cgo]');
+        if (a){ this.hush(); const g = a.dataset.cgo; if (g === 'me') return Acct.open(Cloud.user ? 'in' : 'me'); if (g === 'recap'){ S.gseg = 'recap'; Recap.sel = Recap.unseen(); return go('games'); } return go(g); }
+        if (ev.target.closest('.cav')) this.tap(); }); }
     return e; },
   // on the welcome, reading, findings and choice screens the coach is part of the page, so the corner one stays away
   draw(bub){ const e = this.el(); e.hidden = !SET.coach || (PVIEWS.includes(S.view) && S.view !== 'setup') || S.view === 'grad' || libOn(); e.classList.toggle('quiet', ['drill', 'quiz', 'sandbox', 'study', 'explore'].includes(S.view));
     e.innerHTML = (bub || '') + `<button class="cav" type="button" aria-label="${coachName()}, your coach">${knightSVG(this.mood)}</button>`; },
   say(t, o = {}){
-    if (!SET.coach) return; clearTimeout(this.timer); this.last = {t, o}; this.mood = o.mood;
+    if (!SET.coach) return; clearTimeout(this.timer); this.last = {t, o, v: S.view}; this.mood = o.mood;
     this.draw(`<div class="cbub ${o.art ? 'art' : ''}" role="status"><button class="cx" type="button" aria-label="Close">×</button>${o.art ? `<span class="cart">${o.art}</span>` : ''}<span class="cwho">${coachName()}</span>${o.head ? `<b class="chead2">${esc(o.head)}</b>` : ''}${esc(t)}${o.cta ? `<div class="cacts"><button class="btn small primary" data-cgo="${o.cta[0]}">${esc(o.cta[1])}</button></div>` : ''}</div>`);
     if (!o.stay) this.timer = setTimeout(() => this.hush(), 9000 + t.length * 45);
   },
   hush(){ clearTimeout(this.timer); this.mood = null; this.draw(''); },
-  once(key, t, o){ if (this.seen[key]) return false; this.seen[key] = 1; try { localStorage.setItem('playbook-coach', JSON.stringify(this.seen)); } catch(e){} this.say(t, o); return true; },
+  // a tap on the coach: closes what is open; otherwise what is worth knowing on this tab, what was last said here, or
+  // what the tab is for. Nothing while a line, a game or a checkpoint is being played.
+  tap(){
+    if (this.el().querySelector('.cbub')) return this.hush();
+    if (S.drill && S.drill.state === 'play') return;
+    const tab = tabOf(S.view, S.studyFrom), n = PERSONA !== 'new' && this.news(tab);
+    if (n) return this.say(n);
+    if (this.last && this.last.v === S.view) return this.say(this.last.t, this.last.o);
+    this.say(this.tip());
+  },
+  once(key, t, o){ if (this.seen[key]) return false; this.seen[key] = 1; this.prune(); try { localStorage.setItem('playbook-coach', JSON.stringify(this.seen)); } catch(e){} this.say(t, o); return true; },
+  // once a day: what the coach says about a tab is worth hearing once that day
+  today(key, t, o){ return this.once(`${key}@${dayKey()}`, t, o); },
+  prune(){ const old = dayKey(-14); for (const k in this.seen){ const d = k.split('@')[1]; if (d && d < old) delete this.seen[k]; } },
   refresh(){ this.hush(); },
+  // the first visit to a tab: what it is for
   tip(){
     const T = {start: 'Connect your chess account and I\'ll build your course around your games.', setup: 'A username is the quickest way. I only read your public games.', sandbox: 'Play your side. The other side answers the way club players really do.',
-      course: 'Work down the path. Each checkpoint you pass opens the next unit.', learn: 'Pick a lesson, then step through it with the arrow keys.', drill: 'Five lines a day keeps your streak. The ones you slipped on come first.',
-      games: 'Your openings, with your record in each. Open one for its lessons and every position in it at a glance.', study: 'Step through with the arrow keys. Switch the engine on under the board if a position looks scary.'};
+      course: 'Work down the path. Each checkpoint you pass opens the next unit.', learn: 'Pick a lesson, or switch to At a glance for every decision in this opening on one page.', drill: 'Five lines a day keeps your streak. The ones you slipped on come first.',
+      games: 'Your openings, with your record in each. Open one for its lessons and every position in it at a glance.', study: 'Step through with the arrow keys. Switch the engine on under the board if a position looks scary.',
+      shop: 'Tokens come from badges, levels and days in a row. Two drops come out every day and are gone at midnight.'};
     return T[S.view] || T[tabOf(S.view, S.studyFrom)] || 'Keep going.';
   },
-  // called after every full render: at most one thing to say, and only the first time
+  // what is worth knowing on a tab today, about this player's own lines and games. Nothing when there is nothing.
+  news(v){
+    if (v === 'drill' && !S.drill){
+      if (Daily.count() >= DAILY){ const due = Prog.dueCount(); return due ? `Today's five are done. ${due} more ${due === 1 ? 'line is' : 'lines are'} due if you want to keep going.` : null; }
+      const x = dailyNext(); if (!x) return null; const t = lineTitleOf(x.s, x.id); if (!t) return null;
+      const due = Prog.dueCount();
+      return {'You slipped here last time': `Today's five start with ${t}. It caught you last time.`, 'Changed line': `${t} has new moves since you last played it, so it comes first today.`,
+        'Due for review': `${due} ${due === 1 ? 'line is' : 'lines are'} due today. First up: ${t}.`, 'New line from a lesson you studied': `Nothing is due, so today's five bring new lines, starting with ${t} from a lesson you studied.`,
+        'New line': `Nothing is due, so today's five bring new lines, starting with ${t}.`}[x.why] || null;
+    }
+    if (v === 'course' && !gradAt()){
+      const U = COURSE.find(U => !U.soon && U.lessons && !unitPassed(U)); if (!U) return null;
+      const ls = U.lessons, seen = ls.filter(l => lessonSeen(U.side, l)).length;
+      return seen >= ls.length ? `Every lesson in ${unitNo(U)}, ${U.title}, is studied. Its checkpoint is waiting.` : `Next: ${unitNo(U)}, ${U.title}. ${seen ? `${seen} of ${ls.length} lessons studied.` : `${plural(ls.length, 'lesson')} to study, then the checkpoint.`}`;
+    }
+    if (v === 'shop'){
+      if (!Shop.isOpen()){ const L = Level.of(), toGo = Array.from({length: Math.max(0, SHOP_AT - L.n)}, (_, k) => Level.step(L.n + k)).reduce((a, x) => a + x, 0) - L.into;
+        return toGo > 0 ? `${toGo} more ${toGo === 1 ? 'point' : 'points'} and the shop opens. A clean line is ten.` : null; }
+      const d = Shop.today().filter(I => !Shop.owns(I.id)); if (!d.length) return null; const bal = Shop.balance(), cheap = Math.min(...d.map(I => I.price));
+      return `Today's ${d.length === 1 ? 'drop is the' : 'drops are the'} ${d.map(I => lc(I.name)).join(' and the ')}. ${bal >= cheap ? 'You have the tokens for one.' : `You have ${bal} ${bal === 1 ? 'token' : 'tokens'}; ${d.length === 1 ? 'it costs' : 'the cheaper one costs'} ${cheap}.`} Gone at midnight.`;
+    }
+    return null;
+  },
+  // called after every full render: at most one thing to say
   onView(){
     const v = S.view, e = this.el();
     if (S.drill && S.drill.state === 'play'){ this.lastView = v; return this.hush(); } // never while a drill, a practice game or a checkpoint is being played
@@ -847,23 +972,274 @@ const Coach = {
       return this.hush();
     }
     if (PERSONA === 'ready' && v === 'course' && this.once('ready-course', 'This is your course, in the order your games asked for. Start with the unit at the top.')) return;
-    if (['course', 'learn', 'drill', 'games', 'sandbox'].includes(v) && this.once('tab-' + v, this.tip())) return;
+    if (Recap.announce()) return;                                                      // a finished month's recap that hasn't been opened yet
+    const tab = ['course', 'learn', 'drill', 'games', 'sandbox', 'shop', 'study'].includes(v) ? v : null;
+    if (tab && this.once('tab-' + tab, this.tip())) return;
+    const n = tab && this.news(tab); if (n && this.today('news-' + tab, n)) return;
     this.hush();
   },
-  // the fifth line of the day
+  // the fifth line of the day: the streak, and the token every third day in a row
   daily(){
-    const st = Daily.streak(), week = st === 7 && Math.max(0, ...Shop.runs().slice(0, -1)) < 7;
-    const sh = Shop.isOpen() ? ['shop', 'Open the shop'] : null;
-    if (week) return this.say(`Seven days in a row. That's two tokens for the week, plus one for your first full week.`, {mood: 'cheer', stay: true, head: 'A week in a row', art: `<span class="cflame">${FLAME}<b>${st}</b></span>`, cta: sh});
-    this.say(st > 1 ? `That's today's five. ${st} days in a row${st % 3 === 0 ? ', and every third day is a shop token' : ''}: come back tomorrow for ${st + 1}.` : `That's today's five, and day one of your streak. Five more tomorrow keeps it going.`, {mood: 'cheer', ms: 9000, art: `<span class="cflame">${FLAME}<b>${st}</b></span>`, cta: st % 3 === 0 ? sh : null});
+    const st = Daily.streak(), fix = Daily.ids().filter(id => { const r = Prog.rec(id); return r && !r.box; }).length, tok = st % 3 === 0, sh = Shop.isOpen() ? ['shop', 'Open the shop'] : null;
+    this.say(`That's today's five${fix ? `, ${fix} of them still to get clean` : ', all of them clean'}. ${st === 1 ? 'Day one of your streak.' : `${st} days in a row.`} ${tok ? 'Every third day in a row is a shop token, and today is one.' : `${3 - st % 3 === 1 ? 'One more day' : 'Two more days'} in a row for the next token.`}`,
+      {mood: 'cheer', head: st === 7 ? 'A week in a row' : st === 30 ? 'A month in a row' : '', art: `<span class="cflame">${FLAME}<b>${st}</b></span>`, cta: tok ? sh : null});
   },
-  event(kind, ok){
-    if (kind === 'line' && S.view === 'drill'){ this.n++;
-      if (!ok) return this.say('That one comes back today. The second time is where it sticks.');
-      if (this.n % 3 === 1) return this.say(['Clean. That line is yours for a few days.', 'No slips. On to the next one.', 'Clean run. I\'ll bring it back before you forget it.'][Math.floor(this.n / 3) % 3], {mood: 'cheer'}); }
+  // a drill line is over: what happened in it, for the drill panel. Where it caught the player, what they played
+  // instead (and what the book says about that move, when it knows it), why the line's move is the move, and whether
+  // that spot has caught them before. On a clean run: a move that held after catching them last time, a lesson whose
+  // lines are now all clean, a line at full strength. Nothing for an ordinary clean run: the panel says when it comes
+  // back. Badges and today's five get the bubble.
+  lineNote(id, clean, prev, D){
+    const r = Prog.rec(id) || {}, line = LINES[id], L = lessonOf(id), out = []; let cta = '', mood = 'cheer';
+    if (!clean && D.slipAt && D.slipAt.length){
+      mood = 'think';
+      const [i, u] = D.slipAt[0], par = line.n[i - 1], nd = N[line.n[i]], no = Math.ceil(i / 2), times = (r.sl || {})[i] || 1;
+      const alt = (N[par].k || []).map(c => N[c]).find(x => x.u === u && x !== nd);       // the move tried, when the book has it
+      let played = ''; try { played = wordsAt(nodeFen(par), u); } catch(e){}
+      out.push(`${times > 1 ? `Move ${no} has caught you ${times === 2 ? 'twice' : times + ' times'} now.` : `Move ${no} caught you.`} You played: ${played ? lc(played) : 'another move'}. The line's move: ${lc(nd.l)}.`);
+      if (alt && alt.t) out.push(`${(alt.g || []).includes('warn') ? 'That one is a known mistake here' : 'About your move'}: ${alt.t}`);
+      else if (nd.t) out.push(`Why: ${nd.t}`);
+      if (D.slipAt.length > 1) out.push(`${D.slipAt.length === 2 ? 'One more slip' : `${D.slipAt.length - 1} more slips`} after that.`);
+      cta = `<button class="linkish" type="button" data-line="${id}" data-i="${i - 1}">Study move ${no}</button>`;
+    } else if (clean){
+      const was = prev && prev.sl ? Object.keys(prev.sl).map(Number).sort((a, b) => prev.sl[b] - prev.sl[a]) : [], spot = was[0];
+      const ls = L ? L.lines.filter(x => DRILLSET.has(x)) : [], all = ls.length > 1 && ls.every(lineClean) && !(prev && prev.clean);
+      if (spot && prev && !prev.box && N[line.n[spot]]) out.push(`Move ${Math.ceil(spot / 2)} held this time: ${lc(N[line.n[spot]].l)}. That's the one that caught you before.`);
+      if (all) out.push(`That's every line of ${L.title} clean: all ${ls.length}.`);
+      else if ((r.box || 0) >= 5 && (prev && prev.box || 0) < 5) out.push(`Five clean reviews in a row: this line is at full strength. Next time you see it is in ${INTERVALS[5]} days.`);
+    }
+    if (!out.length) return '';
+    return `<div class="coachnote" role="status">${SET.coach ? `<span class="cnface">${knightSVG(mood)}</span>` : ''}<div class="cntx">${SET.coach ? `<b>${esc(coachName())}</b>` : ''}<p>${out.map(esc).join(' ')}</p>${cta}</div></div>`;
+  },
+  // a checkpoint or practice set is over with misses: which lesson they come from, so the next try starts there
+  quizNote(Q, U){
+    const misses = Q.items.filter((_, k) => !Q.res[k]); if (!misses.length || misses[0].fen) return '';
+    const at = it => { const kid = (N[it.node].k || []).find(c => N[c].u === it.ans), ids = (linesByNode.get(kid !== undefined ? kid : it.node) || []).map(x => LINES[x] && LINES[x].lesson).filter(x => LESSONS[x]);
+      return ids.find(x => (U.lessons || []).includes(x)) || ids[0]; };
+    const by = {}; for (const it of misses){ const lid = at(it); if (lid) by[lid] = (by[lid] || 0) + 1; }
+    const top = Object.entries(by).sort((a, b) => b[1] - a[1])[0]; if (!top) return '';
+    const [lid, k] = top, L = LESSONS[lid], passed = Q.res.filter(Boolean).length >= quizPass(U, Q.set);
+    const t = misses.length === 1 ? `The one you missed is from ${L.title}.` : k === misses.length ? `All ${misses.length} misses are from ${L.title}.` : `${k} of your ${misses.length} misses are from ${L.title}.`;
+    return `<div class="coachnote" role="status">${SET.coach ? `<span class="cnface">${knightSVG(passed ? 'cheer' : 'think')}</span>` : ''}<div class="cntx">${SET.coach ? `<b>${esc(coachName())}</b>` : ''}<p>${esc(t)} ${passed ? 'Worth a look before it comes up in a game.' : 'Go through it once more, then try again.'}</p><button class="linkish" type="button" data-lesson="${lid}">Open ${esc(L.title)}</button></div></div>`;
+  },
+  bought(I){
+    const t = {skin: `${I.name}. I feel like a new piece.`, head: `The ${lc(I.name)}? How do I look?`, face: `${I.name}. Now I can see the whole board.`, neck: `The ${lc(I.name)}. Very smart.`}[I.slot] || `${I.name}? Suits me.`;
+    this.say(I.daily ? `${t} It was today only, and now it's in your locker for good.` : `${t} Thank you.`, {mood: 'cheer', ms: 5000});
   }
 };
 
+/* ---- the monthly recap. The month's games from the player's own account, read on the website (the claude.ai copy
+   can't reach chess.com or Lichess), summed up and set beside the month before, with the lines drilled that month.
+   A check reads the current month when the app opens and when Your games opens, at most every six hours (Check now
+   reads it at once), and reads the month before once more after it ends, so that recap is final. Months are calendar
+   months in UTC, the way chess.com files games. Each month is kept as a small summary in d.recap.m, the newest copy
+   wins a merge, so recaps follow the player to every device; d.recap.seen is the last finished month they opened and
+   d.recap.chk the last good check (a failed one is kept on this page only). Bullet and daily games are left out, as they are
+   when the games are first read. The house playbook reads HOUSE_ACCT; a personal playbook, the account it was built
+   from. */
+const RECAP_EVERY = 6 * 36e5;
+const Recap = {
+  busy: false, got: 0, err: '', sel: null, tried: 0,
+  acct(){ if (PERSONA === 'house') return HOUSE_ACCT; const s = (Product.me() || {}).src || {}; return (s.site === 'chess.com' || s.site === 'lichess') && s.user ? s : null; },
+  aid(){ const a = this.acct(); return a ? `${a.site}:${a.user.toLowerCase()}` : ''; },
+  on(){ return PERSONA !== 'new' && !!this.acct(); },             // the part of Your games is there
+  can(){ return this.on() && !!SITE; },                             // and games can be read from here
+  st(){ const r = Prog.d.recap || (Prog.d.recap = {}); r.m = r.m || {}; return r; },
+  key(t){ const d = new Date(t); return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`; },
+  shift(k, n){ const [y, m] = k.split('-').map(Number); return this.key(Date.UTC(y, m - 1 + n, 1)); },
+  end(k){ const [y, m] = k.split('-').map(Number); return Date.UTC(y, m, 1); },
+  name(k, yr){ const [y, m] = k.split('-').map(Number); return new Date(Date.UTC(y, m - 1, 15)).toLocaleDateString(undefined, Object.assign({month: 'long', timeZone: 'UTC'}, yr ? {year: 'numeric'} : {})); },
+  // a month of this account, with every field in place (a copy written by an older page may lack some)
+  month(k){ const M = this.st().m[k]; if (!M || M.a !== this.aid()) return null; const T = () => [0, 0, 0, 0];
+    return Object.assign({all: T(), col: {w: T(), b: T()}, tc: '', r0: 0, rs: [], inb: 0, bp: 0, me: 0, them: 0, ch: {}, lk: null, best: null, deep: null, early: 0, clock: 0}, M); },
+  months(){ return Object.keys(this.st().m).filter(k => this.month(k)).sort().reverse(); },
+  last(){ return Math.max(this.st().chk || 0, this.tried); },
+  nextAt(){ return this.last() + RECAP_EVERY; },
+  // the month before still waiting to be read once it is over
+  owed(){ const now = Date.now(), prev = this.shift(this.key(now), -1), M = this.month(prev); return !!M && !M.fin && now > this.end(prev) + 36e5; },
+  due(){ return !this.last() || Date.now() >= this.nextAt() || (this.owed() && Date.now() - this.last() > 36e5); },
+  auto(){ if (this.can() && !this.busy && this.due()) this.check(); },
+  // one month's games as PGN text, blitz and slower
+  async read(a, k){
+    const [y, m] = k.split('-');
+    if (a.site === 'lichess'){
+      const r = await fetch(`https://lichess.org/api/games/user/${encodeURIComponent(a.user.trim())}?since=${Date.UTC(+y, m - 1, 1)}&until=${this.end(k)}&perfType=blitz,rapid,classical&clocks=false&evals=false&opening=false`, {headers: {Accept: 'application/x-chess-pgn'}});
+      if (r.status === 404) throw Object.assign(new Error('missing'), {missing: true}); if (!r.ok) throw new Error('http ' + r.status); return r.text();
+    }
+    const r = await fetch(`https://api.chess.com/pub/player/${encodeURIComponent(a.user.trim().toLowerCase())}/games/${y}/${m}`);
+    if (r.status === 404) return ''; if (!r.ok) throw new Error('http ' + r.status);
+    return ((await r.json()).games || []).filter(g => g.rules === 'chess' && g.pgn && g.time_class !== 'daily' && g.time_class !== 'bullet').map(g => g.pgn).join('\n\n');
+  },
+  // a month in a few numbers: the record (and by colour), the rating through the month in the time control played
+  // most, how long the games stayed in the book and who left it first, each opening met, the place the player left
+  // the book most, the best win, the game that stayed in the book longest, and how the losses came
+  sum(P, k){
+    const G = P.games.slice().reverse(), T = () => [0, 0, 0, 0], add = (t, r) => { t[0]++; t[r === 1 ? 1 : r === 0 ? 2 : 3]++; };
+    const all = T(), col = {w: T(), b: T()}, ch = {}, tcs = {}, rd = {};
+    for (const g of G) tcs[g.tc] = (tcs[g.tc] || 0) + 1;
+    const tc = Object.keys(tcs).sort((x, y) => tcs[y] - tcs[x])[0] || '';
+    let inb = 0, bp = 0, me = 0, them = 0, best = null, deep = null, early = 0, clock = 0;
+    for (const g of G){
+      add(all, g.r); add(col[g.me], g.r);
+      if (g.tc === tc && g.e) rd[new Date(g.t).getUTCDate()] = g.e;
+      if (g.ch){ const c = ch[g.me + ':' + g.ch] || (ch[g.me + ':' + g.ch] = [0, 0, 0, 0, 0]); add(c, g.r); c[4] += g.bp; inb++; bp += g.bp;
+        if (g.by === 'me') me++; else if (g.by === 'opp') them++;     // who left the book first ('end': the book had run out)
+        if (!deep || g.bp > deep.bp) deep = {opp: g.opp, url: g.url, bp: g.bp, me: g.me, ch: g.ch}; }
+      if (g.r === 1 && g.oe && (!best || g.oe > best.oe)) best = {opp: g.opp, oe: g.oe, url: g.url, me: g.me, ch: g.ch};
+      if (g.r === 0){ if (g.ot) clock++; else if (g.pl < 50) early++; }
+    }
+    const rs = Object.entries(rd).map(([d, e]) => [+d, e]).sort((x, y) => x[0] - y[0]), L = P.leaks[0];
+    return {a: this.aid(), at: Date.now(), fin: Date.now() > this.end(k) + 36e5, all, col, tc, r0: (G.find(g => g.tc === tc && g.e) || {}).e || 0, rs, inb, bp, me, them, ch,
+      lk: L && L.n >= 2 ? {side: L.side, node: L.node, uci: L.uci, ch: L.ch, n: L.n, w: L.w, l: L.l, d: L.d} : null, best, deep, early, clock};
+  },
+  // read the current month, the month before until it is final, and on the first check the two before that too, so
+  // there is something to set this month beside
+  async check(){
+    if (this.busy || !this.can()) return;
+    const a = this.acct(), st = this.st(), now = Date.now(), cur = this.key(now), ks = [cur];
+    if (!(this.month(this.shift(cur, -1)) || {}).fin) ks.push(this.shift(cur, -1));
+    if (!this.months().length) ks.push(this.shift(cur, -2));
+    this.busy = true; this.got = 0; this.err = ''; this.tried = now; this.paint();
+    try {
+      for (const k of ks){
+        const text = await this.read(a, k), P = await Analyze.run(text, a.user, {w: BOOKS.w.full, b: BOOKS.b.full}, p => { this.got = p.done; this.paint(true); });
+        st.m[k] = this.sum(P, k);
+      }
+      st.chk = Date.now(); Prog.save();
+    } catch(e){ this.err = e.missing ? 'missing' : 'net'; }
+    this.busy = false; this.paint();
+  },
+  // the newest finished month with games, when its recap hasn't been opened yet
+  unseen(){ const st = this.st(), k = this.months().find(x => this.month(x).fin && this.month(x).all[0]); return k && !(st.seen && st.seen >= k) ? k : null; },
+  fresh(){ return this.on() && !!this.unseen(); },
+  // the month on screen: the one picked, else a finished month not opened yet, else the newest
+  cur(){ const ks = this.months(); return ks.includes(this.sel) ? this.sel : this.unseen() || ks[0]; },
+  // the coach's word when a month is over and its recap hasn't been opened yet
+  announce(){
+    if (!this.on() || !SET.coach) return false;
+    const k = this.unseen();
+    if (!k || (S.view === 'games' && S.gseg === 'recap')) return false;
+    const M = this.month(k), dr = this.rating(M);
+    return Coach.once('recap-' + k, `Your ${this.name(k)} recap is ready: ${plural(M.all[0], 'game')}, ${this.score(M.all)}%${dr ? `, rating ${dr > 0 ? 'up' : 'down'} ${Math.abs(dr)}` : ''}. Here's how the month went.`, {mood: 'cheer', stay: true, head: 'Monthly recap', cta: ['recap', 'See the recap']});
+  },
+  score(t){ return t && t[0] ? Math.round((t[1] + t[3] / 2) / t[0] * 100) : 0; },
+  rating(M){ return M.rs.length && M.r0 ? M.rs[M.rs.length - 1][1] - M.r0 : 0; },
+  depth(M){ return M.inb ? Math.round(M.bp / M.inb / 2 * 10) / 10 : 0; },
+  first(M){ return M.me + M.them ? Math.round(M.me / (M.me + M.them) * 100) : 0; },
+  chName(s, id){ return ((BOOKS[s].full || BOOKS[s]).chapters.find(c => c.id === id) || {}).name || ''; },
+  open(s, id){ return BOOKS[s].chapters.some(c => c.id === id); },
+  // lines drilled in a month, by opening: d.days keeps the ids for two months, then only a count
+  drilled(k){
+    if (!this.lineCh){ this.lineCh = {};
+      for (const s of ['w', 'b']){ const F = BOOKS[s].full || BOOKS[s], part = {}; F.chapters.forEach(c => c.parts.forEach(p => part[p] = c.id)); const les = {}; F.lessons.forEach(l => les[l.id] = part[l.part]);
+        F.lines.forEach(l => { if (les[l.lesson]) this.lineCh[l.id] = s + ':' + les[l.lesson]; }); } }
+    const out = {n: 0, ch: {}}; for (const [d, v] of Object.entries(Prog.d.days || {})){ if (!d.startsWith(k)) continue;
+      if (Array.isArray(v)){ out.n += v.length; for (const id of v){ const c = this.lineCh[id]; if (c) out.ch[c] = (out.ch[c] || 0) + 1; } } else out.n += v || 0; }
+    return out;
+  },
+  ago(t){ const m = Math.round((Date.now() - t) / 6e4); return m < 2 ? 'just now' : m < 60 ? `${m} minutes ago` : m < 120 ? 'an hour ago' : m < 60 * 24 ? `${Math.round(m / 60)} hours ago` : new Date(t).toLocaleDateString(undefined, {month: 'short', day: 'numeric'}); },
+  at(t){ const d = new Date(t), today = dayKey() === dkey(d); return (today ? '' : d.toLocaleDateString(undefined, {weekday: 'long'}) + ' ') + d.toLocaleTimeString(undefined, {hour: 'numeric', minute: '2-digit'}); },
+  // the strip above the recap: where the games come from, when they were read, when they are read next
+  statusHTML(){
+    const a = this.acct(), st = this.st(), site = a.site === 'lichess' ? 'Lichess' : 'chess.com';
+    if (!SITE) return `<section class="rcstat"><div><b>Recaps are made on the website</b><span>This copy can't reach ${site}, so your games are read on the website, where the recap for every month is kept.</span></div>${HOME ? `<a class="btn small" href="${HOME}#games" target="_blank" rel="noopener">Open the website</a>` : ''}</section>`;
+    const when = this.busy ? `Reading your games${this.got ? `: ${plural(this.got, 'game')} so far` : ''}…`
+      : this.err === 'missing' ? `${site} doesn't know ${esc(a.user)}.` : this.err ? `${site} didn't answer. I'll try again after ${this.at(this.nextAt())}.`
+      : st.chk ? `Checked ${this.ago(st.chk)}. Next check after ${this.at(this.nextAt())}, whenever the app is open.` : 'Not checked yet.';
+    return `<section class="rcstat"><div><b>${site} · ${esc(a.user)}</b><span id="rcWhen">${when}</span></div><button class="btn small" type="button" id="rcGo" ${this.busy ? 'disabled' : ''}>${this.busy ? 'Checking…' : 'Check now'}</button></section>`;
+  },
+  // a number beside the month before: up or down, and whether that is good
+  delta(v, unit, good, from){
+    if (!v) return `<span class="rcd">${from ? 'Same as ' + from : ''}</span>`;
+    const ok = good === undefined ? 0 : (v > 0) === good ? 1 : -1;
+    return `<span class="rcd ${ok > 0 ? 'up' : ok < 0 ? 'dn' : ''}"><i aria-hidden="true">${v > 0 ? '▲' : '▼'}</i>${Math.abs(v)}${unit}${from ? ' from ' + from : ''}</span>`;
+  },
+  // the rating through the month: one point per day played, the last game of the day
+  chartHTML(M, k){
+    const rs = M.rs; if (rs.length < 2) return `<p class="rcnone">${rs.length ? `One day of ${esc(M.tc)} games: ${rs[0][1]}.` : 'No rated games to draw.'}</p>`;
+    const W = innerWidth < 620 ? 360 : 600, H = innerWidth < 620 ? 170 : 150, px = 34, py = 14, days = new Date(this.end(k) - 1).getUTCDate(), lo = Math.min(...rs.map(r => r[1])), hi = Math.max(...rs.map(r => r[1])), pad = Math.max(8, Math.round((hi - lo) * 0.15));
+    const y0 = lo - pad, y1 = hi + pad, X = d => px + (d - 1) / Math.max(1, days - 1) * (W - px - 8), Y = e => py + (1 - (e - y0) / (y1 - y0)) * (H - py * 2);
+    const pts = rs.map(([d, e]) => `${X(d).toFixed(1)},${Y(e).toFixed(1)}`).join(' '), mon = this.name(k).slice(0, 3);
+    return `<div class="rcchart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Rating from ${rs[0][1]} to ${rs[rs.length - 1][1]} over ${plural(rs.length, 'day')} played">
+      ${[y0 + pad, y1 - pad].map(v => `<line class="rcg" x1="${px}" x2="${W - 8}" y1="${Y(v)}" y2="${Y(v)}"/><text class="rcax" x="${px - 6}" y="${Y(v) + 4}" text-anchor="end">${v}</text>`).join('')}
+      ${[1, Math.ceil(days / 2), days].map(d => `<text class="rcax" x="${X(d)}" y="${H - 1}" text-anchor="middle">${mon} ${d}</text>`).join('')}
+      <polyline class="rcl" points="${pts}"/>${rs.map(([d, e], i) => `<circle class="rcp${i === rs.length - 1 ? ' end' : ''}" cx="${X(d)}" cy="${Y(e)}" r="4"/><circle class="rch" cx="${X(d)}" cy="${Y(e)}" r="14" data-tip="${mon} ${d}: ${e}" tabindex="0"/>`).join('')}
+      </svg><span class="rctip" hidden></span></div>`;
+  },
+  // what moved since the month before, in plain words: the biggest gains first, then what slipped
+  changes(M, P, pn){
+    const out = [], sc = this.score.bind(this);
+    const push = (good, size, text) => out.push({good, size, text});
+    const s1 = sc(M.all), s0 = sc(P.all); if (P.all[0] >= 5 && M.all[0] >= 5 && Math.abs(s1 - s0) >= 5) push(s1 > s0, Math.abs(s1 - s0) / 5, `You scored ${s1}% (${pn}: ${s0}%).`);
+    for (const c of ['w', 'b']){ const a = M.col[c], b = P.col[c]; if (a[0] >= 5 && b[0] >= 5 && Math.abs(sc(a) - sc(b)) >= 8) push(sc(a) > sc(b), Math.abs(sc(a) - sc(b)) / 8, `With ${c === 'w' ? 'White' : 'Black'}: ${sc(a)}% (${pn}: ${sc(b)}%).`); }
+    const d1 = this.depth(M), d0 = this.depth(P); if (M.inb >= 5 && P.inb >= 5 && Math.abs(d1 - d0) >= 0.5) push(d1 > d0, Math.abs(d1 - d0) / 0.5, `Your games stayed in the book ${d1} moves on average (${pn}: ${d0}).`);
+    const f1 = this.first(M), f0 = this.first(P); if (M.me + M.them >= 5 && P.me + P.them >= 5 && Math.abs(f1 - f0) >= 8) push(f1 < f0, Math.abs(f1 - f0) / 8, `You were the first to leave the book in ${f1}% of games (${pn}: ${f0}%).`);
+    const e1 = M.early / Math.max(1, M.all[0]), e0 = P.early / Math.max(1, P.all[0]); if (Math.abs(M.early - P.early) >= 2 && Math.abs(e1 - e0) >= 0.04) push(e1 < e0, Math.abs(e1 - e0) * 20, `${plural(M.early, 'game')} lost before move 25 (${pn}: ${P.early}).`);
+    const c1 = M.clock / Math.max(1, M.all[0]), c0 = P.clock / Math.max(1, P.all[0]); if (Math.abs(M.clock - P.clock) >= 2 && Math.abs(c1 - c0) >= 0.04) push(c1 < c0, Math.abs(c1 - c0) * 20, `${plural(M.clock, 'game')} lost on time (${pn}: ${P.clock}).`);
+    for (const [key, a] of Object.entries(M.ch)){ const b = P.ch[key]; if (!b || a[0] < 3 || b[0] < 3) continue; const x = sc(a), y = sc(b); if (Math.abs(x - y) < 15) continue;
+      const [s, id] = key.split(':'); push(x > y, Math.abs(x - y) / 15, `${this.chName(s, id)} with ${s === 'w' ? 'White' : 'Black'}: ${x}% (${pn}: ${y}%).`); }
+    out.sort((x, y) => y.size - x.size);
+    return {up: out.filter(x => x.good).slice(0, 4), down: out.filter(x => !x.good).slice(0, 2)};
+  },
+  // the whole part of Your games
+  html(){
+    const ks = this.months(), k = this.cur(), st = this.st(); if (k) this.sel = k;     // the month stays put while the page redraws
+    if (!k) return `${this.statusHTML()}<section class="rcempty"><div class="cface">${knightSVG('think')}</div><div><h3>No recap yet</h3><p>${SITE ? (this.busy ? 'Reading this month\'s games now, and the two months before it, so there is something to compare with.' : 'The first check reads this month\'s games and the two months before it, so there is something to compare with.') : 'Open the website and your recaps start there.'}</p></div></section>`;
+    if ((this.month(k) || {}).fin && (!st.seen || st.seen < k)){ st.seen = k; Prog.save(); }
+    const M = this.month(k), pk = this.shift(k, -1), P = this.month(pk), pn = this.name(pk), i = ks.indexOf(k), n = M.all[0], s = this.score(M.all), dr = this.rating(M);
+    const nav = `<div class="rcnav"><button class="btn ghost small" type="button" data-rcm="${ks[i + 1] || ''}" ${ks[i + 1] ? '' : 'disabled'} aria-label="Month before">${ICON.prev}</button>
+      <h3>${this.name(k, true)}${M.fin ? '' : ' <span class="chip">So far</span>'}</h3><button class="btn ghost small" type="button" data-rcm="${ks[i - 1] || ''}" ${ks[i - 1] ? '' : 'disabled'} aria-label="Month after">${ICON.next}</button></div>`;
+    if (!n) return `${this.statusHTML()}${nav}<section class="rcempty"><div class="cface">${knightSVG('think')}</div><div><h3>No games in ${this.name(k)}</h3><p>${M.fin ? 'Nothing at blitz or slower that month.' : 'Play a few blitz or rapid games and the recap fills in at the next check.'}</p></div></section>`;
+    const tile = (lab, val, sub) => `<li><span class="rclab">${lab}</span><b class="tnum">${val}</b>${sub}</li>`;
+    const pv = P && P.all[0] ? P : null, D = this.drilled(k);
+    const tiles = `<ul class="rctiles">
+      ${tile('Games', n, `<span class="rcsub">${M.all[1]} won · ${M.all[2]} lost${M.all[3] ? ` · ${M.all[3]} drawn` : ''}</span>`)}
+      ${tile('Score', s + '%', pv ? this.delta(s - this.score(pv.all), ' pts', true, pn) : '<span class="rcsub">points per game</span>')}
+      ${tile(`${M.tc ? M.tc[0].toUpperCase() + M.tc.slice(1) : 'Rating'} rating`, M.rs.length ? M.rs[M.rs.length - 1][1] : '–', M.r0 && M.rs.length ? this.delta(dr, '', true, 'the start of the month') : '<span class="rcsub">no rated games</span>')}
+      ${tile('Moves in the book', this.depth(M), pv && pv.inb ? this.delta(Math.round((this.depth(M) - this.depth(pv)) * 10) / 10, '', true, pn) : '<span class="rcsub">on average, per game</span>')}</ul>`;
+    const ch = pv ? this.changes(M, pv, pn) : null;
+    const chg = ch && (ch.up.length || ch.down.length) ? `<section class="pcard rcchg"><p class="kicker">Since ${pn}</p>
+        ${ch.up.length ? `<ul class="rcli up">${ch.up.map(x => `<li>${esc(x.text)}</li>`).join('')}</ul>` : '<p class="rcnone">Nothing moved much the right way yet.</p>'}
+        ${ch.down.length ? `<p class="rcsh">To watch</p><ul class="rcli dn">${ch.down.map(x => `<li>${esc(x.text)}</li>`).join('')}</ul>` : ''}</section>`
+      : `<section class="pcard rcchg"><p class="kicker">Since ${pn}</p><p class="rcnone">${pv ? 'About the same as the month before.' : `No games in ${pn} to compare with.`}</p></section>`;
+    const keys = [...new Set(Object.keys(M.ch).concat(Object.keys(D.ch)))].sort((a, b) => ((M.ch[b] || [0])[0] - (M.ch[a] || [0])[0]) || ((D.ch[b] || 0) - (D.ch[a] || 0))).slice(0, 8);
+    const rows = keys.map(key => { const [sd, id] = key.split(':'), c = M.ch[key], q = pv && pv.ch[key], dv = c && q && q[0] ? Math.round((c[4] / c[0] - q[4] / q[0]) / 2 * 10) / 10 : 0, dl = D.ch[key] || 0, op = this.open(sd, id);
+      return `<${op ? `button type="button" data-pch="${key}"` : 'div'} class="rcrow"><span class="rcnm"><b>${esc(this.chName(sd, id))}</b><i>with ${sd === 'w' ? 'White' : 'Black'}</i></span>
+        <span class="rcv">${c ? `${plural(c[0], 'game')} · ${this.score(c)}%` : '<i>not met in a game</i>'}</span>
+        <span class="rcv">${c ? `${Math.round(c[4] / c[0] / 2 * 10) / 10} moves in the book${dv ? ` <em class="${dv > 0 ? 'up' : 'dn'}">${dv > 0 ? '+' : '−'}${Math.abs(dv)}</em>` : ''}` : ''}</span>
+        <span class="rcv">${dl ? plural(dl, 'line') + ' drilled' : '<i>not drilled</i>'}</span></${op ? 'button' : 'div'}>`; }).join('');
+    const prac = keys.length ? `<section class="pcard rcprac"><p class="kicker">Your openings in ${this.name(k)}</p><p class="rcnote">Games and time in the book beside the lines you drilled.${D.n ? ` ${plural(D.n, 'line')} drilled in all.` : ''}</p><div class="rcrows">${rows}</div></section>` : '';
+    const link = (g, t) => g.url ? `<a class="linkish" href="${esc(g.url)}" target="_blank" rel="noopener">${t}</a>` : '';
+    const where = g => `With ${g.me === 'w' ? 'White' : 'Black'}${g.ch ? ' · ' + esc(this.chName(g.me, g.ch)) : ''}`;
+    const hl = [M.best ? `<li><span class="rclab">Best win</span><b>vs ${esc(M.best.opp)} (${M.best.oe})</b><span>${where(M.best)}</span>${link(M.best, 'See the game')}</li>` : '',
+      M.deep && M.deep.bp >= 6 ? `<li><span class="rclab">Longest in the book</span><b>${Math.floor(M.deep.bp / 2)} moves, vs ${esc(M.deep.opp)}</b><span>${where(M.deep)}</span>${link(M.deep, 'See the game')}</li>` : ''].join('');
+    const lk = M.lk && BOOKS[M.lk.side].nodes[M.lk.node] ? `<section class="pcard"><p class="kicker">Where you left the book most</p><div class="leaks rcleak">${Product.leakHTML(M.lk, true)}</div></section>` : '';
+    const hist = ks.length > 1 ? `<section class="pcard rchist"><p class="kicker">Month by month</p><div class="gwrap"><table class="gtable"><thead><tr><th>Month</th><th>Games</th><th>Score</th><th>Rating</th><th>In the book</th></tr></thead><tbody>
+      ${ks.slice(0, 12).map(x => { const X = this.month(x); return `<tr${x === k ? ' class="on"' : ''}><td><button class="linkish" type="button" data-rcm="${x}">${this.name(x, true)}</button></td><td class="tnum">${X.all[0]}</td><td class="tnum">${X.all[0] ? this.score(X.all) + '%' : '–'}</td><td class="tnum">${X.rs.length ? X.rs[X.rs.length - 1][1] : '–'}</td><td class="tnum">${X.inb ? this.depth(X) + ' moves' : '–'}</td></tr>`; }).join('')}</tbody></table></div></section>` : '';
+    return `${this.statusHTML()}${nav}${tiles}
+      <div class="rcgrid"><section class="pcard"><p class="kicker">${M.tc ? M.tc[0].toUpperCase() + M.tc.slice(1) : ''} rating through ${this.name(k)}</p>${this.chartHTML(M, k)}</section>${chg}</div>
+      ${prac}<div class="rcgrid">${hl ? `<section class="pcard"><p class="kicker">Highlights</p><ul class="rchl">${hl}</ul></section>` : ''}${lk}</div>${hist}`;
+  },
+  // wiring after the part is drawn (on the house page and on a personal one)
+  wire(view){
+    const go1 = view.querySelector('#rcGo'); if (go1) go1.onclick = () => this.check();
+    view.querySelectorAll('[data-rcm]').forEach(b => b.onclick = () => { if (!b.dataset.rcm) return; this.sel = b.dataset.rcm; renderGames(); });
+    view.querySelectorAll('.rcchart').forEach(c => { const tip = c.querySelector('.rctip'), show = e => { const t = e.target.closest('[data-tip]'); if (!t){ tip.hidden = true; return; }
+        const r = c.getBoundingClientRect(), b = t.getBoundingClientRect(); tip.textContent = t.dataset.tip; tip.hidden = false; tip.style.left = Math.min(r.width - 90, Math.max(0, b.left - r.left + b.width / 2 - 45)) + 'px'; tip.style.top = Math.max(0, b.top - r.top - 30) + 'px'; };
+      c.addEventListener('pointerover', show); c.addEventListener('focusin', show); c.addEventListener('pointerleave', () => tip.hidden = true); });
+    view.querySelectorAll('.rcprac [data-pch]').forEach(b => b.onclick = () => { const [s, id] = b.dataset.pch.split(':'); useSide(s); S.chapter = id; go('learn'); });
+    view.querySelectorAll('.rcgrid [data-leak]').forEach(b => b.onclick = () => { const [s, line, kid] = b.dataset.leak.split(':'); useSide(s); openLine(line, Math.max(0, LINES[line].n.indexOf(+kid)), 'games'); });
+  },
+  // redraw the part when it is on screen; while reading, only the status line
+  paint(soft){
+    if (S.view !== 'games' || S.gseg !== 'recap') return;
+    if (soft){ const w = document.getElementById('rcWhen'); if (w) w.textContent = `Reading your games: ${plural(this.got, 'game')} so far…`; return; }
+    renderGames();
+  }
+};
+
+setInterval(() => Recap.auto(), 30 * 6e4);
+setTimeout(() => Recap.auto(), 5000);
 /* ---- hooks into the app */
 const render0 = render;
 render = function(){
@@ -874,12 +1250,17 @@ render = function(){
 const renderGames0 = renderGames;
 renderGames = function(){ if (PERSONA === 'ready' && Product.me().P) return Product.games(); renderGames0(); };
 const record0 = Prog.record.bind(Prog);
-Prog.record = function(id, clean){
-  const before = Daily.count(), nb = Badges.n; record0(id, clean);
+Prog.record = function(id, clean, slips){
+  const before = Daily.count(), nb = Badges.n, r0 = Prog.rec(id), prev = r0 ? JSON.parse(JSON.stringify(r0)) : null;
+  const D = S.view === 'drill' && S.drill && S.drill.kind === 'line' && S.drill.id === id ? S.drill : null;   // a line played in Drill: its panel speaks
+  record0(id, clean, slips);
+  if (D) D.note = Coach.lineNote(id, clean, prev, D);
+  const day = before < DAILY && Daily.count() >= DAILY;
   if (Badges.n !== nb) return;                           // a new badge says it louder (now, or once the line is over)
-  if (before < DAILY && Daily.count() >= DAILY) return Coach.daily();
-  Coach.event('line', clean);
+  if (day) return Coach.daily();
 };
+// a tap anywhere but on the coach closes the bubble (on a phone it sits over the page)
+document.addEventListener('pointerdown', ev => { const e = document.getElementById('coach'); if (e && e.querySelector('.cbub') && !e.contains(ev.target)) Coach.hush(); }, true);
 // every save is a moment something may have been earned
 const save0 = Prog.save.bind(Prog);
 Prog.save = function(){ save0(); const b = Badges.check(), l = Lv.check(); if (b || l) save0(); };
@@ -981,7 +1362,7 @@ const render1 = render;
 render = function(){ render1(); OwnerUI.paint(); };
 // a level reached while a line was being played waits for the line to end
 const record1 = Prog.record;
-Prog.record = function(id, clean){ record1.call(Prog, id, clean); if (Lv.pending && !(S.drill && S.drill.state === 'play')) Lv.up(Lv.pending); };
+Prog.record = function(id, clean, slips){ record1.call(Prog, id, clean, slips); if (Lv.pending && !(S.drill && S.drill.state === 'play')) Lv.up(Lv.pending); };
 const refreshSoon0 = refreshSoon, refresh0 = refresh;
 refreshSoon = function(){ Lv.sync(); Lv.paint(); refreshSoon0(); };
 refresh = function(){ Lv.sync(); refresh0(); };

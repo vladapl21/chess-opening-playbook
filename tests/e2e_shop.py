@@ -1,6 +1,7 @@
 """The shop and the levels: points from lines played and days kept, a level chip in the corner with a card for each new
 level, a wardrobe that opens at level 5, tokens from badges, days in a row and levels, buying and wearing looks for the
-coach, items that need a badge, the look on every coach and in the corner, and the record of it all."""
+coach, items that need a badge, today's two drops (gone at midnight unless bought) and the locker, the look on every
+coach and in the corner, and the record of it all."""
 from playwright.sync_api import sync_playwright
 from e2e_white import launch, URL, out
 errors = []
@@ -28,13 +29,13 @@ with sync_playwright() as p:
     pg.click('.tabs [data-view="shop"]'); pg.wait_for_timeout(400)
     assert pg.locator('.wlock').count() == 1 and pg.locator('[data-buy]').count() == 0, 'nothing to buy before level 5'
     assert 'level 5' in pg.inner_text('.wlock') and pg.locator('.wlock .wlv i').count() == 5
-    assert pg.locator('.item.lock').count() == pg.evaluate('SHOP.length') - 1, 'every item but the classic look is locked'
+    assert pg.locator('.item.lock').count() == pg.evaluate('SHOP.filter(I => !I.daily).length - 1 + Shop.today().length'), 'every item but the classic look is locked, today\'s drops too'
     pg.screenshot(path=out + 's_locked.png', full_page=True)
 
     # ---- six days in a row, then today's five: a week in a row, but points, not days, open the wardrobe
     pg.evaluate("""(() => { const D = Prog.d.days = {}; for (let k = 1; k <= 6; k++) D[dayKey(-k)] = ['a','b','c','d','e']; Prog.save(); Badges.queue = []; Coach.hush(); })()""")
     tok = pg.evaluate('[Shop.earned(), Shop.balance(), Shop.isOpen(), Level.xp(), Level.n()]'); print('after six days:', tok)
-    assert tok[0]['streak'] == 2 and tok[0]['week'] == 0 and not tok[2] and tok[3] == 6 * 15 and tok[4] == 2, 'a day with today\'s five is worth 15 points'
+    assert tok[0]['streak'] == 2 and 'week' not in tok[0] and not tok[2] and tok[3] == 6 * 15 and tok[4] == 2, 'a day with today\'s five is worth 15 points'
     pg.wait_for_timeout(1700)   # the points from those days have floated away
     ids = pg.evaluate('DRILLABLE.slice(0, 26)')
     for k, lid in enumerate(ids[:5]):
@@ -43,16 +44,16 @@ with sync_playwright() as p:
         if k == 4: assert pg.locator('#lvBtn .xpf').last.inner_text() == '+25', 'the fifth line also finishes the day'
     pg.wait_for_timeout(300)
     tok = pg.evaluate('[Shop.earned(), Shop.balance(), Shop.isOpen(), Daily.streak(), Level.xp(), Level.n()]'); print('after the seventh day:', tok)
-    assert tok[3] == 7 and tok[0]['week'] == 1 and tok[4] == 7 * 15 + 5 * 10 and tok[5] == 3 and not tok[2]
+    assert tok[3] == 7 and tok[4] == 7 * 15 + 5 * 10 and tok[5] == 3 and not tok[2]
     card = pg.inner_text('#lvup'); print('level card:', card.replace('\n', ' | ')); assert 'Level 3' in card and 'level 5' in card and pg.locator('#lvup [data-go]').count() == 0
-    bub = pg.inner_text('#coach .cbub'); print('coach:', bub.replace('\n', ' | ')); assert 'A full week' in bub and pg.locator('#coach [data-cgo="shop"]').count() == 0, 'no way into a shop that is still shut'
+    bub = pg.inner_text('#coach .cbub'); print('coach:', bub.replace('\n', ' | ')); assert ('A week in a row' in bub or 'New badge' in bub) and 'first full week' not in bub and pg.locator('#coach [data-cgo="shop"]').count() == 0, 'no way into a shop that is still shut'
     pg.screenshot(path=out + 's_level3.png')
     # ---- twenty-one more lines: level 5, and that card waits with the way in
     for lid in ids[5:]: pg.evaluate(f"Prog.record('{lid}', true)")
     pg.wait_for_timeout(500)
     tok = pg.evaluate('[Shop.earned(), Shop.balance(), Shop.isOpen(), Level.xp(), Level.n(), Prog.d.lvl]'); print('after 26 lines:', tok)
     assert tok[2] and tok[3] == 7 * 15 + 26 * 10 and tok[4] == 5 and tok[5] == 5 and tok[0]['level'] == 1
-    assert tok[1] == tok[0]['badges'] + tok[0]['streak'] + tok[0]['week'] + tok[0]['level']
+    assert tok[1] == tok[0]['badges'] + tok[0]['streak'] + tok[0]['level']
     card = pg.inner_text('#lvup'); print('level card:', card.replace('\n', ' | ')); assert 'Level 5' in card and 'shop is open' in card
     pg.screenshot(path=out + 's_level5.png')
     pg.wait_for_timeout(5600); assert pg.locator('#lvup').count() == 1, 'the card that opens the shop stays until it is used or closed'
@@ -69,17 +70,43 @@ with sync_playwright() as p:
     pg.click('[data-buy="h-tophat"]'); pg.wait_for_timeout(300)
     assert pg.evaluate('Shop.balance()') == bal - 3 and pg.evaluate('Shop.worn().head') == 'h-tophat'
     assert pg.get_attribute('#coach .cav svg', 'viewBox') == '-6 -12 76 76' and pg.locator('#coach .cav svg .g-ros').count() == 1, 'the corner coach wears the hat'
-    assert 'Needs the badge' in pg.inner_text('.item:has([data-buy="h-crown"]), .item:has-text("Crown")')
+    assert 'Needs the badge' in pg.inner_text('.slot .item:has(b:text-is("Crown"))')
     assert pg.locator('[data-buy="h-crown"]').count() == 0
     poor = pg.evaluate("SHOP.filter(I => I.price > Shop.balance() && !Shop.owns(I.id) && !Shop.lockOf(I)).map(I => I.id)")
     for i in poor: assert pg.is_disabled(f'[data-buy="{i}"]'), i
+    assert pg.locator('.shopmain .slot [data-wear="h-tophat"], .shopmain .slot [data-off="head"]').count() == 0, 'what is bought leaves the shop for the locker'
+    pg.click('[data-shoptab="locker"]'); pg.wait_for_timeout(200)
     pg.click('[data-off="head"]'); pg.wait_for_timeout(200); assert pg.evaluate('Shop.worn().head') is None
     pg.click('[data-wear="h-tophat"]'); pg.wait_for_timeout(200); assert pg.evaluate('Shop.worn().head') == 'h-tophat'
+    pg.click('[data-shoptab="shop"]'); pg.wait_for_timeout(200)
     # a colour, then the same look on another coach
     if pg.evaluate('Shop.balance()') >= 2: pg.click('[data-buy="c-ruby"]'); pg.wait_for_timeout(200); assert pg.get_attribute('#coach .cav svg', 'class') == 'sk-ruby'
     pg.click('.shopside [data-coachwho="rook"]'); pg.wait_for_timeout(300)
     assert pg.evaluate('SET.who') == 'rook' and pg.locator('.mannequin svg .g-ros').count() == 1
     pg.evaluate('Coach.hush()'); pg.screenshot(path=out + 's_open.png', full_page=True)
+    assert 'Spent' not in pg.inner_text('.shopside') and 'week' not in pg.inner_text('.earn').lower(), 'no spent row and no week token'
+
+    # ---- today's drops: two items set by the date, so every device shows the same two; tomorrow's shelf is a mystery
+    drops = pg.evaluate('Shop.today().map(I => I.id)'); print('drops today:', drops, '| tomorrow:', pg.evaluate('Shop.tomorrow().map(I => I.id)'))
+    assert len(drops) == 2 and pg.locator('.sdrops .sdi:not(.sdnext)').count() == 2 and pg.locator('.sdrops .sdnext').count() == 1
+    assert pg.evaluate("Shop.today().every(I => I.daily.includes(new Date().getDay()))"), 'a drop comes out only on its days'
+    assert pg.evaluate("Shop.on(new Date(2026, 10, 16, 1)).map(I => I.id).join() === Shop.on(new Date(2026, 10, 16, 23)).map(I => I.id).join()"), 'one shelf all day'
+    assert pg.evaluate("Shop.on(new Date(2026, 10, 16, 12)).map(I => I.id).join() !== Shop.on(new Date(2026, 10, 17, 12)).map(I => I.id).join()"), 'a new shelf the next day'
+    assert pg.evaluate("SHOP.filter(I => I.daily && !Shop.today().includes(I)).every(I => Shop.lockOf(I) === 'gone')"), 'the other drops are not for sale today'
+    assert pg.evaluate("[...document.querySelectorAll('.shopmain .slot [data-buy]')].every(e => !SHOP.find(I => I.id === e.dataset.buy).daily)"), 'drops are only on their shelf'
+    pg.evaluate("Prog.d.xpb = (Prog.d.xpb || 0) + 1500; Prog.save()"); pg.wait_for_timeout(300); pg.evaluate("document.querySelectorAll('#lvup').forEach(e => e.remove()); Coach.hush(); renderShop()")
+    assert pg.evaluate('Shop.balance()') >= 4, pg.evaluate('Shop.balance()')
+    d0 = drops[0]; name = pg.evaluate(f"SHOP.find(I => I.id === '{d0}').name")
+    pg.click(f'.sdrops [data-buy="{d0}"]'); pg.wait_for_timeout(300)
+    bub = pg.inner_text('#coach .cbub'); print('bought a drop:', bub.replace('\n', ' | ')); assert 'today only' in bub and 'locker' in bub
+    assert pg.evaluate(f"Shop.owns('{d0}')") and 'In your locker' in pg.inner_text('.sdrops .sdi:first-child')
+    pg.click('[data-shoptab="locker"]'); pg.wait_for_timeout(200)
+    names = pg.locator('.shopmain .slot .item b').all_inner_texts(); print('locker:', names); assert name in names and 'Top hat' in names
+    pg.screenshot(path=out + 's_locker.png', full_page=True)
+    # bought on an earlier day, a drop leaves the rotation: its days bring another item, or nothing
+    pg.evaluate(f"Prog.d.shop.own['{d0}'] = Date.now() - 3 * DAY; Prog.save()")
+    assert d0 not in pg.evaluate('Shop.today().map(I => I.id)')
+    pg.click('[data-shoptab="shop"]'); pg.wait_for_timeout(200)
 
     # ---- the record: bought items stay bought, the newer choice of what to wear wins, tokens are the same everywhere
     m = pg.evaluate("mergeProg({shop: {own: {'h-cap': 5}, wear: {head: ['h-cap', 10]}}}, {shop: {own: {'h-cap': 3, 'n-bowtie': 4}, wear: {head: ['h-tophat', 20], neck: ['n-bowtie', 4]}}}).shop")

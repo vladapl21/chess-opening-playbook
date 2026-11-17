@@ -388,7 +388,7 @@ L('quiet-d6', 'bishop', 'Black declines the pawn', 'Castle, then jump your knigh
   J(QD, "O-O Nd5 Nxd5 exd5 Ne7 Qa4 c5 a3 Ba5 dxc5 dxc5 d6"),
   alts=[('quiet-d6-bxc3', 'Bishop takes your knight', J(QD, "Bxc3 bxc3 Nxe4 Re1 d5 Ba3")),
         ('quiet-d6-nxe4', 'Black grabs the pawn late', J(QD, "Nxe4 Nxe4 d5 Ng3 dxc4 d5 O-O dxc6"))],
-  start=13, tags=['new', 'game'], why='Not in your study. Your opponent played it on Oct 14.', outcome='You are clearly better')
+  start=13, tags=['new', 'game'], why='Not in your study. An opponent played it against you.', outcome='You are clearly better')
 n(J(CH, "d6"), "Black declines the pawn", "Black guards the center instead of grabbing your pawn. Not in your study, but you met it in a game.", ['new', 'game'])
 n(QD, "Castle", "Same idea as always: king safe first. Your e-pawn is still offered.", ['key'])
 n(J(QD, "O-O"), "Black castles too")
@@ -425,7 +425,7 @@ L('bb6', 'bishop', 'Bishop steps back', 'Your center rolls forward with tempo', 
   alts=[('bb6-nb4', 'Knight counterattacks', J(BB, "e5 d5 exf6 dxc4 d5 Nb4 Qa4+ c6 O-O Nxd5 fxg7 Rg8 Re1+ Kd7 Nc3 Nxc3 bxc3 Rxg7 Qd1+ Kc7 Bf4+ Qd6 Qxd6#")),
         ('bb6-ne4', 'Knight jumps forward', J(BB, "e5 Ne4 Bd5 f5 Nc3 Ne7 Nxe4 fxe4 Bxe4")),
         ('bb6-ng4', 'Knight to the side', J(BB, "e5 Ng4 Nc3 d6 h3 Nh6 Bg5"))],
-  start=11, tags=['game'], why='From your study. You met it on Oct 13 and pushed the other pawn.', outcome='You are clearly better')
+  start=11, tags=['game'], why='From your study. You met it in a game and pushed the other pawn.', outcome='You are clearly better')
 n(BB, "Bishop steps back", "No check this time. Now your center can roll forward.")
 n(J(BB, "e5"), "Kick the knight", "Push the e-pawn and attack the knight. Pushing the d-pawn to hit the other knight is just as strong; what matters is pushing one of them now.", ['key'], arrows=['e5f6g'])
 n(J(BB, "e5 d5"), "Black counterattacks", "Black hits your bishop instead of moving the knight.")
@@ -686,7 +686,7 @@ L('tk-sidelines', 'knight', 'Black ignores f7: other tries', 'Take on f7 and col
   alts=[('tk-h6', 'Pawn kicks the knight', J(TK, "h6 Nxf7 Qe7 Nxh8")),
         ('tk-qe7', 'Queen guards the center', J(TK, "Qe7 Bxf7+ Kd8 Bb3")),
         ('tk-nxe4', 'Knight grabs your pawn', J(TK, "Nxe4 Bxf7+ Ke7 d4"))],
-  start=7, tags=['new', 'game'], why='Not in your study. Your opponent tried the knight move on Oct 14.', outcome='You are winning')
+  start=7, tags=['new', 'game'], why='Not in your study. An opponent tried the knight move against you.', outcome='You are winning')
 n(J(TK, "Na5"), "Knight hits your bishop", "Black ignores the threat on f7.", ['mistake', 'game'])
 n(J(TK, "Na5 Bxf7+"), "Bishop takes f7", "With check. In your game you took with the knight, which is also good; the bishop is cleaner.", ['key'])
 n(J(TK, "Na5 Bxf7+ Ke7"), "King steps up")
@@ -717,7 +717,7 @@ L('shilling', 'odd', 'The knight jump trap', 'Never take the center pawn here', 
   alts=[('shilling-bc5', 'Bishop out (your game)', J(SH, "Nxd4 exd4 O-O Bc5 Bxf7+ Kf8 Bb3")),
         ('shilling-bc5-kxf7', 'Black takes the bishop', J(SH, "Nxd4 exd4 O-O Bc5 Bxf7+ Kxf7 Qh5+ Kf8 Qxc5+ d6 Qxd4")),
         ('shilling-warn', 'The trap Black wants', J(SH, "Nxe5 Qg5 Nxf7 Qxg2 Rf1 Qxe4+ Be2 Nf3#"))],
-  start=5, tags=['game'], why='From your study. You met it on Oct 13.', outcome='You are clearly better')
+  start=5, tags=['game'], why='From your study. You have met it in a game.', outcome='You are clearly better')
 n(SH, "Knight jumps to the center", "A trap: it leaves the center pawn hanging on purpose.", ['trap'])
 n(J(SH, "Nxd4"), "Trade knights", "Simple and good. Don't take the center pawn.", ['key'])
 n(J(SH, "Nxd4 exd4"), "Pawn takes back")
@@ -812,7 +812,7 @@ L('d6-3rd', 'odd', 'Black plays the d-pawn one square', 'Take space and develop'
   J(IT, "d6 d4 exd4 Nxd4 Nf6 Nc3 Be7 O-O"),
   alts=[('d6-nf6', 'Knight hits your pawn', J(IT, "d6 d4 Nf6 d5 Ne7 Nc3 g6 Bg5 Bg7 h3")),
         ('d6-f6', 'Black weakens the king (your game)', J(IT, "d6 d4 f6 O-O"))],
-  start=5, tags=['game'], why='From your study. You met it on Oct 14.', outcome='Slightly better for you')
+  start=5, tags=['game'], why='From your study. You have met it in a game too.', outcome='Slightly better for you')
 n(J(IT, "d6"), "Black plays solid", "Black supports the center pawn.")
 n(J(IT, "d6 d4"), "Strike the center", ['key'])
 n(J(IT, "d6 d4 exd4"), "Black takes")

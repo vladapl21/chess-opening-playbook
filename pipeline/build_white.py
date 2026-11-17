@@ -138,7 +138,7 @@ for G in ALL_GAMES:
         glines.append(dict(id=aid, lesson=G['id'], title=atitle, n=ids, main=0, at=ply))
     lines.extend(glines)
     h = g.headers
-    games_out.append(dict(id=G['id'], opp=G['opp'], oppElo=G['opp_elo'], meElo=G['me_elo'], result=G['result'], tc=G['tc'], date=G['date'], acct=G.get('acct', 'aqua_alpaca'),
+    games_out.append(dict(id=G['id'], opp=G['opp'], oppElo=G['opp_elo'], meElo=G['me_elo'], result=G['result'], tc=G['tc'],
                           title=G['title'], lesson=G['lesson'], summary=G['summary'], lines=[l['id'] for l in glines],
                           moments=sorted(G['moments'].keys())))
 

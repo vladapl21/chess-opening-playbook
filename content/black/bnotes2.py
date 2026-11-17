@@ -10,7 +10,7 @@ n(J(QH, 'Bc4 g6'), 'Pawn blocks the queen', 'Kick the queen off the diagonal. Yo
 n(J(QH, 'Bc4 g6 Qf3'), 'Queen hits f7 again', 'Now down the f-file.', arrows=['f3f7r'])
 n(J(QH, 'Bc4 g6 Qf3 Nf6'), 'Knight blocks', 'Shut the queen out. Almost every club player gets here.', ['key'])
 n(J(QH, 'Bc4 g6 Qf3 Nf6 c3'), 'Small c-pawn move')
-n(J(QH, 'Bc4 g6 Qf3 Nf6 c3 Bg7'), 'Bishop next to your king', 'From here it guards your knight. In both October losses the bishop went to the Italian diagonal, and White\'s queen and bishop won the knight.', ['key', 'swap', 'game'])
+n(J(QH, 'Bc4 g6 Qf3 Nf6 c3 Bg7'), 'Bishop next to your king', 'From here it guards your knight. In both of your losses here the bishop went to the Italian diagonal, and White\'s queen and bishop won the knight.', ['key', 'swap', 'game'])
 n(J(QH, 'Bc4 g6 Qf3 Nf6 c3 Bg7 d3 O-O'), 'Castle', 'You are better: White\'s queen is misplaced and you are developed.')
 n(J(QH, 'Bc4 g6 Qf3 Nf6 d3'), 'Small d-pawn move', 'It leaves the c-pawn without a guard.')
 n(J(QH, 'Bc4 g6 Qf3 Nf6 d3 Nd4'), 'Knight hits the queen', 'It also threatens to fork king and rook from the c-pawn\'s square.', ['key'], arrows=['d4f3g', 'd4c2r'])
