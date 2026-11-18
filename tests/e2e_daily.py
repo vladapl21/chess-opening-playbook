@@ -132,8 +132,9 @@ with sync_playwright() as p:
         mv2 = pg.evaluate("(() => { const Q = S.quizState, it = Q.items[Q.k], L = DATA.legal[String(it.node)] || []; return Q.tries ? it.ans : (L.find(m => !it.ok.includes(m) && m.length === 4) || it.ans); })()")
         pg.evaluate(f"quizTry('{mv2}', '{mv2[2:4]}')"); pg.wait_for_timeout(400)
     qn = pg.inner_text('.coachnote'); print('checkpoint note:', qn.replace('\n', ' | '))
-    assert 'misses are from' in qn and pg.locator('.coachnote [data-lesson]').count() == 1
-    pg.click('.coachnote [data-lesson]'); pg.wait_for_timeout(400); assert pg.evaluate('S.view') in ('study', 'learn'), pg.evaluate('S.view')
+    assert ('misses: ' in qn or 'Your miss: ' in qn) and 'Play it along once more' in qn and pg.locator('.coachnote [data-guided]').count() == 1
+    pg.click('.coachnote [data-guided]'); pg.wait_for_timeout(500)
+    assert pg.evaluate('[S.view, !!(S.drill && S.drill.guided), S.drill && S.drill.unit]') == ['drill', True, uid], 'the note leads into a play-along of that lesson'
     pg.evaluate("S.drill = S.drillState = S.quizState = null; go('course')"); pg.wait_for_timeout(300)
 
     # ---- settings from another device: the newer copy wins, the coach changes face

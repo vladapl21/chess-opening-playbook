@@ -119,7 +119,7 @@ with sync_playwright() as p:
     pg.click('#dGo'); pg.wait_for_timeout(300)
     assert pg.evaluate('S.view') == 'unit' and pg.evaluate('S.unit') == 'x-w-italian-1' and pg.evaluate("Prog.d.course.u['x-w-italian-1'].o > 0"), 'starting a step marks the deep dive as started'
     u = pg.inner_text('#view'); no_notation(u, 'part page')
-    assert 'Deep dive · Part 1 of 4' in u and '← The Italian' in u and 'positions from this part' in u and 'open the next part' in u, u[:800]
+    assert 'Deep dive · Part 1 of 4' in u and '← The Italian' in u and 'positions from this part' in u and 'opens the next part' in u, u[:800]
     cards = pg.evaluate("UNIT['x-w-italian-1'].idea.map(s => slideOf(UNIT['x-w-italian-1'], s))")
     assert cards[0]['h'] == 'Black steps off early' and all(a.endswith('b') for a in cards[0]['arrows']) and len(cards[0]['arrows']) >= 2
     assert all(c['t'].startswith('Green:') for c in cards[1:]) and len(cards) == 1 + len(pg.evaluate("UNIT['x-w-italian-1'].lessons"))

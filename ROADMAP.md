@@ -69,6 +69,15 @@ Facts that shape the design:
 - Settings and the account button moved out of the header into the corner of the screen; the header fits one row on an ordinary monitor and centres its rows when it has to wrap.
 - A lesson opened from a course unit has "Next lesson" at the top. The Sandbox has "Free play: pick openings" to leave a course practice game.
 
+## Phase 1.13: learning by playing (done, November 17)
+
+The app is for a player who would rather play than read; the learning should happen in the playing.
+
+- **Play along** replaces "Learn the lines" in every course unit. A lesson is played on the drill board with the move to make as a green arrow and the coach's word beside the board in two bullets at most; a wrong move just doesn't go and isn't counted. Played to its end, the lesson counts as studied and the next step is the same line once from memory. The unit page has one button that always leads on: that line from memory, then the next lesson to play along, then the practice games and the checkpoint. Skipping to the end of a lesson's page no longer counts as studying it; stepping through it (or letting it play) still does.
+- **A slip in a unit drill keeps the line in front.** Again leads, ahead of the way back to the unit; a clean run leads to the unit's next thing. A unit drill or play-along stays under the Course tab, with a way back to the unit above the board.
+- **The header** is a grid: brand and the player's things on one row, the tabs on their own row, so nothing sits on a tab at any width; on a phone the White/Black switch gets the middle row. The level is a ring that fills toward the next level around a number in ink. The streak in the coach's bubble is a pill: flame, number, "days in a row".
+- **Fewer words at a time.** The coach, the unit steps, the course and opening pages, the lesson notes, the welcome screen and the shop's lock speak in short bullets instead of paragraphs.
+
 ## Phase 1.12: the monthly recap, daily drops, a coach that says something (done, November 17)
 
 - **Monthly recap**, a fourth part of Your games (`Recap` in `app/product.js`). The month's games are read straight from the playbook's own account (the house playbook's chess.com account, `HOUSE_ACCT`; a personal playbook's account from `me.src`), bullet and daily left out, run through the same analysis, and kept as a small summary per month in `d.recap.m` (the newest copy of each month wins a merge; `d.recap.seen`, the last finished month opened, is the latest; `d.recap.chk`, the last good check, the latest). The part shows the month beside the one before: games, score, rating and how far it moved, moves in the book, the rating day by day, what changed in plain sentences, each opening's games and time in the book beside the lines drilled from it that month, highlights, the place the player left the book most, and the months side by side. A check runs when the app opens and when Your games opens, at most every six hours, and **Check now** runs one at once; the month before is read again after it ends so its recap is final, and the coach says when a finished month is new. The claude.ai copy can't reach chess.com, so it points to the website. The analysis rows gained `tc`, `ot` (lost or won on time) and `by: 'end'` (the book ran out, nobody left it).
@@ -152,6 +161,7 @@ The original plan for this phase, for reference:
 - Done (Phase 1.9 and 1.10): the shop and the coach's wardrobe; the course-complete celebration and the library.
 - Done (Phase 1.11): points and levels, the shop at level 5.
 - Done (Phase 1.12): the monthly recap, daily drops in the shop.
+- Done (Phase 1.13): Play along, a lesson played with the arrows and the coach before it is played from memory.
 - Still to do: a streak freeze (one a week), a smaller celebration when you pass a checkpoint, and optional sound.
 - Leagues and friends later, once other players exist.
 

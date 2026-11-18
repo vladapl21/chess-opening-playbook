@@ -119,6 +119,12 @@ with sync_playwright() as p:
       W.lines.forEach(id => Prog.d.lines[id] = {box: 2, seen: 2, clean: 2, last: now, due: now + 2 * DAY});
       render(); })()"""); pg.wait_for_timeout(400); settle(pg)
     save(pg.screenshot(), 'course.png')
+    # Play along: the Italian unit's first lesson two moves in, the arrow on the next move and the coach's word on it
+    pg.evaluate("useSide('w'); startGuided(LIDX.w[UNIT['w-italian'].lessons[0]].lines[0], 'w-italian')"); pg.wait_for_timeout(900)
+    for _ in range(2):
+        idle(pg); tap(pg, pg.evaluate('N[LINES[S.drill.id].n[S.drill.i + 1]].u')); pg.wait_for_timeout(1600)
+    idle(pg); pg.wait_for_timeout(300); pg.evaluate("Coach.hush(); window.scrollTo(0, 0)"); settle(pg)
+    save(pg.screenshot(), 'play.png'); pg.evaluate("S.drill = S.drillState = null")
     pg.evaluate("localStorage.clear()"); pg.goto(URL + '#learn'); pg.reload(); pg.wait_for_timeout(900); settle(pg)
     save(pg.screenshot(), 'learn-white.png')
     pg.click('.sidesw [data-side="b"]'); pg.wait_for_timeout(700); pg.evaluate("go('learn')"); pg.wait_for_timeout(500); settle(pg)

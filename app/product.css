@@ -98,7 +98,7 @@
 .wopt .board{border-radius:4px;overflow:hidden} .wopt b{font-family:var(--f-display);font-size:22px;line-height:1.1;font-weight:700} .wopt p{color:var(--muted);font-size:14.5px}
 .wopt .you{font-size:13.5px;font-weight:600;color:var(--ink);background:var(--surface-2);border-radius:4px;padding:8px 10px}
 .wopt.plain{align-content:center;min-height:190px;justify-items:start} .wopt.plain .pbig{width:64px;height:64px;padding:8px;border-radius:6px;background:var(--surface-2)}
-.done-art{display:grid;justify-items:center;gap:14px;text-align:center;padding:clamp(20px,5vw,50px) 0} .done-art .cface{width:140px}
+.done-art{display:grid;justify-items:center;gap:14px;text-align:center;padding:clamp(20px,5vw,50px) 0} .done-art .cface{width:140px} .done-art .bul{text-align:left;justify-self:center}
 .pop{animation:pop .5s cubic-bezier(.2,1.4,.4,1) both} @keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
 
 /* the coach, bottom right */
@@ -162,8 +162,12 @@ body:has(.coach:not([hidden])) .foot{padding-right:100px}
 .cmedal::before{content:"";position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(var(--oro-soft) 0 9deg,transparent 9deg 18deg);-webkit-mask:radial-gradient(circle,#000 30%,transparent 70%);mask:radial-gradient(circle,#000 30%,transparent 70%);animation:rays 9s linear infinite}
 .cmedal .medal{position:relative;width:70px;height:83px;display:block;animation:medalIn .6s cubic-bezier(.2,1.4,.4,1)}
 @keyframes rays{to{transform:rotate(360deg)}}
-.cflame{display:grid;place-items:center;position:relative;width:46px;height:52px} .cflame .flame{width:46px;height:46px;animation:medalIn .6s cubic-bezier(.2,1.4,.4,1)}
-.cflame b{position:absolute;bottom:6px;font:800 14px var(--f-display);color:var(--flame-ink)}
+/* the streak in the coach's bubble: the flame, the number beside it and the words, nothing printed on top of anything */
+.cstreak{display:inline-grid;grid-template-columns:auto auto auto;align-items:center;gap:2px 8px;padding:6px 16px 6px 10px;border-radius:999px;background:var(--flame-soft)}
+.cstreak .flame{width:34px;height:34px;animation:medalIn .6s cubic-bezier(.2,1.4,.4,1)}
+.cstreak b{font:800 30px/1 var(--f-display);color:var(--ink)} .cstreak i{font-style:normal;font-size:11.5px;line-height:1.15;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.cbub .cbul{margin-top:4px;font-size:14px;font-weight:550} .cbub .cbul li::before{top:.58em}
+.coachnote .cntx .cnhead{font-weight:700;font-size:15px;margin:0} .coachnote .bul{margin-top:3px}
 .chead2{display:block;font-size:15px;margin-bottom:2px}
 @keyframes medalIn{0%{transform:scale(.3) rotate(-16deg);opacity:0}70%{transform:scale(1.08) rotate(3deg);opacity:1}100%{transform:none}}
 /* the profile */
@@ -284,7 +288,7 @@ body:has(.coach:not([hidden])) .foot{padding-right:100px}
 /* the level at the top of the profile */
 .plevel{display:flex;align-items:center;gap:14px;padding:4px 0 2px} .plevel > div{display:grid;gap:4px;flex:1;min-width:0}
 .plevel b{font:700 20px/1.1 var(--f-display)} .plevel span{font-size:13px;color:var(--muted)}
-.lvc.big{min-width:50px;height:50px;border-radius:25px;font-size:26px} .lvbar.wide{width:100%;height:7px}
+.lvc.big{width:54px;height:54px;font-size:25px;background:radial-gradient(closest-side,var(--surface) calc(100% - 5px),transparent calc(100% - 4.5px)),conic-gradient(var(--accent) calc(var(--p) * 1%),var(--line) 0)} .lvbar.wide{width:100%;height:7px}
 .lvnote{color:var(--accent)!important;font-weight:600}
 .pxp summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--muted)} .pxp ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:4px}
 .pxp li{display:flex;justify-content:space-between;font-size:13.5px;border-bottom:1px solid var(--line);padding:4px 0} .pxp li b{color:var(--accent)}
@@ -365,3 +369,5 @@ button.rcrow{cursor:pointer} button.rcrow:hover{border-color:var(--accent)}
 .rcempty .cface{width:64px;flex:none} .rcempty h3{margin:0 0 4px} .rcempty p{margin:0;color:var(--muted);font-size:14px}
 @media (max-width:860px){ .rctiles{grid-template-columns:repeat(2,minmax(0,1fr))} .rcgrid{grid-template-columns:minmax(0,1fr)} }
 @media (max-width:620px){ .rcrow{grid-template-columns:minmax(0,1fr) auto} .rcrow .rcnm{grid-column:1 / -1} .rcrow .rcv:last-child{grid-column:1 / -1} .rctiles b{font-size:27px} .rcnav h3{font-size:20px} }
+/* on a phone the coach steps aside while the board is in use: it can't speak then anyway, and it would cover the panel */
+@media (max-width:640px){ .coach.quiet:not(:has(.cbub)){display:none} }

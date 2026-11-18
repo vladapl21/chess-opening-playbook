@@ -10,9 +10,13 @@ from assemble import site_html  # noqa: E402
 
 
 class Site:
+    def __init__(self, docs=False):
+        self.docs = docs   # True: the GitHub Pages page itself (docs/index.html, accounts configured), not the build without them
+
     def start(self):
         self.dir = tempfile.mkdtemp(prefix='playbook-site-')
-        (Path(self.dir) / 'index.html').write_text(site_html((ROOT / 'data' / 'build' / 'playbook.html').read_text(), None))
+        page = (ROOT / 'docs' / 'index.html').read_text() if self.docs else site_html((ROOT / 'data' / 'build' / 'playbook.html').read_text(), None)
+        (Path(self.dir) / 'index.html').write_text(page)
         shutil.copytree(ROOT / 'docs' / 'engine', Path(self.dir) / 'engine')
         s = socket.socket(); s.bind(('127.0.0.1', 0)); port = s.getsockname()[1]; s.close()
         self.srv = subprocess.Popen([sys.executable, '-m', 'http.server', str(port), '--bind', '127.0.0.1'], cwd=self.dir,
