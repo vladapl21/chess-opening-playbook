@@ -330,7 +330,7 @@ const Product = {
     const lock = (v, h, p) => `<button class="lockcard" data-view="${v}"><b>${ICON.lock}${h}</b>${p}</button>`;
     return `<section class="whero"><div><p class="kicker">An opening course built from your own games</p>
         <h2>Connect your account.<br>Get <em>your</em> playbook.</h2>
-        <p class="lede" style="margin-top:14px">It reads what you already play, where you score and where you leave the book, asks you a few would-you-rather questions, and builds a course in that order. No notation anywhere.</p>
+        ${bullets(['Reads what you already play, where you score and where you leave the book', 'Asks a few would-you-rather questions', 'Builds your course in that order, with no notation anywhere'], 'lede')}
         <div class="cta">${cta}<button class="btn ghost" data-view="sandbox">Try the sandbox first</button></div></div>
       <div class="wart"><div class="board">${boardSVG(w.fen, {coords: false, last: w.last, arrows: ['c4f7r'], flip: false})}</div><p class="wbub">${short ? `Not enough games yet. Play some more and I'll be here.` : `Hi, I'm ${coachName()}. Connect your account and I'll show you your openings.`}</p><div class="wcoach cface">${knightSVG()}</div></div></section>
       <ol class="steps3">${li(1, 'Make an account', 'So your playbook follows you to every device.')}${li(2, 'Connect your chess account', 'Your chess.com or Lichess username. Only your public games are read.')}${li(3, 'Pick your lines', 'A few would-you-rather questions, then your course opens.')}</ol>
@@ -503,7 +503,7 @@ const Product = {
   builtHTML(){
     const P = this.me().P || {n: 0};
     return `<section class="done-art"><div class="cface pop">${knightSVG('cheer')}</div><p class="kicker">Built from your games</p><h2>Your playbook is <em>ready</em>.</h2>
-      <p class="lede">Your course is ordered by your own games, every chapter shows your own record, and Your games shows where you leave the book.</p>
+      ${bullets(['Your course is ordered by your own games', 'Every chapter shows your own record', 'Your games shows where you leave the book'], 'lede')}
       <div class="cta"><button class="btn primary" data-open style="min-height:48px;padding:12px 24px;font-size:16px">Open my course</button></div></section>`;
   },
   /* -- Your games, for a player with a profile. The same switch as the house page: your openings (both colours, every
@@ -522,7 +522,7 @@ const Product = {
     const body = seg === 'recap' ? Recap.html() : seg === 'leaks' ? `<p class="legendline">The same position, the same different move. Red is what you played, green is the playbook.</p><div class="leaks">${leaks.map(L => this.leakHTML(L, true)).join('')}</div>`
       : seg === 'games' ? `${P.facts.length ? `<div class="pcard"><p class="kicker">Where you score</p><ul class="factl">${P.facts.map(f => `<li><b>${f.big}</b><span>${esc(f.text)}</span></li>`).join('')}</ul></div>` : ''}
           <div class="gwrap pcard" style="padding:6px 10px"><table class="gtable"><thead><tr><th>Colour</th><th>Opponent</th><th>Result</th><th>Opening</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`
-      : `<p class="legendline">Their move is highlighted. The green arrow is your answer. Open one for its lessons and every position in it.</p>${group('w')}${group('b')}`;
+      : `<p class="legendline">Their move is highlighted, the green arrow is your answer.</p>${group('w')}${group('b')}`;
     const num = (b, w) => `<span><b class="tnum">${b}</b> ${w}</span>`;
     if (Recap.on()) segs[segs.length - 1][4] = Recap.fresh();      // after the body: opening a finished month marks it seen
     view.innerHTML = `<div class="pv"><div class="chead ghd"><div><p class="kicker">Your games${P.user ? ' · ' + esc(P.user) : ''}</p><h2 style="font-size:clamp(30px,4vw,44px)">What actually happened</h2>
@@ -621,7 +621,7 @@ function profileHTML(){
   const one = B => { const at = have[B.id], need = badgeNeed(B, x), cur = Math.min(need, B.n(x));
     return `<li class="bdg ${at ? 'got' : 'lock'}" title="${esc(B.need)}">${medalSVG(at ? B.tier : 'locked', B.glyph)}<b>${esc(B.name)}</b><span>${at ? 'Earned ' + new Date(at).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'}) : esc(B.need)}</span>${at ? '' : `<i class="bprog" aria-hidden="true"><i style="width:${Math.round(cur / need * 100)}%"></i></i>`}</li>`; };
   const L = Level.of(), pts = [['A line without a slip', XP.clean], ['A line with a slip', XP.slip], ['A lesson studied', XP.lesson], ['A practice game', XP.game], ['Today\'s five', XP.day], ['A checkpoint passed', XP.pass]];
-  return `<div class="prof"><div class="plevel"><span class="lvc big tnum">${L.n}</span><div><b>Level ${L.n}</b><span class="tnum">${L.into} of ${L.need} points to level ${L.n + 1}</span><span class="lvbar wide" aria-hidden="true"><i style="width:${Math.round(L.into / L.need * 100)}%"></i></span>
+  return `<div class="prof"><div class="plevel"><span class="lvc big tnum" style="--p:${Math.round(L.into / L.need * 100)}">${L.n}</span><div><b>Level ${L.n}</b><span class="tnum">${L.into} of ${L.need} points to level ${L.n + 1}</span><span class="lvbar wide" aria-hidden="true"><i style="width:${Math.round(L.into / L.need * 100)}%"></i></span>
       ${L.n < SHOP_AT ? `<span class="lvnote">The shop opens at level ${SHOP_AT}.</span>` : ''}</div></div>
     <details class="pxp"><summary>How points add up</summary><ul>${pts.map(([t, n]) => `<li><span>${t}</span><b class="tnum">+${n}</b></li>`).join('')}</ul></details>
     <div class="pstreak ${st ? '' : 'zero'}">${FLAME}<div><b class="tnum">${st}</b><span>${st === 1 ? 'day' : 'days'} in a row</span></div><p>Best: ${best} · today: ${k} of ${DAILY} lines</p></div>
@@ -742,7 +742,7 @@ function renderShop(){
         <div class="coachpick mini">${COACHES.map(c => `<button type="button" data-coachwho="${c.id}" aria-pressed="${who === c.id}"><span class="cface">${knightSVG('', c.id, L)}</span><b>${c.name}</b></button>`).join('')}</div>
       </aside>
       <div class="shopmain">
-        ${open ? '' : `<section class="wlock"><div><p class="kicker">Locked</p><h3>The wardrobe opens at level ${SHOP_AT}</h3><p>Every line you play earns points toward your next level. You're level ${lv.n}: ${toGo} more ${toGo === 1 ? 'point' : 'points'} and every item here can be bought. Your tokens wait for you until then.</p></div>
+        ${open ? '' : `<section class="wlock"><div><p class="kicker">Locked</p><h3>The wardrobe opens at level ${SHOP_AT}</h3>${bullets([`You're level ${lv.n}: ${toGo} more ${toGo === 1 ? 'point' : 'points'} to go`, 'Every line you play earns points', 'Your tokens wait for you until then'])}</div>
           <div class="wlv" aria-label="Level ${lv.n} of ${SHOP_AT}">${Array.from({length: SHOP_AT}, (_, k) => `<i class="${k < lv.n ? 'on' : ''}">${k + 1}</i>`).join('')}</div></section>`}
         <section class="sdrop" aria-label="Today only">
           <div class="sdhd"><div><p class="kicker">Today only · ${WEEKDAYS[new Date().getDay()]}</p><h3>${drops.length ? `${drops.length === 1 ? 'One drop' : 'Two drops'}, gone at midnight` : 'Nothing left to drop today'}</h3></div><span class="sdt tnum" id="dropT">${Shop.endsIn()} left</span></div>
@@ -848,7 +848,7 @@ function renderDeep(X){
     const steps = unitSteps(cur), nx = steps.find(s => !s.done), open = unitOpen(cur);
     hero = `<section class="chero"><div class="board">${slideSVG(cur, cur.idea[0])}</div>
       <div><div class="chips">${sideChip(cur)}<span class="chip">Up next · ${unitNo(cur)} of ${X.units.length}</span></div>
-        <h3>${esc(cur.title)}</h3><p class="lede">${esc(cur.why)}</p>
+        <h3>${esc(cur.title)}</h3>${bullets(cur.why, 'lede')}
         <ol class="ministeps" aria-label="Steps in this part">${steps.map(s => `<li class="${s.done ? 'done' : s === nx ? 'next' : ''}">${s.done ? ICON.check : ''}${esc(s.title)}</li>`).join('')}</ol>
         <div class="cta">${open ? `<button class="btn primary" id="dGo">${esc(stepCta(cur, nx))}</button>` : ''}<button class="btn" data-unit="${cur.id}">See the whole part</button></div></div></section>`;
   } else hero = `<section class="chero done dfin"><span class="dmedal">${medalSVG('silver', 'flag')}</span><div><p class="kicker">Deep dive finished</p><h3>Every part passed.</h3><p class="lede">Its lines stay in your reviews, and today's five bring them back. The library has more picks waiting.</p><div class="cta"><button class="btn primary" data-lib>Back to the library</button></div></div></section>`;
@@ -906,8 +906,8 @@ const Coach = {
     e.innerHTML = (bub || '') + `<button class="cav" type="button" aria-label="${coachName()}, your coach">${knightSVG(this.mood)}</button>`; },
   say(t, o = {}){
     if (!SET.coach) return; clearTimeout(this.timer); this.last = {t, o, v: S.view}; this.mood = o.mood;
-    this.draw(`<div class="cbub ${o.art ? 'art' : ''}" role="status"><button class="cx" type="button" aria-label="Close">×</button>${o.art ? `<span class="cart">${o.art}</span>` : ''}<span class="cwho">${coachName()}</span>${o.head ? `<b class="chead2">${esc(o.head)}</b>` : ''}${esc(t)}${o.cta ? `<div class="cacts"><button class="btn small primary" data-cgo="${o.cta[0]}">${esc(o.cta[1])}</button></div>` : ''}</div>`);
-    if (!o.stay) this.timer = setTimeout(() => this.hush(), 9000 + t.length * 45);
+    this.draw(`<div class="cbub ${o.art ? 'art' : ''}" role="status"><button class="cx" type="button" aria-label="Close">×</button>${o.art ? `<span class="cart">${o.art}</span>` : ''}<span class="cwho">${coachName()}</span>${o.head ? `<b class="chead2">${esc(o.head)}</b>` : ''}${Array.isArray(t) || sentences(t).length > 1 ? bullets(Array.isArray(t) ? t : sentences(t), 'cbul') : esc(t)}${o.cta ? `<div class="cacts"><button class="btn small primary" data-cgo="${o.cta[0]}">${esc(o.cta[1])}</button></div>` : ''}</div>`);
+    if (!o.stay) this.timer = setTimeout(() => this.hush(), 9000 + String(t).length * 45);
   },
   hush(){ clearTimeout(this.timer); this.mood = null; this.draw(''); },
   // a tap on the coach: closes what is open; otherwise what is worth knowing on this tab, what was last said here, or
@@ -928,9 +928,11 @@ const Coach = {
   // the first visit to a tab: what it is for
   tip(){
     const T = {start: 'Connect your chess account and I\'ll build your course around your games.', setup: 'A username is the quickest way. I only read your public games.', sandbox: 'Play your side. The other side answers the way club players really do.',
-      course: 'Work down the path. Each checkpoint you pass opens the next unit.', learn: 'Pick a lesson, or switch to At a glance for every decision in this opening on one page.', drill: 'Five lines a day keeps your streak. The ones you slipped on come first.',
-      games: 'Your openings, with your record in each. Open one for its lessons and every position in it at a glance.', study: 'Step through with the arrow keys. Switch the engine on under the board if a position looks scary.',
+      course: 'Work down the path. In Play along you make every move yourself, with an arrow to follow.', learn: 'Pick a lesson, or switch to At a glance for every decision in this opening on one page.', drill: 'Five lines a day keeps your streak. The ones you slipped on come first.',
+      games: 'Your openings, with your record in each. Open one for its lessons and every position in it at a glance.', study: 'Step through with the arrow keys. Play along puts the moves in your hands, with an arrow to follow.',
       shop: 'Tokens come from badges, levels and days in a row. Two drops come out every day and are gone at midnight.'};
+    if (S.view === 'drill' && S.drill && S.drill.guided) return 'Play the move the green arrow shows. Then the same line once from memory.';
+    if (S.view === 'drill' && S.drill && S.drill.unit) return 'Clean once from memory and the line counts for this unit. A slip: play it again.';
     return T[S.view] || T[tabOf(S.view, S.studyFrom)] || 'Keep going.';
   },
   // what is worth knowing on a tab today, about this player's own lines and games. Nothing when there is nothing.
@@ -945,8 +947,8 @@ const Coach = {
     }
     if (v === 'course' && !gradAt()){
       const U = COURSE.find(U => !U.soon && U.lessons && !unitPassed(U)); if (!U) return null;
-      const ls = U.lessons, seen = ls.filter(l => lessonSeen(U.side, l)).length;
-      return seen >= ls.length ? `Every lesson in ${unitNo(U)}, ${U.title}, is studied. Its checkpoint is waiting.` : `Next: ${unitNo(U)}, ${U.title}. ${seen ? `${seen} of ${ls.length} lessons studied.` : `${plural(ls.length, 'lesson')} to study, then the checkpoint.`}`;
+      const ls = U.lessons, seen = ls.filter(l => lessonSeen(U.side, l)).length, m = unitNext(U);
+      return [`Next: ${unitNo(U)}, ${U.title}`, seen >= ls.length ? 'Every lesson played along' : seen ? `${seen} of ${ls.length} lessons played along` : `${plural(ls.length, 'lesson')} to play along`, m ? m.cta : ''].filter(Boolean);
     }
     if (v === 'shop'){
       if (!Shop.isOpen()){ const L = Level.of(), toGo = Array.from({length: Math.max(0, SHOP_AT - L.n)}, (_, k) => Level.step(L.n + k)).reduce((a, x) => a + x, 0) - L.into;
@@ -963,6 +965,7 @@ const Coach = {
     if (v === 'grad' || libOn()){ this.lastView = v; return this.hush(); }            // the coach is part of those pages
     if (Badges.queue.length && PERSONA !== 'new') return Badges.show();
     if (e.querySelector('.cbub') && this.lastView === v) return this.draw(e.querySelector('.cbub').outerHTML); this.lastView = v;
+    if (v === 'drill' && S.drill && (S.drill.unit || S.drill.guided)) return this.hush();  // a course line: its panel has the coach's word already
     if (v === 'reading' || v === 'choices' || v === 'built' || v === 'findings') return this.hush(); // the coach is already on the page there
     if (PERSONA === 'new'){
       if (v === 'start') return this.hush();
@@ -980,9 +983,9 @@ const Coach = {
   },
   // the fifth line of the day: the streak, and the token every third day in a row
   daily(){
-    const st = Daily.streak(), fix = Daily.ids().filter(id => { const r = Prog.rec(id); return r && !r.box; }).length, tok = st % 3 === 0, sh = Shop.isOpen() ? ['shop', 'Open the shop'] : null;
-    this.say(`That's today's five${fix ? `, ${fix} of them still to get clean` : ', all of them clean'}. ${st === 1 ? 'Day one of your streak.' : `${st} days in a row.`} ${tok ? 'Every third day in a row is a shop token, and today is one.' : `${3 - st % 3 === 1 ? 'One more day' : 'Two more days'} in a row for the next token.`}`,
-      {mood: 'cheer', head: st === 7 ? 'A week in a row' : st === 30 ? 'A month in a row' : '', art: `<span class="cflame">${FLAME}<b>${st}</b></span>`, cta: tok ? sh : null});
+    const st = Daily.streak(), fix = Daily.ids().filter(id => { const r = Prog.rec(id); return r && !r.box; }).length, tok = st > 0 && st % 3 === 0, sh = Shop.isOpen() ? ['shop', 'Open the shop'] : null;
+    this.say([fix ? `${fix} of them still to get clean` : 'All five clean', tok ? 'Third day in a row: a shop token' : `${3 - st % 3 === 1 ? 'One more day' : 'Two more days'} to the next shop token`],
+      {mood: 'cheer', head: st === 7 ? 'A week in a row' : st === 30 ? 'A month in a row' : 'Today\'s five: done', art: `<span class="cstreak">${FLAME}<b class="tnum">${st}</b><i>${st === 1 ? 'day' : 'days'}<br>in a row</i></span>`, cta: tok ? sh : null});
   },
   // a drill line is over: what happened in it, for the drill panel. Where it caught the player, what they played
   // instead (and what the book says about that move, when it knows it), why the line's move is the move, and whether
@@ -990,26 +993,27 @@ const Coach = {
   // lines are now all clean, a line at full strength. Nothing for an ordinary clean run: the panel says when it comes
   // back. Badges and today's five get the bubble.
   lineNote(id, clean, prev, D){
-    const r = Prog.rec(id) || {}, line = LINES[id], L = lessonOf(id), out = []; let cta = '', mood = 'cheer';
+    const r = Prog.rec(id) || {}, line = LINES[id], L = lessonOf(id), out = []; let cta = '', mood = 'cheer', head = '';
     if (!clean && D.slipAt && D.slipAt.length){
       mood = 'think';
       const [i, u] = D.slipAt[0], par = line.n[i - 1], nd = N[line.n[i]], no = Math.ceil(i / 2), times = (r.sl || {})[i] || 1;
       const alt = (N[par].k || []).map(c => N[c]).find(x => x.u === u && x !== nd);       // the move tried, when the book has it
       let played = ''; try { played = wordsAt(nodeFen(par), u); } catch(e){}
-      out.push(`${times > 1 ? `Move ${no} has caught you ${times === 2 ? 'twice' : times + ' times'} now.` : `Move ${no} caught you.`} You played: ${played ? lc(played) : 'another move'}. The line's move: ${lc(nd.l)}.`);
-      if (alt && alt.t) out.push(`${(alt.g || []).includes('warn') ? 'That one is a known mistake here' : 'About your move'}: ${alt.t}`);
-      else if (nd.t) out.push(`Why: ${nd.t}`);
-      if (D.slipAt.length > 1) out.push(`${D.slipAt.length === 2 ? 'One more slip' : `${D.slipAt.length - 1} more slips`} after that.`);
+      head = times > 1 ? `Move ${no} has caught you ${times === 2 ? 'twice' : times + ' times'} now` : `Move ${no} caught you`;
+      out.push(`You played: ${played ? lc(played) : 'another move'}`, `The line's move: ${lc(nd.l)}`);
+      if (alt && alt.t) out.push(`${(alt.g || []).includes('warn') ? 'A known mistake here' : 'About your move'}: ${firstSentence(alt.t)}`);
+      else if (nd.t) out.push(`Why: ${firstSentence(nd.t)}`);
+      if (D.slipAt.length > 1) out.push(`${D.slipAt.length === 2 ? 'One more slip' : `${D.slipAt.length - 1} more slips`} after that`);
       cta = `<button class="linkish" type="button" data-line="${id}" data-i="${i - 1}">Study move ${no}</button>`;
     } else if (clean){
       const was = prev && prev.sl ? Object.keys(prev.sl).map(Number).sort((a, b) => prev.sl[b] - prev.sl[a]) : [], spot = was[0];
       const ls = L ? L.lines.filter(x => DRILLSET.has(x)) : [], all = ls.length > 1 && ls.every(lineClean) && !(prev && prev.clean);
-      if (spot && prev && !prev.box && N[line.n[spot]]) out.push(`Move ${Math.ceil(spot / 2)} held this time: ${lc(N[line.n[spot]].l)}. That's the one that caught you before.`);
-      if (all) out.push(`That's every line of ${L.title} clean: all ${ls.length}.`);
-      else if ((r.box || 0) >= 5 && (prev && prev.box || 0) < 5) out.push(`Five clean reviews in a row: this line is at full strength. Next time you see it is in ${INTERVALS[5]} days.`);
+      if (spot && prev && !prev.box && N[line.n[spot]]){ head = `Move ${Math.ceil(spot / 2)} held this time`; out.push(`${N[line.n[spot]].l}: the one that caught you before`); }
+      if (all){ head = head || `Every line of ${L.title} is clean`; out.push(`All ${ls.length} of them`); }
+      else if ((r.box || 0) >= 5 && (prev && prev.box || 0) < 5){ head = head || 'Full strength'; out.push('Five clean reviews in a row', `Next review in ${INTERVALS[5]} days`); }
     }
-    if (!out.length) return '';
-    return `<div class="coachnote" role="status">${SET.coach ? `<span class="cnface">${knightSVG(mood)}</span>` : ''}<div class="cntx">${SET.coach ? `<b>${esc(coachName())}</b>` : ''}<p>${out.map(esc).join(' ')}</p>${cta}</div></div>`;
+    if (!head) return '';
+    return `<div class="coachnote" role="status">${SET.coach ? `<span class="cnface">${knightSVG(mood)}</span>` : ''}<div class="cntx">${SET.coach ? `<b>${esc(coachName())}</b>` : ''}<p class="cnhead">${esc(head)}</p>${bullets(out)}${cta}</div></div>`;
   },
   // a checkpoint or practice set is over with misses: which lesson they come from, so the next try starts there
   quizNote(Q, U){
@@ -1019,8 +1023,8 @@ const Coach = {
     const by = {}; for (const it of misses){ const lid = at(it); if (lid) by[lid] = (by[lid] || 0) + 1; }
     const top = Object.entries(by).sort((a, b) => b[1] - a[1])[0]; if (!top) return '';
     const [lid, k] = top, L = LESSONS[lid], passed = Q.res.filter(Boolean).length >= quizPass(U, Q.set);
-    const t = misses.length === 1 ? `The one you missed is from ${L.title}.` : k === misses.length ? `All ${misses.length} misses are from ${L.title}.` : `${k} of your ${misses.length} misses are from ${L.title}.`;
-    return `<div class="coachnote" role="status">${SET.coach ? `<span class="cnface">${knightSVG(passed ? 'cheer' : 'think')}</span>` : ''}<div class="cntx">${SET.coach ? `<b>${esc(coachName())}</b>` : ''}<p>${esc(t)} ${passed ? 'Worth a look before it comes up in a game.' : 'Go through it once more, then try again.'}</p><button class="linkish" type="button" data-lesson="${lid}">Open ${esc(L.title)}</button></div></div>`;
+    const head = misses.length === 1 ? `Your miss: ${L.title}` : k === misses.length ? `All ${misses.length} misses: ${L.title}` : `${k} of ${misses.length} misses: ${L.title}`;
+    return `<div class="coachnote" role="status">${SET.coach ? `<span class="cnface">${knightSVG(passed ? 'cheer' : 'think')}</span>` : ''}<div class="cntx">${SET.coach ? `<b>${esc(coachName())}</b>` : ''}<p class="cnhead">${esc(head)}</p>${bullets([passed ? 'Worth a look before it comes up in a game' : 'Play it along once more, then try again'])}<button class="linkish" type="button" data-guided="${L.lines[0]}@${U.id}">Play along: ${esc(L.title)}</button></div></div>`;
   },
   bought(I){
     const t = {skin: `${I.name}. I feel like a new piece.`, head: `The ${lc(I.name)}? How do I look?`, face: `${I.name}. Now I can see the whole board.`, neck: `The ${lc(I.name)}. Very smart.`}[I.slot] || `${I.name}? Suits me.`;
@@ -1275,8 +1279,8 @@ const Lv = {
   // being played here: no points float up, and a level reached that way is not celebrated again
   sync(){ this.last = Level.xp(); const n = Level.n(); if (Prog.d.lvl !== undefined && n > Prog.d.lvl) Prog.d.lvl = n; },
   paint(){
-    const L = Level.of(), i = document.getElementById('lvI'), n = document.getElementById('lvN'), b = document.getElementById('lvBtn');
-    if (n) n.textContent = L.n; if (i) i.style.width = Math.round(L.into / L.need * 100) + '%';
+    const L = Level.of(), n = document.getElementById('lvN'), b = document.getElementById('lvBtn');
+    if (n){ n.textContent = L.n; n.style.setProperty('--p', Math.round(L.into / L.need * 100)); }
     if (b) b.setAttribute('aria-label', `Level ${L.n}: ${L.into} of ${L.need} points to level ${L.n + 1}`);
   },
   // after every save: points gained since the last look, and a new level if there is one
@@ -1302,7 +1306,7 @@ const Lv = {
     const shop = this.shop && !Owner.on, L = Level.of(), old = document.getElementById('lvup'); if (old) old.remove(); this.shop = false;
     const el = document.createElement('div'); el.id = 'lvup'; el.className = 'lvup'; el.setAttribute('role', 'status');
     el.innerHTML = `<div class="lvring" aria-hidden="true"><span class="tnum">${n}</span>${Array.from({length: 10}, (_, k) => `<i style="--a:${k * 36}deg"></i>`).join('')}</div>
-      <div class="lvsay"><p class="kicker">Level up</p><b>Level ${n}</b><span>${shop ? 'The shop is open. Your tokens can buy your coach a new look, and every level from here on is another token.' : n > SHOP_AT ? `That's a shop token too. ${L.need - L.into} points to level ${n + 1}.` : `${L.need - L.into} points to level ${n + 1}.${n < SHOP_AT ? ` The shop opens at level ${SHOP_AT}.` : ''}`}</span>
+      <div class="lvsay"><p class="kicker">Level up</p><b>Level ${n}</b><span>${shop ? 'The shop is open: a new look for your coach. Every level from here on is a token.' : n > SHOP_AT ? `That's a shop token too. ${L.need - L.into} points to level ${n + 1}.` : `${L.need - L.into} points to level ${n + 1}.${n < SHOP_AT ? ` The shop opens at level ${SHOP_AT}.` : ''}`}</span>
         ${shop ? '<button class="btn small primary" type="button" data-go="shop">Open the shop</button>' : ''}</div>
       <button class="x" type="button" aria-label="Close">×</button>`;
     document.body.appendChild(el);

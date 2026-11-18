@@ -1,7 +1,10 @@
 """End-to-end checks for the course: the path, unit pages, unit drills, practice games, checkpoints and the threat sets."""
 import random
 from playwright.sync_api import sync_playwright
-from e2e_white import drag, click_move, launch, URL, out
+from e2e_white import drag, click_move, launch, out
+from serve import Site
+# over local HTTP: headless Chromium sometimes drops a file:// page's storage across a scripted reload
+site = Site(); URL = site.start()
 errors = []
 
 
@@ -25,6 +28,20 @@ def drill_unit_line(pg):
         if st['busy']: pg.wait_for_timeout(200); continue
         play(pg, pg.evaluate("N[LINES[S.drill.id].n[S.drill.i + 1]].u")); pg.wait_for_timeout(800)
     return pg.evaluate("S.drill.state")
+
+
+def my_turn(pg):
+    """Wait until the running line drill asks for the player's move; returns that move."""
+    for _ in range(60):
+        st = pg.evaluate("({busy: S.drill.busy, state: S.drill.state, mine: S.drill.i < LINES[S.drill.id].n.length - 1 && isMine(N[LINES[S.drill.id].n[S.drill.i + 1]])})")
+        if st['state'] == 'play' and not st['busy'] and st['mine']: break
+        pg.wait_for_timeout(150)
+    return pg.evaluate("N[LINES[S.drill.id].n[S.drill.i + 1]].u")
+
+
+def wrong_move(pg, good):
+    """A legal move on the drill board that isn't the line's move."""
+    return [m for m in pg.evaluate('legalFor()') if m != good and len(m) == 4 and m[:2] != good[:2]][0]
 
 
 def spar_clean(pg):
@@ -66,25 +83,53 @@ with sync_playwright() as p:
     assert rows == 17 and pg.locator('button.ucard').count() == 1
     pg.screenshot(path=out + 'c_course.png', full_page=True)
 
-    # ---- unit 1: idea, a lesson, a drill line, the checkpoint
+    # ---- unit 1: idea, a lesson played along with the arrows, the same line from memory, the checkpoint
     pg.click('#cGo'); pg.wait_for_timeout(500)
     assert pg.evaluate('[S.view, S.unit, SIDE]') == ['unit', 'w-italian', 'w']
     for _ in range(3): pg.keyboard.press('ArrowRight'); pg.wait_for_timeout(120)
     assert pg.evaluate("!!up('w-italian').idea")
-    pg.click('[data-ulesson="center"]'); pg.wait_for_timeout(400)
-    assert pg.evaluate('[S.view, S.studyFrom]') == ['study', 'unit']
-    print('lesson crumbs:', pg.inner_text('.crumbs').replace('\n', ' | '))
-    pg.keyboard.press('End'); pg.wait_for_timeout(300)
-    assert pg.evaluate("lessonSeen('w', 'center')")
-    pg.screenshot(path=out + 'c_lesson_end.png')
-    pg.click('.lesson-actions [data-unit="w-italian"]'); pg.wait_for_timeout(400)
-    assert pg.evaluate('S.view') == 'unit'
-    print('learn step:', pg.locator('.step').nth(1).locator('.cnt').inner_text())
-    pg.click('[data-ustep="drill"]'); pg.wait_for_timeout(700)
-    assert pg.evaluate('[S.view, S.drill.unit]') == ['drill', 'w-italian']
+    assert pg.inner_text('#uGo').startswith('Play along: '), pg.inner_text('#uGo')
+    print('learn step:', pg.locator('.step').nth(1).inner_text().replace('\n', ' | '))
+    pg.click('[data-ulesson="center"]'); pg.wait_for_timeout(500)
+    g = pg.evaluate("({view: S.view, guided: !!S.drill.guided, unit: S.drill.unit, tab: document.querySelector('.tabs [aria-selected=\"true\"]').dataset.view})")
+    assert g == {'view': 'drill', 'guided': True, 'unit': 'w-italian', 'tab': 'course'}, g
+    assert pg.locator('.crumbs [data-unit="w-italian"]').count() == 1, 'a way back to the unit above the board'
+    # the arrow shows the move on every one of the player's turns; a wrong move doesn't go and isn't counted
+    lid = pg.evaluate('S.drill.id'); u = my_turn(pg)
+    assert pg.evaluate('S.drill.hint') == u and pg.locator('#db .arr.hint').count() == 1
+    assert 'Your move:' in pg.inner_text('.gcoach'), pg.inner_text('.gcoach')
+    i0 = pg.evaluate('S.drill.i'); play(pg, wrong_move(pg, u)); pg.wait_for_timeout(250)
+    assert pg.evaluate('[S.drill.i, S.drill.mistakes, (S.drill.slipAt || []).length]') == [i0, 0, 0]
+    assert pg.is_visible('.gcoach .gwarn'), pg.inner_text('.gcoach')
+    pg.screenshot(path=out + 'c_guided.png')
+    play(pg, u); pg.wait_for_timeout(300); my_turn(pg)
+    print('guided card:', pg.inner_text('.gcoach').replace('\n', ' | ')[:240])
+    assert pg.evaluate('S.drill.hint') and pg.inner_text('.gcoach .gsaid').strip(), 'the reply named, the next arrow up'
     assert drill_unit_line(pg) == 'done'
-    print('drill done box:', pg.inner_text('.donebox').replace('\n', ' | ')[:200])
-    assert pg.query_selector('#dNextU') is not None
+    assert pg.evaluate(f"lessonSeen('w', 'center') && !Prog.rec('{lid}')"), 'played along: the lesson counts as studied, the line is not graded'
+    assert pg.locator('#gMem').count() == 1 and pg.locator('.crumbs [data-unit="w-italian"]').count() == 1
+    assert pg.locator('#coach .cbub').count() == 0, 'no Drill-tab tip in a course line: ' + (pg.inner_text('#coach .cbub') if pg.locator('#coach .cbub').count() else '')
+    print('guided done:', pg.inner_text('.dpanel').replace('\n', ' | ')[:240])
+    pg.screenshot(path=out + 'c_guided_done.png')
+    # the notes from there keep the way back to the unit, and Play along on that page carries the unit along
+    pg.click('.dpanel .lesson-actions [data-line]'); pg.wait_for_timeout(400)
+    assert pg.evaluate('[S.view, S.studyFrom, S.unit, S.line]') == ['study', 'unit', 'w-italian', lid] and pg.locator('.crumbs [data-unit="w-italian"]').count() == 1
+    pg.click('#playAlong'); pg.wait_for_timeout(500)
+    assert pg.evaluate('[S.view, !!S.drill.guided, S.drill.unit, S.drill.id]') == ['drill', True, 'w-italian', lid]
+    assert drill_unit_line(pg) == 'done' and pg.locator('#gMem').count() == 1
+    # from memory: a slip keeps the same line in front (Again leads), clean leads on to the unit's next thing
+    pg.click('#gMem'); pg.wait_for_timeout(300)
+    assert pg.evaluate('[S.drill.id, !!S.drill.guided, S.drill.unit, S.drill.hint]') == [lid, False, 'w-italian', None]
+    u = my_turn(pg); assert pg.locator('#db .arr.hint').count() == 0, 'no arrow from memory'
+    play(pg, wrong_move(pg, u)); pg.wait_for_timeout(700)
+    assert drill_unit_line(pg) == 'done' and pg.evaluate('S.drill.mistakes') == 1
+    acts = pg.evaluate("[...document.querySelectorAll('.donebox .lesson-actions .btn')].map(b => [b.id || ('unit:' + (b.dataset.unit || '')), b.classList.contains('primary')])")
+    print('slip done box:', pg.inner_text('.donebox').replace('\n', ' | ')[:200], '|', acts)
+    assert acts[0] == ['dAgain', True] and not any(p for _, p in acts[1:]) and pg.locator('#dUnitNext').count() == 0, acts
+    pg.click('#dAgain'); pg.wait_for_timeout(300)
+    assert drill_unit_line(pg) == 'done' and pg.evaluate('S.drill.mistakes') == 0
+    nx = pg.inner_text('#dUnitNext'); print('clean done box:', pg.inner_text('.donebox').replace('\n', ' | ')[:200])
+    assert nx.startswith('Next: play along · ') and 'primary' in pg.get_attribute('#dUnitNext', 'class'), nx
     pg.click('.donebox [data-unit="w-italian"]'); pg.wait_for_timeout(400)
     print('drill step:', pg.locator('.step').nth(2).locator('.cnt').inner_text())
     pg.click('[data-ustep="cp"]'); pg.wait_for_timeout(500)
@@ -191,3 +236,4 @@ with sync_playwright() as p:
     print('ERRORS:', errors[:10])
     assert not errors
     b.close()
+site.stop()

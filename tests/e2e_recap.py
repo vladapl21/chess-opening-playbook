@@ -5,7 +5,10 @@ chess.com) points to the website instead. The fixture is the house account's own
 import json, re, random, datetime
 from pathlib import Path
 from playwright.sync_api import sync_playwright
-from e2e_white import launch, URL, out, ROOT
+from e2e_white import launch, out, ROOT
+from serve import Site
+# the website's own page, over local HTTP: headless Chromium sometimes drops a file:// page's storage across a scripted reload
+site = Site(docs=True); URL = site.start()
 errors = []
 ART = (ROOT / 'data' / 'build' / 'playbook.html').as_uri()
 
@@ -36,17 +39,17 @@ hits, fail = [], {'on': False}
 
 def chesscom(route):
     u = route.request.url; m = re.search(r'/player/([^/]+)/games/(\d{4})/(\d\d)$', u); hits.append(u)
-    if fail['on']: return route.fulfill(status=503, body='busy')
+    if fail['on']: return route.fulfill(status=503, headers={'Access-Control-Allow-Origin': '*'}, body='busy')
     if m and m.group(1) == 'aqua_alpaca' and (int(m.group(2)), int(m.group(3))) in MONTHS:
         ym = (int(m.group(2)), int(m.group(3)))
-        return route.fulfill(status=200, content_type='application/json', body=json.dumps({'games': [{'rules': 'chess', 'time_class': 'blitz', 'pgn': g} for g in MONTHS[ym]]
+        return route.fulfill(status=200, content_type='application/json', headers={'Access-Control-Allow-Origin': '*'}, body=json.dumps({'games': [{'rules': 'chess', 'time_class': 'blitz', 'pgn': g} for g in MONTHS[ym]]
             + [{'rules': 'chess', 'time_class': 'bullet', 'pgn': MONTHS[ym][0]}, {'rules': 'chess960', 'time_class': 'blitz', 'pgn': MONTHS[ym][1]}]}))
-    route.fulfill(status=404, content_type='application/json', body='{}')
+    route.fulfill(status=404, content_type='application/json', headers={'Access-Control-Allow-Origin': '*'}, body='{}')
 
 
 with sync_playwright() as p:
     b = launch(p)
-    ctx = b.new_context(viewport={'width': 1280, 'height': 900}); ctx.route('https://api.chess.com/**', chesscom); ctx.route('https://lichess.org/**', lambda r: r.fulfill(status=200, content_type='application/x-chess-pgn', body=MONTHS[KEYS[1]][0]))
+    ctx = b.new_context(viewport={'width': 1280, 'height': 900}); ctx.route('https://api.chess.com/**', chesscom); ctx.route('https://lichess.org/**', lambda r: r.fulfill(status=200, content_type='application/x-chess-pgn', headers={'Access-Control-Allow-Origin': '*'}, body=MONTHS[KEYS[1]][0]))
     pg = ctx.new_page(); hook(pg)
     pg.goto(URL); pg.wait_for_timeout(900)
     assert pg.evaluate("[Recap.on(), Recap.can(), JSON.stringify(Recap.acct())]") == [True, True, '{"site":"chess.com","user":"aqua_alpaca"}'], 'the house playbook reads its own account'
@@ -92,6 +95,8 @@ with sync_playwright() as p:
     # ---- the coach: a finished month that hasn't been opened is news on any tab, once; the switch shows a dot
     # (seen only moves forward in a merge, so it is set back on this device alone, in memory and on disk, and the coach
     # forgets what it has said; a save as the page unloads then writes the same)
+    # (the recap part is left first: drawn again on screen, it would mark the month opened before the reload)
+    pg.evaluate("S.gseg = 'open'; go('course')"); pg.wait_for_timeout(300)
     pg.evaluate("Prog.d.recap.seen = '%s'; Prog.saveLocal(); Coach.seen = {}; try { localStorage.removeItem('playbook-coach'); } catch(e){}" % key(KEYS[2])); pg.reload(); pg.wait_for_timeout(1500)
     bub = pg.inner_text('#coach .cbub'); print('coach:', bub.replace('\n', ' | ')); assert 'recap is ready' in bub and pg.locator('#coach [data-cgo="recap"]').count() == 1
     pg.evaluate("S.gseg = 'open'; go('games')"); pg.wait_for_timeout(300); assert pg.locator('.gseg .sgdot').count() == 1, 'the switch marks the new recap'
@@ -117,5 +122,6 @@ with sync_playwright() as p:
     print('claude.ai copy:', art.inner_text('.rcstat').replace('\n', ' | ')); assert 'made on the website' in art.inner_text('.rcstat') and not hits and not art.evaluate('Recap.can()')
     b.close()
 
+site.stop()
 print('ERRORS:', errors); assert not errors
 print('recap checks passed')

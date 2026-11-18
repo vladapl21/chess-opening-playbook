@@ -86,16 +86,31 @@ with sync_playwright() as p:
     ph.click('#setBtn'); ph.wait_for_timeout(300); ph.screenshot(path=out + 's_settings_phone.png')
     assert ph.evaluate("document.getElementById('setPanel').scrollWidth <= document.getElementById('setPanel').clientWidth + 1")
 
-    # ---- layout: one header row on an ordinary monitor, settings and account out of the way, rows centred when they wrap
-    for w, one in ((1280, True), (1440, True), (1000, True), (820, False)):   # five tabs: one row down to about 1000px
-        lp = b.new_page(viewport={'width': w, 'height': 800}); hook(lp); lp.goto(URL); lp.wait_for_timeout(800)
-        m = lp.evaluate("(() => { const r = x => document.querySelector(x).getBoundingClientRect(), t = r('.tabs'), br = r('.brandrow'), c = r('#setBtn'), h = r('.top'); return {one: Math.abs(t.top + t.height / 2 - (br.top + br.height / 2)) < 12, gearAbove: c.bottom <= h.top + 1, gearRight: c.right, mid: Math.abs((t.left + t.right) / 2 - innerWidth / 2), tabsRight: t.right, inHeader: !!document.querySelector('.top #setBtn, .top #acctBtn')}; })()")
-        print('header at', w, m); assert m['one'] == one and m['gearAbove'] and not m['inHeader'] and m['gearRight'] >= (m['tabsRight'] if one else w - 60) - 2
-        if not one: assert m['mid'] < 4, 'a wrapped header is centred'
-        lp.close()
-    wide = b.new_page(viewport={'width': 1700, 'height': 800}); hook(wide); wide.goto(URL); wide.wait_for_timeout(800)
-    g = wide.evaluate("(() => { const c = document.querySelector('#setBtn').getBoundingClientRect(), a = document.querySelector('.top').getBoundingClientRect(); return [c.left > a.right, c.top < 30]; })()")
-    print('wide screen: gear in the corner', g); assert g == [True, True]; wide.close()
+    # ---- the header: brand and the player's things (level, streak, settings, account) on one row, the tabs on a row of
+    # their own under it, so nothing ever sits on a tab; on a phone the White/Black switch gets the middle row.
+    # Shown with everything a signed-in player on a streak has, at every width from a small phone to a wide monitor.
+    SEED = """(() => { const now = Date.now(); for (const id of DRILLABLE.slice(0, 120)) Prog.d.lines[id] = {box: 3, seen: 3, clean: 3, last: now, due: now + 2 * DAY, v: VER[id] || 1};
+      const D = Prog.d.days = Prog.d.days || {}; for (let k = 0; k <= 5; k++) D[dayKey(-k)] = ['a', 'b', 'c', 'd', 'e']; Prog.d.lvl = 99; Prog.save(); Badges.queue = []; Coach.hush();
+      const a = document.getElementById('acctBtn'); a.hidden = false; a.className = 'acct in ok'; a.innerHTML = '<span class=av>V</span><span class=acctx>Saved</span>'; renderChrome(); })()"""
+    LAYOUT = """(() => { const R = e => e.getBoundingClientRect(), hit = (a, b) => !(a.right <= b.left + 1 || b.right <= a.left + 1 || a.bottom <= b.top + 1 || b.bottom <= a.top + 1);
+      const vis = e => e && !e.hidden && R(e).width > 0 && getComputedStyle(e).display !== 'none';
+      const mine = [...document.querySelectorAll('.corner > *')].filter(vis), tabs = [...document.querySelectorAll('.tabs button')];
+      const parts = [...mine, document.querySelector('.brand'), document.querySelector('.top .sidesw')].filter(vis);
+      const name = e => e.id || e.dataset.view || e.className.split(' ')[0];
+      const over = parts.flatMap((x, i) => [...parts.slice(i + 1), ...tabs].filter(y => hit(R(x), R(y))).map(y => name(x) + ' x ' + name(y)));
+      const t = document.querySelector('.tabs'), g = R(document.getElementById('setBtn')), tr = R(t), lv = document.getElementById('lvN');
+      return {over, mine: mine.map(name), page: document.documentElement.scrollWidth, tabsFit: t.scrollWidth <= t.clientWidth + 1,
+        tabsInView: tabs.every(b => R(b).left >= -1 && R(b).right <= innerWidth + 1), gearAboveTabs: g.bottom <= tr.top + 1, gearInHeader: !!document.querySelector('.top #setBtn'),
+        ring: getComputedStyle(lv).backgroundImage.includes('conic-gradient'), num: getComputedStyle(lv).color, ink: getComputedStyle(document.body).color}; })()"""
+    for w in (360, 390, 600, 700, 761, 1000, 1280, 1536, 1920):   # phone, tablet (the switch on a middle row), one row from 761px
+        hc = b.new_context(viewport={'width': w, 'height': 800}); lp = hc.new_page(); hook(lp); lp.goto(URL + '#b.drill'); lp.wait_for_timeout(800)
+        lp.evaluate(SEED); lp.wait_for_timeout(400); lp.evaluate("document.querySelectorAll('#lvup,.lvfloat').forEach(e => e.remove())")
+        m = lp.evaluate(LAYOUT); print('header at', w, {k: m[k] for k in ('over', 'mine', 'page', 'tabsFit')})
+        assert not m['over'] and m['page'] <= w and m['tabsFit'] and m['tabsInView'] and m['gearAboveTabs'] and m['gearInHeader'], (w, m)
+        assert len(m['mine']) >= 4, ('level, streak, settings and account all showing', m['mine'])
+        assert m['ring'] and m['num'] == m['ink'], 'the level number is in ink on the page colour, the green is the ring around it'
+        if w in (390, 1280): lp.screenshot(path=out + f's_header_{w}.png', clip={'x': 0, 'y': 0, 'width': w, 'height': 200})
+        hc.close()
 
     # ---- three coaches: the face and the name change, the words do not
     cp = ctx.new_page(); hook(cp); cp.goto(URL); cp.wait_for_timeout(900)
@@ -111,16 +126,28 @@ with sync_playwright() as p:
     print('coaches:', names); assert [n[:3] for n in names] == [['rook', 'Rocco', 'rook'], ['pawn', 'Dot', 'pawn'], ['knight', 'Pip', 'knight']] and len({n[3] for n in names}) == 3
     cp.screenshot(path=out + 's_coaches.png'); cp.keyboard.press('Escape')
 
-    # ---- a lesson opened from a unit: the way forward is at the top
+    # ---- a lesson opened from a unit: the way forward is at the top, and skipping ahead doesn't count as studying.
+    # A lesson counts once its moves are played along with the arrows, or stepped through to the end on its page.
     cp.evaluate("openUnitLesson(UNIT['w-italian'], UNIT['w-italian'].lessons[0])"); cp.wait_for_timeout(500)
     first = cp.evaluate("UNIT['w-italian'].lessons")
     assert cp.inner_text('#topNext').startswith('Next lesson') and cp.evaluate("document.getElementById('topNext').getBoundingClientRect().top") < 260
+    assert cp.locator('#playAlong').count() == 1, 'Play along sits beside the drill button'
     assert not cp.evaluate(f"lessonSeen('w', '{first[0]}')")
+    cp.keyboard.press('End'); cp.wait_for_timeout(300)
+    assert not cp.evaluate(f"lessonSeen('w', '{first[0]}')"), 'jumping to the end is not studying it'
+    cp.keyboard.press('Home'); cp.wait_for_timeout(200)
+    for _ in range(cp.evaluate('LINES[S.line].n.length')): cp.keyboard.press('ArrowRight'); cp.wait_for_timeout(40)
+    cp.wait_for_timeout(300); assert cp.evaluate(f"lessonSeen('w', '{first[0]}')"), 'stepped through to the end: studied'
     cp.click('#topNext'); cp.wait_for_timeout(500)
-    assert cp.evaluate(f"[lessonSeen('w', '{first[0]}'), LINES[S.line].lesson, S.studyFrom]") == [True, first[1], 'unit']
+    assert cp.evaluate(f"[lessonSeen('w', '{first[1]}'), LINES[S.line].lesson, S.studyFrom]") == [False, first[1], 'unit']
     for _ in range(len(first) - 2): cp.click('#topNext'); cp.wait_for_timeout(350)
     assert cp.inner_text('#topNext').startswith('Done'); cp.click('#topNext'); cp.wait_for_timeout(400)
-    assert cp.evaluate("[S.view, S.unit]") == ['unit', 'w-italian'] and cp.evaluate("UNIT['w-italian'].lessons.every(l => lessonSeen('w', l))")
+    assert cp.evaluate("[S.view, S.unit]") == ['unit', 'w-italian'] and cp.evaluate("UNIT['w-italian'].lessons.filter(l => lessonSeen('w', l)).length") == 1
+    # Play along from the lesson page: the same line on the drill board with the arrow, still under the Course tab
+    cp.evaluate("openUnitLesson(UNIT['w-italian'], UNIT['w-italian'].lessons[1])"); cp.wait_for_timeout(500)
+    cp.click('#playAlong'); cp.wait_for_timeout(600)
+    assert cp.evaluate("[S.view, !!S.drill.guided, S.drill.unit, LINES[S.drill.id].lesson]") == ['drill', True, 'w-italian', first[1]]
+    assert tab(cp) == 'Course'
 
     # ---- a practice game from the course, then free play in the Sandbox
     cp.evaluate("doStep(UNIT['w-italian'], 'spar')"); cp.wait_for_timeout(700)
