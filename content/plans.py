@@ -319,6 +319,82 @@ W = {
   'rr-stgeorge': dict(h='Hit the advanced pawns', b=[
     ('pawns', 'Push the a-pawn and c-pawn at Black\'s queenside pawns.'),
     ('pieces', 'Knight out, rook to the e-file.')]),
+  # ---------------------------------------------------------------- the London
+  'ld-setup': dict(h='Castle, then the knight into the hole', b=[
+    ('king', 'Castle short next. If Black then takes your bishop, the h-pawn takes back and the king is still safe behind the other pawns.'),
+    ('pieces', 'The king\'s knight jumps to the hole in front of Black\'s e-pawn when no pawn can chase it. The queen comes one square up, next to the light bishop.'),
+    ('them', 'Black\'s queen comes to the b-file at your b-pawn. Guard it with a rook, or offer the queens.'),
+    ('watch', 'Black\'s c-pawn can take your d-pawn at any moment: the e-pawn takes back.')]),
+  'ld-bd6': dict(h='Knight to the hole, queen to the king\'s side', b=[
+    ('pieces', 'The king\'s knight jumps into the hole in front of Black\'s e-pawn and the queen comes up behind it.'),
+    ('target', 'Black\'s h-pawn. Your rook, your light bishop and later your queen all point at it.'),
+    ('them', 'Black\'s queen comes to the b-file at your b-pawn. A rook guards it.'),
+    ('king', 'Your king can wait in the middle while the h-file is half open. Castle when the attack is set up.')]),
+  'ld-qb6': dict(h='Prepare the e-pawn push', b=[
+    ('pawns', 'Black\'s c-pawn has gone past your d-pawn. Your break is the e-pawn two squares, once your pieces support it.'),
+    ('pieces', 'Light bishop one square, then castle short.'),
+    ('watch', 'Black\'s knight jumps to the edge at your bishop. Step the bishop forward into the middle rather than give it up.'),
+    ('them', 'Black wants to push the b-pawn on the queenside.')]),
+  'ld-trick': dict(h='A rook up: trade the queens', b=[
+    ('pieces', 'Block a queen check with your queen and offer the trade. With fewer pieces on the board, the extra rook decides.'),
+    ('watch', 'Your knight in the corner may be lost. It has already earned its keep: you are still well ahead.'),
+    ('king', 'Once the queens are off, your king can walk up and join in.')]),
+  'ld-nc6': dict(h='The c-pawn two squares', b=[
+    ('pawns', 'Castle, then the c-pawn goes two squares and hits Black\'s d-pawn while Black\'s rook is busy guarding the b-pawn.'),
+    ('pieces', 'Rook to the c-file behind the pawn; the light bishop goes one square.'),
+    ('target', 'Black\'s h-pawn down the open h-file, if Black castles short.'),
+    ('them', 'Black wants to push the b-pawn after all, with the rook behind it.')]),
+  'ld-nb4': dict(h='A piece up: develop and castle', b=[
+    ('pieces', 'King\'s knight out and castle before anything else.'),
+    ('watch', 'Black\'s e-pawn push hits your bishop. Count before you grab the b-pawn with the queen.'),
+    ('them', 'Black has no compensation. Trade pieces when you can.')]),
+  'ld-bf5': dict(h='Finish the setup and castle', b=[
+    ('pieces', 'Queen\'s knight beside the queen, then castle short.'),
+    ('them', 'Black\'s c-pawn hits the d-pawn and the queen comes out at your b-pawn. The b-pawn one square takes the sting out of it.'),
+    ('watch', 'Black\'s knight would like to jump at your queen. Keep her on a square no knight can reach.')]),
+  'ld-c6': dict(h='Queen at the b-pawn, knight into the hole', b=[
+    ('pieces', 'Queen to the b-file at Black\'s b-pawn, and the king\'s knight into the hole in front of Black\'s e-pawn.'),
+    ('target', 'Black\'s doubled pawns on the f-file are slow and hard to use.'),
+    ('king', 'Castle short. The h-pawn one square gives the king air.')]),
+  'ln-kid': dict(h='A pawn up: trade and keep it', b=[
+    ('pieces', 'Trade knights when you can; the London bishop keeps its diagonal.'),
+    ('watch', 'Black\'s knight jumps to the edge at your bishop and the queen comes out: make sure the bishop is guarded or can step back.'),
+    ('them', 'Black looks for play with the f-pawn. Keep your pieces near your king.')]),
+  'ln-e6': dict(h='Castle, then the knight into the hole', b=[
+    ('king', 'Castle short next.'),
+    ('pieces', 'The king\'s knight jumps into the hole in front of Black\'s e-pawn; the queen comes up behind it.'),
+    ('them', 'The same plans as in the setup lesson: the queen at your b-pawn, the c-pawn trade.')]),
+  'ln-d6': dict(h='A pawn up: castle and trade', b=[
+    ('king', 'Light bishop one square, then castle short.'),
+    ('pieces', 'Trade the knights in the middle when Black offers; your bishop keeps its diagonal.'),
+    ('them', 'Black hopes to win the pawn back with piece play. Keep everything guarded.')]),
+  'ln-d5': dict(h='Back to the setup', b=[
+    ('pieces', 'Bishop opposite yours? Step back. Then the light bishop, and castle.'),
+    ('them', 'The same tries as in the first chapter: the bishop offer, the queen at your b-pawn.')]),
+  'ln-c5': dict(h='Guard the e-pawn, then castle', b=[
+    ('watch', 'Black can offer the b-pawn to pull your light bishop away from the e-pawn. Before that bishop comes out, guard the e-pawn a second time with the queen or the knight.'),
+    ('king', 'Castle short once the e-pawn is safe.'),
+    ('them', 'Black plays on the queenside with the a-pawn and b-pawn.')]),
+  'lr-e6': dict(h='Castle, then the knight into the hole', b=[
+    ('king', 'Castle short next.'),
+    ('pieces', 'The king\'s knight jumps into the hole in front of Black\'s e-pawn.'),
+    ('them', 'The same plans as in the setup lesson.')]),
+  'lr-englund': dict(h='A pawn up and the two bishops', b=[
+    ('pawns', 'The e-pawn two squares next: it takes the middle and opens the light bishop.'),
+    ('pieces', 'Light bishop out, castle. The dark bishop on the long diagonal guards your extra pawn.'),
+    ('them', 'Black\'s queen will try to win the pawn back. Keep it guarded and develop.')]),
+  'lr-c5': dict(h='Bishop out, then the middle', b=[
+    ('pieces', 'The dark bishop comes out to its usual diagonal; the knight heads for the queenside.'),
+    ('pawns', 'If Black trades in the middle, take back with the e-pawn and keep the space.'),
+    ('them', 'Black pushes the queenside pawns.')]),
+  'lr-g6': dict(h='Castle, then the c-pawn', b=[
+    ('king', 'Castle short next.'),
+    ('pawns', 'The c-pawn one square, then the queen\'s knight beside the queen.'),
+    ('watch', 'When Black\'s e-pawn pushes, your bishop steps back to the square the h-pawn made for it.')]),
+  'lr-other': dict(h='Queen at the b-pawn, then castle', b=[
+    ('pieces', 'Queen to the b-file at Black\'s b-pawn, then finish the setup.'),
+    ('target', 'Black\'s doubled pawns on the f-file.'),
+    ('king', 'Castle short.')]),
 }
 
 B = {

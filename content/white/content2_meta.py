@@ -2,6 +2,13 @@
 from content2 import E5, PH, PT, CK, CKX, CKG, SC, SN, SD, SQ, PD, PN, FR, FC
 from content import J
 
+# Systems. A slot is one decision in a repertoire ("what do I open with?") and a pack is one answer to it (see PACKS in
+# content/black/bmeta.py for the Black book). The White book's first system is the e-pawn; the London is the second.
+PACKS = dict(
+  white=dict(default='e4', packs=dict(e4=['italian', 'e5x', 'caro', 'sic', 'scandi', 'pirc', 'french', 'rare'],
+                                      d4=['london', 'lindian', 'lrare'])),
+)
+
 CH_META = {
   'italian': dict(tile='e4 e5 Nf3 Nc6 Bc4', roots=['e4 e5 Nf3 Nc6'], first='setup'),
   'e5x': dict(tile=J(E5, 'd6'), first='ph-main',
@@ -76,12 +83,39 @@ CH_META = {
            dict(big='6', text='moves: how long your loss to the bishop-on-the-long-diagonal setup lasted', alert=True),
            dict(big='3', text='rare openings you met: Owen\'s, the knight first, and Alekhine\'s')],
     notes=[dict(b='Against Gilmarmv:', t='Black\'s bishop and knight hit your e-pawn, you moved the other bishop, and the pawn and game were gone by move six. Guard it first.', lesson='rr-owen')]),
+  'london': dict(tile='d4 d5 Bf4', first='ld-setup', roots=['d4 d5'],
+    hero='d4 d5 Bf4 Nf6 e3 e6 Nf3 c5 c3 Nc6 Nbd2 Bd6 Bg3 O-O Bd3', arrows=['d3h7g', 'f3e5g'], circles=['c3g', 'd4g', 'e3g'], cap='The setup, complete: pawns in a pyramid, both bishops outside them.',
+    kicker='Black\'s d-pawn mirrors yours',
+    headline='One setup, <em>one order</em>.',
+    lede='Your dark bishop comes out before the e-pawn shuts it in. Then the e-pawn, the king\'s knight, the c-pawn, the queen\'s knight and the light bishop, in that order, against nearly everything. Where the order changes, it is for a reason you can see on the board.',
+    facts=[dict(big='8', text='moves make the whole setup, the same ones in almost every line'),
+           dict(big='1 in 3', text='club players bring the queen\'s knight out on move two. Two tricks punish what usually follows.', alert=True),
+           dict(big='6 in 10', text='club players take the b-pawn when your knight offers it, and lose the corner rook')],
+    notes=[]),
+  'lindian': dict(tile='d4 Nf6 Bf4', first='ln-kid', roots=['d4 Nf6'],
+    hero='d4 Nf6 Bf4 g6 e3 Bg7 Nf3 O-O Be2 d6 h3', arrows=['f4h2g'], circles=['e2g', 'h3g'], cap='Against the fianchetto: bishop one square, and a way back for the London bishop.',
+    kicker='Black\'s king\'s knight first',
+    headline='Same bishop, <em>a way back</em>.',
+    lede='The bishop still comes out on move two. Against the fianchetto the light bishop goes one square instead of two, and the h-pawn gives the London bishop a retreat before Black can hit it. Against the e-pawn and the d-pawn you are back in the setup.',
+    facts=[dict(big='3 in 10', text='club players fianchetto against your bishop'),
+           dict(big='1', text='e-pawn push to know: with your bishop on its diagonal, it costs Black a pawn', alert=True),
+           dict(big='4 in 10', text='club players reach the first chapter\'s setup by another road')],
+    notes=[]),
+  'lrare': dict(tile='d4 e6 Bf4', first='lr-e6', roots=['d4 e6', 'd4 e5', 'd4 c5', 'd4 g6', 'd4 d6', 'd4 c6', 'd4 b6', 'd4 f5', 'd4 Nc6'],
+    hero='d4 e5 dxe5 Nc6 Nf3 Qe7 Bf4 Qb4+ Bd2 Qxb2 Nc3', arrows=['c3a2g'], circles=['b2r'], cap='The gambit: the knight comes out, never the bishop.',
+    kicker='Everything else',
+    headline='The setup does the work.',
+    lede='Most other first moves lead back to the setup. Two need something new: the c-pawn two squares, where your d-pawn pushes past it, and the e-pawn gambit, where you take the pawn and know the one move that avoids a famous trap.',
+    facts=[dict(big='3 in 10', text='club players start with something other than the d-pawn or the knight'),
+           dict(big='1', text='trap in the e-pawn gambit, and one move that avoids it', alert=True),
+           dict(big='9', text='first moves covered here, most of them by the same setup')],
+    notes=[]),
 }
 
 CHEAT2 = [
   (E5 + ' d6', 'd4', 'Hit the center at once', 'ph-main'),
   (J(PH, 'Nd7'), 'Bc4', 'Bishop at f7; watch for the sacrifice', 'ph-nd7'),
-  (J(PH, 'Bg4'), 'dxe5', 'Take first, then the queen hits f7 and b7', 'ph-bg4'),
+  (J(PH, 'Bg4'), 'dxe5', 'Take first, then the queen hits f7 and the b-pawn', 'ph-bg4'),
   (J(PT, 'Nxe5 Nxe4'), 'Qe2', 'Queen to the e-file: the copycat trap', 'pt-copy'),
   (J(PT, 'Nxe5 Nc6 Nxc6 dxc6'), 'd3', 'Knight gambit: the safe pawn move', 'pt-stafford'),
   (J(CKX, 'Bf5'), 'Ng3', 'Knight hits the bishop', 'ck-march'),
@@ -101,6 +135,26 @@ CHEAT2 = [
   (J(FR, 'c5'), 'c3', 'Support the chain from behind', 'fr-qb6'),
   (J(FC, 'Qb6'), 'a3', 'Small pawn move, then the queenside pawns', 'fr-qb6'),
   ('e4 b6 d4 Bb7', 'Bd3', 'Guard your e-pawn with the bishop', 'rr-owen'),
+  # the London (its own pack)
+  ('d4 d5', 'Bf4', 'Bishop out before the e-pawn', 'ld-setup'),
+  ('d4 d5 Bf4 Nf6', 'e3', 'E-pawn one square, then the king\'s knight', 'ld-setup'),
+  ('d4 d5 Bf4 Nf6 e3 e6 Nf3 c5', 'c3', 'C-pawn hits: c-pawn one square', 'ld-setup'),
+  ('d4 d5 Bf4 Nf6 e3 e6 Nf3 c5 c3 Nc6', 'Nbd2', 'Queen\'s knight beside the queen, then the bishop', 'ld-setup'),
+  ('d4 d5 Bf4 Nf6 e3 e6 Nf3 c5 c3 Nc6 Nbd2 Bd6', 'Bg3', 'Bishop opposite yours: step back, keep it', 'ld-setup'),
+  ('d4 d5 Bf4 e6 e3 Bd6 Bg3 Bxg3', 'hxg3', 'Take back with the h-pawn: the rook gets the file', 'ld-bd6'),
+  ('d4 d5 Bf4 Nf6 e3 e6 Nf3 c5 c3 Nc6 Nbd2 Bd6 Bg3 O-O Bd3 Qc7', 'dxc5', 'Queen behind the bishop: take the c-pawn', 'ld-setup'),
+  ('d4 d5 Bf4 Nf6 e3 e6 Nf3 c5 c3 Qb6', 'Qb3', 'Queen at the b-pawn, c-pawn moved: offer the queens', 'ld-qb6'),
+  ('d4 d5 Bf4 c5 e3 Nc6 Nf3 Qb6', 'Nc3', 'Queen at the b-pawn, c-pawn home: knight out', 'ld-trick'),
+  ('d4 d5 Bf4 Nc6 e3 Nf6 Nf3 Bg4 c3 e6', 'Qb3', 'Bishop left the b-pawn: the queen hits it', 'ld-nc6'),
+  ('d4 d5 Bf4 Nc6 e3 Bf5', 'Bd3', 'Bishop out: offer the light bishops', 'ld-nb4'),
+  ('d4 d5 Bf4 Nc6 e3 Bf5 Bd3 Bxd3 Qxd3 Nb4', 'Qb5+', 'Knight hits the queen: check, and take it', 'ld-nb4'),
+  ('d4 d5 Bf4 Bf5 e3 e6', 'Bd3', 'Bishop out: offer the light bishops', 'ld-bf5'),
+  ('d4 Nf6 Bf4 g6 e3 Bg7 Nf3 O-O', 'Be2', 'Fianchetto: light bishop one square', 'ln-kid'),
+  ('d4 Nf6 Bf4 g6 e3 Bg7 Nf3 O-O Be2 d6', 'h3', 'D-pawn one square: make a way back for the bishop', 'ln-kid'),
+  ('d4 Nf6 Bf4 c5', 'd5', 'C-pawn hits: push past it', 'ln-c5'),
+  ('d4 c5', 'd5', 'C-pawn two squares: push past it', 'lr-c5'),
+  ('d4 e5', 'dxe5', 'Gambit: take the pawn', 'lr-englund'),
+  ('d4 e5 dxe5 Nc6 Nf3 Qe7 Bf4 Qb4+ Bd2 Qxb2', 'Nc3', 'Queen takes the b-pawn: the knight, never the bishop', 'lr-englund'),
 ]
 
 GAMES2 = [

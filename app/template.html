@@ -768,6 +768,9 @@ function applyPacks(D){
   D.chapters = D.chapters.filter(c => !off.has(c.id)); D.parts = D.parts.filter(q => !parts.has(q.id)); D.lessons = D.lessons.filter(l => !les.has(l.id));
   D.lines = D.lines.filter(l => !les.has(l.lesson)); D.cheat = D.cheat.filter(r => !les.has(r.lesson));
   D.games = D.games.map(g => les.has(g.lesson) ? Object.assign({}, g, {lesson: null}) : g);
+  // the Sandbox plays White's first move for you: the one the system in play starts with (the d-pawn in the London)
+  const firsts = [...new Set(D.lines.filter(l => l.n[0] === 0 && l.n.length > 1).map(l => l.n[1]))];
+  if (D.side === 'w' && firsts.length === 1) D.e4 = firsts[0];
 }
 for (const s of ['w', 'b']){ BOOKS[s].side = s; applyPacks(BOOKS[s]); BOOKS[s].drillable = drillableOf(BOOKS[s]); }
 // A line's version goes up when its moves change (pipeline/assemble.py). Lines still on their first version carry none.
@@ -2195,7 +2198,7 @@ function sbStart(scope, odds){
   if (S.view !== 'sandbox'){ S.view = 'sandbox'; setHash(); }
   render();
   D.busy = true; const t = ++D.tick;
-  // the White book always opens with your e-pawn; the Black book waits for White's first move
+  // the White book opens with the first move of the system in play; the Black book waits for White's first move
   setTimeout(() => { if (S.drill === D && D.tick === t){ if (ME === 1) sbGo(E4); else sbContinue(); } }, 420);
 }
 function sbGo(next, anim = true){

@@ -29,9 +29,10 @@ test: build
 	node tests/analyze_check.js
 	node tests/nudge_check.mjs
 
-# Engine and wording checks for the Black book
+# Engine and wording checks: the Black book, and the White book's packs after the first (the London)
 check:
 	$(PY) pipeline/check_black.py 14
+	$(PY) pipeline/check_white.py 14
 	$(PY) pipeline/lint_notes.py
 	$(PY) pipeline/lint_claims.py
 

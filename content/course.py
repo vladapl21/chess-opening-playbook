@@ -9,6 +9,24 @@ Record counts come from all 200 games (both accounts, July to November 2026).
 """
 
 UNITS = [
+  dict(id='w-london', side='w', title='The London', kicker='White · one setup against the d-pawn',
+       why='Bishop out before the e-pawn, then the king\'s knight, the c-pawn, the queen\'s knight and the light bishop. The same moves in the same order against nearly everything, and a trick for each of Black\'s usual tries.',
+       lessons=['ld-setup', 'ld-bd6', 'ld-qb6', 'ld-nc6', 'ld-nb4'],
+       deeper=['ld-trick', 'ld-bf5', 'ld-c6'],
+       idea=[
+         dict(path='d4 d5 Bf4', arrows=['f4c7g'], circles=['f4g'], h='Bishop out first',
+              t='The dark bishop leaves before the e-pawn moves, so it is never shut in behind your own pawns.'),
+         dict(path='d4 d5 Bf4 Nf6 e3 e6 Nf3 c5 c3 Nc6 Nbd2 Bd6 Bg3 O-O Bd3', arrows=['d3h7g'], circles=['c3g', 'd4g', 'e3g'], h='Eight moves, one order',
+              t='E-pawn, king\'s knight, c-pawn, queen\'s knight beside the queen, light bishop, castle. Three pawns make a pyramid and both bishops stand outside it.'),
+         dict(path='d4 d5 Bf4 e6 e3 Bd6 Bg3 Bxg3 hxg3', arrows=['h1h7g'], circles=['h7r'], h='Bishop offered? Step back',
+              t='When Black\'s bishop comes opposite yours, keep yours. If Black takes it anyway, the h-pawn takes back and your rook already looks at Black\'s h-pawn.'),
+         dict(path='d4 d5 Bf4 Nf6 e3 e6 Nf3 c5 c3 Qb6 Qb3', arrows=['b3b6g'], circles=['b2r'], h='The queen raid on the b-pawn',
+              t='Your bishop has left the queenside, so the b-pawn has no guard. With the c-pawn already moved, your queen meets Black\'s and offers the trade.'),
+         dict(path='d4 d5 Bf4 Nc6 e3 Nf6 Nf3 Bg4 c3 e6 Qb3', arrows=['b3b7g'], circles=['g4r'], h='Bishop at your knight: queen at the b-pawn',
+              t='When Black\'s light bishop leaves for your knight, nothing guards Black\'s b-pawn either. Your queen hits it at once.'),
+         dict(path='d4 d5 Bf4 Nc6 e3 Bf5 Bd3 Bxd3 Qxd3 Nb4 Qb5+', arrows=['b5b4r', 'b5e8r'], h='The check that wins the knight',
+              t='Offer the light bishops and take back with the queen. If Black\'s knight jumps at her, the queen checks and hits the knight at the same time.'),
+       ]),
   dict(id='w-italian', side='w', title='The Italian', kicker='White · your main weapon',
        why='About one White game in eight goes into this line, and you have won only five of the last twelve. One idea runs through all of it: a big center, a quick castle, and every piece aimed at f7.',
        lessons=['setup', 'center', 'grab', 'bxa1', 'moller-bf6'],
@@ -108,6 +126,20 @@ UNITS = [
          dict(path='e4 c5 c3 Nc6 d4 cxd4 cxd4 d5 exd5 Qxd5 Nf3 Bg4 Be2 Bxf3 Bxf3 Qxd4', arrows=['f3c6g', 'd1d4g'], circles=['d4r'], h='The loose pawn is bait',
               t='If the queen grabs your d-pawn, take the knight with check first. When the pawn takes back, your queen takes Black\'s.'),
        ]),
+  dict(id='w-lindian', side='w', title='The London: knight first', kicker='White · the same bishop against the knight',
+       why='Against the king\'s knight the bishop still comes out on move two. Against the fianchetto two small changes keep it safe; against the e-pawn and the d-pawn you are back in the setup.',
+       lessons=['ln-kid', 'ln-e6'],
+       deeper=['ln-d6', 'ln-d5', 'ln-c5'],
+       idea=[
+         dict(path='d4 Nf6 Bf4', arrows=['f4c7g'], circles=['f4g'], h='Same bishop, same move',
+              t='The knight changes nothing on move two. The setup comes out as usual unless Black puts the dark bishop behind the g-pawn.'),
+         dict(path='d4 Nf6 Bf4 g6 e3 Bg7 Nf3 O-O Be2 d6 h3', arrows=['f4h2g'], circles=['e2g', 'h3g'], h='Against the fianchetto: a way back',
+              t='The light bishop goes one square instead of two, out of reach of a pawn fork. The h-pawn makes a way back for the London bishop before Black can hit it.'),
+         dict(path='d4 Nf6 Bf4 g6 e3 Bg7 Nf3 O-O Be2 d6 h3 Nbd7 O-O e5 dxe5 dxe5 Nxe5', circles=['e5g'], h='The e-pawn push costs a pawn',
+              t='Black\'s usual plan is to push the e-pawn at your bishop. Take it, and when Black takes back, two of your pieces hit the pawn and only one guards it.'),
+         dict(path='d4 Nf6 Bf4 e6 e3 d5 Nf3 c5 c3 Nc6 Nbd2', circles=['c3g', 'd4g', 'e3g'], h='The e-pawn and the d-pawn: home again',
+              t='Four club players in ten answer with the e-pawn or the d-pawn, and the moves walk straight back into the setup you already know.'),
+       ]),
   dict(id='b-scotch', side='b', title='Scotch & center gambits', kicker='Black · same bishop, same diagonal',
        why='Thirteen games and only four wins: your weakest Black opening. Now it is your Italian setup: the bishop goes straight to its diagonal, the queen joins it against f2, and against the gambits you develop instead of grabbing a second pawn.',
        lessons=['bs-classical', 'bs-classical-be3', 'bs-gambit', 'bs-danish', 'bs-center'],
@@ -135,6 +167,18 @@ UNITS = [
               t='Swap off Black\'s best piece, put your king on the other side, and attack where your h-pawn already stands.'),
          dict(path='e4 c6 d4 d5 Nc3 dxe4 Nxe4 Nf6 Nxf6+ exf6', circles=['f6r', 'f7r'], h='Knight trade? Take it',
               t='Taking with check spoils Black\'s pawns. Stepping back, as you did in your games, gave Black an easy game.'),
+       ]),
+  dict(id='w-lrare', side='w', title='The London: other first moves', kicker='White · the setup does the work',
+       why='Most other first moves lead back to the setup. Two need something new: the c-pawn two squares, where your d-pawn pushes past it, and the e-pawn gambit, where one move avoids a famous trap.',
+       lessons=['lr-e6', 'lr-englund', 'lr-c5'],
+       deeper=['lr-g6', 'lr-other'],
+       idea=[
+         dict(path='d4 e6 Bf4 d5 e3', circles=['e3g', 'f4g'], h='Most roads lead to the setup',
+              t='The e-pawn first, the c-pawn one square, the b-pawn or the f-pawn: your bishop comes out and the same moves follow.'),
+         dict(path='d4 e5 dxe5 Nc6 Nf3 Qe7 Bf4 Qb4+ Bd2 Qxb2 Nc3', arrows=['c3a2g', 'd1a1g'], circles=['b2r'], h='The gambit: the knight, never the bishop',
+              t='Take the pawn and guard it. When Black\'s queen takes your b-pawn, the knight comes out. The bishop to the same square loses to a mate in the corner.'),
+         dict(path='d4 c5 d5', arrows=['e2e4g', 'b1c3g'], circles=['d5g'], h='The c-pawn two squares: push past it',
+              t='Bringing the bishop out first would leave the b-pawn to Black\'s queen. Push the d-pawn past, then the knight and the e-pawn take the middle.'),
        ]),
   dict(id='b-ruy', side='b', title='Against the Ruy Lopez', kicker='Black · same setup, new bishop',
        why='The same setup as your Italian: hit the e-pawn with the knight, bishop to its diagonal, castle. You have won seven of ten here.',
@@ -272,6 +316,27 @@ SKILL_IDEAS = {'threats': THREAT_IDEA, 'finish': FINISH_IDEA, 'endings': END_IDE
 
 # Checkpoint positions: the moves that lead to a position where it is your turn. The answer is your repertoire move there.
 QUIZ = {
+  'w-london': [
+    'd4 d5',
+    'd4 d5 Bf4 Nf6 e3 e6 Nf3 c5',
+    'd4 d5 Bf4 Nf6 e3 e6 Nf3 c5 c3 Nc6 Nbd2 Bd6',
+    'd4 d5 Bf4 Nf6 e3 e6 Nf3 c5 c3 Qb6',
+    'd4 d5 Bf4 Nc6 e3 Nf6 Nf3 Bg4 c3 e6',
+    'd4 d5 Bf4 Nc6 e3 Bf5 Bd3 Bxd3 Qxd3 Nb4'],
+  'w-lindian': [
+    'd4 Nf6',
+    'd4 Nf6 Bf4 g6 e3 Bg7 Nf3 O-O',
+    'd4 Nf6 Bf4 g6 e3 Bg7 Nf3 O-O Be2 d6',
+    'd4 Nf6 Bf4 g6 e3 Bg7 Nf3 O-O Be2 d6 h3 Nh5',
+    'd4 Nf6 Bf4 g6 e3 Bg7 Nf3 O-O Be2 d6 h3 Nbd7 O-O e5',
+    'd4 Nf6 Bf4 e6 e3 c5 Nf3 cxd4'],
+  'w-lrare': [
+    'd4 e5',
+    'd4 e5 dxe5 Nc6 Nf3 Qe7 Bf4 Qb4+',
+    'd4 e5 dxe5 Nc6 Nf3 Qe7 Bf4 Qb4+ Bd2 Qxb2',
+    'd4 c5',
+    'd4 c5 d5 d6',
+    'd4 e6 Bf4 c5 e3 cxd4'],
   'w-italian': [
     'e4 e5 Nf3 Nc6 Bc4 Bc5',
     'e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6',
@@ -391,6 +456,30 @@ QUIZ = {
 # (blue arrows: the other side's tries, drawn by the build); then one card per lesson at its first new move, with your
 # answer in green. The coach suggests three deep dives for each player (app/template.html, deepRank).
 DEEP = [
+  dict(id='x-w-london', name='the London', base='w-london', title='The London', tag='The knight trick, the early bishop and the Slav setup',
+       why='The London past its main lines: the c-pawn at once and the knight that punishes the queen raid, Black\'s light bishop out before anything else, and the Slav setup from the other side.',
+       parts=[
+         dict(title='The c-pawn at once', sub='The knight trick and the quiet lines',
+              lessons=['ld-trick'],
+              why='When Black\'s c-pawn goes two squares before your c-pawn has moved, the queen raid on the b-pawn walks into a knight. When Black plays quietly instead, it is the setup again.',
+              t='Blue: Black\'s moves after your e-pawn. Only the queen raid needs a new answer.'),
+         dict(title='The bishop out early', sub='Offer it, take it if it stays',
+              lessons=['ld-bf5', 'ld-c6'],
+              why='Black\'s light bishop is the one piece the setup can\'t shut in. Offer yours for it at once, take it if it stays behind the e-pawn, and keep your queen ready to take back.',
+              t='Blue: the early bishop and the c-pawn one square. The same bishop rule answers both.'),
+       ]),
+  dict(id='x-w-lindian', name='the London against the knight', base='w-lindian', title='The London: knight first', tag='The small d-pawn, the d-pawn two squares, the c-pawn at once',
+       why='The knight-first lines past the fianchetto: the small d-pawn and its e-pawn push, the d-pawn that walks back into the setup, and the c-pawn that hits at once.',
+       parts=[
+         dict(title='The d-pawn, one or two squares', sub='A pawn to win, and the setup again',
+              lessons=['ln-d6', 'ln-d5'],
+              why='After the small d-pawn, Black\'s e-pawn push drops a pawn to your knight and bishop. After the d-pawn two squares, you are in the first chapter by another road.',
+              t='Blue: Black\'s d-pawn moves after your bishop. One loses a pawn, the other is the setup.'),
+         dict(title='The c-pawn at once', sub='Push past, then the e-pawn',
+              lessons=['ln-c5'],
+              why='Black hits your d-pawn before anything else. Push past it, bring the knight out and take the middle with the e-pawn.',
+              t='Blue: Black\'s answers to your push. The knight and the e-pawn follow in every one.'),
+       ]),
   dict(id='x-w-italian', name='the Italian', base='w-italian', title='The Italian', tag='The main line, the traps and the early sidesteps',
        why='Your main weapon all the way down: what to do when Black leaves the main road early, when Black won\'t take the pawn, '
            'the main line where Black takes it, and the traps behind your bishop move.',

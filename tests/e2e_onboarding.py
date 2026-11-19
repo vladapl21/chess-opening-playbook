@@ -89,7 +89,7 @@ with sync_playwright() as p:
     pg.click('[data-pgo="choices"]'); pg.wait_for_timeout(500)
     n = pg.evaluate('Product.cards.length'); kinds = pg.evaluate('Product.cards.map(c => c.id)'); print('cards:', kinds)
     assert 'blackD4' in kinds and kinds[-2:] == ['order', 'depth'], kinds   # this player met the d-pawn with something the library lacks
-    assert kinds[0] == 'blackE4', kinds                                       # the library has two answers to the e-pawn, so that is asked too
+    assert kinds[:2] == ['white', 'blackE4'], kinds                          # the library has two first moves for White and two answers to the e-pawn, so both are asked too
     txt = pg.inner_text('.wyr'); assert 'Ready now' in txt and 'What you play now' in txt and 'Being written' not in txt
     for k in range(n):
         q = pg.evaluate('Product.cards[Product.ci]')
@@ -100,7 +100,7 @@ with sync_playwright() as p:
         pick = next(i for i, o in enumerate(q['opts']) if o['id'] in ('e4', 'e5', 'slav')) if q['kind'] == 'system' else 0
         pg.click(f'.duo .wopt >> nth={pick}'); pg.wait_for_timeout(350)
         if k == n - 2: pg.screenshot(path=out + 'o_choice_style.png')
-    assert pg.evaluate('[S.view, Prog.d.me.state, Prog.d.me.picks.blackD4, Prog.d.me.picks.order, Prog.d.me.picks.depth]') == ['built', 'ready', 'slav', 'leaks', 'core']
+    assert pg.evaluate('[S.view, Prog.d.me.state, Prog.d.me.picks.white, Prog.d.me.picks.blackD4, Prog.d.me.picks.order, Prog.d.me.picks.depth]') == ['built', 'ready', 'e4', 'slav', 'leaks', 'core']
     pg.screenshot(path=out + 'o_built.png')
     pg.click('[data-open]'); pg.wait_for_timeout(1500)
 
