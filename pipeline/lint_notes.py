@@ -1,49 +1,57 @@
-"""Sanity-check Black-book notes against the actual positions."""
+"""Sanity-check notes against the actual positions: the Black book, and the White book's later packs (the London)."""
 import sys, re
 import paths
 from common import *
 import bcontent as BC
 import bnotes
+import content as WC, content2, content2_meta as CM  # noqa: F401  (content2 registers the London)
 from lint_claims import pins
 VAL = {chess.PAWN: 1, chess.KNIGHT: 3, chess.BISHOP: 3, chess.ROOK: 5, chess.QUEEN: 9, chess.KING: 0}
 NAME = {'pawn': chess.PAWN, 'knight': chess.KNIGHT, 'bishop': chess.BISHOP, 'rook': chess.ROOK, 'queen': chess.QUEEN, 'king': chess.KING}
-def mat(b):  # black minus white
-    return sum(VAL[p.piece_type] * (1 if p.color == chess.BLACK else -1) for p in b.piece_map().values())
+def mat(b, side=chess.BLACK):  # the side the notes speak to, minus the other
+    return sum(VAL[p.piece_type] * (1 if p.color == side else -1) for p in b.piece_map().values())
+# the White notes checked here: every note on a line of a pack other than the slot's first one
+later = {c for s_ in CM.PACKS.values() for p_, chs in s_['packs'].items() if p_ != s_['default'] for c in chs}
+part_ch = {p_['id']: p_['ch'] for p_ in WC.PARTS}
+wl = [l_ for l_ in WC.LESSONS if part_ch[l_['part']] in later]
+wpaths = {ln for l_ in wl for ln in [l_['path']] + [a[2] for a in l_['alts']]}
+wnotes = {p_: nt for p_, nt in WC.NOTES.items() if any((ln + ' ').startswith(p_ + ' ') for ln in wpaths)}
 issues = []
-for path, nt in BC.NOTES.items():
-    toks = path.split(); b = chess.Board()
-    for s in toks[:-1]: b.push_san(s)
-    before = b.copy(); mv = b.parse_san(toks[-1]); b.push(mv)
-    lab = (nt['label'] or ''); txt = (nt['text'] or ''); L = lab.lower(); T = txt.lower()
-    piece = before.piece_at(mv.from_square); cap = before.is_capture(mv); chk = b.is_check()
-    mine = piece.color == chess.BLACK
-    def bad(msg): issues.append(f"{msg:38s} | {lab} | {txt[:70]} | {' '.join(toks[-4:])}")
-    if re.search(r'\bcheck\b', L) and 'blocks the check' not in L and 'stops the queen check' not in L and not chk and 'out of check' not in L: bad('label says check, no check')
-    if re.search(r'\b(takes|take|grabs|grab)\b', L) and 'takes back' not in L and not cap and 'take the center' not in L and not re.search(r"\b(don't|do not|not) (take|grab)\b|\blet (her|him|it|white) take\b", L): bad('label says take, not a capture')
-    if L.startswith('castle') and not before.is_castling(mv): bad('castle label, not castling')
-    if 'white castles' in L and not before.is_castling(mv): bad('castles label, not castling')
-    if 'hits the queen' in L or 'hits your queen' in L:
-        tgt = [s for s in b.attacks(mv.to_square) if b.piece_at(s) and b.piece_at(s).piece_type == chess.QUEEN and b.piece_at(s).color != piece.color]
-        disc = any(b.piece_at(s) and b.piece_at(s).piece_type == chess.QUEEN and b.piece_at(s).color != piece.color for s in chess.SQUARES if b.is_attacked_by(piece.color, s))
-        if not tgt and not disc: bad('says hits the queen, it does not')
-    m = re.search(r'(?:pins|pin) (?:the|your) (knight|bishop|rook|queen|pawn)', L)
-    if m and not any(b.piece_at(t).piece_type == NAME[m.group(1)] and s == mv.to_square for t, s in pins(b)):
-        bad(f'pin claim: no pinned {m.group(1)}')
-    m = re.search(r'(?:hits|kick|kicks|ask) (?:the|your) (knight|bishop|rook|pawn|queen)', L)
-    if m and 'pin' not in L:
-        want = NAME[m.group(1)]
-        att = [s for s in b.attacks(mv.to_square) if b.piece_at(s) and b.piece_at(s).color != piece.color and b.piece_at(s).piece_type == want]
-        if L.startswith('ask the bishop') or L.startswith('kick'):
-            pass
-        if not att:
-            # discovered attack by another piece?
-            disc = any(b.piece_at(s) and b.piece_at(s).color != piece.color and b.piece_at(s).piece_type == want and b.is_attacked_by(piece.color, s) for s in chess.SQUARES)
-            if not disc: bad(f'says hits {m.group(1)}, no')
-    for pat, need in ((r'piece up for a pawn|piece for a pawn', 2), (r'\ba piece up\b(?! for a pawn)|whole piece', 3), (r'\ba pawn up\b|pawn ahead|pawn up\.', 1), (r'two pieces for a pawn', 5), (r'piece and two pawns up', 5)):
-        if re.search(pat, T):
-            mb = mat(b)
-            if mb < need - 0.5: bad(f'material claim {pat[:18]} but bal {mb:+d}')
-    if 'equal' in T.split('.')[0] and abs(mat(b)) >= 2: bad(f'says equal, material {mat(b):+d}')
+for side, notes in ((chess.BLACK, BC.NOTES), (chess.WHITE, wnotes)):
+  for path, nt in notes.items():
+      toks = path.split(); b = chess.Board()
+      for s in toks[:-1]: b.push_san(s)
+      before = b.copy(); mv = b.parse_san(toks[-1]); b.push(mv)
+      lab = (nt['label'] or ''); txt = (nt['text'] or ''); L = lab.lower(); T = txt.lower()
+      piece = before.piece_at(mv.from_square); cap = before.is_capture(mv); chk = b.is_check()
+      mine = piece.color == side
+      def bad(msg): issues.append(f"{msg:38s} | {lab} | {txt[:70]} | {' '.join(toks[-4:])}")
+      if re.search(r'\bcheck\b', L) and 'blocks the check' not in L and 'stops the queen check' not in L and not chk and 'out of check' not in L: bad('label says check, no check')
+      if re.search(r'\b(takes|take|grabs|grab)\b', L) and 'takes back' not in L and not cap and 'take the center' not in L and not re.search(r"\b(don't|do not|not) (take|grab)\b|\blet (her|him|it|white) take\b", L): bad('label says take, not a capture')
+      if L.startswith('castle') and not before.is_castling(mv): bad('castle label, not castling')
+      if ('white castles' in L or 'black castles' in L) and not before.is_castling(mv): bad('castles label, not castling')
+      if 'hits the queen' in L or 'hits your queen' in L:
+          tgt = [s for s in b.attacks(mv.to_square) if b.piece_at(s) and b.piece_at(s).piece_type == chess.QUEEN and b.piece_at(s).color != piece.color]
+          disc = any(b.piece_at(s) and b.piece_at(s).piece_type == chess.QUEEN and b.piece_at(s).color != piece.color for s in chess.SQUARES if b.is_attacked_by(piece.color, s))
+          if not tgt and not disc: bad('says hits the queen, it does not')
+      m = re.search(r'(?:pins|pin) (?:the|your) (knight|bishop|rook|queen|pawn)', L)
+      if m and not any(b.piece_at(t).piece_type == NAME[m.group(1)] and s == mv.to_square for t, s in pins(b)):
+          bad(f'pin claim: no pinned {m.group(1)}')
+      m = re.search(r'(?:hits|kick|kicks|ask) (?:the|your) (knight|bishop|rook|pawn|queen)', L)
+      if m and 'pin' not in L:
+          want = NAME[m.group(1)]
+          att = [s for s in b.attacks(mv.to_square) if b.piece_at(s) and b.piece_at(s).color != piece.color and b.piece_at(s).piece_type == want]
+          if L.startswith('ask the bishop') or L.startswith('kick'):
+              pass
+          if not att:
+              # discovered attack by another piece?
+              disc = any(b.piece_at(s) and b.piece_at(s).color != piece.color and b.piece_at(s).piece_type == want and b.is_attacked_by(piece.color, s) for s in chess.SQUARES)
+              if not disc: bad(f'says hits {m.group(1)}, no')
+      for pat, need in ((r'piece up for a pawn|piece for a pawn', 2), (r'\ba piece up\b(?! for a pawn)|whole piece', 3), (r'\ba pawn up\b|pawn ahead|pawn up\.', 1), (r'two pieces for a pawn', 5), (r'piece and two pawns up', 5)):
+          if re.search(pat, T):
+              mb = mat(b, side)
+              if mb < need - 0.5: bad(f'material claim {pat[:18]} but bal {mb:+d}')
+      if 'equal' in T.split('.')[0] and abs(mat(b, side)) >= 2: bad(f'says equal, material {mat(b, side):+d}')
 print(len(issues), 'issues')
 print('\n'.join(issues))
 sys.exit(1 if issues else 0)

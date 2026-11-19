@@ -383,9 +383,14 @@ CHAPTERS = [
   dict(id='pirc', name='Pirc & Modern', move='d-pawn one square, or the fianchetto', parts=['pirc-150', 'pirc-other']),
   dict(id='french', name='French', move='e-pawn one square', parts=['french-adv', 'french-other']),
   dict(id='rare', name='Rare first moves', move='knights, b-pawn, a-pawn', parts=['rare-all']),
+  # the London System: a second pack for White (PACKS in content2_meta.py), lessons and notes in london.py
+  dict(id='london', name='The London', move='d-pawn mirrors yours', parts=['ld-setup', 'ld-cpawn', 'ld-knight', 'ld-bishop', 'ld-side']),
+  dict(id='lindian', name='Knight first', move='king\'s knight, then the g-pawn or e-pawn', parts=['ln-fian', 'ln-epawn', 'ln-cpawn']),
+  dict(id='lrare', name='Other first moves', move='e-pawn, c-pawn, gambits, fianchetto', parts=['lr-epawn', 'lr-gambit', 'lr-cpawn', 'lr-fian', 'lr-other']),
 ]
 
 for _p in PARTS:
     _p.setdefault('ch', 'italian')
 NEW_PARTS = {p['id'] for p in PARTS if p['ch'] != 'italian'}
 import content2_notes  # noqa
+import london  # noqa: E402,F401  the London System for White (its own pack)

@@ -49,7 +49,7 @@ Everything above was built by hand for one player. The site now has the first ve
 
 <img src="docs/img/choices.png" alt="A would-you-rather card: the classical defence the player uses now, marked as being written, or the Slav setup, marked ready" width="100%">
 
-**What it cannot do yet.** The library is small: the e-pawn as White; the e-pawn reply, the Caro-Kann or the Sicilian against the e-pawn; the Slav setup against the d-pawn. A player who prefers something else is told that their system is still being written, and that part of their course waits. A d-pawn system for White and the English are next. Puzzles from a player's own mistakes need the engine run over their games, which is not built yet.
+**What it cannot do yet.** The library is small: the e-pawn or the London as White; the e-pawn reply, the Caro-Kann or the Sicilian against the e-pawn; the Slav setup against the d-pawn. A player who prefers something else is told that their system is still being written, and that part of their course waits. The English is next. Puzzles from a player's own mistakes need the engine run over their games, which is not built yet.
 
 A **coach**, one of three characters to pick from (Pip the knight, Rocco the rook, Dot the pawn), says the short things in a speech bubble at the bottom right: what a tab is for the first time it is opened, once a day what is worth knowing there (the first of today's five and why it comes first, the next unit and how far along it is, today's drops in the shop), the end of today's five with the streak, a new badge with its medal, a new monthly recap, why a section is locked. Tapping the coach brings back what is worth knowing on that tab. When a drill line ends with a slip, the coach's note in the drill panel says which move caught you, what you played instead, what the book says about that move and why the line's move is the move, and whether the same move has caught you before; when a checkpoint goes wrong, it names the lesson most of the misses came from and offers to play it along again. The coach talks in short bullets, never paragraphs. It never speaks during a drill, a practice game or a checkpoint, and it can be switched off in **Settings**, which also has light and dark mode, text size, five board colours and the letters on the board. Settings are kept with the progress, so the coach and the look follow an account to every device. The system for each part of the repertoire is in Settings too, folded away at the bottom: switching one swaps whole course units, so it asks for the player's username first.
 
@@ -267,12 +267,16 @@ The library can hold more than one answer to the same question. A **slot** is on
 
 | Slot | Packs | |
 | --- | --- | --- |
+| White's first move | **Open with the e-pawn** (1.e4): the eight chapters above | the first system; 8 chapters |
+| | **The London** (1.d4 and 2.Bf4): the setup, the queen raid on the b-pawn, Black's knight first, Black's bishop first, the Slav setup; the knight first (the fianchetto, the e-pawn, the d-pawn, the c-pawn at once); the other first moves (the e-pawn one square, the gambit, the c-pawn two squares, the fianchetto, sidelines) | 3 chapters, 18 lessons, 102 lines |
 | Against the e-pawn | **Meet it head-on** (1…e5): Italian, Ruy Lopez, Scotch, Four Knights and Vienna, early attacks | the first system; 5 chapters |
 | | **Caro-Kann** (1…c6): the push past, the pawn trade and the c-pawn attack, the main line, both knights, sidelines | 7 lessons, 59 lines |
 | | **Sicilian** (1…c5, the Kan setup): the open game, the early bishop, the small c-pawn and the pawn offer, sidelines | 5 lessons, 31 lines |
 | Against the d-pawn | **The Slav setup** | 3 chapters |
 
 The Caro-Kann is written as the Slav setup's twin: c-pawn one square, d-pawn two, light bishop out before the e-pawn moves. It reuses the Slav's rules where the positions are alike (after a pawn trade, both knights come out before the bishop; in the main line the queen's knight goes first). Two of its lines win a pawn against a move a third of club players make.
+
+The London is a whole White repertoire on its own, since a player who picks it has no e-pawn lines left: one chapter for each of Black's three answers (the d-pawn, about half of club players; the king's knight, one in six; everything else). It is one setup in one order (below), with a trick ready for the usual tries: the knight that punishes the queen raid on the b-pawn while your c-pawn is at home, the queen check that wins the knight when Black jumps it at your queen, the queen that hits the b-pawn once Black's light bishop has gone to your knight, the c-pawn capture that wins Black's queen when it stands behind its bishop on your bishop's diagonal, and the one move that avoids the mate trap in the e-pawn gambit (a line that shows the trap is marked as a mistake and never drilled). Black's moves come from the Maia odds at club level; the house player has no games with it, so its chapters show no record. Opening the White book with the London in play, the Sandbox plays the d-pawn for you, and the course puts the three London units where the e-pawn units were.
 
 Inside the packs a player can hold together, one position still gets one move. Two packs of the same slot may answer a position differently, so the repeat check runs once for every combination of one pack per slot.
 
@@ -300,6 +304,34 @@ The places where the order changes, each with the reason the lesson gives:
 | Both White knights out in the Queen's Gambit | Take the c-pawn and hold it with the b-pawn | The bishop can't come out safely yet, and White needs several moves to win the pawn back. |
 | White's bishop comes at the king's knight | The knight jumps to the middle if that square is free | It hits the bishop, and the queen check on the edge wins it if White takes the knight. |
 | White fianchettoes, or the c-pawn pushes past | Dark bishop one square shorter, to e7 | On d6 it would be hit by the pawn or stare at a guarded pawn. |
+
+The London has its own order, the same against almost every Black setup:
+
+1. **d-pawn** two squares.
+2. **Dark bishop** out to f4, before the e-pawn moves and shuts it in.
+3. **E-pawn** one square.
+4. **King's knight.**
+5. **C-pawn** one square.
+6. **Queen's knight** to d2, beside the queen.
+7. **Light bishop** to d3.
+8. **Castle.**
+
+The places where it changes:
+
+| When | What changes | Why |
+| --- | --- | --- |
+| Black's dark bishop comes to d6, opposite yours | Bishop back to g3; if Black takes, the h-pawn takes back | It keeps the London bishop. After the trade the rook behind the h-pawn looks straight at Black's h-pawn. |
+| Black's light bishop comes out to f5 | Light bishop to d3 at once, and the queen takes back | It is Black's best minor piece. With the queen on d3, a knight jump at her loses the knight to a queen check. |
+| That bishop stays on f5 behind the e-pawn, or steps back to g6 | Take it, before the queen's knight goes to d2 | With the knight on d2 the queen no longer guards your bishop, and Black's bishop would take it for free. |
+| Black's light bishop goes to g4, at your knight | C-pawn, then the queen to b3 | The bishop has left Black's b-pawn without a guard. |
+| Black's queen comes to b6 at your b-pawn, your c-pawn already on c3 | Queen to b3, offering the trade; if Black's c-pawn chases her, to c2 | If Black trades, the a-pawn takes back toward the middle and the rook gets the a-file. |
+| The same, with your c-pawn at home and Black's on c5 | Queen's knight to c3 | If the queen takes the b-pawn, the knight takes on d5, the rook chases her, and the knight check next to the king wins the corner rook. |
+| The same, with Black's c-pawn on c6 | Queen to c1 | The knight trick doesn't work with that pawn guarding d5. |
+| Black's c-pawn takes on d4 | The e-pawn takes back | It keeps a pawn in the middle and opens the e-file. |
+| Black's queen stands behind its bishop on your bishop's diagonal | Take on c5 with the d-pawn | If the bishop takes back, your bishop takes the queen. Half of club players fall for it. |
+| Black's rook goes behind the e-pawn | Knight to e5 before the castle | The knight takes the square before Black's e-pawn can push. |
+| Black fianchettoes | Light bishop to e2, and h3 once Black's d-pawn moves | On d3 a pawn fork waits for it; h3 gives the London bishop a way back when the knight or the e-pawn comes at it. |
+| Black's c-pawn goes two squares on move one, or straight after the knight | Push the d-pawn past it, then the queen's knight and the e-pawn | With the bishop out first, Black's queen would come at the b-pawn with gain of time. |
 
 Three checks keep it that way ([`pipeline/lint_claims.py`](pipeline/lint_claims.py)), and the build stops when any of them finds something:
 
@@ -423,7 +455,7 @@ supabase/
 content/
   course.py                the course: units, idea boards, checkpoint positions; the deep dives (DEEP)
   plans.py                 the plan shown where each lesson's main line ends
-  white/                   White book: lessons, labels and notes, chapter text, game reviews
+  white/                   White book: lessons, labels and notes, chapter text, game reviews; london.py, the London pack
   black/                   Black book: bcontent (lessons), bnotes + bnotes2 (labels, notes, arrows),
                            bmeta (chapters, game reviews, puzzles, cheat sheet, insights)
 pipeline/
@@ -438,8 +470,8 @@ pipeline/
   black_games.py, black_chapters.py, scan_games.py, find_shots.py
                            game import, sorting by opening, engine scans, missed shots
   explain_skills.py        the reason for every wrong move in the skill units: the engine's line, cut where the loss is on the board
-  check_black.py, lint_notes.py
-                           engine and wording checks
+  check_black.py, check_white.py, lint_notes.py
+                           engine and wording checks (check_white.py: the White packs after the first, the London)
   lint_claims.py           one position, one move; pins, guards and attacks in the text must be on the board
   paths.py, common.py      paths, environment variables, shared imports
 data/
@@ -496,12 +528,25 @@ Edit the files in [`content/`](content) and rebuild. Positions that are not in t
 | `MAIA_WEIGHTS` | a folder with `maia-1300.pb.gz` and `maia-1500.pb.gz` from [CSSLab/maia-chess](https://github.com/CSSLab/maia-chess) | `vendor/maia` |
 | `LCZERO_TRAINING` | a checkout of [LeelaChessZero/lczero-training](https://github.com/LeelaChessZero/lczero-training) (for `tf/policy_index.py`) | `vendor/lczero-training` |
 
+One way to set them up (`vendor/` is ignored by git). Stockfish's own download of its networks may be blocked; the two files are also in the [networks repository](https://github.com/official-stockfish/networks), and the build checks them by name:
+
+```bash
+mkdir -p vendor && cd vendor
+git clone --depth 1 --branch sf_17.1 https://github.com/official-stockfish/Stockfish stockfish-src
+(cd stockfish-src/src && for n in nn-1c0000000000.nnue nn-37f18f62d772.nnue; do
+   curl -sSfLo $n https://raw.githubusercontent.com/official-stockfish/networks/master/$n; done && make -j build ARCH=x86-64-avx2)
+git clone --depth 1 --filter=blob:none --sparse https://github.com/CSSLab/maia-chess && (cd maia-chess && git sparse-checkout set maia_weights)
+git clone --depth 1 https://github.com/LeelaChessZero/lczero-training
+cd .. && export STOCKFISH=$PWD/vendor/stockfish-src/src/stockfish MAIA_WEIGHTS=$PWD/vendor/maia-chess/maia_weights LCZERO_TRAINING=$PWD/vendor/lczero-training
+```
+
 Some useful commands while writing:
 
 ```bash
 python3 pipeline/human_odds.py "e4 e5 Nf3 Nc6 Bc4"     # what club players play here, with odds
 python3 pipeline/sf.py -d 18 "e4 e5 Nf3 Nc6 Bc4 Bc5"   # Stockfish's top three moves
 python3 pipeline/check_black.py 16 bi-main,bs-classical  # check lessons (or all, without ids)
+python3 pipeline/check_white.py 16 ld-setup,ln-kid      # the same for the London's lessons
 python3 pipeline/lint_notes.py                         # notes that contradict their position
 python3 pipeline/lint_claims.py                        # same position, different move; pins, guards, attacks not on the board
 ```

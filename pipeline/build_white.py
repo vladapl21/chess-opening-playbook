@@ -214,6 +214,8 @@ for idx, fen in FULLFEN.items():
 stats = dict(white=0, wins=0, losses=0, draws=0, e5=0, italian=0, it_w=0, it_l=0, third=collections.Counter(), second=collections.Counter(), first=collections.Counter())
 chstats = collections.defaultdict(lambda: dict(n=0, w=0, l=0, d=0))
 def chapter_of(sans):
+    if sans and sans[0] == 'd4':     # the London pack: by Black's first reply
+        return 'london' if len(sans) > 1 and sans[1] == 'd5' else 'lindian' if len(sans) > 1 and sans[1] == 'Nf6' else 'lrare'
     if len(sans) < 2: return 'rare'
     if sans[1] == 'e5': return 'italian' if len(sans) > 3 and sans[2] == 'Nf3' and sans[3] == 'Nc6' else 'e5x'
     return {'c6': 'caro', 'c5': 'sic', 'd5': 'scandi', 'd6': 'pirc', 'g6': 'pirc', 'e6': 'french'}.get(sans[1], 'rare')
@@ -263,7 +265,8 @@ def pidx(path): return path_to_idx[tuple(path.split())]
 chapters_out = []
 for C in content2.CHAPTERS:
     M = CM.CH_META[C['id']]; st = dict(chstats[C['id']])
-    d = dict(id=C['id'], name=C['name'], move=C['move'], parts=C['parts'], stats=st, tile=pidx(M['tile']),
+    slot, pack = next(((s, p) for s, v in CM.PACKS.items() for p, chs in v['packs'].items() if C['id'] in chs), (None, None))
+    d = dict(id=C['id'], name=C['name'], move=C['move'], parts=C['parts'], stats=st, tile=pidx(M['tile']), slot=slot, pack=pack,
              roots=[pidx(r) for r in M['roots']], first=M['first'])
     assert M['first'] in {l['id'] for l in content.LESSONS}, M['first']
     if C['id'] != 'italian':
@@ -275,11 +278,17 @@ for C in content2.CHAPTERS:
         for nn in M['notes']:
             assert ('lesson' not in nn or nn['lesson'] in lids) and ('line' not in nn or nn['line'] in lineids), nn
     chapters_out.append(d)
+# every lesson of a pack other than the first sits inside its chapter's roots (the first pack was written before packs existed)
+for les in lesson_out:
+    ch = next(c for c in chapters_out if les['part'] in c['parts'])
+    if ch['pack'] and ch['pack'] != CM.PACKS[ch['slot']]['default']:
+        n_ = next(l for l in lines if l['id'] == les['id'])['n']
+        assert any(r in n_ for r in ch['roots']), (les['id'], ch['id'])
 print('chapters', [(c['id'], c['stats']) for c in chapters_out])
 print('stats', stats)
 
 out = dict(nodes=nodes, lines=lines, lessons=lesson_out, parts=content.PARTS, games=games_out, puzzles=puzzles,
-           legal={str(k): v for k, v in legal.items()}, cheat=cheat, stats=stats, repCount=REP_COUNT, e4=E4, chapters=chapters_out)
+           legal={str(k): v for k, v in legal.items()}, cheat=cheat, stats=stats, repCount=REP_COUNT, e4=E4, chapters=chapters_out, packs=CM.PACKS)
 OUT = paths.BUILD / 'data_white.json'
 json.dump(out, open(OUT, 'w'), separators=(',', ':'))
 print(f"nodes={len(nodes)} rep={REP_COUNT} lines={len(lines)} lessons={len(lesson_out)} games={len(games_out)} puzzles={len(puzzles)} cheat={len(cheat)} legal={len(legal)}")

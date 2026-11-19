@@ -1,9 +1,11 @@
-"""Systems (packs): the library holds two answers to the e-pawn for Black, and a player has one of them.
+"""Systems (packs): the library holds three answers to the e-pawn for Black and two first moves for White, and a player
+has one of each.
 
-- With nothing chosen, the playbook is what it always was: no Caro-Kann anywhere.
+- With nothing chosen, the playbook is what it always was: no Caro-Kann and no London anywhere.
 - Choosing the Caro-Kann in Settings swaps the chapters, the course units, the drills, the cards at a glance and the Sandbox.
 - Progress in the other system is kept, and switching back brings everything back.
-- A new player who already plays the Caro-Kann is offered it, and gets it."""
+- A new player who already plays the Caro-Kann is offered it, and gets it.
+- The same for White: the London swaps the White book, and the Sandbox opens with the d-pawn."""
 from playwright.sync_api import sync_playwright
 from e2e_white import click_move, drag, launch, out
 from serve import Site
@@ -11,6 +13,9 @@ from serve import Site
 site = Site(); URL = site.start()
 errors = []
 E5 = ['italian', 'ruy', 'scotch', 'vienna', 'attacks']
+WE4 = ['italian', 'e5x', 'caro', 'sic', 'scandi', 'pirc', 'french', 'rare']
+WE4_UNITS = {'w-italian', 'w-sicilian', 'w-caro', 'w-2knights', 'w-philidor', 'w-defences', 'w-rare'}
+LONDON_UNITS = {'w-london', 'w-lindian', 'w-lrare'}
 
 
 def hook(pg):
@@ -24,13 +29,27 @@ def shape(pg):
         first: (() => { useSide('b'); const e4 = N[0].k.find(k => N[k].u === 'e2e4'); return sbMyKids(e4).map(c => N[c].u); })()})""")
 
 
+def wshape(pg):
+    return pg.evaluate("""(() => { useSide('w'); return {chapters: BOOKS.w.chapters.map(c => c.id), all: BOOKS.w.full.chapters.length,
+        units: COURSE.map(U => U.id), lines: BOOKS.w.lines.length, cheat: BOOKS.w.cheat.length, black: BOOKS.b.chapters.length,
+        first: N[BOOKS.w.e4].u, roots: N[0].k.filter(k => BOOKS.w.lines.some(l => l.n[1] === k)).map(k => N[k].u)}; })()""")
+
+
+def switch(pg, ask, name='aqua_alpaca'):
+    pg.click('#setBtn'); pg.wait_for_timeout(300)
+    pg.click('#setPanel .repdet > summary'); pg.wait_for_timeout(200)
+    pg.click(f'#setPanel [data-packask="{ask}"]'); pg.wait_for_timeout(200); pg.fill('#repName', name)
+    pg.evaluate("window.__before = 1"); pg.click('.repask [type=submit]')
+    pg.wait_for_function("typeof __before === 'undefined' && typeof COURSE !== 'undefined' && typeof PERSONA !== 'undefined'"); pg.wait_for_timeout(900)
+
+
 def drill_clean(pg):
     for _ in range(120):
         st = pg.evaluate("({state: S.drill.state, busy: S.drill.busy})")
         if st['state'] == 'done': break
         if st['busy']: pg.wait_for_timeout(200); continue
         u = pg.evaluate("N[LINES[S.drill.id].n[S.drill.i + 1]].u")
-        if u in ('e8g8', 'e8c8'): drag(pg, 'e8', 'h8' if u[2] == 'g' else 'a8')
+        if u in ('e8g8', 'e8c8', 'e1g1', 'e1c1'): drag(pg, u[:2], u[0].replace('e', 'h' if u[2] == 'g' else 'a') + u[1])
         else: click_move(pg, u[:2], u[2:4])
         pg.wait_for_timeout(750)
     return pg.evaluate("S.drill.state")
@@ -50,7 +69,7 @@ with sync_playwright() as p:
     pg.click('#setBtn'); pg.wait_for_timeout(300)
     assert not pg.locator('#setPanel [data-packask="blackE4:caro"]').is_visible(), 'the repertoire is folded away'
     pg.click('#setPanel .repdet > summary'); pg.wait_for_timeout(200)
-    rows = pg.locator('#setPanel [data-packask]').all_inner_texts(); print('settings:', rows); assert len(rows) == 3
+    rows = pg.locator('#setPanel [data-packask]').all_inner_texts(); print('settings:', rows); assert len(rows) == 5
     pg.click('#setPanel [data-packask="blackE4:caro"]'); pg.wait_for_timeout(200)
     assert pg.evaluate("PICKS.blackE4 || null") is None and pg.locator('#repName').count() == 1, 'a tap alone switches nothing'
     pg.fill('#repName', 'somebody'); assert pg.is_disabled('.repask [type=submit]')
@@ -127,11 +146,67 @@ with sync_playwright() as p:
     pg.wait_for_function("typeof __before === 'undefined' && typeof COURSE !== 'undefined' && typeof PERSONA !== 'undefined'"); pg.wait_for_timeout(900)
     assert shape(pg)['chapters'] == a['chapters']
 
+    # the London is a pack for White, beside the e-pawn
+    w0 = wshape(pg); print('white default:', {k: (v if k != 'units' else len(v)) for k, v in w0.items()})
+    assert w0['chapters'] == WE4 and w0['all'] == len(WE4) + 3 and w0['first'] == 'e2e4' and w0['roots'] == ['e2e4']
+    assert not LONDON_UNITS & set(w0['units']) and WE4_UNITS <= set(w0['units'])
+    assert pg.evaluate("Object.keys(LIDX.w).some(l => l.startsWith('ld-'))") is False
+    pg.evaluate("useSide('w'); startDrillLine('setup')"); pg.wait_for_timeout(600); assert drill_clean(pg) == 'done'
+    pg.evaluate("go('course')"); switch(pg, 'white:d4')
+    w1 = wshape(pg); print('london:', {k: (v if k != 'units' else len(v)) for k, v in w1.items()})
+    assert w1['chapters'] == ['london', 'lindian', 'lrare'] and w1['first'] == 'd2d4' and w1['roots'] == ['d2d4'] and w1['black'] == len(a['chapters'])
+    assert LONDON_UNITS <= set(w1['units']) and not WE4_UNITS & set(w1['units']) and 'b-slav' in w1['units']
+    assert pg.evaluate("[PICKS.white, Prog.d.packs.white, Prog.rec('setup').clean]") == ['d4', 'd4', 1]
+    pg.evaluate("useSide('w'); S.chapter = 'london'; go('learn')"); pg.wait_for_timeout(500)
+    txt = pg.inner_text('#view'); assert 'one order' in txt and 'The setup' in txt, txt[:400]
+    pg.screenshot(path=out + 'p_london_chapter.png', full_page=True)
+    pg.evaluate("openLine('ld-setup')"); pg.wait_for_timeout(500); pg.keyboard.press('End'); pg.wait_for_timeout(500)
+    assert 'Castle, then the knight into the hole' in pg.inner_text('#view'); pg.screenshot(path=out + 'p_london_lesson.png')
+    for lid in ('ld-setup', 'ld-trick', 'lr-englund'):
+        pg.evaluate(f"useSide('w'); startDrillLine('{lid}')"); pg.wait_for_timeout(600); assert drill_clean(pg) == 'done', lid
+    assert pg.evaluate("Prog.rec('ld-trick').clean") == 1
+    assert pg.evaluate("DRILLSET.has('lr-englund-trap')") is False, 'the line that shows the trap is never drilled'
+    glance = pg.evaluate("DATA.chapters.flatMap(C => glanceCards(C)).map(c => c.rule)")
+    assert 'Bishop out before the e-pawn' in glance and 'Get the bishop out first' not in glance, glance[:6]
+    pg.evaluate("go('course')"); pg.wait_for_timeout(400); pg.evaluate("S.unit = 'w-london'; S.slide = 0; go('unit')"); pg.wait_for_timeout(500)
+    assert 'Bishop out first' in pg.inner_text('#view'); pg.screenshot(path=out + 'p_london_unit.png')
+    seen = set()
+    pg.evaluate("useSide('w'); SBS.scope = 'london'; SBS.odds = 'even'; go('sandbox')"); pg.wait_for_timeout(300)
+    for k in range(3):
+        pg.evaluate("sbStart()"); pg.wait_for_timeout(900)
+        assert pg.evaluate("N[S.drill.hist[1]].u") == 'd2d4', 'the Sandbox opens with the d-pawn'
+        for _ in range(80):
+            st = pg.evaluate("({state: S.drill.state, busy: S.drill.busy})")
+            if st['state'] == 'done': break
+            if st['busy']: pg.wait_for_timeout(250); continue
+            u = pg.evaluate("(() => { const ks = sbMyKids(S.drill.node); return ks.length ? N[ks[0]].u : null; })()")
+            if not u: break
+            if u in ('e1g1', 'e1c1'): drag(pg, 'e1', 'h1' if u[2] == 'g' else 'a1')
+            else: click_move(pg, u[:2], u[2:4])
+            pg.wait_for_timeout(800)
+        seen.add(pg.evaluate("chapterOf(lessonOf(S.drill.line || sbLinesThrough(S.drill.node)[0])).id"))
+    print('London sandbox games stayed in:', seen); assert seen <= {'london', 'lindian', 'lrare'} and seen
+    assert pg.evaluate('document.documentElement.scrollWidth') <= 1280
+    pg.evaluate("go('course')"); switch(pg, 'white:e4')
+    w2 = wshape(pg); assert w2['chapters'] == WE4 and w2['units'] == w0['units'] and w2['lines'] == w0['lines'] and w2['first'] == 'e2e4'
+    assert pg.evaluate("[Prog.rec('setup').clean, Prog.rec('ld-trick').clean]") == [1, 1]
+    print('White switched back: the same', len(w2['chapters']), 'chapters and', len(w2['units']), 'units')
+    wc = pg.evaluate("""makeChoices({slots: {white: {n: 30, opts: {d4: {n: 24, w: 12, l: 10, d: 2}, e4: {n: 6, w: 3, l: 3, d: 0}}}}}).map(c => [c.id, (c.opts || []).map(o => [o.id, !!o.ready])])""")
+    print('cards for a d-pawn player:', wc[:1]); assert wc[0] == ['white', [['d4', True], ['e4', True]]]
+
     # phone width with the Caro-Kann on
     ph = b.new_context(viewport={'width': 390, 'height': 844}); ph.add_init_script("localStorage.setItem('playbook-packs', JSON.stringify({blackE4: 'caro'}))")
-    q = ph.new_page(); hook(q); q.goto(URL); q.wait_for_timeout(900)
+    q = ph.new_page(); hook(q); q.goto(URL); q.wait_for_function("typeof Prog !== 'undefined' && typeof COURSE !== 'undefined'"); q.wait_for_timeout(900)
     q.evaluate("Prog.d.packs = {blackE4: 'caro', updated: Date.now()}; Prog.save(); useSide('b'); S.chapter = 'caro'; go('learn')"); q.wait_for_timeout(500)
     w = q.evaluate('document.documentElement.scrollWidth'); print('phone scrollWidth', w); assert w <= 390
+    # and with the London on
+    ph2 = b.new_context(viewport={'width': 390, 'height': 844}); ph2.add_init_script("localStorage.setItem('playbook-packs', JSON.stringify({white: 'd4'}))")
+    q2 = ph2.new_page(); hook(q2); q2.goto(URL); q2.wait_for_function("typeof Prog !== 'undefined' && typeof COURSE !== 'undefined'"); q2.wait_for_timeout(900)
+    q2.evaluate("Prog.d.packs = {white: 'd4', updated: Date.now()}; Prog.save(); useSide('w'); S.chapter = 'london'; go('learn')"); q2.wait_for_timeout(500)
+    for view in ("go('learn')", "openLine('lr-englund')", "S.unit = 'w-london'; S.slide = 0; go('unit')"):
+        q2.evaluate(view); q2.wait_for_timeout(500)
+        w = q2.evaluate('document.documentElement.scrollWidth'); assert w <= 390, (view, w)
+    q2.screenshot(path=out + 'p_london_phone.png', full_page=True)
     b.close()
 site.stop()
 
