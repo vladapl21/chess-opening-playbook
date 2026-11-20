@@ -35,7 +35,7 @@ with sync_playwright() as p:
     assert pg.locator('.sidesw .badge, .tabs .badge').count() == 0
     assert pg.is_visible('#drillDot') and pg.inner_text('#drillDot') == '!'
     assert pg.is_visible('#meBtn') and pg.inner_text('#meBtn').strip() == '0'
-    foot = pg.inner_text('#foot'); print('footer:', foot.replace('\n', ' | ')); assert 'your coach' in foot and '© ' in foot and 'Stockfish' not in foot
+    foot = pg.inner_text('#foot'); print('footer:', foot.replace('\n', ' | ')); assert '© ' in foot and 'coach' not in foot and 'Stockfish' not in foot   # the copyright only: where a playbook came from isn't the same for everyone
 
     # ---- today's five: the oldest slip first, from either book, from move one
     pg.evaluate("""(() => { const t = Date.now();

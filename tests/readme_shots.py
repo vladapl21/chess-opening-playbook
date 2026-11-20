@@ -6,7 +6,7 @@ Needs Playwright and Pillow. The page loads its fonts from Google Fonts; on a ma
 access, point FONTS_DIR at the `ofl` folder of a google/fonts checkout (barlow, barlowcondensed and
 jetbrainsmono are enough) and the fonts are served from disk instead.
 """
-import io, os, sys
+import json, io, os, sys
 from pathlib import Path
 from PIL import Image, ImageDraw
 from playwright.sync_api import sync_playwright
@@ -98,6 +98,21 @@ def play_drill(pg, bad=None):
         u = pg.evaluate('N[LINES[S.drill.id].n[S.drill.i + 1]].u')
         if bad and st['i'] + 1 == bad[0]: u, bad = bad[1], None
         pg.evaluate(f"tryMove('{u[:2]}', '{u[2:4]}')"); pg.wait_for_timeout(650)
+
+
+def review_seed():
+    """The last three games' reviews as e2e_review.py leaves them: the moves of each game and what the engine found."""
+    import chess
+    def ucis(sans):
+        b = chess.Board(); out = []
+        for s in sans.split(): m = b.parse_san(s); out.append(m.uci()); b.push(m)
+        return out
+    return [{'id': 'r1', 'src': 'acct', 'me': 'b', 'opp': 'rook_lover', 'oe': 1010, 'r': 0.5, 'url': '', 'u': ucis('e4 e5 g3 Nf6 d3 d5 exd5 Nxd5 Bg2 Nc6 Nf3 Be7 O-O O-O Re1 Bg4'),
+             'at': 2, 'by': 'opp', 'w': 0, 'ln': ['d7d5', 'f1g2', 'd5e4', 'b1c3', 'g8f6'], 'mk': 0},
+            {'id': 'r2', 'src': 'acct', 'me': 'w', 'opp': 'knightmare', 'oe': 1004, 'r': 0, 'url': '', 'u': ucis('e4 e5 Nf3 Nc6 Bc4 Nf6 Nxe5 Nxe5 d4 Nxc4 Qe2 d5 exd5 Qe7 Qxe7 Bxe7'),
+             'at': 6, 'by': 'me', 'w': 0, 'mk': 0},
+            {'id': 'r3', 'src': 'acct', 'me': 'w', 'opp': 'queenside', 'oe': 1004, 'r': 0, 'url': '', 'u': ucis('e4 e5 Nf3 Nc6 Bc4 a6 d3 Nf6 O-O Bc5 Qe2 d6 Qe3 Bxe3 Bxe3 O-O Nc3 Bg4 h3 Bh5'),
+             'at': 5, 'by': 'opp', 'w': 0, 'ln': ['d2d4', 'e5d4', 'e1g1', 'd7d6', 'f3d4'], 'mk': {'k': 12, 'best': 'a2a4', 'loss': 725, 'mate': 0, 'ln': ['a2a4']}}]
 
 
 def idle(pg):
@@ -206,6 +221,12 @@ with sync_playwright() as p:
     pg.evaluate("Coach.hush(); window.scrollTo(0, 0)"); settle(pg)
     box = pg.evaluate("(() => { const b = document.querySelector('#db').getBoundingClientRect(), d = document.querySelector('.donebox').getBoundingClientRect(); return [b.left - 16, b.top - 16, d.right + 16, Math.max(b.bottom, d.bottom) + 16]; })()")
     save(pg.screenshot(), 'slip.png', crop=tuple(round(v * 2) for v in box))
+    # the last three games: two reviews, with what the engine worked out already in them (e2e_review.py works it out for real)
+    pg.evaluate(f"(() => {{ const now = Date.now(); Prog.d.rg = {{g: {json.dumps(review_seed())}.map((R, k) => Object.assign(R, {{t: now - (k + 1) * 36e5, added: now - k}})), chk: now, seen: now}}; Prog.saveLocal(); }})()")
+    pg.evaluate("useSide('w'); Coach.hush(); S.drill = S.drillState = null; S.gseg = 'last'; go('games')"); pg.wait_for_timeout(700)
+    pg.evaluate("Coach.hush(); document.getElementById('coach').style.visibility = 'hidden'; window.scrollTo(0, document.querySelector('.rvcard').getBoundingClientRect().top + scrollY - 16)"); settle(pg)
+    box = pg.evaluate("(() => { const a = document.querySelector('.rvcard').getBoundingClientRect(), z = document.querySelectorAll('.rvcard')[1].getBoundingClientRect(); return [a.left - 12, a.top - 12, a.right + 12, z.bottom + 12]; })()")
+    save(pg.screenshot(), 'review.png', crop=tuple(round(v * 2) for v in box)); pg.evaluate("document.getElementById('coach').style.visibility = ''")
     # every move explained: in the Two Knights the knight takes the e-pawn instead of jumping in, and the answer that punishes it
     pg.evaluate("useSide('w'); startDrillLine('fried-liver', '', null, {from0: true})"); pg.wait_for_timeout(800)
     for _ in range(40):

@@ -203,11 +203,19 @@ with sync_playwright() as p:
     assert a.evaluate("Prog.d.tour && Prog.d.tour.done") == 1750000000000
     a.evaluate("Prog.d.tour = {done: 1760000000000}; Prog.save()"); a.wait_for_timeout(1800)
     assert S.rows[uid]['data']['tour']['done'] == 1750000000000 and a.evaluate("Prog.d.tour.done") == 1750000000000
+    # the last three games' reviews: per game, the newest three kept, what each device worked out and drilled kept too
+    bp.evaluate("Prog.d.rg = {g: [{id: 'g1', t: 1700000001000, added: 1700000001000, src: 'acct', me: 'w', opp: 'one', oe: 900, r: 0, url: '', u: ['e2e4', 'e7e5', 'g1f3', 'b8c6', 'f1c4', 'g8f6', 'f3e5'], at: 6, by: 'me', w: 0}, {id: 'g2', t: 1700000002000, added: 1700000002000, src: 'acct', me: 'w', opp: 'two', oe: 900, r: 0, url: '', u: ['e2e4', 'e7e5', 'g1f3', 'b8c6', 'f1c4', 'g8f6', 'f3e5'], at: 6, by: 'me', w: 0}], chk: 5}; Prog.save()"); bp.wait_for_timeout(1800)
+    a.evaluate("document.dispatchEvent(new Event('visibilitychange'))"); a.wait_for_timeout(900)
+    assert a.evaluate("Review.list().map(R => R.opp)") == ['two', 'one']
+    a.evaluate("Review.get('g1').mk = 0; Review.get('g2').d = {o: [1, 1, 9]}; Prog.d.rg.g.push({id: 'g3', t: 1700000003000, added: 1700000003000, src: 'acct', me: 'w', opp: 'three', oe: 900, r: 0, url: '', u: ['e2e4', 'e7e5', 'g1f3', 'b8c6', 'f1c4', 'g8f6', 'f3e5'], at: 6, by: 'me', w: 0}, {id: 'g4', t: 1700000004000, added: 1700000004000, src: 'acct', me: 'w', opp: 'four', oe: 900, r: 0, url: '', u: ['e2e4', 'e7e5', 'g1f3', 'b8c6', 'f1c4', 'g8f6', 'f3e5'], at: 6, by: 'me', w: 0}); Prog.save()"); a.wait_for_timeout(1800)
+    bp.evaluate("document.dispatchEvent(new Event('visibilitychange'))"); bp.wait_for_timeout(900)
+    got = bp.evaluate("Review.list().map(R => [R.opp, R.mk, R.d ? R.d.o : null])"); print('reviews on the other device:', got)
+    assert got == [['four', None, None], ['three', None, None], ['two', None, [1, 1, 9]]] and len(S.rows[uid]['data']['rg']['g']) == 3, got
     # a page from an older version writes a smaller copy: the next save on any device writes everything back
-    row = S.rows[uid]['data']; S.rows[uid]['data'] = {k: v for k, v in row.items() if k not in ('days', 'prefs', 'set', 'shop', 'badges', 'lvl', 'recap', 'tour')}
+    row = S.rows[uid]['data']; S.rows[uid]['data'] = {k: v for k, v in row.items() if k not in ('days', 'prefs', 'set', 'shop', 'badges', 'lvl', 'recap', 'tour', 'rg')}
     a.evaluate("Prog.save()"); a.wait_for_timeout(1800)
     row = S.rows[uid]['data']; print('after an older copy and one save:', sorted(row.keys()))
-    assert all(k in row for k in ('days', 'prefs', 'shop', 'badges', 'lvl', 'recap', 'tour')) and row['prefs']['who'][0] == 'rook' and row['prefs']['board'][0] == 'plum'
+    assert all(k in row for k in ('days', 'prefs', 'shop', 'badges', 'lvl', 'recap', 'tour', 'rg')) and row['prefs']['who'][0] == 'rook' and row['prefs']['board'][0] == 'plum'
 
     # ---- the account copy can't be reached: the app says so, keeps working, and catches up later
     S.down = True

@@ -4,7 +4,10 @@ The games are the ones in data/games, read as if they belonged to a new player."
 import json
 from pathlib import Path
 from playwright.sync_api import sync_playwright
-from e2e_white import launch, URL, out
+from e2e_white import launch, out
+from serve import Site
+# the website's own page, over local HTTP: headless Chromium sometimes drops a file:// page's storage across a scripted reload
+site = Site(docs=True); URL = site.start()
 ROOT = Path(__file__).resolve().parents[1]
 errors = []
 
@@ -111,14 +114,15 @@ with sync_playwright() as p:
     assert st['units'].index('threats') == 2 and st['units'] != ['w-italian', 'b-slav'] + st['units'][2:], 'the order comes from the games'
     pg.screenshot(path=out + 'o_course.png', full_page=True)
     foot = pg.inner_text('#foot'); print('footer:', foot.replace('\n', ' | '))
-    assert "vladapl's playbook" in foot and 'chess.com' in foot and '©' in foot and 'Stockfish' not in foot and 'games as' not in foot
+    assert '©' in foot and 'playbook,' not in foot and 'study' not in foot and 'Stockfish' not in foot   # the copyright only
     assert pg.is_visible('#meBtn') and pg.is_visible('#drillDot'), 'the streak chip and the drill mark come with a playbook'
     pg.evaluate("go('learn')"); pg.wait_for_timeout(400)
     assert pg.locator('.chnav [data-ch]').count() >= 5 and pg.locator('.changes').count() == 0 and pg.evaluate('tabOf(S.view)') == 'games'
     pg.click('.tabs [data-view="games"]'); pg.wait_for_timeout(500)
     # Your games opens on the openings, every one in the playbook for both colours; the rest is one click away
     n_open = pg.evaluate('BOOKS.w.chapters.length + BOOKS.b.chapters.length')
-    assert pg.locator('.otile').count() == n_open and pg.locator('.leak, .gtable').count() == 0 and pg.locator('[data-gseg]').count() == 4
+    assert pg.locator('.otile').count() == n_open and pg.locator('.leak, .gtable').count() == 0 and pg.locator('[data-gseg]').count() == 5
+    assert pg.locator('[data-gseg]').nth(1).get_attribute('data-gseg') == 'last', 'the last three games come right after the openings'
     assert pg.locator('[data-gseg="recap"]').count() == 1 and pg.evaluate('Recap.aid()') == 'chess.com:vladapl', 'the monthly recap reads the account the playbook was built from'
     assert pg.locator('.otile:has-text("Not met yet")').count() == n_open - pg.evaluate("Object.keys(Product.me().P.white.systems).filter(id => BOOKS.w.chapters.some(c => c.id === id)).length + Object.keys(Product.me().P.black.systems).filter(id => BOOKS.b.chapters.some(c => c.id === id)).length")
     pg.screenshot(path=out + 'o_games.png', full_page=True)
@@ -157,5 +161,6 @@ with sync_playwright() as p:
     sh = q.inner_text('.pshort'); print('too few:', sh.replace('\n', ' | ')[:160]); assert 'Not enough games yet' in sh and 'these files' in sh and q.evaluate('S.view') == 'setup'
     assert q.locator('[data-recheck]').count() == 0; q.click('[data-other]'); q.wait_for_timeout(300); assert q.locator('#uform').count() == 1
     b.close()
+site.stop()
 print('ERRORS:', errors); assert not errors
 print('onboarding checks passed')

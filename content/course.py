@@ -27,7 +27,7 @@ UNITS = [
          dict(path='d4 d5 Bf4 Nc6 e3 Bf5 Bd3 Bxd3 Qxd3 Nb4 Qb5+', arrows=['b5b4r', 'b5e8r'], h='The check that wins the knight',
               t='Offer the light bishops and take back with the queen. If Black\'s knight jumps at her, the queen checks and hits the knight at the same time.'),
        ]),
-  dict(id='w-italian', side='w', title='The Italian', kicker='White · your main weapon',
+  dict(id='w-italian', side='w', title='The Italian', kicker='White · big center, aim at f7',
        why='About one White game in eight goes into this line, and you have won only five of the last twelve. One idea runs through all of it: a big center, a quick castle, and every piece aimed at f7.',
        lessons=['setup', 'center', 'grab', 'bxa1', 'moller-bf6'],
        deeper=['nxc3-d5', 'moller-ne5', 'trap-d6', 'trap-ne7', 'trap-d5', 'be7', 'castle-early', 'quiet-d6', 'bb6', 'four-d6', 'bb6-early', 'other-4th'],
@@ -168,7 +168,7 @@ UNITS = [
          dict(path='e4 c6 d4 d5 Nc3 dxe4 Nxe4 Nf6 Nxf6+ exf6', circles=['f6r', 'f7r'], h='Knight trade? Take it',
               t='Taking with check spoils Black\'s pawns. Stepping back, as you did in your games, gave Black an easy game.'),
        ]),
-  dict(id='w-lrare', side='w', title='The London: other first moves', kicker='White · the setup does the work',
+  dict(id='w-lrare', side='w', title='The London: other first moves', kicker='White · the same setup against anything',
        why='Most other first moves lead back to the setup. Two need something new: the c-pawn two squares, where your d-pawn pushes past it, and the e-pawn gambit, where one move avoids a famous trap.',
        lessons=['lr-e6', 'lr-englund', 'lr-c5'],
        deeper=['lr-g6', 'lr-other'],
@@ -195,7 +195,7 @@ UNITS = [
   dict(id='finish', kind='skill', skill='finish', title='Finish the job', kicker='Skill · from your own games',
        why='21 of your 91 losses came after you had been winning by a lot. Every position here is one of those games, at the move where it slipped. Find the move that keeps the win.',
        pass_set=4, pass_check=4),
-  dict(id='w-2knights', side='w', title='Two Knights & the third-move tricks', kicker='White · keep the streak going',
+  dict(id='w-2knights', side='w', title='Two Knights & the third-move tricks', kicker='White · the knight jump and the traps',
        why='You have won eight of nine when Black brings the second knight out. Keep it that way, and know the two traps Black sets on move three.',
        lessons=['fried-liver', 'two-knights-na5', 'traxler', 'shilling'],
        deeper=['fried-liver-nb4', 'tk-sidelines', 'h6-3rd', 'd6-3rd', 'hungarian', 'rousseau'],
@@ -481,7 +481,7 @@ DEEP = [
               t='Blue: Black\'s answers to your push. The knight and the e-pawn follow in every one.'),
        ]),
   dict(id='x-w-italian', name='the Italian', base='w-italian', title='The Italian', tag='The main line, the traps and the early sidesteps',
-       why='Your main weapon all the way down: what to do when Black leaves the main road early, when Black won\'t take the pawn, '
+       why='Everything in the Italian: what to do when Black leaves the main line early, when Black won\'t take the pawn, '
            'the main line where Black takes it, and the traps behind your bishop move.',
        parts=[
          dict(title='Black steps off early', sub='The d-pawn, the queen, the bishop back',
@@ -550,7 +550,7 @@ DEEP = [
               t='Blue: White\'s moves after the pawn trade. The c-pawn push hits your d-pawn straight away, so the guards come first and the bishop waits.'),
        ]),
   dict(id='x-b-scotch', name='the Scotch and the center gambits', base='b-scotch', title='Scotch & center gambits', tag='Your bishop in the Scotch, the gambits, the move orders',
-       why='The center push lines past the main road: two calm ways White meets your bishop in the Scotch, the small c-pawn gambit, and the move-order tricks.',
+       why='The center push lines past the main line: two calm ways White meets your bishop in the Scotch, the small c-pawn gambit, and the move-order tricks.',
        parts=[
          dict(title='The Scotch after your bishop', sub='The small c-pawn move or the knight retreat',
               lessons=['bs-classical-c3', 'bs-classical-nb3'],

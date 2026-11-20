@@ -28,6 +28,7 @@ test: build
 	$(PY) tests/e2e_artifact_sync.py
 	$(PY) tests/e2e_library.py
 	$(PY) tests/e2e_tour.py
+	$(PY) tests/e2e_review.py
 	node tests/analyze_check.js
 	node tests/nudge_check.mjs
 	node tests/ideas_check.js

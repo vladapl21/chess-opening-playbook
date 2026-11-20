@@ -1,6 +1,9 @@
 """The shell of the app: tab order, the White/Black switch keeping the tab, and Settings."""
 from playwright.sync_api import sync_playwright
-from e2e_white import launch, URL, out
+from e2e_white import launch, out
+from serve import Site
+# the website's own page, over local HTTP: headless Chromium sometimes drops a file:// page's storage across a scripted reload
+site = Site(docs=True); URL = site.start()
 errors = []
 
 
@@ -159,5 +162,6 @@ with sync_playwright() as p:
     print('free play:', st); assert st == ['sandbox', None, None, 0, True, True]
     cp.click('#sbGo'); cp.wait_for_timeout(600); assert cp.evaluate("S.drill.scope") == cp.evaluate("SBS.scope") and cp.locator('.sbcourse, #sbFree').count() == 0
     b.close()
+site.stop()
 print('ERRORS:', errors); assert not errors
 print('shell checks passed')
