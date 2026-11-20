@@ -12,14 +12,22 @@ CH = os.environ.get('CHROMIUM')  # optional path to a Chromium binary; default: 
 HOUSE = """(() => { const K = 'italian-playbook-progress-v1'; if (!localStorage.getItem(K)) localStorage.setItem(K, JSON.stringify({lines: {}, puz: {}, updated: 0, me: {state: 'house'}})); })()"""
 
 
-def launch(p, house=True):
+# the tour starts by itself for anyone who hasn't taken it; the suites mark it as taken on this device, except the tour's own
+TOURED = "localStorage.setItem('playbook-tour', 'done')"
+
+def launch(p, house=True, tour=False):
     b = p.chromium.launch(executable_path=CH, args=['--no-sandbox']) if CH else p.chromium.launch()
-    if house:
+    marks = ([HOUSE] if house else []) + ([] if tour else [TOURED])
+    if marks:
         new_context, new_page = b.new_context, b.new_page
         def ctx(**kw):
-            c = new_context(**kw); c.add_init_script(HOUSE); return c
+            c = new_context(**kw)
+            for m in marks: c.add_init_script(m)
+            return c
         def page(**kw):
-            pg = new_page(**kw); pg.add_init_script(HOUSE); return pg
+            pg = new_page(**kw)
+            for m in marks: pg.add_init_script(m)
+            return pg
         b.new_context, b.new_page = ctx, page
     return b
 errors = []

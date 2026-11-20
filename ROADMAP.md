@@ -69,6 +69,14 @@ Facts that shape the design:
 - Settings and the account button moved out of the header into the corner of the screen; the header fits one row on an ordinary monitor and centres its rows when it has to wrap.
 - A lesson opened from a course unit has "Next lesson" at the top. The Sandbox has "Free play: pick openings" to leave a course practice game.
 
+## Phase 1.14: a tour, and every move explained (done, November 19)
+
+A friend played it for the first time and missed half of it: playing on with the engine, the other side's answers in a lesson, even the switch between White and Black.
+
+- **The tour.** The first time the app opens, the coach the player picks shows them around in about two minutes: the White | Black switch (tapped, and back), the tabs, a unit, Play along (one move on the arrow), today's five, a slip punished and the arrow after two misses (played by the coach), Play on with the engine (tapped) and the explore board, a lesson's list of the other side's answers, the move card, the engine switch, Your games, the Sandbox, the level, the streak, the shop, Settings, the account and the coach. It can't be skipped; Fast forward plays it through by itself, Show me does one tap, Back goes back. Nothing in it is recorded. It is stamped in the progress record, so it runs once per player, and Settings has Take the tour again.
+- **Every move explained** (`app/ideas.js`). Each move, the player's and the other side's, is read from the board with a few rules: what it wins, threatens or stops, a fork, a check that wins something, a pin, a guard taken away, an uncovered attack. A wrong move is answered with the reply that punishes it and what that costs; a second miss adds why the book's move is the move, and the coach's note at the end of the line says both. It shows in drills, Play along, the Sandbox, the lesson's move card ("On the board", leaving out what the note already says), a practice set's refutations and the explore board's last move. About 85% of the books' moves get at least one line.
+- **The README** has a guide to where everything is, the tour, the explainer, and the tests as a table.
+
 ## Phase 1.13: learning by playing (done, November 17)
 
 The app is for a player who would rather play than read; the learning should happen in the playing.
@@ -162,6 +170,7 @@ The original plan for this phase, for reference:
 - Done (Phase 1.11): points and levels, the shop at level 5.
 - Done (Phase 1.12): the monthly recap, daily drops in the shop.
 - Done (Phase 1.13): Play along, a lesson played with the arrows and the coach before it is played from memory.
+- Done (Phase 1.14): the first-time tour, led by the coach the player picks.
 - Still to do: a streak freeze (one a week), a smaller celebration when you pass a checkpoint, and optional sound.
 - Leagues and friends later, once other players exist.
 

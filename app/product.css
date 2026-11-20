@@ -371,3 +371,26 @@ button.rcrow{cursor:pointer} button.rcrow:hover{border-color:var(--accent)}
 @media (max-width:620px){ .rcrow{grid-template-columns:minmax(0,1fr) auto} .rcrow .rcnm{grid-column:1 / -1} .rcrow .rcv:last-child{grid-column:1 / -1} .rctiles b{font-size:27px} .rcnav h3{font-size:20px} }
 /* on a phone the coach steps aside while the board is in use: it can't speak then anyway, and it would cover the panel */
 @media (max-width:640px){ .coach.quiet:not(:has(.cbub)){display:none} }
+
+/* the tour (Tour in product.js): the page dimmed around the thing a step is about, and the coach's card beside it */
+.twalk{position:fixed;inset:0;z-index:1000;pointer-events:none}
+.twshade{position:absolute;inset:0;pointer-events:none}
+.twdim{fill:var(--tour-shade);pointer-events:auto}
+.twblock{fill:transparent;pointer-events:auto} .twalk.free .twblock{pointer-events:none}
+.twring{position:absolute;border-radius:12px;box-shadow:0 0 0 3px var(--accent),0 0 0 7px var(--tour-ring);pointer-events:none;transition:left .25s,top .25s,width .25s,height .25s}
+.twcard{position:absolute;left:12px;top:12px;width:min(410px,calc(100vw - 24px));box-sizing:border-box;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:16px;
+  box-shadow:0 18px 50px rgba(0,0,0,.3);padding:16px 16px 14px;display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;pointer-events:auto;outline:none;transition:left .25s,top .25s}
+.twface{width:52px;height:52px} .twface svg{width:100%;height:100%}
+.twbody{min-width:0}
+.twstep{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:2px 0 0;font-weight:600} .twstep b{color:var(--accent)}
+.twbar{height:3px;background:var(--line);border-radius:3px;margin:7px 0 10px;overflow:hidden} .twbar i{display:block;height:100%;background:var(--accent);transition:width .25s}
+.twcard h3{font-size:19px;line-height:1.25;margin:0 0 6px;text-wrap:balance}
+.twcard .bul{font-size:14.5px;margin:0}
+.twdo{margin:10px 0 0;font-weight:700;color:var(--accent)} .twdo::before{content:"→ "} .twdo.ok::before{content:"✓ "}
+.twnote{font-size:13px;color:var(--muted);margin:8px 0 0}
+.twacts{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;justify-content:flex-end;align-items:center}
+.twacts .btn{min-height:38px}
+.twff[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.twcard .coachpick{margin-top:10px}
+@media (max-width:640px){ .twcard{grid-template-columns:40px minmax(0,1fr);padding:14px 14px 12px;gap:10px} .twface{width:40px;height:40px} .twcard h3{font-size:17px} .twcard .bul{font-size:14px} .twacts{margin-top:10px} }
+@media (prefers-reduced-motion: reduce){ .twring,.twcard,.twbar i{transition:none} }

@@ -12,7 +12,7 @@
   --sq-light:#E6ECE2; --sq-dark:#84A390; --hl:rgba(240,201,64,.55); --sel:rgba(13,106,78,.38);
   --arr-g:#11843F; --arr-r:#D2302A; --arr-b:#2F63C9; --arr-y:#E3A90E; --arr-e:#7646D6;
   --shadow:0 0 0 1px var(--line),0 2px 0 rgba(18,32,26,.05);
-  --flame:#D9541E; --flame-2:#F4A21F; --flame-ink:#FFFFFF; --flame-soft:#FBE4D7;
+  --flame:#D9541E; --flame-2:#F4A21F; --flame-ink:#FFFFFF; --flame-soft:#FBE4D7; --tour-shade:rgba(12,24,18,.6); --tour-ring:#FFFFFF;
   --gear-ink:#18211D; --gear-edge:transparent;
   --sk-mid:#2B4C8C; --sk-mid-2:#C9D7F2; --sk-ruby:#B5302A; --sk-ruby-2:#F4C9C5; --sk-plum:#6B4A9C; --sk-plum-2:#DDD0EF; --sk-tang:#D9661E; --sk-tang-2:#FAD9C2; --sk-gold:#B98A12; --sk-gold-2:#F6E3A6; --sk-mint:#2E9C79; --sk-mint-2:#CDEEE2; --sk-ocean:#1D6A8F; --sk-ocean-2:#C8E4F1; --sk-rose:#C24E78; --sk-rose-2:#F7D3E0; --sk-slate:#58637A; --sk-slate-2:#D8DDE6; --sk-sand:#A9803E; --sk-sand-2:#F1E2C4;
   --gold:#B7860F; --gold-2:#F1CF6B; --silver:#7D8B95; --silver-2:#DCE3E8; --bronze:#9A5A2C; --bronze-2:#E3A878; --ribbon-1:#2D5DAA; --ribbon-2:#B93628; --locked:#A9B5AD; --locked-2:#EEF2EF;
@@ -27,7 +27,7 @@
   --rosso:#F2685B; --rosso-soft:#3D1C18; --oro:#E2B54C; --oro-soft:#3A2F14; --blu:#86AEF2; --blu-soft:#1B2A45; --viola:#B9A2EC; --viola-soft:#2C2342;
   --sq-light:#CFD8CC; --sq-dark:#6F8D7B; --hl:rgba(240,201,64,.5); --sel:rgba(67,192,143,.42);
   --arr-g:#1FA155; --arr-r:#E8463D; --arr-b:#4F82E6; --arr-y:#F0B92A; --arr-e:#A78BF5;
-  --flame:#FF8746; --flame-2:#FFC24A; --flame-ink:#2A1205; --flame-soft:#3B2216;
+  --flame:#FF8746; --flame-2:#FFC24A; --flame-ink:#2A1205; --flame-soft:#3B2216; --tour-shade:rgba(0,0,0,.68); --tour-ring:#CFE9DA;
   --gear-ink:#1C2420; --gear-edge:rgba(230,240,234,.55);
   --sk-mid:#6E8FDA; --sk-mid-2:#2A3A5E; --sk-ruby:#E2605A; --sk-ruby-2:#4A2422; --sk-plum:#A78BF5; --sk-plum-2:#3A2E52; --sk-tang:#FF9A57; --sk-tang-2:#4A2E1C; --sk-gold:#E2B54C; --sk-gold-2:#4A3A12; --sk-mint:#5FD0AA; --sk-mint-2:#173B30; --sk-ocean:#5DB4DD; --sk-ocean-2:#16323F; --sk-rose:#F08AB0; --sk-rose-2:#47202F; --sk-slate:#A6B1C6; --sk-slate-2:#272D38; --sk-sand:#DDB874; --sk-sand-2:#3F3320;
   --gold:#E2B54C; --gold-2:#F7DF92; --silver:#A9B6BF; --silver-2:#E2E8EC; --bronze:#C9864F; --bronze-2:#EFC29C; --ribbon-1:#5F8BE0; --ribbon-2:#E2614F; --locked:#55665D; --locked-2:#1F2A25;
@@ -38,7 +38,7 @@
   --rosso:#F2685B; --rosso-soft:#3D1C18; --oro:#E2B54C; --oro-soft:#3A2F14; --blu:#86AEF2; --blu-soft:#1B2A45; --viola:#B9A2EC; --viola-soft:#2C2342;
   --sq-light:#CFD8CC; --sq-dark:#6F8D7B; --hl:rgba(240,201,64,.5); --sel:rgba(67,192,143,.42);
   --arr-g:#1FA155; --arr-r:#E8463D; --arr-b:#4F82E6; --arr-y:#F0B92A; --arr-e:#A78BF5;
-  --flame:#FF8746; --flame-2:#FFC24A; --flame-ink:#2A1205; --flame-soft:#3B2216;
+  --flame:#FF8746; --flame-2:#FFC24A; --flame-ink:#2A1205; --flame-soft:#3B2216; --tour-shade:rgba(0,0,0,.68); --tour-ring:#CFE9DA;
   --gear-ink:#1C2420; --gear-edge:rgba(230,240,234,.55);
   --sk-mid:#6E8FDA; --sk-mid-2:#2A3A5E; --sk-ruby:#E2605A; --sk-ruby-2:#4A2422; --sk-plum:#A78BF5; --sk-plum-2:#3A2E52; --sk-tang:#FF9A57; --sk-tang-2:#4A2E1C; --sk-gold:#E2B54C; --sk-gold-2:#4A3A12; --sk-mint:#5FD0AA; --sk-mint-2:#173B30; --sk-ocean:#5DB4DD; --sk-ocean-2:#16323F; --sk-rose:#F08AB0; --sk-rose-2:#47202F; --sk-slate:#A6B1C6; --sk-slate-2:#272D38; --sk-sand:#DDB874; --sk-sand-2:#3F3320;
   --gold:#E2B54C; --gold-2:#F7DF92; --silver:#A9B6BF; --silver-2:#E2E8EC; --bronze:#C9864F; --bronze-2:#EFC29C; --ribbon-1:#5F8BE0; --ribbon-2:#E2614F; --locked:#55665D; --locked-2:#1F2A25;
@@ -251,6 +251,13 @@ p{margin:0}
 .mcard h3{font-size:21px;line-height:1.25;font-weight:650;display:flex;align-items:center;gap:10px}
 .mcard h3 .pico{width:30px;height:30px;flex:none}
 .mcard .note{margin-top:8px;font-size:15px;max-width:62ch}
+/* what the board says about a move (app/ideas.js): under the note in a lesson, in the drill's feed, beside a mistake */
+.mcard .mideas{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line)} .mideas .ideak{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:0 0 4px}
+.mideas .bul{font-size:14.5px;max-width:62ch}
+.feedback .mfeed,.feedback .ofeed,.feedback .pun,.feedback .pwhy{display:block} .feedback .ofeed{margin-top:4px}
+.feedback .pun,.feedback .pwhy{margin-top:6px;color:var(--ink)} .feedback .pun::before,.feedback .pwhy::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:1px}
+.feedback .pun::before{background:var(--rosso)} .feedback .pwhy::before{background:var(--accent)}
+.gcoach .gidea{display:block;color:var(--muted);font-size:13px;margin-top:1px} .rwhy{font-weight:600} .xlast{font-size:14px;margin:8px 0 0;color:var(--ink)}
 .mcard .chips{margin-top:10px}
 .mcard.empty h3{font-weight:600;color:var(--muted)}
 .opts h4,.linesin h4{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
@@ -738,6 +745,7 @@ footer.foot .fcopy{margin-left:auto}
 <script>
 /*__CHESSJS__*/
 /*__ANALYZE__*/
+/*__IDEAS__*/
 </script>
 <script>
 const DATA_W = /*__DATA_W__*/;
@@ -1106,7 +1114,7 @@ const SITE = /*__SITE__*/null;
 const canon = o => JSON.stringify(o, (k, v) => v && typeof v === 'object' && !Array.isArray(v) ? Object.keys(v).sort().reduce((a, x) => (a[x] = v[x], a), {}) : v);
 const newer = (x, y) => !x ? y : !y ? x : (y.v || 1) !== (x.v || 1) ? ((y.v || 1) > (x.v || 1) ? y : x) : (y.last || 0) > (x.last || 0) ? y : x;
 // two copies of the progress object -> one: newest record per line and puzzle, best of everything else
-const KNOWN = new Set(['lines', 'puz', 'sb', 'course', 'days', 'updated', 'packs', 'set', 'prefs', 'mail', 'badges', 'tz', 'me', 'owner', 'shop', 'lvl', 'recap']);
+const KNOWN = new Set(['lines', 'puz', 'sb', 'course', 'days', 'updated', 'packs', 'set', 'prefs', 'mail', 'badges', 'tz', 'me', 'owner', 'shop', 'lvl', 'recap', 'tour']);
 function mergeProg(a, b){
   const o = JSON.parse(JSON.stringify(a || {})), r = JSON.parse(JSON.stringify(b || {}));
   a = a || {};
@@ -1144,6 +1152,7 @@ function mergeProg(a, b){
     o.recap = {m}; const chk = Math.max(x.chk || 0, y.chk || 0); if (chk) o.recap.chk = chk;
     const seen = [x.seen, y.seen].filter(Boolean).sort().pop(); if (seen) o.recap.seen = seen; }
   if (r.tz && !o.tz) o.tz = r.tz;
+  if (r.tour && r.tour.done) o.tour = {done: o.tour && o.tour.done ? Math.min(o.tour.done, r.tour.done) : r.tour.done};   // the tour (app/product.js): taken once, anywhere
   for (const k in r) if (!KNOWN.has(k) && (!(k in o) || (r.updated || 0) > (a.updated || 0))) o[k] = r[k];
   const me = mergeMe(a, r); if (me) o.me = JSON.parse(JSON.stringify(me)); else delete o.me;   // whose playbook this is (app/product.js)
   return o;
@@ -1464,6 +1473,7 @@ const Settings = {
       ${sw('coords', 'Letters and numbers on the board', 'The small file and rank marks along the edge.')}
       ${sw('coach', 'Coach', 'A few words from your coach at the moments that matter.')}
       ${typeof coachPickHTML === 'function' ? `<div class="setrow"><b>Your coach</b>${coachPickHTML()}</div>` : ''}${typeof packRowsHTML === 'function' ? packRowsHTML() : ''}
+      ${typeof Tour !== 'undefined' && PERSONA !== 'new' ? `<div class="setrow"><b>The tour</b><div class="lesson-actions" style="margin:0"><button type="button" class="btn small" data-tourgo>Take the tour again</button></div></div>` : ''}
       ${Owner.can ? `<button type="button" class="switch" role="switch" aria-checked="${Owner.on}" data-own><span><b>Admin mode</b><span>Everything open, the shop free, and tools to jump ahead. It works on a copy of your progress: nothing done here is saved to your account.</span></span><i class="knob" aria-hidden="true"></i></button>` : ''}`;
   }
 };
@@ -1471,6 +1481,7 @@ document.getElementById('setBtn').addEventListener('click', () => Settings.open(
 document.getElementById('setSheet').addEventListener('click', e => {
   if (e.target.id === 'setSheet' || e.target.closest('[data-setx]')){ Settings.close(); return; }
   if (e.target.closest('[data-own]')){ if (Owner.on) Owner.leave(); else Owner.enter(); Settings.render(); return; }
+  if (e.target.closest('[data-tourgo]')){ Settings.close(); Tour.start(true); return; }
   const t = e.target.closest('[data-set]'); if (!t) return;
   const [k, v] = t.dataset.set.split(':'); setSetting(k, k === 'coords' || k === 'coach' ? v === '1' : v);
   Settings.render(); if (k === 'coords') render(); if (k === 'coach' && typeof Coach !== 'undefined') Coach.refresh();
@@ -1721,7 +1732,7 @@ function renderStudy(){
   else {
     mcard = `<div class="mcard"><div class="who">${sideBadge(nd)}<span class="stepno">Move ${moveNo(p)}</span></div>
       <h3>${pieceIcon(nd.pc, nd.w === 1)}<span>${esc(nd.l)}</span></h3>
-      ${nd.t ? bullets(nd.t, 'note') : ''}${nd.g ? `<div class="chips">${tagChips(nd.g)}</div>` : ''}</div>`;
+      ${nd.t ? bullets(nd.t, 'note') : ''}${(xs => xs.length ? `<div class="mideas"><p class="ideak">On the board</p>${bullets(xs, 'ideas')}</div>` : '')(ideasBeyond(idx))}${nd.g ? `<div class="chips">${tagChips(nd.g)}</div>` : ''}</div>`;
   }
   // options at this node
   const opts = optionsFor(idx, S.line);
@@ -1863,16 +1874,16 @@ function startDrillLine(id, why, unit, o = {}){
   const line = LINES[id];
   const s0 = o.from0 || S.dfilter.from === 'start' ? 0 : lineStart(id);
   if (!why && Prog.stale(id)) why = 'This line has changed since you last drilled it. If a move is new to you, two tries and the arrow shows it.';
-  S.drill = S.drillState = {kind: 'line', id, i: s0, s0, mistakes: 0, tries: 0, sel: null, busy: false, msg: why || '', state: 'play', hint: null, flash: null, unit: unit || null, daily: !!o.daily};
+  S.drill = S.drillState = {kind: 'line', id, i: s0, s0, mistakes: 0, tries: 0, sel: null, busy: false, msg: why || '', state: 'play', hint: null, flash: null, unit: unit || null, daily: !!o.daily, tour: !!o.tour};
   S.view = 'drill'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
   setTimeout(drillAdvance, 450);
 }
 // Play along: the lesson's line played on the drill board with the move to make shown as a green arrow, and the coach
 // saying in a line or two why it's the move. Nothing is counted against the player: a wrong move just doesn't go. The
 // main line played to the end counts as the lesson studied, and the next step is the same line from memory.
-function startGuided(id, unit){
+function startGuided(id, unit, o = {}){
   const s0 = lineStart(id);
-  S.drill = S.drillState = {kind: 'line', guided: true, id, i: s0, s0, mistakes: 0, tries: 0, sel: null, busy: false, msg: '', state: 'play', hint: null, flash: null, unit: unit || null, daily: false, said: null};
+  S.drill = S.drillState = {kind: 'line', guided: true, id, i: s0, s0, mistakes: 0, tries: 0, sel: null, busy: false, msg: '', state: 'play', hint: null, flash: null, unit: unit || null, daily: false, said: null, tour: !!o.tour};
   S.view = 'drill'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
   setTimeout(drillAdvance, 450);
 }
@@ -1897,7 +1908,11 @@ function drillAdvance(){
   const nx = N[n[D.i + 1]];
   if (!isMine(nx)){
     D.busy = true; D.msg = ''; const at = D.i;
-    setTimeout(() => { if (S.drill !== D || D.i !== at || D.state !== 'play') return; D.i++; D.busy = false; D.flash = null; if (D.guided) D.said = nx; renderDrillBoard({u: nx.u, meta: nx}); renderDrillPanel(); drillAdvance(); }, D.guided ? 700 : 520);
+    setTimeout(() => { if (S.drill !== D || D.i !== at || D.state !== 'play') return; D.i++; D.busy = false; D.flash = null;
+      if (D.guided) D.said = nx;
+      else { const w = moveWhy(n[D.i], 1)[0], said = nx.l.toLowerCase().startsWith(OPP.toLowerCase()) ? nx.l : `${OPP}: ${lc(nx.l)}`;
+        D.feed = (D.feed || []).slice(0, 1).concat([`<span class="ofeed"><b>${esc(said)}.</b> ${esc(w || '')}</span>`]); }
+      renderDrillBoard({u: nx.u, meta: nx}); renderDrillPanel(); drillAdvance(); }, D.guided ? 700 : 520);
   } else { D.busy = false; D.tries = 0; if (D.guided){ D.hint = nx.u; renderDrillBoard(); } renderDrillPanel(); }
 }
 function expectedMove(){ const D = S.drill; if (D.kind === 'puz') return DATA.puzzles[D.k].ok; if (D.kind === 'q'){ const it = D.items[D.k]; return it.ok || it.safe; } if (D.kind === 'sb') return sbMyKids(D.node).map(c => N[c].u); return [N[LINES[D.id].n[D.i + 1]].u]; }
@@ -1925,8 +1940,8 @@ function tryMove(from, to){
       renderDrillBoard({u, meta: {}}); renderDrillPanel(); return;
     }
     D.i++; D.flash = {sq: u.slice(2, 4), ok: true}; D.hint = null; D.said = null;
-    const nd = N[LINES[D.id].n[D.i]];
-    D.msg = `<b>${esc(nd.l)}.</b> ${esc(firstSentence(nd.t))}`;
+    const ni = LINES[D.id].n[D.i], nd = N[ni];
+    D.msg = ''; D.feed = [`<span class="mfeed"><b>${esc(nd.l)}.</b> ${esc(moveWhy(ni, 1)[0] || '')}</span>`];
     renderDrillBoard({u, meta: nd}); renderDrillPanel();
     D.busy = true; setTimeout(() => { if (S.drill === D){ D.flash = null; drillAdvance(); } }, 700);
   } else if (D.guided){
@@ -1936,7 +1951,13 @@ function tryMove(from, to){
   } else {
     if (D.tries === 0){ D.mistakes++; if (D.kind === 'puz') Prog.puz(DATA.puzzles[D.k].id, false); else (D.slipAt || (D.slipAt = [])).push([D.i + 1, u]); }   // where the line caught them, and with what
     D.tries++; D.flash = {sq: to, ok: false};
-    D.msg = D.kind === 'puz' ? (D.tries >= 2 ? 'Not that one. The arrow shows the move; play it to continue.' : 'Not that one. Try again.') : (D.tries >= 2 ? TXT[SIDE].miss2 : TXT[SIDE].miss);
+    if (D.kind === 'puz') D.msg = D.tries >= 2 ? 'Not that one. The arrow shows the move; play it to continue.' : 'Not that one. Try again.';
+    else {
+      // what the move tried allows, when it loses something: kept for the coach's note at the end of the line
+      const p = punishOf(nodeFen(dNode()), u), ni = LINES[D.id].n[D.i + 1];
+      if (p && D.tries === 1) (D.slipWhy || (D.slipWhy = {}))[D.i + 1] = p.lines;
+      D.msg = (D.tries >= 2 ? TXT[SIDE].miss2 : TXT[SIDE].miss) + (p ? punishHTML(p) : '') + (D.tries >= 2 ? whyHTML(ni) : '');
+    }
     if (D.tries >= 2) D.hint = exp[0];
     renderDrillBoard(); renderDrillPanel();
     setTimeout(() => { if (S.drill === D && D.flash && !D.flash.ok){ D.flash = null; renderDrillBoard(); } }, 650);
@@ -1945,8 +1966,9 @@ function tryMove(from, to){
 function puzAfter(idx, u){ return applyMove(N[idx].f, u); } // puzzle reveal (fenAfter, below, replays moves from a full position)
 function finishLine(){
   const D = S.drill; if (D.state === 'done') return; D.state = 'done';
-  if (D.guided){ const L = lessonOf(D.id); D.hint = null; if (L && LINES[D.id].main) markSeen(L.id); render(); return; }
-  Prog.record(D.id, D.mistakes === 0, D.slipAt);
+  if (D.guided){ const L = lessonOf(D.id); D.hint = null; if (L && LINES[D.id].main && !D.tour) markSeen(L.id); render(); return; }
+  if (!D.tour) Prog.record(D.id, D.mistakes === 0, D.slipAt);
+  else if (typeof Coach !== 'undefined') D.note = Coach.lineNote(D.id, D.mistakes === 0, null, D);   // the tour's line: the note, no record
   render();
 }
 function renderDrillBoard(anim){
@@ -1983,7 +2005,7 @@ function drillPanelHTML(){
   let status = D.state === 'done' ? '' : (D.busy ? `${OPP} is thinking…` : 'Your move');
   let doneBox = '';
   if (D.state === 'done'){
-    const r = Prog.rec(D.id), clean = D.mistakes === 0, days = INTERVALS[r.box];
+    const r = Prog.rec(D.id) || {box: 0}, clean = D.mistakes === 0, days = INTERVALS[r.box] || 1;
     const CU = D.unit && UNIT[D.unit], nxU = CU ? unitNextLine(CU, D.id) : null;
     const dk = Daily.count(), left = Math.max(0, DAILY - dk);
     // inside a unit: a slip means the same line again first; clean, the unit's next thing to do
@@ -2001,7 +2023,7 @@ function drillPanelHTML(){
   return `<div class="dpanel"><p class="kicker">${D.unit && UNIT[D.unit] ? 'Course · ' + esc(UNIT[D.unit].title) + ' · ' : D.daily ? 'Today · ' : ''}${esc(L.title)}${line.main ? '' : ' · ' + esc(line.title)}${D.msgWhy ? ' · ' + esc(D.msgWhy) : ''}</p><h3>Play ${MYC}'s moves from memory</h3>
     <div class="progressbar" aria-hidden="true"><i style="width:${pct}%"></i></div>
     ${status ? `<div class="status ${D.busy ? 'wait' : ''} ${D.tries ? 'bad' : ''}"><span class="bub"></span>${status}</div>` : ''}
-    ${D.state === 'done' ? '' : `<p class="feedback">${D.msg || (D.i === D.s0 ? `${OPP}'s moves play automatically. Drag a piece or tap it, then tap where it goes.` : '&nbsp;')}</p>`}${doneBox}</div>`;
+    ${D.state === 'done' ? '' : `<p class="feedback">${D.msg || (D.feed && D.feed.length ? D.feed.join('') : D.i === D.s0 ? `${OPP}'s moves play automatically. Drag a piece or tap it, then tap where it goes.` : '&nbsp;')}</p>`}${doneBox}</div>`;
 }
 // a guided run: the move to make as an arrow on the board, and the coach's word on it in a line or two
 function guidedPanelHTML(D){
@@ -2018,8 +2040,10 @@ function guidedPanelHTML(D){
   }
   const nx = N[n[D.i + 1]], my = nx && isMine(nx) && !D.busy, warn = D.flash && !D.flash.ok;
   // most of the other side's labels already start with "Black …" or "White …": those stand on their own
-  const said = D.said ? `<p class="gsaid">${D.said.l.toLowerCase().startsWith(OPP.toLowerCase()) ? esc(D.said.l) : `${OPP} played: ${esc(lc(D.said.l))}`}</p>` : '';
-  const guide = my ? `<p class="gmove">Your move: ${esc(lc(nx.l))}</p>${nx.t ? bullets(sentences(nx.t).slice(0, 2)) : ''}` : `<p class="gmove wait">${OPP} is thinking…</p>`;
+  const si = D.said ? n[D.i] : null, sw = si !== null ? moveWhy(si, 1)[0] : '';
+  const said = D.said ? `<p class="gsaid">${D.said.l.toLowerCase().startsWith(OPP.toLowerCase()) ? esc(D.said.l) : `${OPP} played: ${esc(lc(D.said.l))}`}${sw ? `<span class="gidea">${esc(sw)}</span>` : ''}</p>` : '';
+  const why = my ? moveWhy(n[D.i + 1], 2) : [];
+  const guide = my ? `<p class="gmove">Your move: ${esc(lc(nx.l))}</p>${why.length ? bullets(why) : ''}` : `<p class="gmove wait">${OPP} is thinking…</p>`;
   return `<div class="dpanel">${head}<h3>Follow the arrows</h3><div class="progressbar" aria-hidden="true"><i style="width:${mine ? Math.round(done / mine * 100) : 100}%"></i></div>
     <div class="coachnote gcoach" role="status">${face(warn ? 'think' : 'cheer')}<div class="cntx">${who}${said}${guide}${warn ? `<p class="gwarn">${esc(D.msg)}</p>` : ''}</div></div>
     <p class="feedback">${D.i === D.s0 ? 'Drag a piece or tap it, then tap where it goes.' : '&nbsp;'}</p></div>`;
@@ -2230,7 +2254,7 @@ function sbTry(u, to){
   const ok = sbMyKids(D.node).find(c => N[c].u === u);
   if (ok !== undefined){
     D.flash = {sq: u.slice(2, 4), ok: true}; D.hint = null;
-    const nd = N[ok]; D.msg = `<b>${esc(nd.l)}.</b> ${esc(nd.t || '')}`;
+    const nd = N[ok]; D.msg = `<b>${esc(nd.l)}.</b> ${esc(moveWhy(ok, 1)[0] || '')}`;
     D.busy = true;
     D.node = ok; D.hist.push(ok);
     renderDrillBoard({u, meta: nd});
@@ -2242,7 +2266,7 @@ function sbTry(u, to){
   if (!D.slipAt.has(D.node)){ D.slipAt.add(D.node); D.slips.push({at: D.node, tried: u, warn: warnKid}); }
   D.tries++; D.flash = {sq: to, ok: false};
   if (warnKid !== undefined) D.msg = `<b>That's the move to avoid here.</b> ${esc(N[warnKid].t || '')}`;
-  else D.msg = D.tries >= 2 ? 'Not your prep move. The arrow shows it; play it to continue.' : 'Not your prep move here. Try again.';
+  else { const p = punishOf(nodeFen(D.node), u); D.msg = (D.tries >= 2 ? 'Not your prep move. The arrow shows it; play it to continue.' : 'Not your prep move here. Try again.') + (p ? punishHTML(p) : '') + (D.tries >= 2 ? whyHTML(sbMyKids(D.node)[0]) : ''); }
   if (D.tries >= 2) D.hint = N[sbMyKids(D.node)[0]].u;
   renderDrillBoard(); renderSbPanel();
   setTimeout(() => { if (S.drill === D && D.flash && !D.flash.ok){ D.flash = null; renderDrillBoard(); } }, 650);
@@ -2778,7 +2802,8 @@ function quizTry(u, to){
   setTimeout(() => {
     if (S.drill !== Q || Q.state !== 'refuted') return;
     Q.view = applyMove(after, r[0]); Q.lastU = r[0]; Q.flash = null; Q.arrows = [r[0].slice(0, 4) + 'r']; Q.busy = false;
-    Q.msg = `<b>${esc(OPP)} answers: ${esc(lc(r[1]))}.</b> ${game ? 'That\'s what happened in the game. ' : ''}${refuteWhy(it, u, r)}<span class="qlook">${skillOf(UNIT[Q.unit]).look}</span>`;
+    const rw = (() => { try { return Ideas.reply(after, r[0], {me: it.me || SIDE})[0] || ''; } catch(e){ return ''; } })();
+    Q.msg = `<b>${esc(OPP)} answers: ${esc(lc(r[1]))}.</b> ${rw ? `<span class="rwhy">${esc(rw)}.</span> ` : ''}${game ? 'That\'s what happened in the game. ' : ''}${refuteWhy(it, u, r)}<span class="qlook">${skillOf(UNIT[Q.unit]).look}</span>`;
     renderDrillBoard({u: r[0], meta: {}}); renderQuizPanel();
   }, 750);
 }
@@ -2936,6 +2961,31 @@ const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 function exploreNode(idx, o = {}){ exploreFrom(nodeFen(idx), Object.assign({pre: nodeUcis(idx)}, o)); }
 // the same position with the other side to move: what would they do if they could move twice?
 function nullFen(fen){ const p = fen.split(' '); p[1] = p[1] === 'w' ? 'b' : 'w'; p[3] = '-'; return p.join(' '); }
+/* ---- ideas: what a move does, in words. app/ideas.js reads it off the board: what it takes, threatens, stops, pins or forks */
+function ideaOf(idx){
+  const nd = N[idx]; if (!nd || nd.p === null || nd.p === undefined || !nd.u) return [];
+  try { return Ideas.of(nodeFen(nd.p), nd.u, {me: SIDE, prev: N[nd.p].u}).lines; } catch(e){ return []; }
+}
+// the board's reasons that a note already gives in its own words
+const IDEA_SAYS = [[/^Threatens|^Uncovers/, /threat|\bhits?\b|attack|aims?\b|goes? after/i], [/^A fork/, /fork|both/i], [/^Pins/, /\bpin/i], [/^Wins/, /\bwins?\b|free|grab/i],
+  [/^Stops|^Blocks/, /stop|block|cover|defen|guard/i], [/^Guards|guarded now/, /guard|defen|protect|cover/i], [/^Takes away the guard/, /guard|defend/i], [/which was hitting/, /attack|hit/i],
+  [/out of danger/, /safe|retreat|back|away|danger/i], [/^Check, and/, /check/i], [/^Leaves|^Puts/, /loose|hang|unguard|undefend|free/i], [/^Offers/, /offer|gambit|sacrific/i], [/^Aims at/, /f7|f2/i]];
+const IDEA_TACT = /^(Threatens|Uncovers|A fork|Pins|Wins|Stops|Blocks|Guards|Takes away|Takes .*which was hitting|Moves .* out of danger|Check, and|Leaves|Puts|Offers|Aims at)|guarded now/;
+const noteSays = (note, s) => { const r = IDEA_SAYS.find(([k]) => k.test(s)); return !!(note && r && r[1].test(note)); };
+// quiet facts the move's own label already says ("Knight out" needs no "Brings a piece into play")
+const IDEA_QUIET = [[/^Brings a piece into play/, /\bout\b|develop|into play/i], [/^Takes space in the center/, /cent(er|re)|middle|push/i], [/^Opens a line/, /open|line|diagonal/i], [/^Tucks the king/, /castl/i]];
+const labelSays = (l, s) => { const r = IDEA_QUIET.find(([k]) => k.test(s)); return !!(l && r && r[1].test(l)); };
+// what the board adds to the book's note: when there is no note, all but what the label says; else only the tactics the note leaves out
+function ideasBeyond(idx){ const nd = N[idx], xs = ideaOf(idx); return nd && nd.t ? xs.filter(x => IDEA_TACT.test(x) && !noteSays(nd.t, x)) : xs.filter(x => !labelSays(nd && nd.l, x)); }
+// a move's reasons in a line or two: the book's note first, then the board. A note that opens with a name ("The Italian
+// bishop.") keeps its next sentence with it when there is room for one line only.
+function noteLine(t){ const xs = sentences(t); if (!xs.length) return ''; return xs.length > 1 && xs[0].split(' ').length <= 4 ? xs[0] + ' ' + xs[1] : xs[0]; }
+function moveWhy(idx, max = 2){ const nd = N[idx]; const note = !nd || !nd.t ? [] : max === 1 ? [noteLine(nd.t)] : sentences(nd.t).slice(0, max); return note.concat(ideasBeyond(idx)).slice(0, max); }
+// the other side's best answer to a move, when it wins something: a mistake and its punishment, in words
+function punishOf(fen, u){ try { return Ideas.punish(fen, u, {me: SIDE, words: (f, x) => wordsAt(f, x)}); } catch(e){ return null; } }
+const TOOKW = n => ({1: 'a pawn', 3: 'a piece', 5: 'a rook', 9: 'a queen'})[n] || LOSTW(n);
+const punishHTML = p => `<span class="pun">${esc(p.lines[0])}${p.lines[1] ? ': ' + esc(lc(p.lines[1])) : ''}.${p.kind === 'mate' ? '' : ` That costs ${LOSTW(p.gain)}${p.took ? ` for ${TOOKW(p.took)}` : ''}.`}</span>`;
+const whyHTML = idx => { const w = moveWhy(idx, 1)[0]; return w ? `<span class="pwhy"><b>${esc(N[idx].l)}:</b> ${esc(lc(w))}</span>` : ''; };
 const scoreNum = s => typeof s === 'string' ? (parseInt(s.slice(1), 10) > 0 ? 1 : -1) * (100000 - 100 * Math.abs(parseInt(s.slice(1), 10))) : s;
 function evalShort(s){ // a candidate's value: the number from White's side, the colour (good or bad) from yours
   if (typeof s === 'string'){ const m = parseInt(s.slice(1), 10), mine = (m > 0) === (ME === 1); return {t: `${mine ? 'You mate' : OPP + ' mates'} in ${Math.abs(m)}`, good: mine}; }
@@ -3343,6 +3393,8 @@ function renderExplore(){
     <div class="ccol">
       <div class="dpanel"><p class="kicker">Explore · moves for both sides</p><h3>Play on from here</h3>
         <div class="status ${X.busy || X.auto ? 'wait' : ''}"><span class="tomove ${turnW ? 'w' : 'b'}" aria-hidden="true"></span>${esc(status)}</div>
+        ${(() => { if (!X.i || !words[X.i - 1]) return ''; let xs = []; try { xs = Ideas.of(exChess(X.i - 1).fen(), X.moves[X.i - 1], {me: X.side || SIDE}).lines; } catch(e){}
+          return `<p class="xlast"><b>${words[X.i - 1].white ? 'White' : 'Black'}: ${esc(lc(words[X.i - 1].label))}.</b>${xs.length ? ' ' + esc(xs[0]) + '.' : ''}</p>`; })()}
         <p class="feedback">Move any piece for the side to move. Purple arrows: the engine's best moves. Red dashes: what the other side wants. Step back to try something else.</p>
         <label class="xans"><input type="checkbox" id="exAns" ${X.answer ? 'checked' : ''}> <span>The engine answers my moves</span></label>
       </div>
@@ -3440,6 +3492,7 @@ function start(saved){
   Product.landing(h);
   render();
   Prog.connect(); renderAcct();
+  if (typeof Tour !== 'undefined') Tour.boot();
   try { window.claude && window.claude.hot && window.claude.hot.snapshot && window.claude.hot.snapshot(() => ({side: SIDE, view: S.view, unit: S.unit, slide: S.slide, line: S.line, i: S.i, studyFrom: S.studyFrom, chapter: S.chapter, deep: S.deep, coursePath: S.coursePath})); } catch(e){}
 }
 try { if (window.claude && window.claude.hot && window.claude.hot.ready) window.claude.hot.ready(start); else start((window.claude && window.claude.hot && window.claude.hot.data) || {}); }

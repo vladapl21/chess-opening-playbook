@@ -105,6 +105,7 @@ document.addEventListener('click', e => {
   const b = e.target.closest('[data-coachwho]'); if (!b) return;
   setSetting('who', b.dataset.coachwho); if (!document.getElementById('setSheet').hidden) Settings.render();
   render(); Coach.say(`${coachName()} here. Same advice, new face.`, {mood: 'cheer', ms: 5000});
+  if (typeof Tour !== 'undefined' && Tour.on) Tour.paint();
 });
 
 /* ---- the systems the library has, and the ones being written. `keys` are the analysis names for what a player already plays. */
@@ -905,6 +906,7 @@ const Coach = {
   draw(bub){ const e = this.el(); e.hidden = !SET.coach || (PVIEWS.includes(S.view) && S.view !== 'setup') || S.view === 'grad' || libOn(); e.classList.toggle('quiet', ['drill', 'quiz', 'sandbox', 'study', 'explore'].includes(S.view));
     e.innerHTML = (bub || '') + `<button class="cav" type="button" aria-label="${coachName()}, your coach">${knightSVG(this.mood)}</button>`; },
   say(t, o = {}){
+    if (typeof Tour !== 'undefined' && Tour.on) return;
     if (!SET.coach) return; clearTimeout(this.timer); this.last = {t, o, v: S.view}; this.mood = o.mood;
     this.draw(`<div class="cbub ${o.art ? 'art' : ''}" role="status"><button class="cx" type="button" aria-label="Close">×</button>${o.art ? `<span class="cart">${o.art}</span>` : ''}<span class="cwho">${coachName()}</span>${o.head ? `<b class="chead2">${esc(o.head)}</b>` : ''}${Array.isArray(t) || sentences(t).length > 1 ? bullets(Array.isArray(t) ? t : sentences(t), 'cbul') : esc(t)}${o.cta ? `<div class="cacts"><button class="btn small primary" data-cgo="${o.cta[0]}">${esc(o.cta[1])}</button></div>` : ''}</div>`);
     if (!o.stay) this.timer = setTimeout(() => this.hush(), 9000 + String(t).length * 45);
@@ -961,6 +963,7 @@ const Coach = {
   // called after every full render: at most one thing to say
   onView(){
     const v = S.view, e = this.el();
+    if (typeof Tour !== 'undefined' && Tour.on){ this.lastView = v; return this.hush(); }   // the tour does the talking
     if (S.drill && S.drill.state === 'play'){ this.lastView = v; return this.hush(); } // never while a drill, a practice game or a checkpoint is being played
     if (v === 'grad' || libOn()){ this.lastView = v; return this.hush(); }            // the coach is part of those pages
     if (Badges.queue.length && PERSONA !== 'new') return Badges.show();
@@ -1000,10 +1003,13 @@ const Coach = {
       const alt = (N[par].k || []).map(c => N[c]).find(x => x.u === u && x !== nd);       // the move tried, when the book has it
       let played = ''; try { played = wordsAt(nodeFen(par), u); } catch(e){}
       head = times > 1 ? `Move ${no} has caught you ${times === 2 ? 'twice' : times + ' times'} now` : `Move ${no} caught you`;
-      out.push(`You played: ${played ? lc(played) : 'another move'}`, `The line's move: ${lc(nd.l)}`);
+      // what was played, what it allowed (the book's word on it, or the answer that punishes it), the line's move and why
+      const pw = D.slipWhy && D.slipWhy[i], why = moveWhy(line.n[i], 1)[0];
+      out.push(`You played: ${played ? lc(played) : 'another move'}`);
       if (alt && alt.t) out.push(`${(alt.g || []).includes('warn') ? 'A known mistake here' : 'About your move'}: ${firstSentence(alt.t)}`);
-      else if (nd.t) out.push(`Why: ${firstSentence(nd.t)}`);
-      if (D.slipAt.length > 1) out.push(`${D.slipAt.length === 2 ? 'One more slip' : `${D.slipAt.length - 1} more slips`} after that`);
+      else if (pw) out.push(pw[0] + (pw[1] ? ': ' + lc(pw[1]) : ''));
+      out.push(`The line's move: ${lc(nd.l)}`); if (why) out.push(`Why: ${why}`);
+      if (D.slipAt.length > 1 && out.length < 5) out.push(`${D.slipAt.length === 2 ? 'One more slip' : `${D.slipAt.length - 1} more slips`} after that`);
       cta = `<button class="linkish" type="button" data-line="${id}" data-i="${i - 1}">Study move ${no}</button>`;
     } else if (clean){
       const was = prev && prev.sl ? Object.keys(prev.sl).map(Number).sort((a, b) => prev.sl[b] - prev.sl[a]) : [], spot = was[0];
@@ -1371,3 +1377,216 @@ const refreshSoon0 = refreshSoon, refresh0 = refresh;
 refreshSoon = function(){ Lv.sync(); Lv.paint(); refreshSoon0(); };
 refresh = function(){ Lv.sync(); refresh0(); };
 
+
+/* ---- the tour: the coach the player picks walks them through every part of the app before they start. It can't be
+   skipped, only sped up: Fast forward plays the steps by itself (the coach makes the moves), Back goes a step back, and
+   on a step that asks for a tap, "Show me" lets the coach do it. Finished once, it is marked in the progress record
+   (d.tour.done, merged as the earliest) and follows the player to every device; Settings has "Take the tour again".
+   Nothing played on the tour counts: its lines are tour lines (no record, no lesson studied, no points). */
+const TOUR_KEY = 'playbook-tour';
+const Tour = {
+  on: false, k: 0, fast: false, replay: false, t: 0, w: 0, dt: 0, raf: 0, el: null, steps: [], back: null, ok: false, note: '',
+  done(){ if (Prog.d.tour && Prog.d.tour.done) return true; try { return localStorage.getItem(TOUR_KEY) === 'done'; } catch(e){ return false; } },
+  boot(){ setTimeout(() => this.maybe(), 1100); },
+  // the first visit to the app itself (not the welcome or the reading screens), for anyone who hasn't taken it
+  maybe(){ if (!this.on && !this.done() && PERSONA !== 'new' && !Owner.on && !PVIEWS.includes(S.view) && document.getElementById('setSheet').hidden) this.start(false); },
+  start(replay){
+    if (this.on) return;
+    Settings.close(); Coach.hush(); stopPlay();
+    this.on = true; this.replay = !!replay; this.k = 0; this.fast = false; this.note = '';
+    this.back = {side: SIDE, view: VIEWS.includes(S.view) ? S.view : 'course'};
+    this.steps = this.build().filter(st => !st.skip || !st.skip());
+    const el = this.el = document.createElement('div'); el.id = 'tour'; el.className = 'twalk';
+    el.innerHTML = `<svg class="twshade" aria-hidden="true"><path class="twdim" fill-rule="evenodd"/><rect class="twblock"/></svg><div class="twring" aria-hidden="true"></div><div class="twcard" role="dialog" aria-modal="true" aria-labelledby="tourH" tabindex="-1"></div>`;
+    document.body.appendChild(el);
+    el.addEventListener('click', e => this.click(e));
+    this.keyH = e => this.onKey(e); document.addEventListener('keydown', this.keyH, true);
+    const loop = () => { if (!this.on) return; this.place(); this.raf = requestAnimationFrame(loop); }; this.raf = requestAnimationFrame(loop);
+    this.show();
+  },
+  close(){
+    this.on = false; cancelAnimationFrame(this.raf); clearTimeout(this.t); clearTimeout(this.w); clearTimeout(this.dt);
+    document.removeEventListener('keydown', this.keyH, true); if (this.el) this.el.remove(); this.el = null;
+  },
+  finish(){
+    if (!(Prog.d.tour && Prog.d.tour.done)){ Prog.d.tour = {done: Date.now()}; Prog.save(); }
+    try { localStorage.setItem(TOUR_KEY, 'done'); } catch(e){}
+    const b = this.back, replay = this.replay; this.close();
+    S.drill = S.drillState = null; if (b.side !== SIDE) useSide(b.side);
+    go(replay ? b.view : 'course');
+  },
+  cur(){ return this.steps[this.k]; },
+  words(st){ return {h: typeof st.h === 'function' ? st.h() : st.h, say: (typeof st.say === 'function' ? st.say() : st.say) || []}; },
+  target(){ const st = this.cur(); if (!st || !st.at) return null; const e = typeof st.at === 'function' ? st.at() : document.querySelector(st.at); return e && e.getClientRects().length ? e : null; },
+  show(){
+    clearTimeout(this.t); clearTimeout(this.w); clearTimeout(this.dt); this.ok = false; this.note = '';
+    const st = this.cur(); if (!st) return this.finish();
+    try { if (st.go) st.go(); } catch(e){}
+    this.paint();
+    // views draw a moment later: wait for the thing to point at, bring it into view, then (fast) move on by itself
+    let n = 0;
+    const ready = () => {
+      if (!this.on || this.cur() !== st) return;
+      const t = this.target();
+      if (st.at && !t && n++ < 25){ this.t = setTimeout(ready, 120); return; }
+      // on a phone the card docks under the thing when both fit on the screen: scroll it to the top
+      if (t){ const r = t.getBoundingClientRect(), card = this.el.querySelector('.twcard'), ch = card ? card.offsetHeight : 300;
+        if (innerWidth <= 640 && r.height + ch + 30 <= innerHeight && (r.top < 8 || r.bottom > innerHeight - ch - 20)) window.scrollBy({top: r.top - 10, behavior: 'auto'});
+        else if (r.top < 70 || r.bottom > innerHeight - 40) t.scrollIntoView({block: 'center', behavior: reduced ? 'auto' : 'smooth'}); }
+      if (st.demo) try { st.demo(); } catch(e){}
+      this.paint(); this.focus();
+      if (st.act) this.watch(st);
+      if (this.fast) this.ahead();
+    };
+    this.t = setTimeout(ready, 80);
+  },
+  // a step that asks for a tap goes on once it has happened
+  watch(st){
+    const tick = () => {
+      if (!this.on || this.cur() !== st) return;
+      if (!this.ok && st.act.done()){ this.ok = true; this.paint(); this.w = setTimeout(() => { if (this.cur() === st) this.next(); }, this.fast ? 500 : 900); return; }
+      this.w = setTimeout(tick, 150);
+    };
+    tick();
+  },
+  // fast forward: the coach does the step's tap, or reads it out and turns the page
+  ahead(){
+    const st = this.cur(); if (!st || !this.fast) return;
+    clearTimeout(this.t);
+    if (st.act && !this.ok) this.t = setTimeout(() => { if (this.fast && this.cur() === st && !this.ok) this.doIt(); }, 650);
+    else if (st.ready && !st.ready()) this.t = setTimeout(() => this.ahead(), 300);
+    else if (!st.act){ const w = this.words(st); this.t = setTimeout(() => { if (this.fast && this.cur() === st) this.next(); }, Math.max(1600, 26 * (w.h.length + w.say.join('').length))); }
+  },
+  doIt(){ const st = this.cur(); if (st && st.act && !this.ok) try { st.act.auto(); } catch(e){} },
+  next(){ if (this.k < this.steps.length - 1){ this.k++; this.show(); } else this.finish(); },
+  prev(){ if (this.k > 0){ this.fast = false; this.k--; this.show(); } },
+  click(e){
+    const t = e.target.closest('[data-tour]'); if (!t) return;
+    const a = t.dataset.tour;
+    if (a === 'next'){ const st = this.cur(); if (st.act && !this.ok) this.doIt(); else this.next(); }
+    else if (a === 'back') this.prev();
+    else if (a === 'fast'){ this.fast = !this.fast; this.paint(); if (this.fast) this.ahead(); else clearTimeout(this.t); }
+  },
+  onKey(e){
+    if (!this.on) return;
+    if (e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); this.note = 'The tour can\'t be skipped, but Fast forward gets you through it quickly.'; this.paint(); return; }
+    if (e.target.closest && e.target.closest('input, textarea')) return;
+    if (e.key === 'Enter' || e.key === 'ArrowRight'){ if (e.target.closest && e.target.closest('.twcard button') && e.key === 'Enter') return; e.preventDefault(); e.stopPropagation(); const st = this.cur(); if (st.act && !this.ok) this.doIt(); else this.next(); }
+    else if (e.key === 'ArrowLeft'){ e.preventDefault(); e.stopPropagation(); this.prev(); }
+  },
+  focus(){ const b = this.el && this.el.querySelector('[data-tour="next"]'); if (b) try { b.focus({preventScroll: true}); } catch(e){} },
+  paint(){
+    if (!this.el) return;
+    const st = this.cur(); if (!st) return;
+    const n = this.steps.length, act = st.act && !this.ok, last = this.k === n - 1;
+    const {h, say} = this.words(st);
+    this.el.querySelector('.twcard').innerHTML = `<div class="twface cface">${knightSVG(this.ok ? 'cheer' : act ? 'think' : 'cheer')}</div>
+      <div class="twbody"><p class="twstep"><b>${esc(coachName())}</b> · ${this.k + 1} of ${n}</p><div class="twbar" aria-hidden="true"><i style="width:${Math.round((this.k + 1) / n * 100)}%"></i></div>
+        <h3 id="tourH">${esc(h)}</h3>${bullets(say || [])}${st.pick ? coachPickHTML() : ''}
+        ${st.act ? `<p class="twdo ${this.ok ? 'ok' : ''}">${this.ok ? 'That\'s it' : esc(st.act.ask)}</p>` : ''}${this.note ? `<p class="twnote">${esc(this.note)}</p>` : ''}
+        <div class="twacts">${this.k ? '<button class="btn ghost" type="button" data-tour="back">Back</button>' : ''}<button class="btn twff" type="button" data-tour="fast" aria-pressed="${this.fast}">${this.fast ? 'Pause' : 'Fast forward'}</button>
+          <button class="btn primary" type="button" data-tour="next">${act ? 'Show me' : last ? (this.replay ? 'Done' : 'Start the course') : 'Next'}</button></div></div>`;
+    this.el.classList.toggle('free', !!act);
+    this.place();
+  },
+  // the dimmed page with a hole around the thing the step is about, and the card beside it (docked on a phone)
+  place(){
+    if (!this.el) return;
+    const W = innerWidth, H = innerHeight, t = this.target(), card = this.el.querySelector('.twcard'), ring = this.el.querySelector('.twring');
+    const path = this.el.querySelector('.twdim'), blk = this.el.querySelector('.twblock'), svg = this.el.querySelector('.twshade');
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('width', W); svg.setAttribute('height', H);
+    let r = null;
+    if (t){ const b = t.getBoundingClientRect(), pad = 6; r = {x: Math.max(4, b.left - pad), y: Math.max(4, b.top - pad), w: Math.min(W - 8, b.width + pad * 2), h: Math.min(H - 8, b.height + pad * 2)}; }
+    path.setAttribute('d', `M0 0H${W}V${H}H0Z` + (r ? `M${r.x} ${r.y}V${r.y + r.h}H${r.x + r.w}V${r.y}Z` : ''));
+    if (r){ Object.assign(ring.style, {display: 'block', left: r.x + 'px', top: r.y + 'px', width: r.w + 'px', height: r.h + 'px'});
+      blk.setAttribute('x', r.x); blk.setAttribute('y', r.y); blk.setAttribute('width', r.w); blk.setAttribute('height', r.h); }
+    else { ring.style.display = 'none'; blk.setAttribute('width', 0); blk.setAttribute('height', 0); }
+    const cw = card.offsetWidth, ch = card.offsetHeight, m = 12;
+    let x, y;
+    if (W <= 640){ x = m; y = !r || (r.y + r.h / 2) < H * 0.5 ? H - ch - m : m; if (r && y > r.y && y < r.y + r.h && r.y > ch + 2 * m) y = m; }
+    else if (!r){ x = (W - cw) / 2; y = Math.max(m, (H - ch) / 2); }
+    else {
+      x = Math.min(Math.max(m, r.x + r.w / 2 - cw / 2), W - cw - m);
+      if (r.y + r.h + m + ch <= H - m) y = r.y + r.h + m;
+      else if (r.y - m - ch >= m) y = r.y - m - ch;
+      else if (r.x + r.w + m + cw <= W - m){ x = r.x + r.w + m; y = Math.min(Math.max(m, r.y), H - ch - m); }
+      else if (r.x - m - cw >= m){ x = r.x - m - cw; y = Math.min(Math.max(m, r.y), H - ch - m); }
+      else { y = H - ch - m; }
+    }
+    card.style.left = Math.round(x) + 'px'; card.style.top = Math.round(Math.max(m, y)) + 'px';
+  },
+
+  build(){
+    const NM = {w: 'White', b: 'Black'}, s0 = SIDE, other = s0 === 'w' ? 'b' : 'w', tap = sel => { const e = document.querySelector(sel); if (e) e.click(); };
+    const mine = () => { const D = S.drill; if (!D || !D.id) return 0; const n = LINES[D.id].n; return n.slice(D.s0 + 1, D.i + 1).filter(i => isMine(N[i])).length; };
+    const playRight = () => { const D = S.drill; if (!D || D.busy || D.state !== 'play') return false; const u = N[LINES[D.id].n[D.i + 1]].u; tryMove(u.slice(0, 2), u.slice(2, 4)); return true; };
+    // the unit a new player starts with, its first lesson's main line, and a position in it where the other side has choices
+    const unit = () => COURSE.find(U => !U.soon && U.lessons && U.lessons.length && U.side === SIDE && !unitPassed(U)) || COURSE.find(U => !U.soon && U.lessons && U.lessons.length && U.side === SIDE);
+    const lineOf = U => { const L = U && LIDX[U.side] && LIDX[U.side][U.lessons[0]]; return L ? L.lines[0] : DRILLABLE[0]; };
+    const choiceAt = id => { const n = LINES[id].n; for (let i = 0; i < n.length - 1; i++) if (!isMine(N[n[i + 1]]) && optionsFor(n[i], id).length >= 2) return i; return 1; };
+    // the demo slip: from memory, the coach plays the line until a move that would lose a piece is there to try, and tries it
+    const slip = () => {
+      const D = S.drill; if (!D || !D.tour || D.guided) return;
+      const step = () => {
+        if (!this.on || S.drill !== D || D.state !== 'play') return;
+        if (D.busy){ this.dt = setTimeout(step, 150); return; }
+        const fen = nodeFen(dNode()), exp = N[LINES[D.id].n[D.i + 1]].u;
+        // a move that leaves the piece where it can be taken for free: quick to find, and it shows what a slip costs
+        const hangs = u => { const ch = new Chess(fen); if (!ch.move(uciObj(u))) return false; const t = sqi(u.slice(2, 4)); return Ideas.captures(ch.fen()).some(x => x.t === t && x.v >= 3); };
+        const bad = mine() >= 1 ? legalFor().find(u => u !== exp && hangs(u) && punishOf(fen, u)) : null;
+        if (bad){ tryMove(bad.slice(0, 2), bad.slice(2, 4)); return; }
+        if (D.i >= LINES[D.id].n.length - 2){ const u = legalFor().find(x => x !== exp); if (u) tryMove(u.slice(0, 2), u.slice(2, 4)); return; }
+        playRight(); this.dt = setTimeout(step, 900);
+      };
+      this.dt = setTimeout(step, 700);
+    };
+    const U = unit(), lid = lineOf(U);
+    return [
+      {h: () => `Hi! I'm ${coachName()}, your coach`, say: ['I\'ll show you around: it takes about two minutes', 'First, pick who shows you around'], pick: true},
+      {h: 'Two books: White and Black', at: '.top .sidesw', go: () => { S.drill = null; if (SIDE !== s0) useSide(s0); go('course'); },
+        say: [`Your ${NM.w} openings and your ${NM.b} defences are two separate books`, 'This switch flips between them, and every tab follows'],
+        act: {ask: `Tap ${NM[other]}`, done: () => SIDE === other, auto: () => tap(`.top .sidesw [data-side="${other}"]`)}},
+      {h: () => `This is your ${NM[other]} book`, at: '.top .sidesw', go: () => { if (SIDE !== other){ useSide(other); render(); } },
+        say: [`Its own course, its own drills, its own games`, `Tap ${NM[s0]} to go back`],
+        act: {ask: `Tap ${NM[s0]}`, done: () => SIDE === s0, auto: () => tap(`.top .sidesw [data-side="${s0}"]`)}},
+      {h: 'Five tabs', at: '.tabs', go: () => { if (SIDE !== s0){ useSide(s0); render(); } },
+        say: ['Sandbox: practice games against the lines in your book', 'Course: your openings, one idea at a time', 'Drill: five lines a day, from memory', 'Your games: your record, and where you leave the book', 'Shop: a new look for me']},
+      {h: () => gradAt() ? 'The library' : 'The course', at: () => document.getElementById('cGo') || document.querySelector('.path') || document.querySelector('#app .libcoach'), go: () => { S.drill = S.drillState = null; go('course'); },
+        say: () => gradAt() ? ['You finished the course, so this tab is your library now', 'Deep dives take one opening further, picked from how your course went']
+          : ['One opening idea per unit, in the order your games need them', 'This button always takes you to the next thing to do']},
+      {h: 'Inside a unit', at: '.steps', go: () => { if (U) openUnit(U.id); },
+        say: ['Five steps: the idea, play along, drill, practice games, the checkpoint', 'Five right in the checkpoint and the next unit opens']},
+      {h: 'Play along', at: '#db', go: () => startGuided(lid, U ? U.id : null, {tour: true}),
+        say: ['The green arrow shows the move: you play it', 'Drag the piece, or tap it and then tap where it goes'],
+        act: {ask: 'Play the arrow\'s move', done: () => mine() >= 1, auto: () => { if (!playRight()) setTimeout(() => this.doIt(), 300); }}},
+      {h: 'I explain every move', at: '.gcoach', say: ['What the other side just played, and the idea behind it', 'Why your next move is the move', 'A wrong move here just doesn\'t go, and nothing is counted']},
+      {h: 'Drill: today\'s five', at: '.today', go: () => { S.drill = S.drillState = null; go('drill'); },
+        say: ['Five lines a day, from memory, keep your streak going', 'A line you slip on comes back sooner, a clean one later']},
+      {h: 'A wrong move, explained', at: '#dpanel', go: () => startDrillLine(lid, '', null, {tour: true, from0: true}), demo: slip, ready: () => !!S.drill && S.drill.tries >= 1,
+        say: ['Watch: I\'ll play a move that isn\'t in the book', 'You see the answer that punishes it, and what it costs']},
+      {h: 'Miss twice and the arrow shows it', at: '#db', ready: () => !!S.drill && S.drill.tries >= 2, demo: () => { const D = S.drill; if (D && D.tour && D.state === 'play' && D.tries < 2){ const exp = N[LINES[D.id].n[D.i + 1]].u, u = legalFor().find(x => x !== exp); if (u) setTimeout(() => tryMove(u.slice(0, 2), u.slice(2, 4)), 500); } },
+        say: ['The arrow shows the book\'s move, with the reason for it', 'Play it and the line goes on']},
+      {h: 'Play on with the engine', at: '#dExplore', go: () => { const D = S.drill; if (D && D.tour && D.state === 'play'){ D.hint = null; D.i = LINES[D.id].n.length - 1; finishLine(); } },
+        say: ['When a line ends, keep playing from there against the engine', 'You get it after drills, lessons and practice games'],
+        act: {ask: 'Tap Play on with the engine', done: () => S.view === 'explore', auto: () => tap('#dExplore')}},
+      {h: 'The explore board', at: () => { const x = document.querySelector('.xans'); return x && x.closest('.dpanel'); },
+        say: ['Move for either side, and the engine answers your moves', 'Purple arrows: its best moves. Red dashes: what the other side wants', 'Under the board: what the last move does']},
+      {h: 'Lessons: the other side\'s answers', at: '.opts', go: () => { S.drill = S.drillState = null; openLine(lid, choiceAt(lid), 'games'); },
+        say: ['Every position lists what the other side can play, and how often at your level', 'Tap one to see how your book meets it']},
+      {h: 'Every move explained', at: '.mcard', say: ['Step through with the arrows under the board, or the arrow keys', 'Each move says what it does: the book\'s note, and what the board shows']},
+      {h: 'The engine in lessons', at: '.engrow', say: ['Switch it on for the best moves, their arrows and the score', 'It stays off in drills, practice games and checkpoints, and comes back when they end']},
+      {h: 'Your games', at: '.gseg', go: () => go('games'),
+        say: () => PERSONA === 'ready' ? ['Your openings with both colours, and your record in each', 'Where you leave the book, and your recent games'] : ['Your openings, with your record in each', 'Missed shots from your games, game reviews and the monthly recap']},
+      {h: 'The Sandbox', at: '#sbpanel', go: () => { S.drill = S.drillState = null; go('sandbox'); },
+        say: ['Practice games against an opponent who plays your book\'s lines', 'It picks the lines you know least: choose an opening, or give odds', 'Leave the book and it shows what your move allows']},
+      {h: 'Levels', at: '#lvBtn', skip: () => document.getElementById('lvBtn').hidden, say: ['Every line you play earns points', 'The ring fills toward your next level. Tap it for your badges']},
+      {h: 'Your streak', at: '#meBtn', skip: () => document.getElementById('meBtn').hidden, say: ['The flame counts the days in a row you finish today\'s five', 'Every third day in a row earns a shop token']},
+      {h: () => `${coachName()}'s wardrobe`, at: () => document.querySelector('#app .chead') || document.querySelector('#app h2'), go: () => go('shop'),
+        say: () => ['Tokens from badges, levels and streaks buy me a new look', 'Two new drops every day'].concat(Level.of().n < SHOP_AT ? [`It opens at level ${SHOP_AT}`] : [])},
+      {h: 'Settings', at: '#setBtn', go: () => go('course'), say: ['Light or dark, text size, board colours, your coach and your systems', 'You can take this tour again from there']},
+      {h: 'Your account', at: '#acctBtn', skip: () => document.getElementById('acctBtn').hidden, say: ['Sign in and your progress follows you to every device']},
+      {h: 'That\'s me', at: '#coach .cav', skip: () => !SET.coach, say: ['Tap me any time for a tip', 'I speak up when a line ends, and when something new happens']},
+      {h: 'You\'re all set', say: () => this.replay ? ['That\'s everything', 'Back to where you were'] : ['Start with the course: your first unit is waiting', 'Five lines a day and the openings stick']}
+    ];
+  }
+};

@@ -43,6 +43,7 @@ def device(b, name, viewer='viewer-1', owner=True):
     """A browser on the claude.ai copy: the artifact's owner by default, or someone it was shared with."""
     ctx = b.new_context(viewport={'width': 1280, 'height': 860})
     ctx.add_init_script(f"window.__viewer = {json.dumps(viewer)}; window.__owner = {'true' if owner else 'false'};")
+    ctx.add_init_script("localStorage.setItem('playbook-tour', 'done')")   # the tour has its own suite
     ctx.expose_binding('__dbGet', lambda src, path: DB.get(path))
     ctx.expose_binding('__dbSet', lambda src, path, text: (DB.__setitem__(path, text), writes.append((name, path))))
     ctx.add_init_script(FAKE)
@@ -115,6 +116,11 @@ with sync_playwright() as p:
     assert a.evaluate("[Prog.d.recap.m['2026-10'].all[0], Prog.d.recap.seen]") == [40, '2026-09']
     a.evaluate("Prog.d.recap.m['2026-10'] = {a: 'chess.com:aqua_alpaca', at: 2, fin: true, all: [1, 0, 1, 0]}; Prog.d.recap.seen = '2026-10'; Prog.save()"); a.wait_for_timeout(1200)
     assert stored()['recap']['m']['2026-10']['all'][0] == 40 and stored()['recap']['seen'] == '2026-10' and bp.evaluate("Prog.d.recap.seen") == '2026-10'
+    # ---- the tour, taken on one device, is taken on both (the earliest time wins)
+    bp.evaluate("Prog.d.tour = {done: 1750000000000}; Prog.save()"); bp.wait_for_timeout(1200)
+    assert a.evaluate("Prog.d.tour && Prog.d.tour.done") == 1750000000000
+    a.evaluate("Prog.d.tour = {done: 1760000000000}; Prog.save()"); a.wait_for_timeout(1200)
+    assert stored()['tour']['done'] == 1750000000000 and a.evaluate("Prog.d.tour.done") == 1750000000000
 
     # ---- the artifact's owner has a switch nobody else has: it works on a copy that is never written to the database,
     # while what other devices write keeps arriving underneath and is there when the switch goes off
@@ -136,11 +142,11 @@ with sync_playwright() as p:
     c.context.close()
 
     # ---- a page from an older version writes a smaller copy: the next save on either device puts everything back
-    d = stored(); old = {k: v for k, v in d.items() if k not in ('days', 'prefs', 'set', 'badges', 'shop', 'lvl', 'recap')}; old['someday'] = {'x': 1}
+    d = stored(); old = {k: v for k, v in d.items() if k not in ('days', 'prefs', 'set', 'badges', 'shop', 'lvl', 'recap', 'tour')}; old['someday'] = {'x': 1}
     DB['data/users/viewer-1/italian-progress'] = json.dumps(old); a.wait_for_timeout(700)
     a.evaluate("Prog.save()"); a.wait_for_timeout(900)
     d = stored(); print('after a smaller copy and one save:', sorted(d.keys()))
-    assert all(k in d for k in ('days', 'prefs', 'badges', 'shop', 'lvl', 'recap', 'someday')) and d['prefs']['who'][0] == 'pawn'
+    assert all(k in d for k in ('days', 'prefs', 'badges', 'shop', 'lvl', 'recap', 'tour', 'someday')) and d['prefs']['who'][0] == 'pawn'
     assert a.evaluate("Prog.d.someday && Prog.d.someday.x") == 1, 'a field this version does not know is kept'
 
     # ---- the explore screen is not disturbed by another device: no re-render while a line is being played
