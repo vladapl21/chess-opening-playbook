@@ -34,7 +34,7 @@ test: build
 	node tests/nudge_check.mjs
 	node tests/ideas_check.js
 
-# Engine and wording checks: the Black book, and the White book's packs after the first (the London)
+# Engine and wording checks: the Black book, and the White book's packs after the first (the London and the English)
 check:
 	$(PY) pipeline/check_black.py 14
 	$(PY) pipeline/check_white.py 14

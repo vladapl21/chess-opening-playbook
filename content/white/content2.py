@@ -387,6 +387,10 @@ CHAPTERS = [
   dict(id='london', name='The London', move="Queen's Pawn Game, Accelerated London", parts=['ld-setup', 'ld-cpawn', 'ld-knight', 'ld-bishop', 'ld-side']),
   dict(id='lindian', name='Indian Defenses', move="King's Indian setup and the rest", parts=['ln-fian', 'ln-epawn', 'ln-cpawn']),
   dict(id='lrare', name='Other first moves', move='Horwitz, Englund, Old Benoni, Dutch, Modern', parts=['lr-epawn', 'lr-gambit', 'lr-cpawn', 'lr-fian', 'lr-other']),
+  # the English Opening: a third pack for White (PACKS in content2_meta.py), lessons and notes in english.py
+  dict(id='english', name='The English', move="King's English, Reversed Dragon, Smyslov, Keres", parts=['en-rev', 'en-revside']),
+  dict(id='engsym', name='Symmetrical & Anglo-Indian', move='Symmetrical, Anglo-Indian, Great Snake', parts=['en-sym', 'en-ind']),
+  dict(id='engrare', name='The d-pawn & rare moves', move='Anglo-Scandinavian, Agincourt, Caro-Kann setup', parts=['en-dp', 'en-rare']),
 ]
 
 for _p in PARTS:
@@ -394,3 +398,5 @@ for _p in PARTS:
 NEW_PARTS = {p['id'] for p in PARTS if p['ch'] != 'italian'}
 import content2_notes  # noqa
 import london  # noqa: E402,F401  the London System for White (its own pack)
+import english  # noqa: E402,F401  the English Opening for White (its own pack)
+import odd  # noqa: E402,F401  odd first, second and third moves, in the house chapters

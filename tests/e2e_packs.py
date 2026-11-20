@@ -1,11 +1,13 @@
-"""Systems (packs): the library holds three answers to the e-pawn for Black and two first moves for White, and a player
-has one of each.
+"""Systems (packs): the library holds four answers to the e-pawn and two to the d-pawn for Black and three first moves for
+White, and a player has one of each.
 
 - With nothing chosen, the playbook is what it always was: no Caro-Kann and no London anywhere.
 - Choosing the Caro-Kann in Settings swaps the chapters, the course units, the drills, the cards at a glance and the Sandbox.
 - Progress in the other system is kept, and switching back brings everything back.
 - A new player who already plays the Caro-Kann is offered it, and gets it.
-- The same for White: the London swaps the White book, and the Sandbox opens with the d-pawn."""
+- The same for White: the London swaps the White book, and the Sandbox opens with the d-pawn.
+- The Scandinavian, the King's Indian (two chapters in place of the Slav's three) and the English switch the same way:
+  chapters, units, a main line drilled clean, the plan at its end, the Sandbox's first move, and back again."""
 from playwright.sync_api import sync_playwright
 from e2e_white import click_move, drag, launch, out
 from serve import Site
@@ -60,7 +62,7 @@ with sync_playwright() as p:
     ctx = b.new_context(viewport={'width': 1280, 'height': 900}); pg = ctx.new_page(); hook(pg)
     pg.goto(URL); pg.wait_for_timeout(1000)
     a = shape(pg); print('default:', {k: (v if k != 'units' else len(v)) for k, v in a.items()})
-    assert 'caro' not in a['chapters'] and a['chapters'][:5] == E5 and a['all'] == len(a['chapters']) + 2
+    assert 'caro' not in a['chapters'] and a['chapters'][:5] == E5 and a['all'] == len(a['chapters']) + 5
     assert 'b-caro' not in a['units'] and len(a['units']) == 17 and a['first'] == ['e7e5']
     assert pg.evaluate("Object.keys(LIDX.b).some(l => l.startsWith('bck-'))") is False
 
@@ -69,7 +71,7 @@ with sync_playwright() as p:
     pg.click('#setBtn'); pg.wait_for_timeout(300)
     assert not pg.locator('#setPanel [data-packask="blackE4:caro"]').is_visible(), 'the repertoire is folded away'
     pg.click('#setPanel .repdet > summary'); pg.wait_for_timeout(200)
-    rows = pg.locator('#setPanel [data-packask]').all_inner_texts(); print('settings:', rows); assert len(rows) == 5
+    rows = pg.locator('#setPanel [data-packask]').all_inner_texts(); print('settings:', rows); assert len(rows) == 9
     pg.click('#setPanel [data-packask="blackE4:caro"]'); pg.wait_for_timeout(200)
     assert pg.evaluate("PICKS.blackE4 || null") is None and pg.locator('#repName').count() == 1, 'a tap alone switches nothing'
     pg.fill('#repName', 'somebody'); assert pg.is_disabled('.repask [type=submit]')
@@ -131,9 +133,10 @@ with sync_playwright() as p:
     # a new player who already plays the Caro-Kann is offered it first, as ready
     cards = pg.evaluate("""makeChoices({slots: {blackE4: {n: 20, opts: {caro: {n: 15, w: 8, l: 6, d: 1}, e5: {n: 5, w: 2, l: 3, d: 0}}},
         blackD4: {n: 12, opts: {slav: {n: 12, w: 6, l: 5, d: 1}}}}}).map(c => [c.id, (c.opts || []).map(o => [o.id, !!o.ready])])""")
-    print('cards for a Caro-Kann player:', cards[:2]); assert cards[0] == ['blackE4', [['caro', True], ['e5', True], ['sicilian', True]]] and cards[1][0] == 'order'
+    print('cards for a Caro-Kann player:', cards[:2]); assert cards[0] == ['blackE4', [['caro', True], ['e5', True], ['sicilian', True], ['scandi', True]]], cards[0]
+    assert cards[1] == ['blackD4', [['slav', True], ['kid', True]]] and cards[2][0] == 'order', 'the d-pawn has a second system now, so it gets a card'
     three = pg.evaluate("""makeChoices({slots: {blackE4: {n: 20, opts: {sicilian: {n: 16, w: 8, l: 7, d: 1}, e5: {n: 4, w: 2, l: 2, d: 0}}}}})[0].opts.map(o => o.id)""")
-    assert three == ['sicilian', 'e5', 'caro'], three
+    assert three == ['sicilian', 'e5', 'caro', 'scandi'], three
 
     # the Sicilian is a pack too
     pg.evaluate("Prog.d.packs = {blackE4: 'sicilian', updated: Date.now()}; Prog.save(); window.__before = 1; syncPacks()")
@@ -148,7 +151,7 @@ with sync_playwright() as p:
 
     # the London is a pack for White, beside the e-pawn
     w0 = wshape(pg); print('white default:', {k: (v if k != 'units' else len(v)) for k, v in w0.items()})
-    assert w0['chapters'] == WE4 and w0['all'] == len(WE4) + 3 and w0['first'] == 'e2e4' and w0['roots'] == ['e2e4']
+    assert w0['chapters'] == WE4 and w0['all'] == len(WE4) + 6 and w0['first'] == 'e2e4' and w0['roots'] == ['e2e4']
     assert not LONDON_UNITS & set(w0['units']) and WE4_UNITS <= set(w0['units'])
     assert pg.evaluate("Object.keys(LIDX.w).some(l => l.startsWith('ld-'))") is False
     pg.evaluate("useSide('w'); startDrillLine('setup')"); pg.wait_for_timeout(600); assert drill_clean(pg) == 'done'
@@ -194,7 +197,38 @@ with sync_playwright() as p:
     assert pg.evaluate("[Prog.rec('setup').clean, Prog.rec('ld-trick').clean]") == kept, 'switching back keeps both systems\' records'
     print('White switched back: the same', len(w2['chapters']), 'chapters and', len(w2['units']), 'units')
     wc = pg.evaluate("""makeChoices({slots: {white: {n: 30, opts: {d4: {n: 24, w: 12, l: 10, d: 2}, e4: {n: 6, w: 3, l: 3, d: 0}}}}}).map(c => [c.id, (c.opts || []).map(o => [o.id, !!o.ready])])""")
-    print('cards for a d-pawn player:', wc[:1]); assert wc[0] == ['white', [['d4', True], ['e4', True]]]
+    print('cards for a d-pawn player:', wc[:1]); assert wc[0] == ['white', [['d4', True], ['e4', True], ['flank', True]]], wc[0]
+
+    # the three newer systems: each swaps its chapters and units, its main line drills clean and ends with a plan, and it switches back
+    base_b, base_w = shape(pg), wshape(pg)
+    pg.evaluate("go('course')"); switch(pg, 'blackE4:scandi')
+    n1 = shape(pg); print('scandinavian:', n1['chapters'], n1['first'])
+    assert n1['chapters'][0] == 'scandi' and not set(E5) & set(n1['chapters']) and n1['first'] == ['d7d5'] and 'b-scandi' in n1['units'] and {'slav', 'other'} <= set(n1['chapters'])
+    pg.evaluate("useSide('b'); startDrillLine('bsc-main')"); pg.wait_for_timeout(600); assert drill_clean(pg) == 'done'
+    assert pg.evaluate("!!planOf('bsc-main')") and pg.evaluate("planOf('bsc-main').h") in pg.inner_text('#view'), 'a clean drill ends with the plan'
+    pg.evaluate("go('course')"); switch(pg, 'blackD4:kid')
+    n2 = shape(pg); print('king\'s indian:', n2['chapters'])
+    assert {'kid', 'kidx', 'scandi', 'other'} <= set(n2['chapters']) and not {'slav', 'london', 'd4x'} & set(n2['chapters']) and {'b-kid', 'b-kidx'} <= set(n2['units']) and 'b-slav' not in n2['units']
+    assert pg.evaluate("(() => { useSide('b'); const d4 = N[0].k.find(k => N[k].u === 'd2d4'); return sbMyKids(d4).map(c => N[c].u); })()") == ['g8f6']
+    for lid in ('bki-main', 'bkx-london'):
+        pg.evaluate(f"useSide('b'); startDrillLine('{lid}')"); pg.wait_for_timeout(600); assert drill_clean(pg) == 'done', lid
+    pg.evaluate("useSide('b'); S.chapter = 'kid'; go('learn')"); pg.wait_for_timeout(500)
+    txt = pg.inner_text('#view'); assert 'then strike' in txt and 'The Four Pawns Attack' in txt and 'The Classical: castle, then the e-pawn' in txt; pg.screenshot(path=out + 'p_kid.png')
+    pg.evaluate("go('course')"); switch(pg, 'white:flank')
+    n3 = wshape(pg); print('english:', n3['chapters'], n3['first'])
+    assert n3['chapters'] == ['english', 'engsym', 'engrare'] and n3['first'] == 'c2c4' and n3['roots'] == ['c2c4'] and {'w-english', 'w-engsym', 'w-engrare'} <= set(n3['units']) and not WE4_UNITS & set(n3['units'])
+    pg.evaluate("useSide('w'); startDrillLine('en-main')"); pg.wait_for_timeout(600); assert drill_clean(pg) == 'done'
+    pg.evaluate("useSide('w'); S.chapter = 'english'; go('learn')"); pg.wait_for_timeout(500)
+    txt = pg.inner_text('#view'); assert 'one square' in txt and 'Black opens the middle' in txt; pg.screenshot(path=out + 'p_english.png')
+    pg.evaluate("useSide('w'); SBS.scope = 'all'; SBS.odds = 'even'; go('sandbox')"); pg.wait_for_timeout(300); pg.evaluate("sbStart()"); pg.wait_for_timeout(1200)
+    assert pg.evaluate("N[S.drill.hist[1]].u") == 'c2c4', 'the Sandbox opens with the c-pawn'
+    assert pg.evaluate('document.documentElement.scrollWidth') <= 1280
+    for ask in ('white:e4', 'blackD4:slav', 'blackE4:e5'):
+        pg.evaluate("go('course')"); switch(pg, ask)
+    e_b, e_w = shape(pg), wshape(pg)
+    assert e_b['chapters'] == base_b['chapters'] and e_b['units'] == base_b['units'] and e_b['lines'] == base_b['lines'] and e_w['chapters'] == base_w['chapters'] and e_w['lines'] == base_w['lines']
+    assert pg.evaluate("['bsc-main', 'bki-main', 'bkx-london', 'en-main'].map(l => Prog.rec(l).clean)") == [1, 1, 1, 1], 'records in the other systems are kept'
+    print('the Scandinavian, the King\'s Indian and the English switch in and out')
 
     # phone width with the Caro-Kann on
     ph = b.new_context(viewport={'width': 390, 'height': 844}); ph.add_init_script("localStorage.setItem('playbook-packs', JSON.stringify({blackE4: 'caro'}))")

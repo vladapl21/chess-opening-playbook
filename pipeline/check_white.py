@@ -1,6 +1,8 @@
 """Check White-book lessons of the packs added after the first one (the London): legality, White (your) move quality with
 Stockfish, Black move realism and coverage with Maia.
     python3 pipeline/check_white.py [depth] [lesson-or-part ids, comma separated]
+With ids, those lessons are checked whatever pack they are in (the first pack's hand-built lessons are not in the
+default run: many show a trap on purpose).
 
 The same report as check_black.py, from the other side. W-LOSS, ILLEGAL and ENDS-ON-BLACK need a look; B-RARE and
 B-MISS are information. A line with a move tagged 'warn' shows a mistake on purpose and is skipped from the move check."""
@@ -40,7 +42,7 @@ def score(b):
 # the lessons of every chapter that belongs to a pack other than the slot's first one
 later = {c for s in CM.PACKS.values() for p, chs in s['packs'].items() if p != s['default'] for c in chs}
 part_ch = {p['id']: p['ch'] for p in content.PARTS}
-lessons = [l for l in content.LESSONS if part_ch[l['part']] in later and (not only or l['id'] in only or l['part'] in only)]
+lessons = [l for l in content.LESSONS if (l['id'] in only or l['part'] in only if only else part_ch[l['part']] in later)]   # named ids: any pack
 warn = {p for p, nt in content.NOTES.items() if 'warn' in (nt.get('tags') or [])}
 lines = []
 for l in lessons:

@@ -50,7 +50,7 @@ Everything above was built by hand for one player. The site now has the first ve
 
 <img src="docs/img/choices.png" alt="A would-you-rather card: the classical defence the player uses now, marked as being written, or the Slav setup, marked ready" width="100%">
 
-**What it cannot do yet.** The library is small: the e-pawn or the London as White; the e-pawn reply, the Caro-Kann or the Sicilian against the e-pawn; the Slav setup against the d-pawn. A player who prefers something else is told that their system is still being written, and that part of their course waits. The English is next. Puzzles from a player's own mistakes need the engine run over their games, which is not built yet.
+**What it cannot do yet.** The library is still short of some systems: it has the e-pawn, the London or the English as White; the e-pawn reply, the Caro-Kann, the Sicilian or the Scandinavian against the e-pawn; the Slav setup or the King's Indian against the d-pawn. A player who prefers something else is told that their system is still being written, and that part of their course waits. The French and the Queen's Gambit Declined are next. Puzzles from a player's own mistakes need the engine run over their games, which is not built yet.
 
 A **coach**, one of three characters to pick from (Pip the knight, Rocco the rook, Dot the pawn), says the short things in a speech bubble at the bottom right: what a tab is for the first time it is opened, once a day what is worth knowing there (the first of today's five and why it comes first, the next unit and how far along it is, today's drops in the shop), the end of today's five with the streak, a new badge with its medal, a new monthly recap, why a section is locked. Tapping the coach brings back what is worth knowing on that tab. When a drill line ends with a slip, the coach's note in the drill panel says which move caught you, what you played instead, what the book says about that move and why the line's move is the move, and whether the same move has caught you before; when a checkpoint goes wrong, it names the lesson most of the misses came from and offers to play it along again. The coach talks in short bullets, never paragraphs, and it is the coach the player picks that leads the [tour](#first-time-here-the-tour) on the first visit. It never speaks during a drill, a practice game or a checkpoint, and it can be switched off in **Settings**, which also has light and dark mode, text size, five board colours, the letters on the board and the tour again. Settings are kept with the progress, so the coach and the look follow an account to every device. The system for each part of the repertoire is in Settings too, folded away at the bottom: switching one swaps whole course units, so it asks for the player's username first.
 
@@ -73,7 +73,7 @@ A **coach**, one of three characters to pick from (Pip the knight, Rocco the roo
 
 The course on top of both books has **17 units**. Fourteen are opening units: 55 core lessons, 86 optional ones and 84 checkpoint positions. Three are skill units made of positions from my own games: 26 threats I walked into, 18 winning positions I let slip and 16 endings. Finishing the course opens a library of **11 deep dives**: the optional lessons in 27 parts, with 162 more checkpoint positions.
 
-Those are the numbers for my own playbook. The library behind it also holds the systems other players can pick ([Systems](#systems)): with the London for White and the Caro-Kann and the Sicilian for Black, the books have 11 chapters, 97 lessons and 401 lines for White, 11 chapters, 74 lessons and 596 lines for Black, and the course has 22 units and 14 deep dives.
+Those are the numbers for my own playbook. The library behind it also holds the systems other players can pick ([Systems](#systems)): with the London and the English for White and the Caro-Kann, the Sicilian, the Scandinavian and the King's Indian for Black, the books have 14 chapters, 115 lessons and 661 lines for White, 14 chapters, 99 lessons and 894 lines for Black, and the course has 28 units and 20 deep dives.
 
 ## Using it: where everything is
 
@@ -331,6 +331,8 @@ The layout collapses to one column on phones and follows the system's light or d
 
 72 of the 73 Black games fall into a chapter. The remaining one, an experiment with 1…b6, sits outside the book.
 
+The named oddities are in both books too, each in the chapter where it belongs. For Black: the Halloween Gambit in the Four Knights; the Bongcloud, the Portuguese, the Alapin, the Tortoise, the Whale and Mengarini's Opening among White's second moves; the Kádas, the Ware, the Barnes, the Amar and the Sodium Attack among the first moves. For White: the Borg, the Barnes, the Ware, the Goldsmith, the Lemming, the Carr, the Hippopotamus and the Duras Gambit on move one, the Gunderam Defense and Gambit and five other odd second moves, and seven odd third moves in the Italian. 111 lines in all, drafted from the positions the books already answer, so a position that was known keeps its move.
+
 ### Systems
 
 The library can hold more than one answer to the same question. A **slot** is one decision in a repertoire ("what do I play against the e-pawn?") and a **pack** is one answer to it. A player has one pack per slot, chosen in the would-you-rather cards or later in Settings, and the page cuts both books down to the packs in play before anything else is built: chapters, course units, drills, the cheat sheet and the Sandbox all follow. Progress in the other pack is kept.
@@ -339,16 +341,29 @@ The library can hold more than one answer to the same question. A **slot** is on
 | --- | --- | --- |
 | White's first move | **Open with the e-pawn** (1.e4): the eight chapters above | the first system; 8 chapters |
 | | **The London** (1.d4 and 2.Bf4): the setup, the queen raid on the b-pawn, Black's knight first, Black's bishop first, the Slav setup; the knight first (the fianchetto, the e-pawn, the d-pawn, the c-pawn at once); the other first moves (the e-pawn one square, the gambit, the c-pawn two squares, the fianchetto, sidelines) | 3 chapters, 18 lessons, 102 lines |
+| | **The English** (1.c4): the King's English with the Reversed Dragon, the Smyslov and the Keres; the Symmetrical and the Anglo-Indian; Black's d-pawn at once (the Anglo-Scandinavian, the Agincourt, the Caro-Kann setup) and rare first moves | 3 chapters, 15 lessons, 191 lines |
 | Against the e-pawn | **Meet it head-on** (1…e5): Italian, Ruy Lopez, Scotch, Four Knights and Vienna, early attacks | the first system; 5 chapters |
 | | **Caro-Kann** (1…c6): the push past, the pawn trade and the c-pawn attack, the main line, both knights, sidelines | 7 lessons, 59 lines |
 | | **Sicilian** (1…c5, the Kan setup): the open game, the early bishop, the small c-pawn and the pawn offer, sidelines | 5 lessons, 31 lines |
-| Against the d-pawn | **The Slav setup** | 3 chapters |
+| | **Scandinavian** (1…d5): the queen takes back and steps to the side, then one setup; the push past, the Tennison and Blackmar-Diemer gambits, quiet second moves | 10 lessons, 120 lines |
+| Against the d-pawn | **The Slav setup** | the first system; 3 chapters |
+| | **King's Indian** (1…Nf6 and 2…g6): the Classical, the Four Pawns Attack, the early bishop, the quiet setups; and the same five moves against the London, the Torre, the Colle, the Jobava and the Trompowsky | 2 chapters, 12 lessons, 136 lines |
 
 The Caro-Kann is written as the Slav setup's twin: c-pawn one square, d-pawn two, light bishop out before the e-pawn moves. It reuses the Slav's rules where the positions are alike (after a pawn trade, both knights come out before the bishop; in the main line the queen's knight goes first). Two of its lines win a pawn against a move a third of club players make.
 
 The London is a whole White repertoire on its own, since a player who picks it has no e-pawn lines left: one chapter for each of Black's three answers (the d-pawn, about half of club players; the king's knight, one in six; everything else). It is one setup in one order (below), with a trick ready for the usual tries: the knight that punishes the queen raid on the b-pawn while your c-pawn is at home, the queen check that wins the knight when Black jumps it at your queen, the queen that hits the b-pawn once Black's light bishop has gone to your knight, the c-pawn capture that wins Black's queen when it stands behind its bishop on your bishop's diagonal, and the one move that avoids the mate trap in the e-pawn gambit (a line that shows the trap is marked as a mistake and never drilled). Black's moves come from the Maia odds at club level; the house player has no games with it, so its chapters show no record. Opening the White book with the London in play, the Sandbox plays the d-pawn for you, and the course puts the three London units where the e-pawn units were.
 
-Inside the packs a player can hold together, one position still gets one move. Two packs of the same slot may answer a position differently, so the repeat check runs once for every combination of one pack per slot.
+The three newest packs are each one setup in one order, like the London, and were drafted the same way ([`pipeline/draft.py`](pipeline/draft.py)): the other side's moves come from the Maia odds, yours from the setup's order wherever Stockfish accepts it, and the engine's move where it doesn't. Every place where the order changes has a note that says why.
+
+| Pack | The order | Where it changes |
+| --- | --- | --- |
+| **Scandinavian** | Take back with the queen, step to the side when the knight hits her, then king's knight, c-pawn one square, light bishop out, e-pawn one square | The queen goes home early when a knight or a bishop is about to trap her on the edge. Against the push past, the bishop comes out first and the c-pawn goes two squares. |
+| **King's Indian** | Knight, g-pawn one square, bishop to the long diagonal, d-pawn one square, castle, then the e-pawn two squares | When White's queen's knight comes out in front of its own c-pawn, your d-pawn goes two squares to stop the e-pawn. With White's bishop at your knight, the queen's knight backs up the e-pawn first. |
+| **English** | C-pawn two squares, queen's knight, g-pawn one square, bishop to the long diagonal, e-pawn two squares, king's knight tucked in behind it, castle, d-pawn one square | When Black's d-pawn comes two squares, take it; once the c-pawn is gone, the king's knight comes out in front of the f-pawn instead. Against the e-pawn one square the knight comes out first. When knight and bishop (or queen and bishop) aim at f2, the e-pawn goes one square. |
+
+The chapter for White's other first moves is shared by every Black pack. A King's Indian player meets the English and the flank openings with the same e-pawn and d-pawn answers as everyone else; a fianchetto answer there would give one position two moves.
+
+Inside the packs a player can hold together, one position still gets one move. Two packs of the same slot may answer a position differently, so the repeat check runs once for every combination of one pack per slot. The game analysis follows the same rule: a player's games are read against one pack per slot (the ones they picked, or before they pick, the ones their games fit), so a move that only another system plays still counts as leaving the book.
 
 ### One setup, one order
 
@@ -532,9 +547,11 @@ content/
   course.py                the course: units, idea boards, checkpoint positions; the deep dives (DEEP)
   plans.py                 the plans written by hand: each lesson's main line (W, B) and side lines (LW, LB)
   opening_names.py         real names in place of move descriptions: labels, lesson and line titles, parts
-  white/                   White book: lessons, labels and notes, chapter text, game reviews; london.py, the London pack
+  white/                   White book: lessons, labels and notes, chapter text, game reviews; london.py and english.py,
+                           the London and English packs; odd.py, odd first, second and third moves
   black/                   Black book: bcontent (lessons), bnotes + bnotes2 (labels, notes, arrows),
-                           bmeta (chapters, game reviews, puzzles, cheat sheet, insights)
+                           bmeta (chapters, game reviews, puzzles, cheat sheet, insights); bcaro, bsicilian, bscandi and
+                           bkid, the packs; bodd, odd first and second moves
 pipeline/
   build_white.py           build the White book    -> data/build/data_white.json
   build_black.py           build the Black book    -> data/build/data_black.json
@@ -546,12 +563,16 @@ pipeline/
   tree.py, label2.py       move tree; context-aware plain-English labels
   maia.py, expand.py       human move odds (Maia, NumPy only) and the coverage walk
   human_odds.py, sf.py     command-line helpers: Maia odds and Stockfish top moves for any line
+  draft.py                 drafts a pack's lines: the other side by the Maia odds, yours from a setup's order where the
+                           engine accepts it; writes the lessons, the titles and the named lines (not part of the build)
+  drafts/                  the scripts that drafted the Scandinavian, the King's Indian, the English and the odd lines:
+                           each one's order, hand-fixed moves, lessons and notes; run one to rewrite its module
   eng.py                   Stockfish wrapper
   black_games.py, black_chapters.py, scan_games.py, find_shots.py
                            game import, sorting by opening, engine scans, missed shots
   explain_skills.py        the reason for every wrong move in the skill units: the engine's line, cut where the loss is on the board
   check_black.py, check_white.py, lint_notes.py
-                           engine and wording checks (check_white.py: the White packs after the first, the London)
+                           engine and wording checks (check_white.py: the White packs after the first, or any named lesson)
   lint_claims.py           one position, one move; pins, guards and attacks in the text must be on the board
   paths.py, common.py      paths, environment variables, shared imports
 data/
@@ -629,9 +650,10 @@ Some useful commands while writing:
 python3 pipeline/human_odds.py "e4 e5 Nf3 Nc6 Bc4"     # what club players play here, with odds
 python3 pipeline/sf.py -d 18 "e4 e5 Nf3 Nc6 Bc4 Bc5"   # Stockfish's top three moves
 python3 pipeline/check_black.py 16 bi-main,bs-classical  # check lessons (or all, without ids)
-python3 pipeline/check_white.py 16 ld-setup,ln-kid      # the same for the London's lessons
+python3 pipeline/check_white.py 16 ld-setup,ln-kid      # the same for White: the later packs, or any lesson named
 python3 pipeline/lint_notes.py                         # notes that contradict their position
 python3 pipeline/lint_claims.py                        # same position, different move; pins, guards, attacks not on the board
+python3 pipeline/drafts/english.py                     # redraft a pack from its order, fixed moves and notes (needs the engines)
 ```
 
 ### Reminder emails
@@ -666,8 +688,8 @@ The tests drive the real page in Chromium. Run them one at a time, as `make test
 | `e2e_artifact_sync.py` | The same for the claude.ai copy, with a stand-in for its database shared by two browser contexts. |
 | `e2e_versions.py` | The claims check on boards with a known answer; a record made before a line changed comes back as due and marked Changed, a clean run on the new moves replaces it, and two devices merge to the newer version. |
 | `e2e_shell.py` | The tab order, the colour switch keeping its tab, Settings, and the header from a small phone to a wide monitor with the level, streak, settings and account showing: nothing overlaps a tab and nothing scrolls sideways. Skipping to the end of a lesson doesn't count as studying it. |
-| `e2e_onboarding.py` | A new visitor from the welcome screen to a personal playbook, with the games in `data/games` fetched through a stand-in for chess.com (first too few of them, then again) and as a PGN file on a phone. |
-| `e2e_packs.py` | Systems: with nothing chosen the playbook is what it always was; the Caro-Kann chosen in Settings swaps the chapters, course units, drills, cards and Sandbox, keeps the other system's progress and switches back; a new player who plays it is offered it; the London does the same for White. |
+| `e2e_onboarding.py` | A new visitor from the welcome screen to a personal playbook, with the games in `data/games` fetched through a stand-in for chess.com (first too few of them, then again) and as a PGN file on a phone. A card with four systems sits side by side on a wide screen and stacks on a phone. |
+| `e2e_packs.py` | Systems: with nothing chosen the playbook is what it always was; the Caro-Kann chosen in Settings swaps the chapters, course units, drills, cards and Sandbox, keeps the other system's progress and switches back; a new player who plays it is offered it; the London does the same for White; the Scandinavian, the King's Indian and the English switch in and out the same way, with their main lines drilled clean. |
 | `e2e_daily.py` | Today's five across both books, a streak, badges with the coach's medal held back until a line is over, settings from another device, the explore board stepped back to move one, and the coach's notes: the move that caught you, a known mistake named as one, the same move counted when it catches you again, and the note when it holds. |
 | `e2e_shop.py` | The levels climbed line by line (the points floating up, a card for each level, one held back while a line is played) until level 5 opens the wardrobe; buying and wearing; the tokens adding up; today's drops: the same two all day, a new shelf the next day, the rest not for sale, and a bought drop in the locker and out of the rotation. |
 | `e2e_recap.py` | chess.com stubbed with three months of the house account's games: the first check reads all three, past months come out final, the month sits beside the one before, the chart has a tip for each day, Check now reads only what can still change, a failed check saves nothing, the coach says when a finished month is new and opens it, and the claude.ai copy points to the website instead. |
@@ -675,7 +697,7 @@ The tests drive the real page in Chromium. Run them one at a time, as `make test
 | `e2e_tour.py` | The tour starts by itself with the coach the player picks; there is no way to close it (Escape explains why, clicks outside the light do nothing); the colour switch by hand and with Show me; Back; Fast forward to the end through Play along, a punished slip, the arrow, the explore board and a lesson's other answers; no progress left behind; the stamp in the record and on the device; no second start after a reload; the replay from Settings ending where it began; and the card on screen at phone width in dark mode with nothing scrolling sideways. The tour names every tab, every part of Your games, every setting and every feature on its list, so a new one fails here until the tour speaks of it. |
 | `e2e_review.py` | chess.com stubbed with the house account's newest games and the real engine over local HTTP: the first check keeps the newest three; a game where White leaves the Black book on move two gets the engine's answer, one where the player leaves the White book gets the book's move and why, and one where the queen goes on move seven gets the first costly move; each is drilled (a wrong move punished, the arrow after two, a clean run kept); the reviews after a reload; a new game pushing the oldest out; a pasted game and the question of which side; the coach's word; the Sandbox from the position; a phone in dark mode. |
 | `ideas_check.js` | The move explainer under Node: known positions (a threat, a guard, the aim at f7, a mate threat made and stopped, a pin, a trade, a recapture that wins nothing, a fork, castling, the answers that punish a wrong move), then every move of both books, with no notation in any line. |
-| `analyze_check.js` | The game analysis on `data/games`, checked against known facts. |
+| `analyze_check.js` | The game analysis on `data/games`, checked against known facts; a King's Indian player's games are read against that system, and again at once when another is picked. |
 | `nudge_check.mjs` | The reminder-email rules on made-up progress records. |
 
 ## Credits

@@ -395,6 +395,20 @@ W = {
     ('pieces', 'Queen to the b-file at Black\'s b-pawn, then finish the setup.'),
     ('target', 'Black\'s doubled pawns on the f-file.'),
     ('king', 'Castle short.')]),
+  # ---------------------------------------------------------------- the English
+  'en-main': dict(h='Ask the bishop, then the f-pawn', b=[
+    ('pieces', 'The small h-pawn move asks Black\'s bishop to take your knight or go back. If it takes, the other knight takes back.'),
+    ('pawns', 'Then the king steps beside the bishop and the f-pawn goes two squares: that is your attack.'),
+    ('target', 'A knight on the light square in the middle, the one your whole setup guards, is your best piece.'),
+    ('them', 'Black wants a knight on the dark square in front of your d-pawn. Your tucked-in knight is there to trade it off.')]),
+  'en-sym': dict(h='The d-pawn push, or the b-pawn', b=[
+    ('pawns', 'Push the d-pawn two squares if Black allows it: the bishop already backs it up.'),
+    ('pawns', 'If a knight lands in front of it first, switch sides: rook behind the b-pawn, small a-pawn move, then the b-pawn two squares.'),
+    ('them', 'Black is trying for the same two pushes. You are a move ahead.')]),
+  'en-d5': dict(h='The knight leaves, the bishop takes', b=[
+    ('target', 'Black\'s h-pawn. Once the knight is driven off, only the king guards it.'),
+    ('pieces', 'If the knight goes to the middle, the bishop takes the h-pawn with check and the attack crashes through.'),
+    ('watch', 'If the knight jumps forward instead, the small h-pawn move sends it to the edge, and your bishop takes it there.')]),
 }
 
 B = {
@@ -676,6 +690,27 @@ B = {
   'bdx-misc': dict(h='Castle, then the c-pawn break', b=[
     ('king', 'Castle next.'),
     ('pawns', 'Then the c-pawn break.')]),
+  # ---------------------------------------------------------------- the Scandinavian
+  'bsc-main': dict(h='Finish the setup, then castle', b=[
+    ('pieces', 'The queen\'s knight comes out behind the c-pawn, then the dark bishop.'),
+    ('king', 'Castle short once both are out.'),
+    ('watch', 'White\'s knight can jump into the middle and uncover the bishop on your queen. She steps back the way the c-pawn opened.'),
+    ('them', 'White wants that knight jump, and sometimes to castle long and push the kingside pawns at your bishop.')]),
+  'bsc-e5': dict(h='Pile up on the d-pawn', b=[
+    ('target', 'White\'s d-pawn holds the chain together. Your c-pawn and queen\'s knight already hit it.'),
+    ('pawns', 'Trade the c-pawns: the file opens for the rook that already stands on it.'),
+    ('pieces', 'The king\'s knight comes out behind the e-pawn and heads for the square where it hits the d-pawn too.'),
+    ('them', 'White wants to keep the chain and use the extra space on the kingside.')]),
+  # ---------------------------------------------------------------- the King's Indian
+  'bki-main': dict(h='Hold the knight, then the f-pawn', b=[
+    ('pieces', 'Your knight sits in front of White\'s c-pawn and hits the e-pawn. Push the a-pawn two squares so the b-pawn can\'t kick it.'),
+    ('pawns', 'Then the king\'s knight steps back and the f-pawn goes two squares: that is your attack.'),
+    ('them', 'White wants to push the b-pawn at your knight and open the queenside.'),
+    ('watch', 'Until the a-pawn has moved, the b-pawn push costs your knight its square.')]),
+  'bkx-london': dict(h='A knight behind the e-pawn, then push it', b=[
+    ('pieces', 'A knight goes to the square behind your e-pawn\'s path, either one. That backs up the push.'),
+    ('pawns', 'Then the e-pawn two squares. It hits the London bishop and opens your own bishop\'s diagonal.'),
+    ('them', 'White builds slowly with the c-pawn and the light bishop. The small h-pawn move gave the London bishop a way back.')]),
   # ---------------------------------------------------------------- the Sicilian and the Caro-Kann, the side lessons
   'bsi-d4': dict(h='Two moves ahead: e-pawn, bishop, castle', b=[
     ('pawns', 'Push the e-pawn two squares next: it takes the middle and opens the road for your dark bishop.'),
@@ -717,5 +752,27 @@ LW = {
     ('target', 'Black\'s queen stands in front of its own e-pawn and light bishop. Hit it with the queen\'s knight or the dark bishop.'),
     ('pieces', 'King\'s knight out, then castle. Each hit on the queen costs Black another move.'),
     ('them', 'Black wants to bring the queen back and push the e-pawn to free the dark bishop.')]),
+  # the English: the wedge against the King's Indian setup, by two move orders
+  'en-nf6-e5v3': dict(h='Rook behind the b-pawn, then push it', b=[
+    ('pawns', 'Rook to the b-file, small a-pawn move, then the b-pawn two squares: your play is on the queenside.'),
+    ('them', 'Black\'s knight steps to the edge and the f-pawn comes two squares.'),
+    ('watch', 'When that f-pawn arrives, take it with the e-pawn.')]),
+  'en-nf6-d6v2': dict(h='Rook behind the b-pawn, then push it', b=[
+    ('pawns', 'Rook to the b-file, small a-pawn move, then the b-pawn two squares: your play is on the queenside.'),
+    ('them', 'Black\'s knight steps to the edge and the f-pawn comes two squares.'),
+    ('watch', 'When that f-pawn arrives, take it with the e-pawn.')]),
+  'en-first-nc6e6': dict(h='Take the knight, then the d-pawn', b=[
+    ('target', 'Black\'s d-pawn in the middle.'),
+    ('pieces', 'Bishop takes the knight. When the queen takes back, the d-pawn has lost both its guards and your other bishop takes it.'),
+    ('king', 'Then the knight tucks in behind the e-pawn and you castle.')]),
+  'x-odd-g6bg7': dict(h='Take the bishop, then the fork', b=[
+    ('pieces', 'Your knight hits the queen. When she moves, the other knight takes the bishop in the middle.'),
+    ('target', 'Black\'s c-pawn. Once the queen stops guarding it, your knight takes it with check and wins the corner rook.'),
+    ('pieces', 'So the dark bishop comes out with an attack on the queen, to pull her away from that pawn.')]),
 }
-LB = {}
+LB = {
+  'ba-odd2-g3exd5qf3': dict(h='Knight into the middle, castle long', b=[
+    ('pieces', 'The queen\'s knight jumps into the middle and hits White\'s queen, which has to go back home.'),
+    ('king', 'The other knight follows it into the middle, the light bishop comes out and you castle long.'),
+    ('them', 'White is two moves behind and still has to find a square for the queen.')]),
+}

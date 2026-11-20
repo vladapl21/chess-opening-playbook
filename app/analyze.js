@@ -78,15 +78,40 @@ const Analyze = (() => {
     Object.defineProperty(D, '_chOf', {value: chOf, enumerable: false}); Object.defineProperty(D, '_lineOf', {value: lesOf, enumerable: false});
     return chOf;
   }
+  /* ---- systems: a game is read against one pack per slot, never the whole library. Given picks win; without them it is
+     the pack the player's own games fit (when the library has it and it is at least three games in ten), else the first. */
+  const PACK_OF = {c4: 'flank', nf3: 'flank'};
+  function homePacks(books, habit, picks){
+    const out = {};
+    for (const D of [books.w, books.b]) for (const [slot, v] of Object.entries((D && D.packs) || {})){
+      let id = picks && v.packs[picks[slot]] ? picks[slot] : null; const h = habit[slot];
+      if (!id && !(picks && picks[slot]) && h && h.n){
+        const by = {}; for (const k in h.opts){ const pk = PACK_OF[k] || k; by[pk] = (by[pk] || 0) + h.opts[k]; }
+        const top = Object.keys(by).sort((a, b) => by[b] - by[a])[0]; if (top && v.packs[top] && by[top] / h.n >= 0.3) id = top;
+      }
+      out[slot] = id || v.default;
+    }
+    return out;
+  }
+  // the nodes on the lines of the chapters in play (null: the book has one pack per slot, so all of it is in play)
+  function inPlay(D, home){
+    const off = new Set(); for (const [slot, v] of Object.entries(D.packs || {})) for (const id in v.packs) if (id !== home[slot]) v.packs[id].forEach(c => off.add(c));
+    if (!off.size) return null;
+    const partCh = {}; for (const p of D.parts) partCh[p.id] = p.ch;
+    const lesCh = {}; for (const l of D.lessons) lesCh[l.id] = partCh[l.part];
+    const ok = new Set([0]); for (const ln of D.lines){ const ch = lesCh[ln.lesson]; if (ch && !off.has(ch)) for (const i of ln.n) ok.add(i); }
+    return ok;
+  }
   // Follow a game through a book: how far it stays in, who left first and with what.
   // After the player leaves, the walk goes on as a shadow (the book's move for them, the opponent's real moves) for as long
   // as the opponent stays in the book, because the chapter is decided by what the opponent set up, not by the player's slip.
-  function walk(D, ucis, me){
+  function walk(D, ucis, me, ok){
     const N = D.nodes, chOf = indexBook(D), isMine = ply => (ply % 2 === 0) === (me === 'w');
-    const bookKid = n => (N[n].k || []).find(c => !!N[c].w === (me === 'w') && !(N[c].g || []).includes('warn'));
+    const kids = n => ok ? (N[n].k || []).filter(c => ok.has(c)) : (N[n].k || []);
+    const bookKid = n => kids(n).find(c => !!N[c].w === (me === 'w') && !(N[c].g || []).includes('warn'));
     let node = 0, ply = 0, ch = null, out = null;
     for (; ply < ucis.length; ply++){
-      const k = (N[node].k || []).find(c => N[c].u === ucis[ply]);
+      const k = kids(node).find(c => N[c].u === ucis[ply]);
       if (k !== undefined && !(isMine(ply) && (N[k].g || []).includes('warn'))){ node = k; if (chOf[node]) ch = chOf[node]; continue; }
       out = {ply, node, by: isMine(ply) ? 'me' : 'opp', uci: ucis[ply], warned: k !== undefined};
       break;
@@ -96,7 +121,7 @@ const Analyze = (() => {
       let n = bookKid(node);
       for (let q = ply + 1; n !== undefined && q < ucis.length; q++){
         if (chOf[n]) ch = chOf[n];
-        n = isMine(q) ? bookKid(n) : (N[n].k || []).find(c => N[c].u === ucis[q]);
+        n = isMine(q) ? bookKid(n) : kids(n).find(c => N[c].u === ucis[q]);
       }
       if (n !== undefined && chOf[n]) ch = chOf[n];
       out.hasBook = bookKid(node) !== undefined;
@@ -129,7 +154,7 @@ const Analyze = (() => {
   }
 
   /* ---- the whole set */
-  async function run(input, user, books, onProgress){
+  async function run(input, user, books, onProgress, picks){
     const raw = typeof input === 'string' ? parsePGN(input) : input;
     user = (user || guessUser(raw) || '').toLowerCase();
     const tick = () => new Promise(r => setTimeout(r, 0)), games = [];
@@ -139,10 +164,13 @@ const Analyze = (() => {
     }
     games.sort((a, b) => b.t - a.t);
     if (onProgress) onProgress({stage: 'read', done: raw.length, of: raw.length});
-    return profile(games, user, books);
+    return keep(profile(games, user, books, picks), games);
   }
+  // the games as read stay with the profile for this visit (not stored), so it can be made again for other picks at once
+  const keep = (P, games) => Object.defineProperty(P, '_games', {value: games, enumerable: false});
+  const again = (P, books, picks) => P && P._games ? keep(profile(P._games, P.user, books, picks), P._games) : P;
 
-  function profile(games, user, books){
+  function profile(games, user, books, picks){
     const P = {v: 1, user, n: games.length, made: Date.now(), all: tally(), white: {all: tally(), first: {}, systems: {}, off: 0}, black: {all: tally(), vs: {}, systems: {}, off: 0},
       slots: {}, buckets: {}, leaks: [], warned: [], games: []};
     // rating: the time control played most, its latest and best rating
@@ -153,7 +181,12 @@ const Analyze = (() => {
     P.from = games.length ? games[games.length - 1].t : 0; P.to = games.length ? games[0].t : 0;
     const slot = (name, key, label, r) => { const s = P.slots[name] = P.slots[name] || {n: 0, opts: {}}; s.n++; add(s.opts[key] = s.opts[key] || Object.assign(tally(), {name: label}), r); };
     const bucket = (name, key, r) => add((P.buckets[name] = P.buckets[name] || {})[key] = (P.buckets[name] || {})[key] || tally(), r);
-    const leak = {}, warn = {};
+    const leak = {}, warn = {}, habit = {};
+    for (const g of games){
+      const sl = g.me === 'w' ? 'white' : g.sans[0] === 'e4' ? 'blackE4' : g.sans[0] === 'd4' ? 'blackD4' : null, f = sl && nameIn(sl, g.sans);
+      if (f){ const h = habit[sl] = habit[sl] || {n: 0, opts: {}}; h.n++; h.opts[f.key] = (h.opts[f.key] || 0) + 1; }
+    }
+    const home = P.home = homePacks(books, habit, picks), okOf = {w: inPlay(books.w, home), b: inPlay(books.b, home)};
     games.forEach((g, gi) => {
       const side = g.me === 'w' ? P.white : P.black, D = books[g.me], r = g.res;
       add(P.all, r); add(side.all, r);
@@ -168,7 +201,7 @@ const Analyze = (() => {
         else if (first === 'd4'){ const o = nameIn('blackD4', g.sans); slot('blackD4', o.key, o.name, r); }
       }
       // where it sits in the books
-      const w = walk(D, g.ucis, g.me), inBook = !!w.ch;
+      const w = walk(D, g.ucis, g.me, okOf[g.me]), inBook = !!w.ch;
       // systems: how often each chapter's setup was faced. off: games where the player's own first move was not the playbook's
       if (inBook) add(side.systems[w.ch] = side.systems[w.ch] || Object.assign(tally(), {depth: 0}), r), side.systems[w.ch].depth += w.ply;
       if (!inBook || (w.by === 'me' && w.ply <= 1)) side.off++;
@@ -212,6 +245,6 @@ const Analyze = (() => {
     return out.sort((a, b) => b.d - a.d);
   }
 
-  return {parsePGN, guessUser, run, profile, replay, walk, nameIn, score, pct, timeClass, NAMES};
+  return {parsePGN, guessUser, run, again, profile, replay, walk, homePacks, nameIn, score, pct, timeClass, NAMES};
 })();
 if (typeof module !== 'undefined') module.exports = Analyze;

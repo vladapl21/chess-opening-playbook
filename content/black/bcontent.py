@@ -523,3 +523,6 @@ L('bo-misc', 'bo-rare', 'Edge moves and the b-pawn', 'Take the center; the b-paw
 import bslav  # noqa: E402,F401  the Slav setup against the d-pawn (registers its lessons)
 import bsicilian  # noqa: E402,F401  the Sicilian with the small e-pawn and a-pawn moves (its own pack)
 import bcaro  # noqa: E402,F401  the Caro-Kann: a second system against the e-pawn (its own pack)
+import bscandi  # noqa: E402,F401  the Scandinavian: another system against the e-pawn (its own pack)
+import bkid  # noqa: E402,F401  the King's Indian: another system against the d-pawn (its own pack, two chapters)
+import bodd  # noqa: E402,F401  odd first and second moves and the Halloween Gambit, in the house chapters

@@ -113,15 +113,16 @@ const CATALOG = [
   {slot: 'white', ask: 'With White, would you rather…', flip: false, opts: [
     {id: 'e4', keys: ['e4'], ready: true, name: 'Open with the e-pawn', line: 'e4 e5 Nf3 Nc6 Bc4', pitch: 'Fast development and open lines. Your bishop aims at f7 from move three, and every reply has a ready answer.'},
     {id: 'd4', keys: ['d4'], ready: false, name: 'Open with the d-pawn (London)', line: 'd4 d5 Bf4 Nf6 e3 e6 Nf3 c5 c3', pitch: 'One setup in one order against almost anything, with a trick ready for each of Black\'s usual tries.'},
-    {id: 'flank', keys: ['c4', 'nf3'], ready: false, name: 'Start from the side', line: 'c4 e5 Nc3 Nf6 g3', pitch: 'Hold the centre pawns back and steer the game to your kind of position.'}]},
+    {id: 'flank', keys: ['c4', 'nf3'], ready: false, name: 'Start from the side (English)', line: 'c4 e5 Nc3 Nf6 g3', pitch: 'C-pawn, knight, fianchetto: one setup against nearly everything, and Black never gets the game they prepared for.'}]},
   {slot: 'blackE4', ask: 'Against the e-pawn, would you rather…', flip: true, chapters: ['italian', 'ruy', 'scotch', 'vienna', 'attacks'], opts: [
     {id: 'e5', keys: ['e5'], ready: true, name: 'Meet it head-on', line: 'e4 e5 Nf3 Nc6 Bc4 Bc5', pitch: 'Your own e-pawn, your bishop on the same diagonal as theirs, and an early castle. Classical and direct.'},
     {id: 'sicilian', keys: ['sicilian'], ready: false, name: 'Fight from the side (Sicilian)', line: 'e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6', pitch: 'Unbalanced from move one. More to learn and more winning chances.'},
     {id: 'caro', keys: ['caro'], ready: false, name: 'Build a wall (Caro-Kann)', line: 'e4 c6 d4 d5 Nc3 dxe4 Nxe4', pitch: 'A sound pawn structure, few early tactics and a good bishop.'},
+    {id: 'scandi', keys: ['scandi'], ready: false, name: 'Hit the e-pawn at once (Scandinavian)', line: 'e4 d5 exd5 Qxd5 Nc3 Qa5', pitch: 'One setup after the queen comes out: knight, c-pawn, bishop, e-pawn. Little theory and the same moves every game.'},
     {id: 'french', keys: ['french'], ready: false, name: 'Lock the centre (French)', line: 'e4 e6 d4 d5 e5 c5', pitch: 'A closed centre and a clear plan against White\'s pawn chain.'}]},
   {slot: 'blackD4', ask: 'Against the d-pawn, would you rather…', flip: true, chapters: ['slav', 'london', 'd4x'], opts: [
     {id: 'slav', keys: ['slav'], ready: true, name: 'One solid setup (Slav)', line: 'd4 d5 c4 c6 Nf3 Nf6 e3 Bf5', pitch: 'D-pawn, c-pawn, bishop out, e-pawn: the same order against every d-pawn system.'},
-    {id: 'kid', keys: ['kid'], ready: false, name: 'Let them build, then strike', line: 'd4 Nf6 c4 g6 Nc3 Bg7 e4 d6', pitch: 'A fianchetto bishop behind your pawns and an attack on the kingside (King\'s Indian).'},
+    {id: 'kid', keys: ['kid'], ready: false, name: 'Let them build, then strike (King\'s Indian)', line: 'd4 Nf6 c4 g6 Nc3 Bg7 e4 d6', pitch: 'Five moves in the same order against every d-pawn system, then your e-pawn hits the middle.'},
     {id: 'qgd', keys: ['qgd', 'nimzo'], ready: false, name: 'The classical defence', line: 'd4 d5 c4 e6 Nc3 Nf6', pitch: 'D-pawn and e-pawn side by side: hard to break down, with a quieter bishop.'}]}
 ];
 const STYLE = [
@@ -135,6 +136,8 @@ const STYLE = [
 function fenOf(line){ const c = new Chess(); let last = null; for (const s of line.split(' ')){ const m = c.move(s, {sloppy: true}); if (m) last = [m.from, m.to]; } return {fen: c.fen().split(' ')[0], last}; }
 // a system is ready when the library has a pack for it (or it is the system the books were first written for)
 for (const C of CATALOG) for (const o of C.opts) o.ready = o.ready || [BOOKS.w, BOOKS.b].some(D => ((D.packs || {})[C.slot] || {packs: {}}).packs[o.id]);
+// the pack in play in every slot (the month's games are read against these)
+const packsNow = () => { const o = {}; for (const D of [BOOKS.w, BOOKS.b]) for (const [slot, v] of Object.entries((D.full || D).packs || {})) o[slot] = (typeof PICKS !== 'undefined' && PICKS[slot]) || v.default; return o; };
 const packSlots = () => [BOOKS.w, BOOKS.b].flatMap(D => Object.entries(D.packs || {}).filter(([, v]) => Object.keys(v.packs).length > 1).map(([slot, v]) => ({slot, D, v})));
 // the systems this player has chosen, for the slots where the library offers a choice
 function wantPacks(){ const src = PERSONA === 'ready' ? (meOf(Prog.d) || {}).picks : Prog.d.packs, out = {}; for (const {slot, v} of packSlots()) if (src && v.packs[src[slot]] && src[slot] !== v.default) out[slot] = src[slot]; return out; }
@@ -196,7 +199,7 @@ function makeChoices(P){
     const s = P.slots[C.slot]; if (!s || s.n < 5) continue;
     const share = o => o.keys.reduce((a, k) => a + ((s.opts[k] || {}).n || 0), 0), tal = o => o.keys.reduce((a, k) => { const t = s.opts[k]; if (t){ a.n += t.n; a.w += t.w; a.l += t.l; a.d += t.d; } return a; }, {n: 0, w: 0, l: 0, d: 0});
     const top = C.opts.slice().sort((a, b) => share(b) - share(a))[0], own = share(top) / s.n >= 0.3 ? top : null, ready = C.opts.filter(o => o.ready);
-    const opts = (own ? [own] : []).concat(ready.filter(o => o !== own)).slice(0, 3);
+    const opts = (own ? [own] : []).concat(ready.filter(o => o !== own)).slice(0, 4);
     if (opts.length < 2) continue;
     out.push({id: C.slot, ask: C.ask, kind: 'system', flip: C.flip, opts: opts.map(o => Object.assign({}, o, {t: tal(o), of: s.n}))});
   }
@@ -440,7 +443,7 @@ const Product = {
     stage(3, plural(P.leaks.length, 'spot')); say(P.leaks[0] ? `One position came up ${plural(P.leaks[0].n, 'time')} and you left the playbook the same way each time. We'll fix that one first.` : 'You stay in the book longer than most.'); await wait(1700);
     stage(4); say(tb ? `Against you, White goes for the ${cn('b', tb[0])} most. Nearly done.` : 'Nearly done.'); await wait(1300);
     stage(5); clearInterval(anim);
-    this.pool = ''; this.short = null; Prog.d.me = {state: 'new', since: this.me().since || Date.now(), updated: Date.now(), src: this.src || {site: 'pgn', user}, P}; Prog.save();
+    this.pool = ''; this.short = null; this.fresh = P; Prog.d.me = {state: 'new', since: this.me().since || Date.now(), updated: Date.now(), src: this.src || {site: 'pgn', user}, P}; Prog.save();
     S.view = 'findings'; render(); setHash(); window.scrollTo({top: 0});
   },
   /* -- what the games say */
@@ -487,13 +490,16 @@ const Product = {
     };
     return `<section class="wyr"><p class="kicker">Step 3 of 3 · would you rather · ${this.ci + 1} of ${this.cards.length}</p><div class="pdots" aria-hidden="true">${dots}</div>
       <div class="say"><div class="cface">${knightSVG()}</div><p>${esc(Q.ask)}</p></div>
-      <div class="duo${Q.opts.length > 2 ? ' trio' : ''}">${Q.opts.map(opt).join('<span class="or">or</span>')}</div>
+      <div class="duo${Q.opts.length > 3 ? ' quad' : Q.opts.length > 2 ? ' trio' : ''}">${Q.opts.map(opt).join('<span class="or">or</span>')}</div>
       ${this.ci ? `<button class="btn ghost" data-cback>Back</button>` : ''}</section>`;
   },
   pick(id){
     this.picks[this.cards[this.ci].id] = id;
     if (++this.ci < this.cards.length) return render();
-    Prog.d.me = Object.assign({}, this.me(), {state: 'ready', picks: this.picks, updated: Date.now()}); Prog.save(); this.cards = null;
+    // the games were read against the systems they fit; with another one picked, read them again against the book being built
+    const F = this.fresh, P0 = this.me().P, moved = F && F._games && P0 && P0.home && Object.keys(P0.home).some(s => this.picks[s] && this.picks[s] !== P0.home[s]);
+    const P = moved ? Analyze.again(F, {w: BOOKS.w.full, b: BOOKS.b.full}, this.picks) : null;
+    Prog.d.me = Object.assign({}, this.me(), P ? {P} : {}, {state: 'ready', picks: this.picks, updated: Date.now()}); Prog.save(); this.cards = this.fresh = null;
     S.view = 'built'; render(); setHash();
   },
   builtHTML(){
@@ -510,7 +516,7 @@ const Product = {
     const group = s => { const side = s === 'w' ? P.white : P.black, sys = side.systems || {}, n = id => (sys[id] || {}).n || 0;
       const cs = BOOKS[s].chapters.slice().sort((a, b) => n(b.id) - n(a.id));
       return `<div class="ogroup"><p class="kicker">With ${s === 'w' ? 'White' : 'Black'}${side.all && side.all.n ? ` · ${plural(side.all.n, 'game')} · ${rec(side.all)}` : ''}</p><div class="otiles">${cs.map(C => openTile(s, C, sys[C.id], `data-pch="${s}:${C.id}"`)).join('')}</div></div>`; };
-    const leaks = P.leaks.slice(0, 8), games = P.games.slice(0, 40);
+    const leaks = P.leaks.filter(L => BOOKS[L.side].chapters.some(c => c.id === L.ch)).slice(0, 8), games = P.games.slice(0, 40);   // only where the book in play was left
     const segs = [['open', 'Your openings', BOOKS.w.chapters.length + BOOKS.b.chapters.length, 'Openings'], ['leaks', 'Where you leave the book', leaks.length, 'Off the book'], ['games', 'Recent games', games.length, 'Games']].filter(x => x[0] === 'open' || x[2]);
     segs.splice(1, 0, ['last', 'Last 3 games', undefined, 'Last 3']);
     if (Recap.on()) segs.push(['recap', 'Monthly recap', undefined, 'Recap']);
@@ -1110,7 +1116,7 @@ const Recap = {
     this.busy = true; this.got = 0; this.err = ''; this.tried = now; this.paint();
     try {
       for (const k of ks){
-        const text = await this.read(a, k), P = await Analyze.run(text, a.user, {w: BOOKS.w.full, b: BOOKS.b.full}, p => { this.got = p.done; this.paint(true); });
+        const text = await this.read(a, k), P = await Analyze.run(text, a.user, {w: BOOKS.w.full, b: BOOKS.b.full}, p => { this.got = p.done; this.paint(true); }, packsNow());
         st.m[k] = this.sum(P, k);
       }
       st.chk = Date.now(); Prog.save();
