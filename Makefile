@@ -24,10 +24,13 @@ test: build
 	$(PY) tests/e2e_packs.py
 	$(PY) tests/e2e_daily.py
 	$(PY) tests/e2e_shop.py
+	$(PY) tests/e2e_recap.py
 	$(PY) tests/e2e_artifact_sync.py
 	$(PY) tests/e2e_library.py
+	$(PY) tests/e2e_tour.py
 	node tests/analyze_check.js
 	node tests/nudge_check.mjs
+	node tests/ideas_check.js
 
 # Engine and wording checks: the Black book, and the White book's packs after the first (the London)
 check:

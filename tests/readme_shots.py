@@ -3,7 +3,7 @@
     python3 tests/readme_shots.py
 
 Needs Playwright and Pillow. The page loads its fonts from Google Fonts; on a machine without internet
-access, point FONTS_DIR at the `ofl` folder of a google/fonts checkout (bodonimoda, instrumentsans and
+access, point FONTS_DIR at the `ofl` folder of a google/fonts checkout (barlow, barlowcondensed and
 jetbrainsmono are enough) and the fonts are served from disk instead.
 """
 import io, os, sys
@@ -125,14 +125,15 @@ with sync_playwright() as p:
         idle(pg); tap(pg, pg.evaluate('N[LINES[S.drill.id].n[S.drill.i + 1]].u')); pg.wait_for_timeout(1600)
     idle(pg); pg.wait_for_timeout(300); pg.evaluate("Coach.hush(); window.scrollTo(0, 0)"); settle(pg)
     save(pg.screenshot(), 'play.png'); pg.evaluate("S.drill = S.drillState = null")
-    pg.evaluate("localStorage.clear()"); pg.goto(URL + '#learn'); pg.reload(); pg.wait_for_timeout(900); settle(pg)
+    pg.evaluate("localStorage.clear()"); pg.goto(URL + '#learn'); pg.reload(); pg.wait_for_timeout(900); pg.evaluate("Coach.hush()"); settle(pg)
     save(pg.screenshot(), 'learn-white.png')
-    pg.click('.sidesw [data-side="b"]'); pg.wait_for_timeout(700); pg.evaluate("go('learn')"); pg.wait_for_timeout(500); settle(pg)
+    pg.click('.sidesw [data-side="b"]'); pg.wait_for_timeout(700); pg.evaluate("go('learn')"); pg.wait_for_timeout(500); pg.evaluate("Coach.hush()"); settle(pg)
     save(pg.screenshot(), 'learn-black.png')
 
-    # Study: the Scotch lesson, a few moves in
+    # Study: the Scotch lesson at the first move past the opening moves where the board adds something to the book's words
     pg.evaluate("openLine('bs-classical')"); pg.wait_for_timeout(400)
-    for _ in range(9): pg.keyboard.press('ArrowRight'); pg.wait_for_timeout(120)
+    k = pg.evaluate("(() => { const n = LINES['bs-classical'].n; for (let i = S.i + 4; i < n.length; i++) if (ideasBeyond(n[i]).some(x => IDEA_TACT.test(x))) return i; return S.i + 9; })()")
+    pg.evaluate(f"openLine('bs-classical', {k})"); pg.wait_for_timeout(500); pg.evaluate("Coach.hush()")
     settle(pg, 500); save(pg.screenshot(), 'study.png')
 
     # Drill: three moves into the Berlin, next piece picked up
@@ -205,6 +206,16 @@ with sync_playwright() as p:
     pg.evaluate("Coach.hush(); window.scrollTo(0, 0)"); settle(pg)
     box = pg.evaluate("(() => { const b = document.querySelector('#db').getBoundingClientRect(), d = document.querySelector('.donebox').getBoundingClientRect(); return [b.left - 16, b.top - 16, d.right + 16, Math.max(b.bottom, d.bottom) + 16]; })()")
     save(pg.screenshot(), 'slip.png', crop=tuple(round(v * 2) for v in box))
+    # every move explained: in the Two Knights the knight takes the e-pawn instead of jumping in, and the answer that punishes it
+    pg.evaluate("useSide('w'); startDrillLine('fried-liver', '', null, {from0: true})"); pg.wait_for_timeout(800)
+    for _ in range(40):
+        idle(pg)
+        if pg.evaluate('S.drill.i') + 1 >= 7: break
+        tap(pg, pg.evaluate('N[LINES[S.drill.id].n[S.drill.i + 1]].u')); pg.wait_for_timeout(1300)
+    idle(pg); tap(pg, 'f3e5'); pg.wait_for_timeout(900); idle(pg); tap(pg, 'f3e5'); pg.wait_for_timeout(900)   # twice: the second miss adds the arrow and why
+    pg.evaluate("Coach.hush(); window.scrollTo(0, 0)"); settle(pg)
+    box = pg.evaluate("(() => { const b = document.querySelector('#db').getBoundingClientRect(), d = document.getElementById('dpanel').getBoundingClientRect(); return [b.left - 16, Math.min(b.top, d.top) - 16, d.right + 16, Math.max(b.bottom, d.bottom) + 16]; })()")
+    save(pg.screenshot(), 'ideas.png', crop=tuple(round(v * 2) for v in box)); pg.evaluate("S.drill = S.drillState = null")
     # the course finished: the big moment, then the library (a few slips on the Vienna unit's lines)
     pg.evaluate("""(() => { const t = Date.now() - 24 * DAY, c = Prog.d.course || (Prog.d.course = {u: {}, seen: {}}); c.u = c.u || {};
       for (const U of COURSE.filter(U => !U.soon)) c.u[U.id] = Object.assign({idea: t, spar: 3, sparGames: 3 + U.k % 3}, c.u[U.id] || {}, {pass: t + DAY * U.k, cp: U.id === 'w-sicilian' ? 5 : 6});
@@ -225,6 +236,14 @@ with sync_playwright() as p:
     pg.evaluate("startPuzzle(DATA.puzzles.findIndex(p => p.id === 'gb-charizard-47'))"); pg.wait_for_timeout(500); settle(pg)
     save(pg.screenshot(), 'puzzle.png')
     ctx.close()
+
+    # The tour on a first visit: the Play along step, the board lit with the arrow on it and the coach's card beside it
+    c = b.new_context(viewport={'width': 1280, 'height': 860}, device_scale_factor=2); local_fonts(c)
+    q = c.new_page(); q.on('pageerror', lambda e: errors.append(str(e))); q.goto(URL + '#course'); q.wait_for_timeout(900)
+    q.evaluate("Tour.start(false)"); q.wait_for_timeout(500)
+    q.evaluate("Tour.k = Tour.steps.findIndex(st => st.h === 'Play along'); Tour.show()"); q.wait_for_timeout(2200)
+    settle(q, 400); q.evaluate("Tour.place()"); q.wait_for_timeout(200)
+    save(q.screenshot(), 'tour.png'); c.close()
 
     # Three phones: Learn (light), a lesson (dark), the openings in Your games (light)
     phones = []

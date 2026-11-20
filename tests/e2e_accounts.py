@@ -197,11 +197,17 @@ with sync_playwright() as p:
     assert a.evaluate("[Prog.d.course.grad, Prog.d.course.u['x-w-italian-1'].cp]") == [1700000000000, 4]
     a.evaluate("Prog.d.course.grad = 1800000000000; Prog.save()"); a.wait_for_timeout(1800)
     assert S.rows[uid]['data']['course']['grad'] == 1700000000000 and a.evaluate("Prog.d.course.grad") == 1700000000000
+    # the tour, taken on one device, is taken on every device (the earliest time wins)
+    bp.evaluate("Prog.d.tour = {done: 1750000000000}; Prog.save()"); bp.wait_for_timeout(1800)
+    a.evaluate("document.dispatchEvent(new Event('visibilitychange'))"); a.wait_for_timeout(900)
+    assert a.evaluate("Prog.d.tour && Prog.d.tour.done") == 1750000000000
+    a.evaluate("Prog.d.tour = {done: 1760000000000}; Prog.save()"); a.wait_for_timeout(1800)
+    assert S.rows[uid]['data']['tour']['done'] == 1750000000000 and a.evaluate("Prog.d.tour.done") == 1750000000000
     # a page from an older version writes a smaller copy: the next save on any device writes everything back
-    row = S.rows[uid]['data']; S.rows[uid]['data'] = {k: v for k, v in row.items() if k not in ('days', 'prefs', 'set', 'shop', 'badges', 'lvl', 'recap')}
+    row = S.rows[uid]['data']; S.rows[uid]['data'] = {k: v for k, v in row.items() if k not in ('days', 'prefs', 'set', 'shop', 'badges', 'lvl', 'recap', 'tour')}
     a.evaluate("Prog.save()"); a.wait_for_timeout(1800)
     row = S.rows[uid]['data']; print('after an older copy and one save:', sorted(row.keys()))
-    assert all(k in row for k in ('days', 'prefs', 'shop', 'badges', 'lvl', 'recap')) and row['prefs']['who'][0] == 'rook' and row['prefs']['board'][0] == 'plum'
+    assert all(k in row for k in ('days', 'prefs', 'shop', 'badges', 'lvl', 'recap', 'tour')) and row['prefs']['who'][0] == 'rook' and row['prefs']['board'][0] == 'plum'
 
     # ---- the account copy can't be reached: the app says so, keeps working, and catches up later
     S.down = True
