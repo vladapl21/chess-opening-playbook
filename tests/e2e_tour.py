@@ -8,7 +8,7 @@ stays on the screen and nothing scrolls sideways. Over local HTTP, the website's
 import sys, json, time
 sys.path.insert(0, __import__('os').path.dirname(__file__))
 from playwright.sync_api import sync_playwright
-from e2e_white import launch, out
+from e2e_white import launch, out, click_move
 from serve import Site
 site = Site(docs=True); URL = site.start()
 errors = []
@@ -61,30 +61,36 @@ with sync_playwright() as p:
     pg.mouse.click(tab['x'] + tab['width'] / 2, tab['y'] + tab['height'] / 2); pg.mouse.click(20, 840); pg.wait_for_timeout(300)
     assert pg.evaluate('[Tour.on, Tour.k, S.view]') == [True, 0, v0], pg.evaluate('[Tour.on, Tour.k, S.view]')
 
-    # ---- a step that asks for a tap: done by hand, it goes on by itself
+    # ---- the tabs: both books are in every one of them, and there is no colour to switch to
     pg.click('[data-tour="next"]'); pg.wait_for_function('Tour.k === 1'); pg.wait_for_timeout(500)
-    assert 'Tap Black' in pg.inner_text('.twcard') and pg.inner_text('[data-tour="next"]') == 'Show me'
-    ring = pg.evaluate("(() => { const a = document.querySelector('.twring').getBoundingClientRect(), b = document.querySelector('.top .sidesw').getBoundingClientRect(); return a.left <= b.left && a.right >= b.right && a.top <= b.top && a.bottom >= b.bottom; })()")
-    assert ring, 'the ring goes round the colour switch'
-    pg.click('.top .sidesw [data-side="b"]'); pg.wait_for_function('Tour.k === 2', timeout=5000)
-    assert pg.evaluate('SIDE') == 'b'
-    pg.screenshot(path=out + 't_side.png')
-    # ---- Show me: the coach taps it
-    pg.click('[data-tour="next"]'); pg.wait_for_function('Tour.k === 3 && SIDE === "w"', timeout=5000)
+    card = pg.inner_text('.twcard'); assert 'Five tabs' in card and 'both in here' in card and 'Tap Black' not in card, card
+    assert pg.locator('.top .sidesw, #brandKick').count() == 0, 'no White/Black switch in the header'
+    ring = pg.evaluate("(() => { const a = document.querySelector('.twring').getBoundingClientRect(), b = document.querySelector('.tabs').getBoundingClientRect(); return a.left <= b.left && a.right >= b.right && a.top <= b.top && a.bottom >= b.bottom; })()")
+    assert ring, 'the ring goes round the tabs'
+    pg.screenshot(path=out + 't_tabs.png')
     # ---- inside the spotlight of a step that only explains, the page can't be tapped either
     tab = pg.locator('.tabs [data-view="drill"]').bounding_box()
     pg.mouse.click(tab['x'] + tab['width'] / 2, tab['y'] + tab['height'] / 2); pg.wait_for_timeout(300)
-    assert pg.evaluate('[Tour.k, S.view]') == [3, v0]
-    # ---- Back: the step before, set up again
-    pg.click('[data-tour="back"]'); pg.wait_for_function('Tour.k === 2 && SIDE === "b"', timeout=5000)
-    pg.click('[data-tour="next"]'); pg.wait_for_function('Tour.k === 3 && SIDE === "w"', timeout=5000)
+    assert pg.evaluate('[Tour.k, S.view]') == [1, v0]
+    # ---- a step that asks for a move: played by hand, it goes on by itself
+    ka = pg.evaluate("Tour.steps.findIndex(st => Tour.words(st).h === 'Play along')"); assert ka > 1, ka
+    while pg.evaluate('Tour.k') < ka:
+        k0 = pg.evaluate('Tour.k'); pg.click('[data-tour="next"]'); pg.wait_for_function(f'Tour.k === {k0 + 1}', timeout=5000); pg.wait_for_timeout(400)
+    pg.wait_for_function("S.drill && S.drill.guided && !S.drill.busy && S.drill.state === 'play' && !!document.querySelector('#db svg')", timeout=5000); pg.wait_for_timeout(700)
+    assert "Play the arrow's move" in pg.inner_text('.twcard') and pg.inner_text('[data-tour="next"]') == 'Show me'
+    u = pg.evaluate("N[LINES[S.drill.id].n[S.drill.i + 1]].u"); click_move(pg, u[:2], u[2:4])
+    pg.wait_for_function(f'Tour.k === {ka + 1}', timeout=5000)
+    pg.screenshot(path=out + 't_along.png')
+    # ---- Back: the step before, set up again. Show me: the coach plays the move
+    pg.click('[data-tour="back"]'); pg.wait_for_function(f"Tour.k === {ka} && S.drill && S.drill.guided && S.drill.i === S.drill.s0", timeout=5000); pg.wait_for_timeout(400)
+    pg.click('[data-tour="next"]'); pg.wait_for_function(f'Tour.k === {ka + 1}', timeout=6000)
 
     # ---- fast forward: the rest plays by itself
     seen = []; secs = ff_to_end(pg, seen)
     titles = [s for s in seen if not s.startswith('#')]; marks = set(s for s in seen if s.startswith('#'))
     print(f'fast forward: {len(set(titles))} steps in {secs:.0f} s; seen:', sorted(marks))
     assert {'#along', '#pun', '#arrow', '#explore', '#opts'} <= marks, marks
-    assert {'Play along', 'Play on with the engine', 'The explore board', 'Your games', 'The Sandbox', 'Settings'} <= set(titles), titles
+    assert {'I explain every move', 'Play on with the engine', 'The explore board', 'Your games', 'The Sandbox', 'The daily shop', 'Settings'} <= set(titles), titles
 
     # ---- nothing from the tour is kept as progress; the tour itself is
     assert pg.evaluate(keep) == before and pg.evaluate('Level.xp()') == xp0, 'the tour leaves no progress behind'
@@ -113,13 +119,13 @@ with sync_playwright() as p:
     SETTINGS = {'Appearance': 'light or dark', 'Text size': 'text size', 'Board colour': 'board colours', 'Your coach': 'your coach',
                 'The tour': 'this tour'}
     slots = pg.evaluate("Object.keys(DATA_W.packs || {}).concat(Object.keys(DATA_B.packs || {})).map(k => slotName(k))")
-    FEATURES = {'two books': 'two books', 'play along': 'play along', 'move explanations': 'what it does',
+    FEATURES = {'both colours in one place': 'both in here', 'the Sandbox with both colours': 'white and black in turn', 'play along': 'play along', 'move explanations': 'what it does',
                 'a slip and its punishment': 'punishes', 'play on with the engine': 'play on with the engine',
                 'the explore board': 'explore board', 'the engine in lessons': 'the engine in lessons',
                 'the plan at the end of every line': 'plan', 'opening names': "opening's real name",
                 'practice from a position': 'set up a position', 'the last three games': 'last 3 games',
-                'levels': 'level', 'the streak': 'streak', 'the shop': 'new look', 'the account': 'sign in',
-                'the coach': 'tap me', 'marks on the moves': 'key move', 'your moves in order': 'in another order',
+                'levels': 'level', 'the streak': 'streak', 'the daily shop': 'new pieces every day', 'the locker': 'from your locker', 'the account': 'sign in',
+                'the coach': 'tap me', 'marks on the moves': 'key move', 'marks on the board': 'on the board beside the piece', 'your moves in order': 'in another order',
                 'numbers on the board': 'numbers on the board', 'a game that left the book': 'leaves your book',
                 'a move played too early': 'wrong moment'}
     missing = [f'tab {t}' for t in tabs if t.lower() not in said] + [f'Your games: {g}' for g in segs if g.lower() not in said] \

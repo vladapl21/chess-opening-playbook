@@ -145,7 +145,7 @@ L('ck-takes', 'caro-main', 'Black lets you take the bishop', 'Your knight takes 
   alts=[('ck-takes-nf6', 'Knight out: the bishop hangs', J(CKX, "Bf5 Ng3 Nf6 Nxf5 e6 Ne3")),
         ('ck-takes-qa5', 'The queen-check rescue', J(CKX, "Bf5 Ng3 Nf6 Nxf5 Qa5+ Bd2 Qxf5 Nf3"))],
   why='You won a whole piece this way against ykayyy.', outcome='Two bishops for you, weak pawns for Black', tags=['game'])
-L('ck-nf6', 'caro-other4', 'Knight trade, broken pawns', 'Take the knight, then bishop and queen at the king', 'core',
+L('ck-nf6', 'caro-other4', 'A knight trade and broken pawns', 'Take the knight, then bishop and queen at the king', 'core',
   J(CKX, "Nf6 Nxf6+ exf6 c3 Bd6 Bd3 O-O Ne2 Re8 Qc2"),
   alts=[('ck-nf6-be7', 'Quiet bishop', J(CKX, "Nf6 Nxf6+ exf6 c3 Be7 Bd3 O-O Ne2 Re8 Qc2")),
         ('ck-nf6-gxf6', 'Pawn takes toward the side', J(CKX, "Nf6 Nxf6+ gxf6 c3 Bf5 Nf3 e6 Be2")),
@@ -200,7 +200,7 @@ L('sc-d5', 'sic-knight', 'Black strikes the center', 'Take, develop, and watch f
         ('sc-d5-e6', 'Pawn to the side', J(SN, "d5 exd5 Qxd5 Nf3 Bg4 Be2 e6 O-O")),
         ('sc-d5-nf6b', 'Knight out first', J(SN, "d5 exd5 Qxd5 Nf3 Nf6 Nc3"))],
   why='Black opens the game for the queen. One greedy capture loses it.', outcome='Free development, or Black\'s queen', tags=['trap'])
-L('sc-d6', 'sic-pawn', 'The d-pawn first', 'Same big center, same push', 'core',
+L('sc-d6', 'sic-pawn', 'The d-pawn first', 'The same big center and the same push', 'core',
   J(SC, "d6 d4 cxd4 cxd4 Nf6 Nc3 g6 Nf3 Bg7 Be2 O-O O-O"),
   alts=[('sc-d6-e6', 'Pawn to the side', J(SC, "d6 d4 cxd4 cxd4 Nf6 Nc3 e6 Nf3 Be7 Bd3")),
         ('sc-d6-nc6', 'Knight in front of the pawn', J(SC, "d6 d4 cxd4 cxd4 Nf6 Nc3 Nc6 d5 Ne5 f4")),
@@ -248,7 +248,7 @@ L('sd-qa5', 'scandi-queen', 'The queen to the side', 'Develop, break the pin, ca
         ('sd-qa5-c6b', 'Knight, then the c-pawn', J(SQ, "Qa5 d4 Nf6 Nf3 c6 Bc4 Bg4 h3")),
         ('sd-qa5-bf5', 'Bishop out first', J(SQ, "Qa5 d4 Bf5 Nf3 e6 Bd2"))],
   why='A main line. Your old pawn gambit here is shown too, so you know why to drop it.', outcome='Free, quick development for you', tags=['swap'])
-L('sd-qd8', 'scandi-queen', 'The queen goes home', 'Big center, easy development', 'core',
+L('sd-qd8', 'scandi-queen', 'The queen goes home', 'A big center and easy development', 'core',
   J(SQ, "Qd8 d4 Nf6 Nf3 e6 Bd3 Bb4 O-O"),
   alts=[('sd-qd8-bg4', 'Bishop pins your knight', J(SQ, "Qd8 d4 Nf6 Nf3 Bg4 h3")),
         ('sd-qd8-e6', 'Pawn first', J(SQ, "Qd8 d4 e6 Nf3 Bb4 Bd3")),
@@ -291,7 +291,7 @@ L('sd-c6', 'scandi-other', 'The pawn gambit', 'Take it and keep it', 'rare',
 # ============================================================== Pirc and Modern
 PD = "e4 d6 d4"
 PN = J(PD, "Nf6 Nc3 g6 Be3 Bg7 Qd2")
-L('pc-150', 'pirc-150', 'Trade the bishop, go for the king', 'Queen and bishop line up; castle long and push', 'core',
+L('pc-150', 'pirc-150', 'Trade the bishop and go for the king', 'Queen and bishop line up; castle long and push', 'core',
   J(PN, "O-O O-O-O"),
   alts=[('pc-150-nc6', 'Knight out', J(PN, "O-O O-O-O Nc6 f3 e5 d5 Ne7 g4")),
         ('pc-150-nbd7', 'Knight behind the pawn', J(PN, "O-O O-O-O Nbd7 Bh6")),
@@ -299,7 +299,7 @@ L('pc-150', 'pirc-150', 'Trade the bishop, go for the king', 'Queen and bishop l
         ('pc-150-c6', 'Black waits with the c-pawn', J(PN, "c6 Bh6 O-O h4")),
         ('pc-150-ng4', 'Knight hits your bishop', J(PN, "Ng4 Bg5 O-O h3"))],
   why='The plan that wins the most club games against this setup.', outcome='Black\'s king is in danger')
-L('pc-modern', 'pirc-150', 'Bishop first: the Modern', 'Same setup, same plan', 'common',
+L('pc-modern', 'pirc-150', 'Bishop first: the Modern', 'The same setup and the same plan', 'common',
   J("e4 g6 d4 Bg7 Nc3 d6 Be3 Nf6 Qd2"),
   alts=[('pc-modern-e6', 'Pawn to the side', J("e4 g6 d4 Bg7 Nc3 e6 Be3 Ne7 Qd2")),
         ('pc-modern-c6', 'The c-pawn, then the center', J("e4 g6 d4 Bg7 Nc3 c6 Be3 d5 e5")),
@@ -336,7 +336,7 @@ L('fr-other5', 'french-adv', 'Black develops instead', 'Bishop out and castle', 
         ('fr-other5-cxd4', 'Black trades and checks', J(FC, "cxd4 cxd4 Bb4+ Nc3")),
         ('fr-other5-cxne7', 'Black trades, knight out', J(FC, "cxd4 cxd4 Nge7 a3 Nf5 Nc3"))],
   why='Calm development. Keep your pawn chain and finish your setup.', outcome='A space edge')
-L('fr-early', 'french-adv', 'Black skips the knight', 'Same structure, same ideas', 'common',
+L('fr-early', 'french-adv', 'Black skips the knight', 'The same structure with the same ideas', 'common',
   J(FR, "c5 c3 Qb6 Nf3 Nc6 a3"),
   alts=[('fr-early-cxd4', 'Trade right away', J(FR, "c5 c3 cxd4 cxd4 Nc6 Nf3")),
         ('fr-early-bb4', 'Trade, then the bishop check', J(FR, "c5 c3 cxd4 cxd4 Bb4+ Nc3")),

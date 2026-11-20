@@ -31,8 +31,8 @@ with sync_playwright() as p:
     ctx = b.new_context(viewport={'width': 1280, 'height': 900}); pg = ctx.new_page(); hook(pg)
     pg.goto(URL); pg.wait_for_timeout(900)
 
-    # ---- no counts beside White and Black or on Drill; a mark on Drill until today's five are done
-    assert pg.locator('.sidesw .badge, .tabs .badge').count() == 0
+    # ---- no colour switch in the header and no count on Drill; a mark on Drill until today's five are done
+    assert pg.locator('.top .sidesw, .tabs .badge').count() == 0
     assert pg.is_visible('#drillDot') and pg.inner_text('#drillDot') == '!'
     assert pg.is_visible('#meBtn') and pg.inner_text('#meBtn').strip() == '0'
     foot = pg.inner_text('#foot'); print('footer:', foot.replace('\n', ' | ')); assert '© ' in foot and 'coach' not in foot and 'Stockfish' not in foot   # the copyright only: where a playbook came from isn't the same for everyone

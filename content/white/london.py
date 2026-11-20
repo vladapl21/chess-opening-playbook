@@ -144,7 +144,7 @@ L('ln-kid', 'ln-fian', 'The fianchetto', 'Bishop one square, h-pawn one square, 
   outcome='Comfortable, and the e-pawn push costs Black a pawn')
 
 # ============================================================== THE E-PAWN AND THE D-PAWN
-L('ln-e6', 'ln-epawn', 'The e-pawn: back to the setup', 'Same moves, same position', 'core',
+L('ln-e6', 'ln-epawn', 'The e-pawn: back to the setup', 'The same moves reach the same position', 'core',
   J(NE, "d5 Nf3 c5 c3 Nc6 Nbd2 Bd6 Bg3 O-O Bd3"),
   alts=[('ln-e6-bd6', 'The bishop offer', J(NE, "d5 Nf3 Bd6 Bg3 Bxg3 hxg3")),
         ('ln-e6-c5', 'C-pawn and the trade', J(NE, "c5 Nf3 cxd4 exd4 Nc6 c3")),
@@ -213,7 +213,7 @@ L('lr-g6', 'lr-fian', 'The fianchetto first', 'The King\'s Indian setup by anoth
         ('lr-d6-e5x', 'The pawn takes back: trade queens, take the pawn', "d4 d6 Bf4 e5 dxe5 dxe5 Qxd8+ Kxd8 Bxe5")],
   why='One in fourteen between them. They meet the fianchetto lesson, apart from one e-pawn push to know.',
   outcome='The fianchetto lesson, or a pawn up')
-L('lr-other', 'lr-other', 'Rare first moves', 'Same setup, same bishop rule', 'rare',
+L('lr-other', 'lr-other', 'Rare first moves', 'The same setup and the same bishop rule', 'rare',
   "d4 c6 Bf4 d5 e3 Bf5 Bd3 e6 Bxf5 exf5 Nf3",
   alts=[('lr-b6', 'The b-pawn and the long diagonal', "d4 b6 Bf4 Bb7 e3 e6 Nf3 Nf6 c3 Be7 Nbd2"),
         ('lr-f5', 'The f-pawn two squares', "d4 f5 Bf4 Nf6 e3 e6 Nf3 Be7 c3 O-O Nbd2"),
@@ -234,7 +234,7 @@ n(J(D5, "Nf6 e3 e6 Nf3 c5 c3"), "C-pawn one square", "Now the d-pawn has a pawn 
 n(J(D5, "Nf6 e3 e6 Nf3 c5 c3 Nc6"), "Knight joins the attack on the d-pawn", "Two Black pieces hit it now. Two pawns, your knight and your queen guard it.")
 n(J(D5, "Nf6 e3 e6 Nf3 c5 c3 Nc6 Nbd2"), "Queen's knight beside the queen", "On this square it guards the other knight and can jump to the middle later. It goes here before the light bishop.", ['key'])
 n(J(D5, "Nf6 e3 e6 Nf3 c5 c3 Nc6 Nbd2 Bd6"), "Black's bishop offers a trade", "It stands opposite yours. A trade would take away the London bishop.")
-n(J(D5, "Nf6 e3 e6 Nf3 c5 c3 Nc6 Nbd2 Bd6 Bg3"), "Step back, keep it", "Your bishop stays on its diagonal. If Black takes it, your h-pawn takes back and your rook gets the h-file.", ['key'], arrows=['h2g3g'])
+n(J(D5, "Nf6 e3 e6 Nf3 c5 c3 Nc6 Nbd2 Bd6 Bg3"), "Step back and keep it", "Your bishop stays on its diagonal. If Black takes it, your h-pawn takes back and your rook gets the h-file.", ['key'], arrows=['h2g3g'])
 n(SET, "Light bishop out", "The last piece. It aims at the king's side, where Black has just castled. Castling is next unless Black does something first.", ['key'], arrows=['d3h7g'])
 n(J(SET, "Re8"), "Rook behind the e-pawn", "Black wants to push the e-pawn and hit your bishop.")
 n(J(SET, "Re8 Ne5"), "Knight jumps into the hole", "Before the e-pawn can move, your knight takes the square in front of it, and the push is stopped.", ['key'], arrows=['f3e5g'])
@@ -253,7 +253,7 @@ n(J(D5, "Nf6 e3 e6 Nf3 c5 c3 cxd4 exd4"), "Take back with the e-pawn", "Same rul
 # ============================================================== notes: the bishop offer
 n(J(D5, "e6"), "E-pawn one square", "Black's light bishop is shut in. Carry on.")
 n(J(D5, "e6 e3 Bd6"), "Bishop opposite yours", "Black offers the trade at once.")
-n(J(D5, "e6 e3 Bd6 Bg3"), "Step back, keep it", "Your bishop stays on its diagonal. If Black takes, you take back toward the middle with the h-pawn.", ['key'], arrows=['d6g3r', 'h2g3g'])
+n(J(D5, "e6 e3 Bd6 Bg3"), "Step back and keep it", "Your bishop stays on its diagonal. If Black takes, you take back toward the middle with the h-pawn.", ['key'], arrows=['d6g3r', 'h2g3g'])
 n(HX, "H-pawn takes back", "Your pawns stay healthy, and the rook behind the h-pawn now looks straight at Black's h-pawn.", ['key'], arrows=['h1h7g'])
 n(J(HX, "Nf6 Nf3 O-O"), "Black castles into it", "The king is next to the file your rook looks down.")
 n(J(HX, "Nf6 Nf3 O-O c3 c5 Nbd2 Nc6 Bd3"), "Light bishop at the king", "Bishop and rook aim at the same pawn. Black can't push the e-pawn or the b-pawn now without losing material.", ['key'], arrows=['d3h7g', 'h1h7g'])

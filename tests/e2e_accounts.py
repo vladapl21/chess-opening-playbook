@@ -340,7 +340,7 @@ with sync_playwright() as p:
     N1.route('https://api.chess.com/**', chesscom)
     n1.goto(APP); n1.wait_for_timeout(900)
     assert n1.evaluate('[PERSONA, S.view]') == ['new', 'start'] and n1.locator('.whero [data-acct="signup"]').count() == 1 and n1.locator('[data-pgo="setup"]').count() == 0
-    n1.evaluate("go('setup')"); n1.wait_for_timeout(200); assert n1.locator('#uform').count() == 0 and 'First, an account' in n1.inner_text('#view')
+    n1.evaluate("go('setup')"); n1.wait_for_timeout(200); assert n1.locator('#uform').count() == 0 and 'Start with an account' in n1.inner_text('#view')
     n1.evaluate("go('start')"); n1.wait_for_timeout(200)
     n1.click('.whero [data-acct="signup"]'); n1.wait_for_timeout(200); assert n1.evaluate('Acct.mode') == 'signup'
     assert n1.locator('#acctPanel input[name=chess]').count() == 1 and n1.is_checked('#acctPanel input[name=mail]'), 'the chess account and reminders are part of the sign-up'

@@ -11,7 +11,8 @@ The house playbook is the first system in every slot; the library is everything.
                    a written plan, lines that end with a plan, game reviews, missed shots, patterns, cards at a glance
   the course       units, core and optional lessons, checkpoint positions, the skill units, deep dives and their parts
   the library      chapters, lessons and lines per book, units and deep dives
-  Systems          chapters, lessons and lines of every system that isn't the first in its slot"""
+  Systems          chapters, lessons and lines of every system that isn't the first in its slot
+  the shop         pieces on a day's shelf, pieces for sale, pieces that need a badge (read from app/product.js)"""
 import json, re, sys
 from pathlib import Path
 
@@ -47,6 +48,15 @@ def house(side):
                 cards=sum(1 for r in d['cheat'] if r.get('lesson') in ids), ids=ids)
 
 
+def shop():
+    """The shop as app/product.js has it: a day's shelf (SHELF), the pieces with a price, and the ones behind a badge."""
+    js = (ROOT / 'app/product.js').read_text()
+    shelf = sum(int(x) for x in re.findall(r':\s*(\d+)', re.search(r'const SHELF = \{([^}]*)\}', js).group(1)))
+    a = js.index('const SHOP = ['); rows = re.findall(r"\{id: '[^']+', slot: '[^']+'[^\n]*", js[a:js.index('\n];', a)])
+    priced = [r for r in rows if re.search(r'price: [1-9]', r)]
+    return dict(shelf=shelf, priced=len(priced), badge=sum(1 for r in priced if 'needs:' in r))
+
+
 def numbers():
     H = {'w': house('white'), 'b': house('black')}
     units = COURSE['units']
@@ -68,7 +78,7 @@ def numbers():
                 skill=len(skill), threats=positions(skill['threats']), finish=positions(skill['finish']), endings=positions(skill['endings']),
                 deep=len(deep), parts=len(parts), deep_checks=sum(len(p.get('quiz') or []) for p in parts),
                 lib={s: (len(BOOK[s]['chapters']), len(BOOK[s]['lessons']), len(BOOK[s]['lines'])) for s in BOOK},
-                all_units=len(units), all_deep=len(COURSE['deep']), systems=systems)
+                all_units=len(units), all_deep=len(COURSE['deep']), systems=systems, shop=shop())
 
 
 WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen',
@@ -103,6 +113,8 @@ def expected(n):
         ('deep dives', r'a library of \*\*(\d+) deep dives\*\*: the optional lessons in (\d+) parts, with (\d+) more checkpoint positions', [n['deep'], n['parts'], n['deep_checks']]),
         ('the library', r'the books have (\d+) chapters, (\d+) lessons and (\d+) lines for White, (\d+) chapters, (\d+) lessons and (\d+) lines for Black, and the course has (\d+) units and (\d+) deep dives',
          [*W, *B, n['all_units'], n['all_deep']]),
+        ('the daily shop', r'(\d+) pieces a day \(two hats, two colours, one pair of glasses, one thing for the neck\) out of (\d+)', [n['shop']['shelf'], n['shop']['priced']]),
+        ('pieces behind a badge', r'(\w+) pieces need a badge first', [word(n['shop']['badge'])]),
     ]
 
 

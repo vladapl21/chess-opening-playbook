@@ -41,7 +41,7 @@ L('bki-5th', 'bki-center', 'Other fifth moves', 'The same two moves: castle, the
   alts=[('bki-5th-nf3', 'King\'s knight out', 'd4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Bd3 O-O Nf3 e5'),
         ('bki-5th-nge2', 'King\'s knight tucked in', 'd4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Bd3 O-O Nge2 e5 d5 Nfd7')],
   why='The bishop in the middle, the small edge pawn, the pawn that guards the e-pawn. Castle and strike with the e-pawn.', outcome='Equal')
-L('bki-nf3', 'bki-quiet', 'Knights out, no big center', 'D-pawn, castle, and the e-pawn when the knight backs it up', 'core',
+L('bki-nf3', 'bki-quiet', 'Knights out without a big center', 'D-pawn, castle, and the e-pawn when the knight backs it up', 'core',
   'd4 Nf6 c4 g6 Nc3 Bg7 Nf3 d6 Bg5 O-O e3 Nbd7 Bd3 e5',
   alts=[('bki-nf3-e4', 'E-pawn two squares after all', 'd4 Nf6 c4 g6 Nc3 Bg7 Nf3 d6 e4 O-O'),
         ('bki-nf3-e4v2', 'Zinnowitz Variation', 'd4 Nf6 c4 g6 Nc3 Bg7 Nf3 d6 Bg5 O-O e4 Nbd7'),

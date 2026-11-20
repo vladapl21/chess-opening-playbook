@@ -142,7 +142,7 @@ with sync_playwright() as p:
     save(pg.screenshot(), 'play.png'); pg.evaluate("S.drill = S.drillState = null")
     pg.evaluate("localStorage.clear()"); pg.goto(URL + '#learn'); pg.reload(); pg.wait_for_timeout(900); pg.evaluate("Coach.hush()"); settle(pg)
     save(pg.screenshot(), 'learn-white.png')
-    pg.click('.sidesw [data-side="b"]'); pg.wait_for_timeout(700); pg.evaluate("go('learn')"); pg.wait_for_timeout(500); pg.evaluate("Coach.hush()"); settle(pg)
+    pg.evaluate("useSide('b'); go('learn')"); pg.wait_for_timeout(700); pg.evaluate("Coach.hush()"); settle(pg)
     save(pg.screenshot(), 'learn-black.png')
 
     # Study: the Scotch lesson at the first move past the opening moves where the board adds something to the book's words
@@ -178,7 +178,7 @@ with sync_playwright() as p:
 
     # Sandbox: play until a game of 11+ plies with one slip, then shoot the report
     pg.evaluate("go('sandbox')"); pg.wait_for_timeout(300)
-    pg.evaluate("SBS.scope = 'all'; SBS.odds = 'real'; sbStart()"); pg.wait_for_timeout(600)
+    pg.evaluate("SB_STATE.w.scope = SB_STATE.b.scope = 'all'; SB_STATE.w.odds = SB_STATE.b.odds = 'real'; sbStart()"); pg.wait_for_timeout(600)
     for game in range(20):
         slips = 0
         for _ in range(150):

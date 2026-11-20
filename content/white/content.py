@@ -55,7 +55,7 @@ n(IT, "Bishop aims at f7", "The Italian bishop. It aims at f7, the one pawn that
 L('center', 'bishop', 'Build the big center', 'Small pawn move first, then the big push', 'core', CH, start=5,
   why='Black played the bishop out. This is your main plan against it.', outcome='Black chooses how to meet your gambit')
 n(J(IT, "Bc5"), "Black's bishop mirrors yours", "Black's bishop eyes the pawn beside your king, the same way yours eyes f7.", arrows=['c5f2b'])
-n(J(IT, "Bc5 c3"), "Small pawn, big plan", "Push the c-pawn one square. It prepares the d-pawn push, so you can stand two pawns side by side in the center.", ['key'], arrows=['d2d4g'])
+n(J(IT, "Bc5 c3"), "A small pawn with a big plan", "Push the c-pawn one square. It prepares the d-pawn push, so you can stand two pawns side by side in the center.", ['key'], arrows=['d2d4g'])
 n(J(IT, "Bc5 c3 Nf6"), "Black hits your e-pawn", "The knight attacks your center pawn. Don't defend it. Strike first.")
 n(J(IT, "Bc5 c3 Nf6 d4"), "Strike the center", "Push now. The pawn attacks Black's bishop and center pawn at the same time.", ['key'], arrows=['d4c5g', 'd4e5g'])
 n(J(IT, "Bc5 c3 Nf6 d4 exd4"), "Black takes", "Black trades pawns. Take back toward the center.")
@@ -544,7 +544,7 @@ n(J(IT, "Bc5 c3 a6 d4 exd4 cxd4"), "Take back")
 n(J(IT, "Bc5 c3 a6 d4 exd4 cxd4 Ba7"), "Bishop retreats")
 n(J(IT, "Bc5 c3 a6 d4 exd4 cxd4 Ba7 Nc3"), "Develop")
 n(J(IT, "Bc5 c3 a6 d4 exd4 cxd4 Ba7 Nc3 d6"), "Black plays solid")
-n(J(IT, "Bc5 c3 a6 d4 exd4 cxd4 Ba7 Nc3 d6 h3"), "Stop the pin", "Big center, easy development. You are better.")
+n(J(IT, "Bc5 c3 a6 d4 exd4 cxd4 Ba7 Nc3 d6 h3"), "Stop the pin", "A big center and easy development. You are better.")
 
 # ---- 5...Bb6 trap (NEW)
 L('bb6-early', 'bishop', 'Bishop steps back before taking', 'Win a pawn with a bishop sacrifice on f7', 'common',

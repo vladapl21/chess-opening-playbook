@@ -31,12 +31,14 @@ with sync_playwright() as p:
     pg = ctx.new_page(); hook(pg)
     pg.goto(URL + '#learn'); pg.wait_for_timeout(1200)
     assert pg.evaluate('SIDE') == 'w'
-    # ---- switch to Black
-    pg.click('.sidesw [data-side="b"]'); pg.wait_for_timeout(600)
-    assert pg.evaluate('SIDE') == 'b' and pg.evaluate('FLIP') is True
-    print('hash after switch', pg.evaluate('location.hash'), '| kicker', pg.inner_text('#brandKick'))
-    assert pg.evaluate('S.view') == 'games', 'an opening page switches to the other book\'s Your games'
-    pg.evaluate("go('learn')"); pg.wait_for_timeout(400)
+    # ---- to Black's book: there is no switch. Your games lists both colours, and a Black opening opens in Black's book
+    assert pg.locator('.top .sidesw, #brandKick').count() == 0, 'no White/Black switch'
+    pg.click('.tabs button[data-view="games"]'); pg.wait_for_timeout(400)
+    cols = pg.evaluate("[...document.querySelectorAll('.gside')].map(g => [g.dataset.bk, g.querySelector('.mcol').innerText.trim().toLowerCase(), g.querySelectorAll('.otile').length])")
+    print('Your games:', cols); assert cols == [['w', 'white', pg.evaluate('BOOKS.w.chapters.length')], ['b', 'black', 9]], cols
+    pg.click('.gside[data-bk="b"] .otile'); pg.wait_for_timeout(600)
+    assert pg.evaluate('[SIDE, FLIP, S.view]') == ['b', True, 'learn'], pg.evaluate('[SIDE, FLIP, S.view]')
+    print('hash in Black\'s book', pg.evaluate('location.hash'))
     print('openings', pg.locator('.chnav [data-ch]').count())
     assert pg.locator('.chnav [data-ch]').count() == 9
     # hero board orientation: black king (e8) drawn below the white king (e1)
@@ -82,13 +84,15 @@ with sync_playwright() as p:
     assert solved == n
     # ---- sandbox as Black
     pg.click('.tabs button[data-view="sandbox"]'); pg.wait_for_timeout(300)
+    pg.click('[data-sbf="side:b"]'); pg.wait_for_timeout(150)    # from everything: Black's openings only
+    assert pg.evaluate("[SB_STATE.w.scope, SB_STATE.b.scope]") == ['none', 'all']
     pg.click('#sbGo'); pg.wait_for_timeout(300)
     random.seed(7)
     res = play_sandbox(pg, 0.25, 'b all/real'); assert res['state'] == 'done'
     roots = pg.evaluate("S.drill.choices.filter(c => c.at === 0).length"); print('choices at the start position:', roots); assert roots == 1
     pg.screenshot(path=out + 'b_sb_report.png', full_page=True)
     for scope, odds in [('london', 'real'), ('slav', 'even'), ('scotch', 'weak'), ('attacks', 'real'), ('other', 'even'), ('vienna', 'real'), ('d4x', 'even'), ('ruy', 'real')]:
-        pg.click('[data-sbf="scope:all"]'); pg.click(f'[data-sbf="pick:{scope}"]'); pg.click(f'[data-sbf="odds:{odds}"]'); pg.wait_for_timeout(100)
+        pg.click('[data-sbf="scope:all"]'); pg.click(f'[data-sbf="pick:b:{scope}"]'); pg.click(f'[data-sbf="odds:{odds}"]'); pg.wait_for_timeout(100)
         pg.click('#sbAgain'); pg.wait_for_timeout(200)
         r = play_sandbox(pg, 0.1, f'b {scope}/{odds}'); assert r['state'] == 'done'
         first = pg.evaluate("N[S.drill.hist[1]].l")
@@ -96,19 +100,25 @@ with sync_playwright() as p:
     # ---- Your games: the openings, then the shots and the reviews behind the switch; each opening at a glance
     pg.click('.tabs button[data-view="games"]'); pg.wait_for_timeout(400)
     pg.click('[data-gseg="open"]'); pg.wait_for_timeout(300)
-    print('openings', pg.locator('.otile').count(), '| switch', pg.locator('[data-gseg]').all_inner_texts())
-    assert pg.locator('.otile').count() == pg.evaluate('DATA.chapters.length') == 9
+    BK = '.gside[data-bk="b"] '
+    print('openings', pg.locator(BK + '.otile').count(), '| switch', pg.locator('[data-gseg]').all_inner_texts())
+    assert pg.locator(BK + '.otile').count() == pg.evaluate('BOOKS.b.chapters.length') == 9
     pg.screenshot(path=out + 'b_games.png', full_page=True)
-    pg.click('[data-gseg="shots"]'); pg.wait_for_timeout(300); assert pg.locator('.mshot').count() == 4
-    pg.locator('.mshot').nth(3).click(); pg.wait_for_timeout(400)
-    print('shot ->', pg.evaluate('[S.view, S.drill && S.drill.kind]'))
+    pg.click('[data-gseg="shots"]'); pg.wait_for_timeout(300); assert pg.locator(BK + '.mshot').count() == 4
+    pg.evaluate("useSide('w')")                                 # from White's book: a Black shot loads Black's
+    puz = pg.locator(BK + '.mshot[data-puz]'); assert puz.count() >= 1
+    puz.first.click(); pg.wait_for_timeout(400)
+    print('shot ->', pg.evaluate('[S.view, S.drill && S.drill.kind, SIDE]')); assert pg.evaluate('[S.view, S.drill.kind, SIDE, S.drill.side]') == ['drill', 'puz', 'b', 'b']
+    pg.evaluate("useSide('w')"); pg.click('.tabs button[data-view="games"]'); pg.wait_for_timeout(300); pg.click('[data-gseg="shots"]'); pg.wait_for_timeout(300)
+    pg.locator(BK + '.mshot').nth(3).click(); pg.wait_for_timeout(400)
+    print('last shot ->', pg.evaluate('[S.view, S.drill && S.drill.kind, SIDE]')); assert pg.evaluate('SIDE') == 'b'
     pg.click('.tabs button[data-view="games"]'); pg.wait_for_timeout(300)
-    pg.click('[data-gseg="games"]'); pg.wait_for_timeout(300); assert pg.locator('.grev').count() == 11
+    pg.click('[data-gseg="games"]'); pg.wait_for_timeout(300); assert pg.locator(BK + '.grev').count() == 11
     for k in range(11):
-        pg.locator('.grev').nth(k).click(); pg.wait_for_timeout(250)
-        assert pg.evaluate("S.view") == 'study'
+        pg.locator(BK + '.grev').nth(k).click(); pg.wait_for_timeout(250)
+        assert pg.evaluate("[S.view, SIDE]") == ['study', 'b']
         pg.click('[data-go="games"]'); pg.wait_for_timeout(200)
-    pg.click('[data-gseg="open"]'); pg.wait_for_timeout(200); pg.click('.otile[data-ch="slav"]'); pg.wait_for_timeout(300)
+    pg.click('[data-gseg="open"]'); pg.wait_for_timeout(200); pg.click(BK + '.otile[data-ch="slav"]'); pg.wait_for_timeout(300)
     pg.click('[data-lview="glance"]'); pg.wait_for_timeout(300)
     print('slav at a glance', pg.locator('.ccard').count(), '| first:', pg.locator('.ccard .if').first.inner_text())
     assert pg.locator('.ccard').count() == pg.evaluate('glanceCards(CHAPTERS.slav).length') >= 10
@@ -116,17 +126,14 @@ with sync_playwright() as p:
     pg.locator('.ccard').nth(9).click(); pg.wait_for_timeout(300); print('card ->', pg.inner_text('.crumbs .where'))
     assert pg.evaluate('S.view') == 'study'
     pg.evaluate("S.lview = 'lessons'")
-    # ---- switch back: White state restored, Black state kept
-    pg.click('.tabs button[data-view="drill"]'); pg.wait_for_timeout(200)
-    pg.click('.sidesw [data-side="w"]'); pg.wait_for_timeout(500)
-    print('back to white:', pg.evaluate('SIDE'), pg.evaluate('S.view'), pg.evaluate('location.hash'), '| learn h2' , pg.inner_text('.reps h2') if pg.query_selector('.reps h2') else '-')
-    assert pg.evaluate('FLIP') is False
-    pg.evaluate("go('learn')"); pg.wait_for_timeout(300)
-    pg.click('.chnav [data-ch="italian"]'); pg.wait_for_timeout(300)
-    assert pg.query_selector('#heroReplay') is not None
-    pg.click('.sidesw [data-side="b"]'); pg.wait_for_timeout(400)
-    print('black again view:', pg.evaluate('S.view'))
-    assert pg.locator('.sidesw .badge').count() == 0, 'no counts beside White and Black'
+    # ---- back to White's book by one of its openings; Black's page is where it was left
+    pg.click('.tabs button[data-view="games"]'); pg.wait_for_timeout(300)
+    pg.click('.gside[data-bk="w"] .otile[data-ch="italian"]'); pg.wait_for_timeout(500)
+    print('back to white:', pg.evaluate('[SIDE, S.view, S.chapter, location.hash]'))
+    assert pg.evaluate('[SIDE, FLIP, S.view, S.chapter]') == ['w', False, 'learn', 'italian'] and pg.query_selector('#heroReplay') is not None
+    pg.click('.tabs button[data-view="games"]'); pg.wait_for_timeout(300)
+    pg.click(BK + '.otile[data-ch="slav"]'); pg.wait_for_timeout(400)
+    print('black again:', pg.evaluate('[SIDE, S.view, S.chapter]')); assert pg.evaluate('[SIDE, FLIP, S.view, S.chapter]') == ['b', True, 'learn', 'slav']
     # ---- deep links
     for h in ['#b.learn.london', '#b.line.bs-classical', '#b.games', '#learn.sic', '#line.setup']:
         pg2 = ctx.new_page(); hook(pg2)

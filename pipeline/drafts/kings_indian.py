@@ -38,7 +38,7 @@ LESSONS = [
        why='One in ten brings the bishop out first. Castle as usual, and get the queen\'s knight behind the e-pawn before it goes.', outcome='Equal'),
   dict(id='bki-5th', part='bki-center', root=C4 + ' e4 d6', title='Other fifth moves', sub='The same two moves: castle, then the e-pawn', pri='common',
        why='The bishop in the middle, the small edge pawn, the pawn that guards the e-pawn. Castle and strike with the e-pawn.', outcome='Equal'),
-  dict(id='bki-nf3', part='bki-quiet', root=C4 + ' Nf3', title='Knights out, no big center', sub='D-pawn, castle, and the e-pawn when the knight backs it up', pri='core',
+  dict(id='bki-nf3', part='bki-quiet', root=C4 + ' Nf3', title='Knights out without a big center', sub='D-pawn, castle, and the e-pawn when the knight backs it up', pri='core',
        why='A quarter of club players leave the e-pawn at home. Your five moves don\'t change.', outcome='Equal'),
   dict(id='bki-4th', part='bki-quiet', root=C4, title='Other fourth moves', sub='The early bishop, the small e-pawn', pri='common',
        why='Whatever White does on move four, the d-pawn and castling come next.', outcome='Equal'),

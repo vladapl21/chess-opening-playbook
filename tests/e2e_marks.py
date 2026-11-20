@@ -1,16 +1,18 @@
-"""Marks on the moves and your moves in order (over local HTTP, the website's page).
+"""Marks on the moves, the names of the lines and your moves in order (over local HTTP, the website's page).
 
-The other side's moves are marked by what they hand you (inaccuracy, mistake, blunder), yours with one mark, the key
-move: the answer that makes a mistake cost. Known positions first, then how many moves get a mark at all (a mark on
-every other move would say nothing). In a lesson: the chip and its sentence on the move card, the badge on the board,
-the icon in the list of moves and the legend under it, and no second chip that says the same in other words. The marks
-have their own colours and shapes in both themes. In the Sandbox and in a drill nothing is marked while a line is being
-played; the Sandbox marks its list once the game is over. A drill names a move of the line that was played before its turn as
-an order slip, in the panel and in the coach's note.
+The other side's moves are marked by what they hand you (inaccuracy ?!, mistake ?, blunder ??), yours with one mark, the
+key move (!): the answer that makes a mistake cost. Known positions first, then how many moves get a mark at all (a mark
+on every other move would say nothing). In a lesson: the chip and its sentence on the move card, the badge on the board,
+the icon in the list of moves and the legend under it, and no second chip that says the same in other words. The signs
+are the ones players know, in colours close to the familiar ones but not the same, in both themes. In a drill and in a
+Sandbox game the mark shows on the board with the move, with its word for a moment, and the sign beside the piece that
+made the key move stays while the other side answers; a checkpoint shows none.
+
+Names: the opening's name as a trail with the line's own name large, and in the lists of moves the name each move starts.
 
 Your moves in order: the strip under a lesson's board, a picture for every move, the main line beside a line whose order
 differs with the moves that changed places ringed in both rows, a tap on a move steps there, and the numbers on the
-board. A phone in dark mode at the end."""
+board. A drill names a move of the line that was played before its turn as an order slip. A phone in dark mode at the end."""
 import re
 from playwright.sync_api import sync_playwright
 from e2e_white import launch, out, play_sandbox
@@ -20,7 +22,7 @@ site = Site(docs=True); URL = site.start()
 errors = []
 AT = "(us => { let i = 0; for (const u of us.split(' ')){ i = (N[i].k || []).find(c => N[c].u === u); if (i === undefined) return null; } return i; })"
 # colours a well-known review screen uses for its move marks: ours must be our own
-THEIRS = {'#f7c631', '#ffa459', '#fa412d', '#ff7769', '#26c2a3', '#749bbf', '#81b64c', '#95b776', '#d5a47d', '#e58f2a', '#96bc4b', '#5c8bb0', '#1baca6', '#96af8b', '#f0c15c', '#e6912c', '#b33430', '#dbac16'}
+THEIRS = {'#f7c631', '#ffa459', '#fa412d', '#ff7769', '#26c2a3', '#749bbf', '#81b64c', '#95b776', '#d5a47d', '#e58f2a', '#96bc4b', '#5c8bb0', '#1baca6', '#96af8b', '#f0c15c', '#e6912c', '#b33430', '#dbac16', '#56b4e9', '#e69f00', '#df5353', '#5b8bb0', '#ffa459'}
 
 
 def hook(pg):
@@ -78,17 +80,18 @@ with sync_playwright() as p:
     lid, k = pg.evaluate(f"(i => {{ const id = (linesByNode.get(i) || []).find(x => LESSONS[LINES[x].lesson] && LINES[x].main) || linesByNode.get(i)[0]; return [id, LINES[id].n.indexOf(i)]; }})({AT}('e2e4 e7e5 g1f3 f7f6'))")
     pg.evaluate(f"openLine('{lid}', {k})"); pg.wait_for_timeout(500); pg.evaluate("Coach.hush()")
     card = ' '.join(pg.inner_text('.mcard').split()); print('the move card:', card[:200])
-    assert pg.inner_text('.mcard .mkc').strip() == 'Mistake' and 'It hands you the better game' in pg.inner_text('.mcard .mkw')
+    chip = lambda page=pg: page.evaluate("(document.querySelector('.mcard .mkc') || {lastChild: {textContent: ''}}).lastChild.textContent.trim()")
+    assert chip() == 'Mistake' and pg.text_content('.mcard .mkc svg text') == '?' and 'It hands you the better game' in pg.inner_text('.mcard .mkw')
     assert pg.locator('.mcard .chips .chip.mistake, .mcard .chips .chip.blunder, .mcard .chips .chip.key').count() == 0, 'the mark is said once'
     badge = pg.evaluate("(() => { const g = document.querySelector('#sb svg g.mkb'); return g && [g.getAttribute('class'), getComputedStyle(g.querySelector('circle')).fill]; })()")
     print('on the board:', badge); assert badge and 'mk-mistake' in badge[0]
     assert pg.locator('.thumb g.mkb').count() == 0, 'small boards carry no badge'
-    icons = pg.evaluate("[document.querySelectorAll('.timeline .mki').length, LINES[S.line].n.filter((x, q) => q && markOf(x)).length, [...document.querySelectorAll('.mklegend span')].map(s => s.innerText.trim())]")
-    print('in the list of moves:', icons); assert icons[0] == icons[1] > 0 and icons[2] == ['Key move', 'Inaccuracy', 'Mistake', 'Blunder'], icons
+    icons = pg.evaluate("[document.querySelectorAll('.timeline .mki').length, LINES[S.line].n.filter((x, q) => q && markOf(x)).length, [...document.querySelectorAll('.mklegend span')].map(s => s.lastChild.textContent.trim()), [...document.querySelectorAll('.mklegend .mki text')].map(t => t.textContent)]")
+    print('in the list of moves:', icons); assert icons[0] == icons[1] > 0 and icons[2] == ['Key move', 'Inaccuracy', 'Mistake', 'Blunder'] and icons[3] == ['!', '?!', '?', '??'], icons
     assert pg.evaluate("document.querySelector('.timeline .trow.cur .mki').getAttribute('aria-label')") == 'Mistake'
     pg.screenshot(path=out + 'mk_mistake.png')
     pg.keyboard.press('ArrowRight'); pg.wait_for_timeout(400)
-    assert pg.inner_text('.mcard .mkc').strip() == 'Key move' and pg.inner_text('.mcard .mkw').strip() == 'It makes the mistake cost'
+    assert chip() == 'Key move' and pg.text_content('.mcard .mkc svg text') == '!' and pg.inner_text('.mcard .mkw').strip() == 'It makes the mistake cost'
     assert pg.evaluate("document.querySelector('#sb svg g.mkb').getAttribute('class')").endswith('mk-key')
     assert pg.locator('.mcard .chip.key').count() == 0 and 'key' in (pg.evaluate('N[LINES[S.line].n[S.i]].g') or []), 'the old Key move chip is gone: it sat on half the moves'
     pg.screenshot(path=out + 'mk_key.png')
@@ -104,33 +107,84 @@ with sync_playwright() as p:
         return page.evaluate("['key', 'slip', 'mis', 'blun'].map(k => getComputedStyle(document.documentElement).getPropertyValue('--mk-' + k).trim().toLowerCase())")
     light = colours(pg); print('mark colours, light:', light)
     assert len(set(light)) == 4 and not set(light) & THEIRS, light
-    glyphs = pg.evaluate("Object.values(MARK_GLYPH)"); assert len(set(glyphs)) == 4 and not any('<text' in g for g in glyphs), 'a shape each, no ? or ! signs'
+    assert pg.evaluate("MARK_SIGN") == {'key': '!', 'slip': '?!', 'mistake': '?', 'blunder': '??'}, 'the signs players know'
+    # close to the familiar colours: a blue, a yellow, an orange and a red, in that order
+    hue = pg.evaluate("""['key', 'slip', 'mis', 'blun'].map(k => { const c = getComputedStyle(document.documentElement).getPropertyValue('--mk-' + k).trim(), r = parseInt(c.slice(1, 3), 16) / 255, g = parseInt(c.slice(3, 5), 16) / 255, b = parseInt(c.slice(5, 7), 16) / 255, mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
+        return Math.round(((mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4) * 60 + 360) % 360); })""")
+    print('hues:', hue); assert 195 <= hue[0] <= 225 and 38 <= hue[1] <= 55 and 15 <= hue[2] <= 35 and (hue[3] <= 10 or hue[3] >= 350), hue
 
-    # ---- a drill and a Sandbox game: nothing is marked while it is played
-    pg.evaluate(f"startDrillLine('{lid}', '', null, {{from0: true}})"); pg.wait_for_timeout(1300)
-    assert pg.locator('#db g.mkb').count() == 0 and pg.locator('#dpanel .mki, #dpanel .mkc').count() == 0, 'a drill gives nothing away'
-    pg.evaluate("S.drill = S.drillState = null; go('sandbox')"); pg.wait_for_timeout(400)
+    # ---- a drill: the mark comes onto the board with the move. Black's mistake carries its sign and, for a moment, its
+    #      word; your key move gets the ! beside the piece, and it stays there while Black answers
+    pg.evaluate(f"startDrillLine('{lid}', '', null, {{from0: true}})"); pg.wait_for_timeout(600)
+    seen = {'opp': None, 'key': None, 'kept': [], 'pending': None}
+    for _ in range(80):
+        st = pg.evaluate("""({s: S.drill.state, b: S.drill.busy, at: S.drill.i, mk: markOf(LINES[S.drill.id].n[S.drill.i]),
+            board: [...document.querySelectorAll('#db g.mkb')].map(g => g.getAttribute('class').split(' ').pop()), word: [...document.querySelectorAll('#db g.mkl text')].map(t => t.textContent),
+            chips: [...document.querySelectorAll('#dpanel .mkc')].map(c => c.lastChild.textContent.trim())})""")
+        if st['s'] == 'done': break
+        if st['b']: pg.wait_for_timeout(120); continue
+        if st['mk'] == 'mistake' and not seen['opp']: seen['opp'] = st
+        if seen['pending'] is not None:                              # Black has answered a key move: is its sign still up?
+            n = pg.evaluate("LINES[S.drill.id].n"); mine, reply = pg.evaluate(f"[N[{n[seen['pending']]}].u.slice(2, 4), N[{n[st['at']]}].u.slice(2, 4)]")
+            seen['kept'].append([mine != reply, 'mk-key' in st['board']]); seen['pending'] = None
+        nxt = pg.evaluate("markOf(LINES[S.drill.id].n[S.drill.i + 1])")
+        pg.evaluate("(u => tryMove(u.slice(0, 2), u.slice(2, 4)))(expectedMove()[0])")
+        if nxt == 'key': seen['pending'] = st['at'] + 1
+        if nxt == 'key' and not seen['key']:
+            seen['key'] = pg.evaluate("""({board: [...document.querySelectorAll('#db g.mkb')].map(g => g.getAttribute('class').split(' ').pop()), word: [...document.querySelectorAll('#db g.mkl text')].map(t => t.textContent),
+                chips: [...document.querySelectorAll('#dpanel .mfeed .mkc')].map(c => c.lastChild.textContent.trim())})""")
+        pg.wait_for_timeout(250)
+    print('Black\'s mistake on the board:', seen['opp'] and [seen['opp']['board'], seen['opp']['word'], seen['opp']['chips']])
+    assert seen['opp'] and seen['opp']['board'][-1] == 'mk-mistake' and seen['opp']['word'][-1] == 'Mistake' and 'Mistake' in seen['opp']['chips']
+    print('your key move:', seen['key'], '| after Black\'s answers [piece still there, sign still up]:', seen['kept'])
+    assert seen['key'] and seen['key']['board'][-1] == 'mk-key' and seen['key']['word'][-1] == 'Key move' and seen['key']['chips'] == ['Key move']
+    assert seen['kept'] and all(a == b for a, b in seen['kept']) and any(a for a, b in seen['kept']), 'the sign beside the piece that made the key move stays while the other side answers, unless that piece was just taken'
+    # a piece picked up draws the board again: the signs stay, the word has gone
+    pg.evaluate(f"startDrillLine('{lid}', '', null, {{from0: true}})"); pg.wait_for_timeout(400)
+    for _ in range(40):
+        st = pg.evaluate("({b: S.drill.busy, mk: markOf(LINES[S.drill.id].n[S.drill.i])})")
+        if not st['b'] and st['mk'] == 'mistake': break
+        if not st['b']: pg.evaluate("(u => tryMove(u.slice(0, 2), u.slice(2, 4)))(expectedMove()[0])")
+        pg.wait_for_timeout(150)
+    assert pg.locator('#db g.mkl').count() == 1
+    pg.evaluate("renderDrillBoard()"); assert pg.locator('#db g.mkl').count() == 0 and pg.locator('#db g.mkb').count() >= 1
+    # a checkpoint shows no marks: there the position is the question
+    pg.evaluate("S.drill = S.drillState = null; startQuiz(COURSE.find(U => U.side === 'w' && U.quiz && U.quiz.length).id)"); pg.wait_for_timeout(700)
+    assert pg.evaluate("S.view") == 'quiz' and pg.locator('#db g.mkb, #db g.mkl').count() == 0, 'no marks in a checkpoint'
+
+    # ---- a Sandbox game: the same on the board, the other side's card says it, and the list is marked as the game goes
+    pg.evaluate("S.quizState = null; useSide('w'); go('sandbox')"); pg.wait_for_timeout(400)
     pick = pg.evaluate("""(() => { for (const l of Object.values(LINES)){ if (!LESSONS[l.lesson] || !DRILLABLE.includes(l.id)) continue;
         const q = l.n.findIndex((x, i) => i > 2 && !isMine(N[x]) && ['mistake', 'blunder'].includes(markOf(x))); if (q < 0) continue;
         let k = l.n.length - 1; while (k > 2 && sbBookKids(l.n[k - 1]).length === 1) k--;
         if (k < q && k < l.n.length - 3 && sbCanFrom(l.n[k])) return {line: l.id, at: l.n[k], marks: l.n.filter((x, i) => i > k && markOf(x)).length}; } return null; })()""")
     print('a Sandbox game with a mistake in it:', pick); assert pick and pick['marks'] >= 2
-    pg.evaluate(f"SB_FROM[SIDE] = {pick['at']}; sbStart()"); pg.wait_for_timeout(1500)
-    during = []
-    for _ in range(60):
-        st = pg.evaluate("({s: S.drill.state, busy: S.drill.busy, mine: myTurnAt(S.drill.node)})")
+    pg.evaluate(f"sbSetFrom('w', {pick['at']}); sbStart()"); pg.wait_for_timeout(1500)
+    live = {'board': 0, 'list': 0, 'card': 0, 'keyword': 0}
+    for _ in range(80):
+        st = pg.evaluate("""({s: S.drill.state, busy: S.drill.busy, mine: myTurnAt(S.drill.node), board: document.querySelectorAll('#db g.mkb').length, list: document.querySelectorAll('#sbfeed .mki').length,
+            card: document.querySelectorAll('#sbpanel .mcard .mkc').length, kw: [...document.querySelectorAll('#db g.mkl text')].some(t => t.textContent === 'Key move')})""")
         if st['s'] == 'done': break
-        during.append(pg.locator('#sbpanel .mki, #sbside .mki, #db g.mkb').count())
-        if st['busy'] or not st['mine']: pg.wait_for_timeout(200); continue
-        pg.evaluate("(u => tryMove(u.slice(0, 2), u.slice(2, 4)))(expectedMove()[0])"); pg.wait_for_timeout(250)
-    assert pg.evaluate("S.drill.state") == 'done' and during and max(during) == 0, 'no marks while the game is on'
-    after = pg.evaluate("[document.querySelectorAll('#sbpanel .mki').length, [...document.querySelectorAll('#sbpanel .mki')].map(e => e.getAttribute('aria-label'))]")
-    print('once it is over:', after); assert after[0] >= pick['marks'] and 'Key move' in after[1], after
+        for kk, v in (('board', st['board']), ('list', st['list']), ('card', st['card']), ('keyword', int(st['kw']))): live[kk] = max(live[kk], v)
+        if st['busy'] or not st['mine']: pg.wait_for_timeout(120); continue
+        pg.evaluate("(u => tryMove(u.slice(0, 2), u.slice(2, 4)))(expectedMove()[0])"); pg.wait_for_timeout(120)
+    print('while the game was on:', live)
+    assert pg.evaluate("S.drill.state") == 'done' and live['board'] >= 1 and live['list'] >= 1 and live['card'] >= 1 and live['keyword'] == 1, live
+    after = pg.evaluate("[document.querySelectorAll('#sbpanel .mki').length, [...document.querySelectorAll('#sbfeed .mki')].map(e => e.getAttribute('aria-label'))]")
+    print('once it is over:', after); assert len(after[1]) >= pick['marks'] and 'Key move' in after[1], after
     assert pg.locator('#sbpanel .mklegend').count() == 1, 'with the legend under the list'
     pg.screenshot(path=out + 'mk_sandbox.png')
 
+    # ---- the names: the family and the variations as a trail, the line's own name large, and the list of moves says
+    #      where each name starts
+    nm = pg.evaluate("[Openings.ofNode(S.drill.node), [...document.querySelectorAll('#sbpanel .opn .otrail')].map(e => e.innerText), document.querySelector('#sbpanel .opn .oname').innerText, parseFloat(getComputedStyle(document.querySelector('#sbpanel .opn .oname')).fontSize)]")
+    print('the name on the panel:', nm)
+    parts = pg.evaluate(f"nameParts({nm[0]!r})"); assert nm[2] == parts[-1] and nm[3] >= 22 and (len(parts) == 1 or parts[0].upper() in nm[1][0].upper()), nm
+    tags = pg.evaluate("[document.querySelectorAll('#sbfeed .ntag').length, document.querySelectorAll('#sbfeed .named').length]"); print('names in the list of moves:', tags); assert sum(tags) >= 2
+    assert pg.evaluate("nameParts('Italian Game: Two Knights Defense, Fried Liver Attack')") == ['Italian Game', 'Two Knights Defense', 'Fried Liver Attack'] and pg.evaluate("nameParts('Queen\\'s Pawn Game')") == ["Queen's Pawn Game"]
+
     # ---- your moves in order
-    pg.evaluate("SB_FROM[SIDE] = null; S.drill = S.sbState = null; useSide('b')")
+    pg.evaluate("sbSetFrom(null); S.drill = S.sbState = null; useSide('b')")
     main = pg.evaluate("DATA.lines.find(l => l.lesson === CHAPTERS.slav.first && l.main).id")
     pg.evaluate(f"openLine('{main}', 4)"); pg.wait_for_timeout(500); pg.evaluate("Coach.hush()")
     strip = ' '.join(pg.inner_text('.ostrip').split()); print('the main line:', strip[:140])
@@ -171,12 +225,12 @@ with sync_playwright() as p:
     pg.evaluate(f"tryMove('{early[0][:2]}', '{early[0][2:4]}')"); pg.wait_for_timeout(300)
     msg = ' '.join(pg.inner_text('#dpanel .feedback').split()); print('  played early:', msg[:150])
     words = ['', 'one move', 'two moves', 'three moves', 'four moves', 'five moves', 'six moves']
-    assert 'Right move, wrong moment' in msg and f'it comes {words[early[1]]} later' in msg and pg.evaluate('S.drill.hint') is None, msg
+    assert 'The right move at the wrong moment' in msg and f'it comes {words[early[1]]} later' in msg and pg.evaluate('S.drill.hint') is None, msg
     assert pg.evaluate("S.drill.slipOrd && Object.values(S.drill.slipOrd)[0]") == early[1]
     other = pg.evaluate(f"legalFor().find(u => u !== '{early[2]}' && !laterInLine(S.drill, u))")
     pg.evaluate(f"tryMove('{other[:2]}', '{other[2:4]}')"); pg.wait_for_timeout(300)
     msg = ' '.join(pg.inner_text('#dpanel .feedback').split())
-    assert 'The arrow shows the move' in msg and 'Right move, wrong moment' not in msg and pg.evaluate('S.drill.hint') == early[2], msg
+    assert 'The arrow shows the move' in msg and 'The right move at the wrong moment' not in msg and pg.evaluate('S.drill.hint') == early[2], msg
     for _ in range(80):
         st = pg.evaluate("({s: S.drill.state, b: S.drill.busy})")
         if st['s'] == 'done': break
@@ -186,6 +240,7 @@ with sync_playwright() as p:
     assert 'the order slipped, not the move' in note and 'See the order' in note, note
     pg.click('.coachnote [data-line]'); pg.wait_for_timeout(500)
     assert pg.evaluate("[S.view, S.line]") == ['study', main] and pg.locator('.ostrip').count() == 1 and pg.evaluate("N[LINES[S.line].n[S.i]].u") == early[2], 'See the order opens the lesson at the move that was due'
+    assert pg.locator('.ccol .opn .oname').count() == 1 and pg.locator('.timeline .ntag, .timeline .named').count() >= 1, 'the lesson names its line too'
 
     # ---- a phone in dark mode
     ph = b.new_context(viewport={'width': 390, 'height': 844}, color_scheme='dark'); q = ph.new_page(); hook(q)

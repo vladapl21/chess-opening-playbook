@@ -300,7 +300,7 @@ L('bv-scotch4n', 'bv-4n', 'Center push: pin, then strike', 'Take, pin the knight
   alts=[('bv-scotch4n-bg5', 'Bishop pins back', J(FK, "d4 exd4 Nxd4 Bb4 Bg5 h6")),
         ('bv-scotch4n-nd5', 'Knight jumps into the center', J(FK, "d4 exd4 Nd5 Be7"))],
   why='Two of your games went exactly this way: a win against Jaydenh625, and an equal opening against Eschoir.', outcome='Equal', tags=['game'])
-L('bv-italian4n', 'bv-4n', 'Bishop to the long diagonal', 'Your Italian bishop, same plan', 'core',
+L('bv-italian4n', 'bv-4n', 'Bishop to the long diagonal', 'Your Italian bishop with the same plan', 'core',
   J(FK, "Bc4 Bc5 d3 d6 Bg5 h6 Bxf6 Qxf6 Nd5 Qd8"),
   alts=[('bv-italian4n-oo', 'White castles', J(FK, "Bc4 Bc5 O-O d6 d3 Na5")),
         ('bv-italian4n-nxe5', 'Knight grabs your pawn: the fork fails', J(FK, "Bc4 Bc5 Nxe5 Nxe5 d4 Nxc4 dxc5 d5"))],

@@ -183,13 +183,13 @@ with sync_playwright() as p:
     assert pg.locator('.ubub.pass').count() == 2
     pg.screenshot(path=out + 'c_course_after.png', full_page=True)
 
-    # ---- links and reloads keep the course place; switching colour goes back to the path
+    # ---- links and reloads keep the course place; the Course tab goes back to the path
     pg.goto(URL + '#unit.b-italian'); pg.reload(); pg.wait_for_timeout(900)
     print('deep link b-italian ->', pg.evaluate('[S.view, S.unit, SIDE]'))
     assert pg.evaluate('[S.view, S.unit, SIDE]') == ['unit', 'b-italian', 'b']
     assert 'opens when you pass' in pg.inner_text('.lockednote')
-    pg.click('.sidesw [data-side="w"]'); pg.wait_for_timeout(400)
-    assert pg.evaluate('[S.view, SIDE]') == ['course', 'w']
+    pg.click('.tabs [data-view="course"]'); pg.wait_for_timeout(400)
+    assert pg.evaluate('S.view') == 'course' and pg.locator('.top .sidesw').count() == 0, 'the path, and no colour switch above it'
     print('stored keys:', pg.evaluate("[PERSONA, Object.keys(JSON.parse(localStorage.getItem('italian-playbook-progress-v1'))), Object.keys(Prog.d), JSON.stringify(Prog.d.me)]"))
     stored = pg.evaluate("JSON.parse(localStorage.getItem('italian-playbook-progress-v1')).course")
     print('stored course progress:', {k: v for k, v in stored['u'].items()}, '| lessons seen', list(stored['seen']))
