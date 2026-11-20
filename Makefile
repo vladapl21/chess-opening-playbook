@@ -2,11 +2,12 @@ PY ?= python3
 
 .PHONY: build test check shots
 
-# Rebuild both books and the page (needs only python-chess while data/cache covers every position)
+# Rebuild both books and the page (needs only python-chess while data/cache covers every position and every line end)
 build:
 	$(PY) pipeline/build_white.py
 	$(PY) pipeline/build_black.py
 	$(PY) pipeline/build_course.py
+	$(PY) pipeline/plan_lines.py
 	$(PY) pipeline/assemble.py
 
 # Browser tests against docs/index.html (needs Playwright + Chromium; the engine test serves the page over local HTTP)

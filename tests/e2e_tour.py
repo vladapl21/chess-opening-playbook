@@ -2,8 +2,9 @@
 outside the card do nothing). A step that asks for a tap goes on once it's done, by hand or with Show me; Back goes a step
 back; Fast forward plays the rest by itself: the arrow's move in Play along, a punished slip from memory, Play on with
 the engine, a lesson's list of the other side's answers. It leaves no progress behind, is marked in the progress record
-and on the device, doesn't come back after a reload, and Settings plays it again (ending where it began). Phone width in
-dark mode: the card stays on the screen and nothing scrolls sideways. Over local HTTP, the website's own page."""
+and on the device, doesn't come back after a reload, and Settings plays it again (ending where it began). It names every
+tab, every part of Your games, every setting and every feature listed in FEATURES. Phone width in dark mode: the card
+stays on the screen and nothing scrolls sideways. Over local HTTP, the website's own page."""
 import sys, json, time
 sys.path.insert(0, __import__('os').path.dirname(__file__))
 from playwright.sync_api import sync_playwright
@@ -98,6 +99,34 @@ with sync_playwright() as p:
     assert pg.evaluate('[Tour.replay, Tour.k]') == [True, 0]
     ff_to_end(pg, [])
     assert pg.evaluate('[S.view, Tour.on]') == ['games', False], pg.evaluate('[S.view, Tour.on]')
+
+    # ---- the tour keeps up with the app: every tab, every part of Your games, every setting and every feature in
+    #      FEATURES is named in it. A new tab, part or setting fails here until the tour speaks of it; a new feature
+    #      gets a step or a line in Tour.build (app/product.js) and its words in FEATURES.
+    said = pg.evaluate("Tour.build().map(st => { const w = Tour.words(st); return [w.h].concat(w.say).join(' '); }).join(' ').toLowerCase()")
+    tabs = pg.evaluate("[...document.querySelectorAll('.tabs [data-view]')].map(b => ((b.querySelector('.lg') || b).childNodes[0].textContent || '').trim())")
+    pg.evaluate("go('games')"); pg.wait_for_timeout(300)
+    segs = pg.evaluate("[...document.querySelectorAll('.gseg button')].map(b => (b.querySelector('.lg') || b.childNodes[0]).textContent.trim())")
+    pg.click('#setBtn'); pg.wait_for_timeout(300)
+    rows = pg.evaluate("[...document.querySelectorAll('.setrow > b')].map(b => b.textContent.trim())")
+    pg.keyboard.press('Escape'); pg.wait_for_timeout(200)
+    SETTINGS = {'Appearance': 'light or dark', 'Text size': 'text size', 'Board colour': 'board colours', 'Your coach': 'your coach',
+                'The tour': 'this tour'}
+    slots = pg.evaluate("Object.keys(DATA_W.packs || {}).concat(Object.keys(DATA_B.packs || {})).map(k => slotName(k))")
+    FEATURES = {'two books': 'two books', 'play along': 'play along', 'move explanations': 'what it does',
+                'a slip and its punishment': 'punishes', 'play on with the engine': 'play on with the engine',
+                'the explore board': 'explore board', 'the engine in lessons': 'the engine in lessons',
+                'the plan at the end of every line': 'plan', 'opening names': "opening's real name",
+                'practice from a position': 'set up a position', 'the last three games': 'last 3 games',
+                'levels': 'level', 'the streak': 'streak', 'the shop': 'new look', 'the account': 'sign in',
+                'the coach': 'tap me'}
+    missing = [f'tab {t}' for t in tabs if t.lower() not in said] + [f'Your games: {g}' for g in segs if g.lower() not in said] \
+        + [f'setting {r}' for r in rows if r not in SETTINGS and r not in slots] \
+        + [f'setting {r}' for r, w in SETTINGS.items() if r in rows and w not in said] \
+        + (['your systems'] if any(r in slots for r in rows) and 'your systems' not in said else []) \
+        + [f'feature {k}' for k, w in FEATURES.items() if w not in said]
+    print('the tour names:', len(tabs), 'tabs,', len(segs), 'parts of Your games,', len(rows), 'settings,', len(FEATURES), 'features')
+    assert not missing, f'not in the tour: {missing}'
     ctx.close()
 
     # ---- phone, dark: the card stays on the screen, nothing scrolls sideways

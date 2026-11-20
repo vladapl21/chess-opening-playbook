@@ -643,6 +643,10 @@ button.ucard:hover{border-color:var(--accent);transform:translateY(-1px)}
 .enote{font-size:14px;color:var(--muted)} .ekey{font-size:12.5px;color:var(--muted)}
 .qline{margin:8px 0} .qlook{display:block;margin-top:8px;color:var(--muted)}
 .enote a{color:var(--accent);font-weight:600}
+.opn{display:flex;gap:10px;align-items:baseline;margin:0 0 10px;font-size:14px;line-height:1.35;color:var(--ink);min-width:0}
+.opn b{flex:none;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.opn span{min-width:0;overflow-wrap:anywhere}
+.dpanel .opn{margin:8px 0 0}
 .plan{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;gap:10px}
 .plan h4{font-family:var(--f-display);font-size:21px;font-weight:700;line-height:1.15}
 .plan ul{list-style:none;margin:0;padding:0;display:grid;gap:9px}
@@ -757,6 +761,8 @@ footer.foot .fcopy{margin-left:auto}
 const DATA_W = /*__DATA_W__*/;
 const DATA_B = /*__DATA_B__*/;
 const DATA_C = /*__DATA_C__*/;
+// opening names (lichess-org/chess-openings, CC0): families on the first row, then "hash of the position,family,variation"
+const OPENINGS_RAW = /*__OPENINGS__*/'';
 </script>
 <script>
 "use strict";
@@ -1598,7 +1604,7 @@ function lessonCard(L, variant){
   if (L.tags.includes('game') && (typeof PERSONA === 'undefined' || PERSONA === 'house')) chips.push('<span class="chip game">In your games</span>');
   const nl = L.lines.length;
   const often = L.id === 'setup' ? '' : oneIn(L.lines.filter(x => DRILLSET.has(x)).reduce((a, x) => a + lineReach(x), 0) || lineReach(L.lines[0]));
-  return `<button class="lcard ${variant || ''}" data-lesson="${L.id}">${thumb(idx, o)}<div><div class="chips">${chips.join('')}</div><h4>${esc(L.title)}</h4><p>${esc(L.sub)}</p>${variant ? bullets(L.why, 'lwhy') : ''}
+  return `<button class="lcard ${variant || ''}" data-lesson="${L.id}">${thumb(idx, o)}<div><div class="chips">${chips.join('')}</div><h4>${esc(L.title)}</h4><p>${esc(L.sub)}</p>${variant ? bullets(noStudy(L.why), 'lwhy') : ''}
     <div class="meta"><span class="pips" title="Drill progress" aria-label="Drill progress ${lvl} of 5">${[1,2,3,4,5].map(k => `<i class="${k <= lvl ? 'on' : ''}"></i>`).join('')}</span><span>${nl} ${nl === 1 ? 'line' : 'lines'}${often ? ' · ' + often : ''}</span></div></div></button>`;
 }
 function partsHTML(C){
@@ -1696,7 +1702,10 @@ function heroReplay(){
 /* ------------------------------------------------------------------ STUDY */
 function sideBadge(nd){ return isMine(nd) ? '<span class="side you">You</span>' : `<span class="side blk">${OPP}</span>`; }
 const TAGNAMES = {key: 'Key move', best: "Black's best", mistake: 'Inaccuracy', blunder: 'Blunder', trap: 'Trap', mate: 'Checkmate', draw: 'Equal', fix: 'Changed from study', swap: 'Fixes a habit', new: 'Not in your study', game: 'From your games', warn: 'Avoid', missed: 'You missed this', good: 'Good move'};
-function tagChips(tags){ return (tags || []).map(t => `<span class="chip ${t}">${esc(TAGNAMES[t] || t)}</span>`).join(''); }
+// "new" and "fix" were about the study the first book came from: they mean nothing in your book, so they are not shown
+const QUIET_TAGS = new Set(['new', 'fix']);
+function tagChips(tags){ return (tags || []).filter(t => !QUIET_TAGS.has(t)).map(t => `<span class="chip ${t}">${esc(TAGNAMES[t] || t)}</span>`).join(''); }
+const noStudy = t => ((t || '').match(/[^.!?]+[.!?]+["')]*\s*|[^.!?]+$/g) || []).filter(x => !/^\s*(From|Not in) your study\b/i.test(x)).join('').trim();
 function optionsFor(idx, curLine){
   const kids = (N[idx].k || []).filter(c => (linesByNode.get(c) || []).length);   // moves that belong to a system not in play have no lines here
   if (kids.length < 2) return null;
@@ -1732,11 +1741,11 @@ function renderStudy(){
   if (atEnd && S.stepped === S.line) markSeen(les.id);
   const where = les ? `${esc(chapterOf(les).name)} · ${esc(part.title)}` : `Game vs ${esc(game.opp)}`;
   // header
-  const chips = les ? [`<span class="chip ${les.pri}">${{core:'Core',common:'Common',rare:'Rare'}[les.pri]}</span>`].concat(les.tags.map(t => `<span class="chip ${t}">${esc(TAGNAMES[t])}</span>`)).join('')
+  const chips = les ? [`<span class="chip ${les.pri}">${{core:'Core',common:'Common',rare:'Rare'}[les.pri]}</span>`].concat(les.tags.filter(t => !QUIET_TAGS.has(t) && (t !== 'game' || typeof PERSONA === 'undefined' || PERSONA === 'house')).map(t => `<span class="chip ${t}">${esc(TAGNAMES[t])}</span>`)).join('')
                     : `<span class="chip ${game.result === 'W' ? 'win' : 'loss'}">${game.result === 'W' ? 'Win' : 'Loss'}</span><span class="chip">${esc(game.tc)}</span><span class="chip">${esc(game.opp)} ${game.oppElo}</span>`;
   const title = les ? les.title : game.title;
   const sub = les ? les.sub : game.summary;
-  const why = les ? les.why : '';
+  const why = les ? noStudy(les.why) : '';
   // lines in lesson
   const linesHTML = allLines.length > 1 ? `<div class="linesin"><h4>${les ? 'Lines in this lesson' : 'Lines'}</h4><div class="seg">${allLines.map(id => `<button data-line="${id}" aria-pressed="${id === S.line}">${esc(LINES[id].main ? (les ? 'Main line' : 'The game') : LINES[id].title)}</button>`).join('')}</div></div>` : '';
   // move card
@@ -1777,9 +1786,9 @@ function renderStudy(){
   const curEval = evalInfo(nd.e);
   // the engine: a switch under the board; at the end of a line, the plan for what comes next
   const engOn = EngineUI.on(), lineEnd = S.i === line.n.length - 1;
-  const plan = les && lineEnd && line.main ? planFor(les.id) : null;
+  const plan = les && lineEnd ? planOf(S.line) : null;
   const exTitle = `${les ? les.title : 'Game vs ' + game.opp} · ${line.main ? (les ? 'main line' : 'the game') : line.title}${S.i ? `, move ${moveNo(p)}` : ''}`;
-  const exOpts = extra => Object.assign({title: exTitle, plan: plan ? {side: SIDE, lesson: les.id} : null}, extra);
+  const exOpts = extra => Object.assign({title: exTitle, plan: plan ? {side: SIDE, line: S.line} : null}, extra);
   const drillBtn = (les && DRILLABLE.includes(S.line)) ? `<button class="btn ${CU && atEnd ? '' : 'primary'}" id="drillThis">Drill this line</button><button class="btn" id="playAlong">Play along</button>` : '';
   const fromBtn = les && sbCanFrom(idx) ? '<button class="btn ghost" id="sbHere">Practise from here</button>' : '';
   const lessonBtn = (!les && game.lesson) ? `<button class="btn" data-lesson="${game.lesson}">Open the related lesson</button>` : '';
@@ -1805,9 +1814,9 @@ function renderStudy(){
       <div class="engrow"><button class="eswitch" id="cEng" type="button" aria-pressed="${engOn}"><i aria-hidden="true"></i>Engine</button><p class="evaltext" id="stext">${curEval ? `Engine: <b>${esc(curEval.txt)}</b>${curEval.num ? ` <span class="tnum" title="${NUMHINT}">(${curEval.num})</span>` : ''}` : ''}</p></div>
     </div>
     <div class="ccol">
-      ${mcard}${engOn ? '<div id="engcard"></div>' : ''}${optHTML}${linesHTML}
+      ${opnHTML(Openings.ofNode(idx))}${mcard}${engOn ? '<div id="engcard"></div>' : ''}${optHTML}${linesHTML}
       <ol class="timeline" aria-label="Moves in this line">${rows.join('')}</ol>
-      ${outcome}${planCardHTML(plan)}
+      ${outcome}${plan ? planCardHTML(plan, planKick(S.line)) : ''}
       <div class="lesson-actions">${unitBtns}${drillBtn}${fromBtn}${lessonBtn}<button class="btn ${lineEnd && !unitBtns && !drillBtn ? 'primary' : 'ghost'}" id="exHere">${lineEnd ? 'Play on from here' : 'Explore from here'}</button></div>
     </div></div>`;
   const svg = document.querySelector('#sb svg');
@@ -2035,13 +2044,13 @@ function drillPanelHTML(){
         : `${un ? `<button class="btn primary" id="dUnitNext">${esc(un.label)}</button>` : nxU ? `<button class="btn primary" id="dNextU">Next line in this ${uword(CU)}</button>` : ''}<button class="btn ${un || nxU ? '' : 'primary'}" data-unit="${CU.id}">Back to the ${uword(CU)}</button><button class="btn" id="dAgain">Again</button>`)
       : D.daily ? (left ? `<button class="btn primary" id="dDaily">Next line · ${dk + 1} of ${DAILY}</button><button class="btn" id="dAgain">Again</button>` : `<button class="btn primary" id="dDaily">Keep going</button><button class="btn" id="dToday">Done for today</button>`)
       : `<button class="btn primary" id="dNext">Next line</button><button class="btn" id="dAgain">Again</button><button class="btn ghost" data-line="${D.id}">Study it</button>`;
-    const pl = line.main ? planFor(L.id) : null;
+    const pl = planOf(D.id);
     const cnote = CU ? `${CU.lines.filter(lineClean).length} of ${CU.lines.length} lines in this ${uword(CU)} clean` : D.daily ? (left ? `Today: ${dk} of ${DAILY}` : `That's today's five: ${Daily.streak()} ${Daily.streak() === 1 ? 'day' : 'days'} in a row`) : '';
     doneBox = `<div class="donebox ${clean ? '' : 'bad'}"><h4>${clean ? 'Clean run' : `${D.mistakes} ${D.mistakes === 1 ? 'slip' : 'slips'}${CU ? ': again until it\'s clean' : ''}`}</h4>
       ${bullets([clean ? `Back in ${days} ${days === 1 ? 'day' : 'days'}` : CU ? '' : 'Stays in today\'s review until it\'s clean', cnote])}
-      ${D.note || ''}<div class="lesson-actions">${acts}<button class="btn ghost" id="dExplore">Play on with the engine</button></div></div>${clean ? planCardHTML(pl) : ''}`;
+      ${D.note || ''}<div class="lesson-actions">${acts}<button class="btn ghost" id="dExplore">Play on with the engine</button></div></div>${clean && pl ? planCardHTML(pl, planKick(D.id)) : ''}`;
   }
-  return `<div class="dpanel"><p class="kicker">${D.unit && UNIT[D.unit] ? 'Course · ' + esc(UNIT[D.unit].title) + ' · ' : D.daily ? 'Today · ' : ''}${esc(L.title)}${line.main ? '' : ' · ' + esc(line.title)}${D.msgWhy ? ' · ' + esc(D.msgWhy) : ''}</p><h3>Play ${MYC}'s moves from memory</h3>
+  return `<div class="dpanel"><p class="kicker">${D.unit && UNIT[D.unit] ? 'Course · ' + esc(UNIT[D.unit].title) + ' · ' : D.daily ? 'Today · ' : ''}${esc(L.title)}${line.main ? '' : ' · ' + esc(line.title)}${D.msgWhy ? ' · ' + esc(D.msgWhy) : ''}</p><h3>Play ${MYC}'s moves from memory</h3>${opnHTML(Openings.ofNode(dNode()))}
     <div class="progressbar" aria-hidden="true"><i style="width:${pct}%"></i></div>
     ${status ? `<div class="status ${D.busy ? 'wait' : ''} ${D.tries ? 'bad' : ''}"><span class="bub"></span>${status}</div>` : ''}
     ${D.state === 'done' ? '' : `<p class="feedback">${D.msg || (D.feed && D.feed.length ? D.feed.join('') : D.i === D.s0 ? `${OPP}'s moves play automatically. Drag a piece or tap it, then tap where it goes.` : '&nbsp;')}</p>`}${doneBox}</div>`;
@@ -2083,7 +2092,7 @@ function wireDrillPanel(){
   const ga = document.getElementById('gAgain'); if (ga) ga.onclick = () => startGuided(D.id, D.unit);
   const np = document.getElementById('nextPuz'); if (np) np.onclick = () => startPuzzle(D.k + 1);
   const de = document.getElementById('dExplore'); if (de) de.onclick = () => { const line = LINES[D.id], L = lessonOf(D.id), idx = line.n[line.n.length - 1];
-    exploreNode(idx, {title: `${L.title} · end of the ${line.main ? 'main line' : 'line'}`, plan: line.main && planFor(L.id) ? {side: SIDE, lesson: L.id} : null}); };
+    exploreNode(idx, {title: `${L.title} · end of the ${line.main ? 'main line' : 'line'}`, plan: planOf(line.id) ? {side: SIDE, line: line.id} : null}); };
   const pe = document.getElementById('pExplore'); if (pe) pe.onclick = () => { const P = DATA.puzzles[D.k]; exploreNode(P.node, {moves: D.after ? [D.after.u] : [], title: `Missed shot · ${P.title}`}); };
 }
 // today's five: the next line, in whichever book it lives, played from move one
@@ -2381,7 +2390,7 @@ function sbReport(){
       ${n ? `<div class="slips">${slipCards}</div>` : ''}
       ${D.choices.length ? `<div><p class="kicker" style="margin-bottom:6px">${OPP}'s choices</p><div class="chain">${chain}</div><p class="evaltext" style="text-align:left">This exact line: ${oneIn(prob)}.</p></div>` : ''}
       <div class="lesson-actions"><button class="btn ${CU && cs >= SPAR ? '' : 'primary'}" id="sbAgain">Next game</button>${CU ? `<button class="btn ${cs >= SPAR ? 'primary' : ''}" data-unit="${CU.id}">Back to the ${uword(CU)}</button>` : ''}${lid ? `<button class="btn" data-line="${lid}">Study this line</button><button class="btn ghost" id="sbDrill">Drill it</button>` : ''}<button class="btn ghost" id="sbExplore">Play on with the engine</button></div></div>
-      ${lid && LINES[lid].main && L ? planCardHTML(planFor(L.id), `Plan from here · ${L.title}`) : ''}`;
+      ${lid && planOf(lid) ? planCardHTML(planOf(lid), planKick(lid)) : ''}`;
 }
 function sbPanelHTML(){
   const D = S.drill;
@@ -2402,6 +2411,7 @@ function sbPanelHTML(){
       <p class="sbcl"><span class="pdots" aria-hidden="true">${Array.from({length: SPAR}, (_, k) => `<i class="${k < cs ? 'on' : ''}"></i>`).join('')}</span>${cs} of ${SPAR} clean practice games${cs >= SPAR ? ': this step is done' : ''}</p></div>
       <button class="btn small" data-unit="${CU.id}">Back to the ${uword(CU)}</button></div>` : '';
   const head = `<div class="dpanel">${strip}<p class="kicker">${D.from ? 'From your position · ' : ''}${D.slips.length} ${D.slips.length === 1 ? 'slip' : 'slips'} so far${CU ? ` · ${OPP} plays only this ${uword(CU)}'s moves` : ''}</p>
+      ${opnHTML(Openings.ofNode(D.node))}
       ${status ? `<div class="status ${D.busy ? 'wait' : ''} ${D.tries ? 'bad' : ''}"><span class="bub"></span>${status}</div>` : ''}
       ${D.state === 'done' ? sbReport() : `<p class="feedback">${D.msg || (D.hist.length <= 2 ? 'Drag a piece or tap it, then tap where it goes.' : '&nbsp;')}</p>`}</div>`;
   return head + (D.state === 'done' ? '' : black) + sbFeed();
@@ -2420,7 +2430,7 @@ function wireSbPanel(){
   const sbb = document.getElementById('sbSetBack'); if (sbb) sbb.onclick = sbSetBack;
   const sc = document.getElementById('sbSetCancel'); if (sc) sc.onclick = () => { S.drill = S.sbState = null; render(); };
   const ex = document.getElementById('sbExplore'); if (ex && S.drill) ex.onclick = () => { const D = S.drill, lid = D.line, L = lid ? lessonOf(lid) : null;
-    exploreNode(D.node, {title: `Practice game · ${L ? L.title : 'end of your book'}`, plan: L && LINES[lid].main && planFor(L.id) ? {side: SIDE, lesson: L.id} : null}); };
+    exploreNode(D.node, {title: `Practice game · ${L ? L.title : 'end of your book'}`, plan: lid && planOf(lid) ? {side: SIDE, line: lid} : null}); };
 }
 function sbSideHTML(){
   const segBtn = (key, val, label) => `<button data-sbf="${key}:${val}" aria-pressed="${SBS[key] === val}">${label}</button>`;
@@ -2590,7 +2600,10 @@ function lessonSeen(side, lid){ if ((cprog().seen || {})[lid]) return true; cons
 const lineClean = id => !!((Prog.rec(id) || {}).clean);
 // lower-case the first letter for use mid-sentence, except where it starts a name: the sides and the openings
 const PROPER = /^(Black|White|London|Fried|Italian|Scotch|Ruy|Philidor|Petrov|Caro|Sicilian|Vienna|Danish|Evans|Ponziani|Slav|Colle|Jobava|Englund|Traxler|Møller|Hungarian|Alekhine|Owen|Greco|Max Lange|Elephant|Latvian|Stafford|Halloween|French|English|Dutch|Pirc|Scandinavian|Two Knights|Queen's Gambit|King's Gambit|Bishop's Opening|Center Game)\b/;
-const lc = s => s ? (PROPER.test(s) ? s : s[0].toLowerCase() + s.slice(1)) : '';
+// an opening's name keeps its capitals too: two capitalised words ("Nimzowitsch Defense", "St. George Defense") or a
+// hyphenated one ("Smith-Morra Gambit", "Anti-Berlin")
+const NAMED = /^(\S+\s+[A-Z]|[A-Z][^\s-]*-[A-Z])/;
+const lc = s => s ? (PROPER.test(s) || NAMED.test(s) ? s : s[0].toLowerCase() + s.slice(1)) : '';
 // text to take in at a glance: a paragraph becomes one bullet per sentence, without the full stops; one sentence stays a line
 const sentences = t => String(t || '').replace(/([.!?])\s+(?=["“(]?[A-Z])/g, '$1\u0001').split('\u0001').map(x => x.trim()).filter(Boolean);
 const firstSentence = t => sentences(t)[0] || '';
@@ -3034,6 +3047,37 @@ function nodeFen(idx){
 // the moves from the start of the game to a book position
 function nodeUcis(idx){ const us = []; for (let i = idx; N[i] && N[i].p !== null && N[i].p !== undefined; i = N[i].p) us.push(N[i].u); return us.reverse(); }
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+/* ------------------------------------------------------------------ OPENING NAMES
+   The names lichess.org gives (data/openings), for any position: a game is named after the last named position on the
+   way to it. The table is keyed by a hash of the position without the move counters, with an en passant square only
+   when the capture is legal, as pipeline/names.py writes it. */
+const Openings = (() => {
+  let T = null;
+  function table(){
+    if (T) return T; T = new Map();
+    const rows = OPENINGS_RAW.split('\n'), fams = rows[0] ? JSON.parse(rows[0]) : [];
+    for (let k = 1; k < rows.length; k++){
+      const r = rows[k], a = r.indexOf(','), b = r.indexOf(',', a + 1), fam = fams[parseInt(r.slice(a + 1, b), 36)], v = r.slice(b + 1);
+      T.set(r.slice(0, a), v ? `${fam}: ${v}` : fam);
+    }
+    return T;
+  }
+  const hash = s => { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(36); };
+  function epd(ch){ const f = ch.fen().split(' '); if (f[3] !== '-' && !ch.moves({verbose: true}).some(m => m.flags.includes('e'))) f[3] = '-'; return f.slice(0, 4).join(' '); }
+  const at = ch => table().get(hash(epd(ch))) || null;
+  // the name after these moves (uci) from the start, or from fen
+  function ofMoves(ucis, fen){
+    const ch = new Chess(fen && fen !== START_FEN ? fen : undefined); let nm = at(ch);
+    for (const u of ucis || []){ if (!ch.move(uciObj(u))) break; nm = at(ch) || nm; }
+    return nm;
+  }
+  const _n = new Map();
+  function ofNode(idx){ const k = SIDE + idx; if (!_n.has(k)) _n.set(k, ofMoves(nodeUcis(idx))); return _n.get(k); }
+  // the name a move starts, when it starts one: the name after it, if it differs from the name before it
+  function startedBy(ucis, k){ const a = ofMoves(ucis.slice(0, k)), b = ofMoves(ucis.slice(0, k + 1)); return b && b !== a ? b : null; }
+  return {ofMoves, ofNode, startedBy};
+})();
+function opnHTML(name){ return name ? `<p class="opn"><b>Opening</b><span>${esc(name)}</span></p>` : ''; }
 // the explore board at a book position, with the moves that led there
 function exploreNode(idx, o = {}){ exploreFrom(nodeFen(idx), Object.assign({pre: nodeUcis(idx)}, o)); }
 // the same position with the other side to move: what would they do if they could move twice?
@@ -3350,6 +3394,20 @@ function wireEngineCard(card, h){
 /* ---- plans: what to aim for once a line runs out (content/plans.py, per lesson) */
 const PLANK = {king: 'Your king', pawns: 'Pawns', pieces: 'Pieces', target: 'Target', them: 'Their plan', watch: 'Watch for'};
 function planFor(lid){ const L = LESSONS[lid]; return L && L.plan ? L.plan : null; }
+// the plan at the end of any line: its own (data/line_plans.json), else the plan of the main line that ends on the same
+// position (ps), else its lesson's when it is the main line
+function planOf(lineId){ const l = LINES[lineId]; if (!l) return null; return l.plan || (l.ps && planFor(l.ps)) || (l.main ? planFor(l.lesson) : null); }
+function planKick(lineId){ const l = LINES[lineId], o = l && l.ps && l.ps !== l.lesson && LESSONS[l.ps];
+  return o ? `Plan from here · the same position as “${o.title}”` : 'Plan from here'; }
+// the same for a line of either book (the explore board can be opened from the other side's page)
+function planRef(side, lineId){
+  const B = BOOKS[side]; if (!B) return null;
+  const find = (k, id) => (B[k] || []).find(x => x.id === id) || ((B.full && B.full[k]) || []).find(x => x.id === id);
+  const l = find('lines', lineId); if (!l) return null;
+  const L = find('lessons', l.lesson), o = l.ps ? find('lessons', l.ps) : null;
+  const plan = l.plan || (o && o.plan) || (l.main && L && L.plan) || null;
+  return plan ? {plan, title: L ? (l.main ? L.title : `${L.title} · ${l.title}`) : l.title} : null;
+}
 function planCardHTML(p, kick){
   if (!p) return '';
   return `<section class="plan" aria-label="Plan from here"><p class="kicker">${esc(kick || 'Plan from here')}</p>${p.h ? `<h4>${esc(p.h)}</h4>` : ''}
@@ -3450,7 +3508,8 @@ function renderExplore(){
   const ch = exChess(), fen = ch.fen(), turnW = ch.turn() === 'w', words = exWords(), n = X.moves.length;
   const over = ch.in_checkmate() ? `Checkmate. ${turnW ? 'Black' : 'White'} wins.` : ch.in_stalemate() ? 'Stalemate: a draw.' : ch.in_threefold_repetition() ? 'Same position three times: a draw.' : ch.insufficient_material() ? 'Not enough pieces left to mate: a draw.' : ch.in_draw() ? 'A draw.' : '';
   const status = over || (X.busy ? 'The engine is choosing its reply…' : X.auto ? 'Playing the engine\'s line…' : `${turnW ? 'White' : 'Black'} to move`);
-  const plan = X.plan ? (BOOKS[X.plan.side] && BOOKS[X.plan.side].lessons.find(l => l.id === X.plan.lesson)) : null;
+  const plan = !X.plan ? null : X.plan.line ? planRef(X.plan.side, X.plan.line)
+    : (L => L && L.plan ? {plan: L.plan, title: L.title} : null)(BOOKS[X.plan.side] && BOOKS[X.plan.side].lessons.find(l => l.id === X.plan.lesson));
   const B = X.base || 0, rows = words.map((w, k) => `<li><button class="trow ${w.white === (ME === 1) ? 'you' : 'blk'} ${k === X.i - 1 ? 'cur' : ''} ${k < B - 1 ? 'pre' : ''}" data-xi="${k + 1}"><span class="n">${w.no}${w.white ? '' : '…'}</span>${pieceIcon(w.pc, w.white)}<span class="lbl">${esc(w.label)}</span><span class="tg">${k === B - 1 ? '<span class="chip came">You came in here</span>' : ''}</span></button></li>`).join('');
   view.innerHTML = `<div class="crumbs"><button class="btn small" id="exBack">← Back</button><span class="where">${esc(X.title || 'Explore')}</span></div>
   <div class="sgrid">
@@ -3468,7 +3527,7 @@ function renderExplore(){
       ${B && X.i !== B && X.moves.length >= B ? `<button class="btn small" id="xCame">Back to where you came in</button>` : ''}
     </div>
     <div class="ccol">
-      <div class="dpanel"><p class="kicker">Explore · moves for both sides</p><h3>Play on from here</h3>
+      <div class="dpanel"><p class="kicker">Explore · moves for both sides</p><h3>Play on from here</h3>${opnHTML(Openings.ofMoves(X.moves.slice(0, X.i), X.start))}
         <div class="status ${X.busy || X.auto ? 'wait' : ''}"><span class="tomove ${turnW ? 'w' : 'b'}" aria-hidden="true"></span>${esc(status)}</div>
         ${(() => { if (!X.i || !words[X.i - 1]) return ''; let xs = []; try { xs = Ideas.of(exChess(X.i - 1).fen(), X.moves[X.i - 1], {me: X.side || SIDE}).lines; } catch(e){}
           return `<p class="xlast"><b>${words[X.i - 1].white ? 'White' : 'Black'}: ${esc(lc(words[X.i - 1].label))}.</b>${xs.length ? ' ' + esc(xs[0]) + '.' : ''}</p>`; })()}

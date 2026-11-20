@@ -676,4 +676,46 @@ B = {
   'bdx-misc': dict(h='Castle, then the c-pawn break', b=[
     ('king', 'Castle next.'),
     ('pawns', 'Then the c-pawn break.')]),
+  # ---------------------------------------------------------------- the Sicilian and the Caro-Kann, the side lessons
+  'bsi-d4': dict(h='Two moves ahead: e-pawn, bishop, castle', b=[
+    ('pawns', 'Push the e-pawn two squares next: it takes the middle and opens the road for your dark bishop.'),
+    ('pieces', 'Dark bishop out, then castle. The light bishop follows once the d-pawn moves.'),
+    ('them', 'White\'s queen went out and back, so you are ahead in development. White wants to catch up with the knights and the light bishop.')]),
+  'bsi-f4': dict(h='The French chain, with your c-pawn already out', b=[
+    ('pieces', 'Light bishop one square, then the king\'s knight to the edge and forward, where it eyes White\'s center.'),
+    ('pawns', 'Push the h-pawn: it stops White\'s g-pawn from moving up to kick your knight.'),
+    ('them', 'White wants the small c-pawn move, then the d-pawn beside the e-pawn.')]),
+  'bck-panov': dict(h='Castle, then aim at the lone d-pawn', b=[
+    ('king', 'Castle next.'),
+    ('target', 'White\'s d-pawn stands alone. Queen\'s knight out, then the queen and a rook join the pressure on it.'),
+    ('pieces', 'Your knight in the middle can\'t be kicked by a pawn. If White hits it, it steps back to guard your king.'),
+    ('them', 'White wants the bishop and queen pointed at your king, and the d-pawn push when it can.')]),
+  'bck-2kn': dict(h='Trade the bishop when asked, then castle', b=[
+    ('pieces', 'When the h-pawn hits your bishop, take the knight with it. Then the dark bishop comes out and you castle.'),
+    ('pawns', 'Then take White\'s e-pawn and swap the knights off.'),
+    ('them', 'White wants the two bishops and open lines for them.')]),
+  'bck-bc4': dict(h='Light bishop out, then the e-pawn and castle', b=[
+    ('pieces', 'Light bishop out at the knight, then the e-pawn one square and the dark bishop.'),
+    ('king', 'Castle short after that.'),
+    ('them', 'White\'s bishop aims at your d-pawn: keep it guarded with the e-pawn and the knight.')]),
+  'bck-misc': dict(h='Hit the chain with the c-pawn, then develop', b=[
+    ('pawns', 'Your c-pawn hits White\'s d-pawn. Take it when White\'s c-pawn pushes; the queens may come off.'),
+    ('pieces', 'Queen\'s knight out next to add to the pressure, then the king\'s knight.'),
+    ('them', 'White wants to hold the chain with the c-pawn and bring the knights out.')]),
 }
+
+# Plans for side lines, keyed by line id. A side line with none here takes the plan of a main line that ends on the same
+# position, or one read off the board and the engine's line (pipeline/plan_lines.py). Write one here when the read-off
+# plan misses the point.
+LW = {
+  'sc-e6-nge7': dict(h='Guard the d-pawn, then the h-pawn', b=[
+    ('them', 'Black\'s knight is on its way to the king\'s side, where it hits your d-pawn a second time.'),
+    ('pieces', 'Queen\'s knight out, then the dark bishop guards the d-pawn from behind.'),
+    ('pawns', 'Push the h-pawn: later the g-pawn can kick the knight away from your d-pawn.'),
+    ('watch', 'Count the guards on your d-pawn before every trade.')]),
+  'sd-qe6-nc6': dict(h='Gain more time on the queen', b=[
+    ('target', 'Black\'s queen stands in front of its own e-pawn and light bishop. Hit it with the queen\'s knight or the dark bishop.'),
+    ('pieces', 'King\'s knight out, then castle. Each hit on the queen costs Black another move.'),
+    ('them', 'Black wants to bring the queen back and push the e-pawn to free the dark bishop.')]),
+}
+LB = {}

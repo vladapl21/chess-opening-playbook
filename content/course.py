@@ -126,7 +126,7 @@ UNITS = [
          dict(path='e4 c5 c3 Nc6 d4 cxd4 cxd4 d5 exd5 Qxd5 Nf3 Bg4 Be2 Bxf3 Bxf3 Qxd4', arrows=['f3c6g', 'd1d4g'], circles=['d4r'], h='The loose pawn is bait',
               t='If the queen grabs your d-pawn, take the knight with check first. When the pawn takes back, your queen takes Black\'s.'),
        ]),
-  dict(id='w-lindian', side='w', title='The London: knight first', kicker='White · the same bishop against the knight',
+  dict(id='w-lindian', side='w', title='The London against the Indian Defense', kicker='White · the same bishop against the knight',
        why='Against the king\'s knight the bishop still comes out on move two. Against the fianchetto two small changes keep it safe; against the e-pawn and the d-pawn you are back in the setup.',
        lessons=['ln-kid', 'ln-e6'],
        deeper=['ln-d6', 'ln-d5', 'ln-c5'],
@@ -468,7 +468,7 @@ DEEP = [
               why='Black\'s light bishop is the one piece the setup can\'t shut in. Offer yours for it at once, take it if it stays behind the e-pawn, and keep your queen ready to take back.',
               t='Blue: the early bishop and the c-pawn one square. The same bishop rule answers both.'),
        ]),
-  dict(id='x-w-lindian', name='the London against the knight', base='w-lindian', title='The London: knight first', tag='The small d-pawn, the d-pawn two squares, the c-pawn at once',
+  dict(id='x-w-lindian', name='the London against the Indian Defense', base='w-lindian', title='The London against the Indian Defense', tag='The small d-pawn, the d-pawn two squares, the c-pawn at once',
        why='The knight-first lines past the fianchetto: the small d-pawn and its e-pawn push, the d-pawn that walks back into the setup, and the c-pawn that hits at once.',
        parts=[
          dict(title='The d-pawn, one or two squares', sub='A pawn to win, and the setup again',

@@ -88,7 +88,7 @@ with sync_playwright() as p:
 
     # the Caro-Kann is a full part of the book: chapter page, lesson with a plan, drill, cards at a glance, course unit, Sandbox
     pg.evaluate("useSide('b'); S.chapter = 'caro'; go('learn')"); pg.wait_for_timeout(500)
-    txt = pg.inner_text('#view'); assert 'against the e-pawn' in txt and 'The e-pawn pushes past' in txt and 'Take, then the bishop out' in txt
+    txt = pg.inner_text('#view'); assert 'against the e-pawn' in txt and 'The Advance Variation' in txt and 'The Classical: take, then the bishop out' in txt
     pg.screenshot(path=out + 'p_chapter.png', full_page=True)
     pg.evaluate("openLine('bck-main')"); pg.wait_for_timeout(500); pg.keyboard.press('End'); pg.wait_for_timeout(500)
     assert 'Dark bishop, castle, then the c-pawn' in pg.inner_text('#view'); pg.screenshot(path=out + 'p_lesson.png')
@@ -187,9 +187,11 @@ with sync_playwright() as p:
         seen.add(pg.evaluate("chapterOf(lessonOf(S.drill.line || sbLinesThrough(S.drill.node)[0])).id"))
     print('London sandbox games stayed in:', seen); assert seen <= {'london', 'lindian', 'lrare'} and seen
     assert pg.evaluate('document.documentElement.scrollWidth') <= 1280
+    # the records as they stand before switching back (a London practice game can end on the same line and add to it)
+    kept = pg.evaluate("[Prog.rec('setup').clean, Prog.rec('ld-trick').clean]"); assert kept[0] == 1 and kept[1] >= 1, kept
     pg.evaluate("go('course')"); switch(pg, 'white:e4')
     w2 = wshape(pg); assert w2['chapters'] == WE4 and w2['units'] == w0['units'] and w2['lines'] == w0['lines'] and w2['first'] == 'e2e4'
-    assert pg.evaluate("[Prog.rec('setup').clean, Prog.rec('ld-trick').clean]") == [1, 1]
+    assert pg.evaluate("[Prog.rec('setup').clean, Prog.rec('ld-trick').clean]") == kept, 'switching back keeps both systems\' records'
     print('White switched back: the same', len(w2['chapters']), 'chapters and', len(w2['units']), 'units')
     wc = pg.evaluate("""makeChoices({slots: {white: {n: 30, opts: {d4: {n: 24, w: 12, l: 10, d: 2}, e4: {n: 6, w: 3, l: 3, d: 0}}}}}).map(c => [c.id, (c.opts || []).map(o => [o.id, !!o.ready])])""")
     print('cards for a d-pawn player:', wc[:1]); assert wc[0] == ['white', [['d4', True], ['e4', True]]]

@@ -1433,7 +1433,7 @@ const Review = {
       const known = R.w && wk !== undefined && Nn[wk].t ? `A known mistake here: ${lc(firstSentence(Nn[wk].t))}` : '';
       const why = bk === undefined ? '' : Nn[bk].t ? `Why: ${noteLine(Nn[bk].t)}` : (x => x ? `Why: ${x}` : '')(this.idea(fenB, Nn[bk].u, R.me));
       const o = {last: this.sq(R.u[k - 1]), arrows: [R.u[k].slice(0, 4) + 'r'].concat(bk !== undefined ? [Nn[bk].u.slice(0, 4) + 'g'] : [])};
-      return this.item('', this.board(R, k, o), `Move ${no}: you left your book`, [`You played: ${lc(this.words(fenB, R.u[k]))}`, known || (p ? `${p.lines[0]}${p.lines[1] ? ': ' + lc(p.lines[1]) : ''}` : ''), bk !== undefined ? `Your book: ${lc(Nn[bk].l)}` : '', why],
+      return this.item('', this.board(R, k, o), `Move ${no}: you left your book`, [`You played: ${lc(this.words(fenB, R.u[k]))}${(n => n ? ` (${n})` : '')(Openings.startedBy(R.u, k))}`, known || (p ? `${p.lines[0]}${p.lines[1] ? ': ' + lc(p.lines[1]) : ''}` : ''), bk !== undefined ? `Your book: ${lc(Nn[bk].l)}` : '', why],
         bk !== undefined ? `<button class="btn small primary" type="button" data-rvb="${id}">Drill your line</button>${sbCanFromIn(R.me, node) ? `<button class="btn small" type="button" data-rvs="${id}">Practise from here</button>` : ''}` : '');
     }
     const fenA = this.fenAt(R.u, k + 1), kids = (Nn[node].k || []).filter(c => this.inBook(R.me).has(c)).sort((a, b) => (Nn[b].q || 0) - (Nn[a].q || 0)).slice(0, 3);
@@ -1441,7 +1441,7 @@ const Review = {
     const o = {last: this.sq(R.u[k]), arrows: ans ? [ans.slice(0, 4) + 'g'] : []};
     const wait = !R.ln ? (this.noEngine || Engine.state === 'failed' ? 'The answer needs the engine, which can\'t start here' : 'Working out the answer…') : !R.ln.length ? 'No answer to drill: the game was over' : '';
     return this.item('', this.board(R, k + 1, o), `Move ${no}: ${oc} left your book`,
-      [`${oc} played: ${lc(this.words(fenB, R.u[k]))}${idea ? `. ${idea}` : ''}`, kids.length ? `Your book has: ${kids.map(c => lc(Nn[c].l) + (Nn[c].q ? ` (${pctTxt(Nn[c].q)})` : '')).join(', ')}` : '',
+      [`${oc} played: ${lc(this.words(fenB, R.u[k]))}${(n => n ? ` (${n})` : '')(Openings.startedBy(R.u, k))}${idea ? `. ${idea}` : ''}`, kids.length ? `Your book has: ${kids.map(c => lc(Nn[c].l) + (Nn[c].q ? ` (${pctTxt(Nn[c].q)})` : '')).join(', ')}` : '',
        ans ? `The engine's answer: ${lc(this.words(fenA, ans))}` : wait, ans ? (x => x ? `Why: ${x}` : '')(this.idea(fenA, ans, R.me, R.u[k])) : ''],
       ans ? `<button class="btn small primary" type="button" data-rvd="${id}:o">Drill it</button><button class="btn small ghost" type="button" data-rvx="${id}:o">Play on with the engine</button>` : '');
   },
@@ -1890,12 +1890,14 @@ const Tour = {
         say: ['Move for either side, and the engine answers your moves', 'Purple arrows: its best moves. Red dashes: what the other side wants', 'Under the board: what the last move does']},
       {h: 'Lessons: the other side\'s answers', at: '.opts', go: () => { S.drill = S.drillState = null; openLine(lid, choiceAt(lid), 'games'); },
         say: ['Every position lists what the other side can play, and how often at your level', 'Tap one to see how your book meets it']},
-      {h: 'Every move explained', at: '.mcard', say: ['Step through with the arrows under the board, or the arrow keys', 'Each move says what it does: the book\'s note, and what the board shows']},
+      {h: 'Every move explained', at: '.mcard', say: ['Step through with the arrows under the board, or the arrow keys', 'Each move says what it does: the book\'s note, and what the board shows', 'Above it: the opening\'s real name, the one players know it by']},
       {h: 'The engine in lessons', at: '.engrow', say: ['Switch it on for the best moves, their arrows and the score', 'It stays off in drills, practice games and checkpoints, and comes back when they end']},
+      {h: 'The plan from here', at: '.ccol .plan', skip: () => !planOf(lid), go: () => { S.drill = S.drillState = null; openLine(lid, LINES[lid].n.length - 1, 'games'); },
+        say: ['Every line ends with a plan: what to aim for once the moves you know run out', 'You get it at the end of lessons, clean drills and practice games']},
       {h: 'Your games', at: '.gseg', go: () => go('games'),
         say: () => PERSONA === 'ready' ? ['Your openings with both colours, and your record in each', 'Last 3 games: your newest games reviewed, with the spot to drill in each', 'Where you leave the book most, and the monthly recap'] : ['Your openings, with your record in each', 'Last 3 games: your newest games reviewed, with the spot to drill in each', 'Missed shots, game reviews and the monthly recap']},
       {h: 'The Sandbox', at: '#sbpanel', go: () => { S.drill = S.drillState = null; go('sandbox'); },
-        say: ['Practice games against an opponent who plays your book\'s lines', 'Set up a position, or pick one in a lesson, to practise only the lines that go on from it', 'Leave the book and it shows what your move allows']},
+        say: ['Practice games against an opponent who plays your book\'s lines', 'Every game ends with the plan from there, whichever line it took', 'Set up a position, or pick one in a lesson, to practise only the lines that go on from it', 'Leave the book and it shows what your move allows']},
       {h: 'Levels', at: '#lvBtn', skip: () => document.getElementById('lvBtn').hidden, say: ['Every line you play earns points', 'The ring fills toward your next level. Tap it for your badges']},
       {h: 'Your streak', at: '#meBtn', skip: () => document.getElementById('meBtn').hidden, say: ['The flame counts the days in a row you finish today\'s five', 'Every third day in a row earns a shop token']},
       {h: () => `${coachName()}'s wardrobe`, at: () => document.querySelector('#app .chead') || document.querySelector('#app h2'), go: () => go('shop'),

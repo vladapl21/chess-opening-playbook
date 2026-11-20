@@ -261,6 +261,9 @@ for I in BM.INSIGHTS:
 
 print('chapters', [(c['id'], c['stats']) for c in chapters_out])
 print('stats', {k: v for k, v in stats.items() if k != 'first'}, sorted(stats['first'].items(), key=lambda kv: -kv[1]))
+# real names in place of move descriptions (content/opening_names.py, the names lichess.org uses)
+import names as NAMES
+_named = NAMES.apply(dict(nodes=nodes, lessons=lesson_out, lines=lines, parts=BC.PARTS), 'black')
 out = dict(side='b', nodes=nodes, lines=lines, lessons=lesson_out, parts=BC.PARTS, games=games_out, puzzles=puzzles,
            legal={str(k): v for k, v in legal.items()}, cheat=cheat, stats=stats, repCount=REP_COUNT, e4=0, oddsRoot=0,
            chapters=chapters_out, insights=insights, packs=BM.PACKS)

@@ -74,7 +74,20 @@ def main():
         assert set(P) <= ids, sorted(set(P) - ids)
         for L in D['lessons']:
             if L['id'] in P: L['plan'] = P[L['id']]
-    for k, pl in list(PLAN_W.items()) + list(PLAN_B.items()):
+    # plans for the other lines (data/line_plans.json, written by pipeline/plan_lines.py): a line's own plan, or "ps", the
+    # lesson whose main line ends on the same position
+    LP = json.load(open(paths.DATA / 'line_plans.json'))
+    for D in (W, B):
+        lids = {l['id'] for l in D['lines']}
+        for l in D['lines']:
+            p = LP.get(l['id'])
+            if not p: continue
+            if 'same' in p: l['ps'] = p['same']
+            else: l['plan'] = dict(h=p['h'], b=[list(x) for x in p['b']])
+    gone = sorted(set(LP) - {l['id'] for D in (W, B) for l in D['lines']})
+    assert not gone, gone
+    line_plans = [(k, dict(h=p['h'], b=p['b'])) for k, p in LP.items() if 'b' in p]
+    for k, pl in list(PLAN_W.items()) + list(PLAN_B.items()) + line_plans:
         for t in [pl['h']] + [x[1] for x in pl['b']]:
             bad = [m for m in re.findall(r'\b[a-h][1-8]\b', t) if m not in ('f7', 'f2')] + re.findall(r'\b[KQRBN]x?[a-h][1-8]\b|O-O', t)
             assert not bad, (k, t, bad)
@@ -117,13 +130,17 @@ def main():
     assert '</script' not in chessjs
     body = tpl.replace('<!--__PIECES__-->', syms).replace('/*__DATA_W__*/', dump(W)).replace('/*__DATA_B__*/', dump(B)).replace('/*__DATA_C__*/', dump(C))
     body = body.replace('/*__CHESSJS__*/', chessjs).replace("/*__HOME__*/''", json.dumps(site.get('home', '')))
+    # the opening names (data/openings, lichess-org/chess-openings, CC0) for any position on any board
+    import names as NAMES
+    assert body.count("/*__OPENINGS__*/''") == 1
+    body = body.replace("/*__OPENINGS__*/''", dump(NAMES.page_table()))
     # the game analysis, the move explainer and the product shell (welcome, games in, choices, the coach, the tour) live in their own files
     for mark, name in (('/*__ANALYZE__*/', 'analyze.js'), ('/*__IDEAS__*/', 'ideas.js'), ('/*__PRODUCT_JS__*/', 'product.js'), ('/*__PRODUCT_CSS__*/', 'product.css')):
         assert body.count(mark) == 1, mark
         src = (paths.APP / name).read_text()
         for exp in ('Analyze', 'Ideas'): src = src.replace(f"if (typeof module !== 'undefined') module.exports = {exp};", '')
         body = body.replace(mark, src.replace('</', '<\\/'))
-    assert '/*__DATA' not in body and '/*__CHESSJS__*/' not in body and '/*__HOME__*/' not in body
+    assert '/*__DATA' not in body and '/*__CHESSJS__*/' not in body and '/*__HOME__*/' not in body and '/*__OPENINGS__*/' not in body
     (paths.BUILD / 'playbook.html').write_text(body)
     page = site_html(body, site)
     (paths.DOCS / 'index.html').write_text(page)

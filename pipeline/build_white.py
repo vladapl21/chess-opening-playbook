@@ -287,6 +287,9 @@ for les in lesson_out:
 print('chapters', [(c['id'], c['stats']) for c in chapters_out])
 print('stats', stats)
 
+# real names in place of move descriptions (content/opening_names.py, the names lichess.org uses)
+import names as NAMES
+_named = NAMES.apply(dict(nodes=nodes, lessons=lesson_out, lines=lines, parts=content.PARTS), 'white')
 out = dict(nodes=nodes, lines=lines, lessons=lesson_out, parts=content.PARTS, games=games_out, puzzles=puzzles,
            legal={str(k): v for k, v in legal.items()}, cheat=cheat, stats=stats, repCount=REP_COUNT, e4=E4, chapters=chapters_out, packs=CM.PACKS)
 OUT = paths.BUILD / 'data_white.json'
