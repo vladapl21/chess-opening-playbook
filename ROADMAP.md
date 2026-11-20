@@ -69,6 +69,12 @@ Facts that shape the design:
 - Settings and the account button moved out of the header into the corner of the screen; the header fits one row on an ordinary monitor and centres its rows when it has to wrap.
 - A lesson opened from a course unit has "Next lesson" at the top. The Sandbox has "Free play: pick openings" to leave a course practice game.
 
+## Phase 1.15: the last three games, practice from a position, plainer words (done, November 19)
+
+- **Last 3 games** (Your games). The three newest games, reviewed: where each left the book and whose move it was, the book's move or the engine's answer, and the first move that cost a pawn and a half or more. Drill it plays that spot on the drill board; Drill your line and Practise from here when the player left the book. Read from the account on the website every quarter of an hour, or pasted in any copy; the coach says when a new review is waiting, and the Drill page points to what is left to drill. Kept in the progress record and merged per game.
+- **The Sandbox from a position.** A set-up board takes the book's moves for both sides; practice games then start there and only its lines come up. Practise from here in a lesson and in a review does the same.
+- **Wording.** The footer line about the coach's study is gone; the repertoire is "your book" everywhere (no "study", "guide" or "prep"); lesson chips that only meant something to the house player are gone or kept to it; the Drill page no longer says the same thing three times; a few kickers and coach lines say something concrete instead.
+
 ## Phase 1.14: a tour, and every move explained (done, November 19)
 
 A friend played it for the first time and missed half of it: playing on with the engine, the other side's answers in a lesson, even the switch between White and Black.

@@ -13,6 +13,10 @@ errors = []
 ART = (ROOT / 'data' / 'build' / 'playbook.html').as_uri()
 
 
+# the last three games read the same month from the same address: hold them back so every read here is the recap's
+QUIET = "Review.tried = Date.now() + 864e5"
+
+
 def hook(pg):
     pg.on('pageerror', lambda e: errors.append(f'pageerror: {e}'))
     pg.on('console', lambda m: errors.append(f'console {m.type}: {m.text}') if m.type == 'error' and 'ERR_' not in m.text and '503' not in m.text else None)   # 503: the failed check below
@@ -51,7 +55,7 @@ with sync_playwright() as p:
     b = launch(p)
     ctx = b.new_context(viewport={'width': 1280, 'height': 900}); ctx.route('https://api.chess.com/**', chesscom); ctx.route('https://lichess.org/**', lambda r: r.fulfill(status=200, content_type='application/x-chess-pgn', headers={'Access-Control-Allow-Origin': '*'}, body=MONTHS[KEYS[1]][0]))
     pg = ctx.new_page(); hook(pg)
-    pg.goto(URL); pg.wait_for_timeout(900)
+    pg.goto(URL); pg.evaluate(QUIET); pg.wait_for_timeout(900)
     assert pg.evaluate("[Recap.on(), Recap.can(), JSON.stringify(Recap.acct())]") == [True, True, '{"site":"chess.com","user":"aqua_alpaca"}'], 'the house playbook reads its own account'
     assert pg.evaluate("(() => { const keep = [PERSONA, Prog.d.me]; PERSONA = 'ready'; Prog.d.me = {state: 'ready', src: {site: 'lichess', user: 'Someone'}}; const a = Recap.aid(); Prog.d.me = {state: 'ready', src: {site: 'pgn', user: 'x'}}; const b = Recap.on(); [PERSONA, Prog.d.me] = keep; return [a, b]; })()") == ['lichess:someone', False], 'a personal playbook reads the account it was built from; files alone have none'
     assert pg.evaluate("Recap.read({site: 'lichess', user: 'Someone'}, '%s').then(t => t.includes('[Event'))" % key(KEYS[1])), 'Lichess games are read by date'
@@ -97,7 +101,7 @@ with sync_playwright() as p:
     # forgets what it has said; a save as the page unloads then writes the same)
     # (the recap part is left first: drawn again on screen, it would mark the month opened before the reload)
     pg.evaluate("S.gseg = 'open'; go('course')"); pg.wait_for_timeout(300)
-    pg.evaluate("Prog.d.recap.seen = '%s'; Prog.saveLocal(); Coach.seen = {}; try { localStorage.removeItem('playbook-coach'); } catch(e){}" % key(KEYS[2])); pg.reload(); pg.wait_for_timeout(1500)
+    pg.evaluate("Prog.d.recap.seen = '%s'; Prog.saveLocal(); Coach.seen = {}; try { localStorage.removeItem('playbook-coach'); } catch(e){}" % key(KEYS[2])); pg.reload(); pg.evaluate(QUIET); pg.wait_for_timeout(1500)
     bub = pg.inner_text('#coach .cbub'); print('coach:', bub.replace('\n', ' | ')); assert 'recap is ready' in bub and pg.locator('#coach [data-cgo="recap"]').count() == 1
     pg.evaluate("S.gseg = 'open'; go('games')"); pg.wait_for_timeout(300); assert pg.locator('.gseg .sgdot').count() == 1, 'the switch marks the new recap'
     pg.evaluate("Coach.hush(); go('course')"); pg.wait_for_timeout(300); assert 'recap is ready' not in pg.inner_text('#coach'), 'said once'
@@ -111,7 +115,7 @@ with sync_playwright() as p:
 
     # ---- phone and dark
     ph = b.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True, color_scheme='dark'); ph.route('https://api.chess.com/**', chesscom)
-    q = ph.new_page(); hook(q); q.goto(URL); q.wait_for_timeout(900); q.evaluate("Coach.hush(); S.gseg = 'recap'; go('games')")
+    q = ph.new_page(); hook(q); q.goto(URL); q.evaluate(QUIET); q.wait_for_timeout(900); q.evaluate("Coach.hush(); S.gseg = 'recap'; go('games')")
     q.wait_for_function('!Recap.busy && !!(Prog.d.recap || {}).chk', timeout=60000); q.wait_for_timeout(300); q.evaluate('Coach.hush()')
     w = q.evaluate('document.documentElement.scrollWidth'); print('phone recap', w); assert w <= 390
     q.screenshot(path=out + 'r_phone.png', full_page=True); ph.close()

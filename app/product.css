@@ -394,3 +394,23 @@ button.rcrow{cursor:pointer} button.rcrow:hover{border-color:var(--accent)}
 .twcard .coachpick{margin-top:10px}
 @media (max-width:640px){ .twcard{grid-template-columns:40px minmax(0,1fr);padding:14px 14px 12px;gap:10px} .twface{width:40px;height:40px} .twcard h3{font-size:17px} .twcard .bul{font-size:14px} .twacts{margin-top:10px} }
 @media (prefers-reduced-motion: reduce){ .twring,.twcard,.twbar i{transition:none} }
+
+/* the last three games: a card per game, a row per thing to drill */
+.rvwrap{display:grid;gap:14px}
+.rvwrap .rcstat{margin:0}
+.rvcard{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:14px 16px;display:grid;gap:12px}
+.rvh{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
+.rvh b{font-size:15px} .rvelo{color:var(--muted);font-weight:500} .rvwhen{color:var(--muted);font-size:13px}
+.rvh a{margin-left:auto;font-size:13px;color:var(--accent-ink)}
+.rvi{display:grid;grid-template-columns:132px minmax(0,1fr);gap:14px;align-items:start;padding-top:12px;border-top:1px solid var(--line)}
+.rvi.ok,.rvi.wait{grid-template-columns:minmax(0,1fr)} .rvi .thumb{max-width:132px}
+.rvt{font-weight:600;margin:0 0 4px} .rvi.ok .rvt,.rvi.wait .rvt{font-weight:500;color:var(--muted);margin:0}
+.rvx{min-width:0} .rvx ul{margin:0} .rvx .lesson-actions{margin-top:10px}
+.rvpaste{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:12px 16px}
+.rvpaste summary{cursor:pointer;font-weight:600}
+.rvpb{display:grid;gap:8px;margin-top:10px}
+.rvpb textarea{width:100%;box-sizing:border-box;font:13px/1.4 var(--f-mono);padding:8px 10px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);color:var(--ink);resize:vertical}
+.rverr{color:var(--rosso);font-size:13px;margin:0} .rvask p{margin:0 0 6px;font-size:14px}
+@media (max-width:560px){.rvi{grid-template-columns:92px minmax(0,1fr);gap:10px} .rvi .thumb{max-width:92px} .rvh a{margin-left:0}}
+.rvcue{display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap}
+.rvcue .tline{margin:2px 0 0}

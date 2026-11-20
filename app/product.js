@@ -20,7 +20,7 @@ const pc = (a, b) => b ? Math.round(100 * a / b) : 0, rec = t => `${t.w}–${t.l
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 
 /* the coaches: three original characters drawn here. They say the same things; the player picks the face and the name comes with it. */
-const COACHES = [{id: 'knight', name: 'Pip', what: 'the knight'}, {id: 'rook', name: 'Rocco', what: 'the rook'}, {id: 'pawn', name: 'Dot', what: 'the pawn with plans'}];
+const COACHES = [{id: 'knight', name: 'Pip', what: 'the knight'}, {id: 'rook', name: 'Rocco', what: 'the rook'}, {id: 'pawn', name: 'Dot', what: 'the pawn'}];
 const coachWho = () => COACHES.find(c => c.id === SET.who) || COACHES[0], coachName = () => coachWho().name;
 // two eyes for the characters that face you: round and looking at you, looking up when thinking, shut and smiling when pleased
 const eyes2 = (x1, x2, y, r, mood) => mood === 'cheer' ? `<path class="kn-line" d="M${x1 - r + 1} ${y + 1}q${r - 1}-${r} ${2 * r - 2} 0M${x2 - r + 1} ${y + 1}q${r - 1}-${r} ${2 * r - 2} 0"/>`
@@ -248,7 +248,6 @@ function applyProfile(me){
     }
   }
   const site = (me.src || {}).site === 'lichess' ? 'Lichess' : (me.src || {}).site === 'chess.com' ? 'chess.com' : '';
-  FOOT = `${P.user ? P.user + '\'s playbook' : 'Your playbook'}, built from your${site ? ' ' + site : ''} games.`;
   const skills = COURSE.map((U, k) => U.kind === 'skill' ? [k, U] : null).filter(Boolean), open = COURSE.filter(U => U.kind !== 'skill');
   for (const U of open){
     const side = U.side === 'w' ? P.white : P.black, word = U.side === 'w' ? 'White' : 'Black', t = {n: 0, w: 0, l: 0, d: 0, depth: 0};
@@ -467,7 +466,7 @@ const Product = {
   findingsHTML(){
     const P = this.me().P; if (!P) return this.startHTML();
     const tile = (b, s) => `<div class="tile"><b>${b}</b><span>${s}</span></div>`;
-    return `<div class="chead"><div><p class="kicker">Step 2 of 3 · done</p><h2 style="font-size:clamp(30px,4vw,48px)">Here's what your games say${P.user ? ', ' + esc(P.user) : ''}</h2></div></div>
+    return `<div class="chead"><div><p class="kicker">Step 2 of 3 · done</p><h2 style="font-size:clamp(30px,4vw,48px)">What your games say</h2></div></div>
       <div class="tiles">${tile(P.n, 'games read')}${tile(P.rating || '–', `your ${P.tc} rating${P.peak > P.rating ? `, best ${P.peak}` : ''}`)}${tile(rec(P.all), 'wins and losses')}${tile(pc(P.all.w + P.all.d / 2, P.all.n) + '%', `score against ${P.oppAvg || '?'}-rated opponents`)}</div>
       <div class="fgrid"><div class="pcard"><p class="kicker">What you already play</p>
           <h3 style="margin-top:6px">With White</h3><div class="bars">${this.barsHTML('white', P)}</div>
@@ -517,22 +516,24 @@ const Product = {
       return `<div class="ogroup"><p class="kicker">With ${s === 'w' ? 'White' : 'Black'}${side.all && side.all.n ? ` · ${plural(side.all.n, 'game')} · ${rec(side.all)}` : ''}</p><div class="otiles">${cs.map(C => openTile(s, C, sys[C.id], `data-pch="${s}:${C.id}"`)).join('')}</div></div>`; };
     const leaks = P.leaks.slice(0, 8), games = P.games.slice(0, 40);
     const segs = [['open', 'Your openings', BOOKS.w.chapters.length + BOOKS.b.chapters.length, 'Openings'], ['leaks', 'Where you leave the book', leaks.length, 'Off the book'], ['games', 'Recent games', games.length, 'Games']].filter(x => x[0] === 'open' || x[2]);
+    segs.splice(1, 0, ['last', 'Last 3 games', undefined, 'Last 3']);
     if (Recap.on()) segs.push(['recap', 'Monthly recap', undefined, 'Recap']);
     const seg = segs.some(x => x[0] === S.gseg) ? S.gseg : 'open';
+    segs[1][4] = seg !== 'last' && Review.fresh();
     const rows = games.map(g => `<tr><td>${g.me === 'w' ? 'White' : 'Black'}</td><td>${esc(g.opp)}${g.oe ? ` <span style="color:var(--muted)">${g.oe}</span>` : ''}</td><td><span class="chip ${g.r === 1 ? 'win' : g.r === 0 ? 'loss' : 'draw'}">${g.r === 1 ? 'Won' : g.r === 0 ? 'Lost' : 'Draw'}</span></td><td>${esc(g.ch ? cn(g.me, g.ch) || 'Outside the playbook' : 'Outside the playbook')}</td><td>${g.ch ? plural(Math.floor(g.bp / 2), 'move') + ' in the book' : ''}</td></tr>`).join('');
-    const body = seg === 'recap' ? Recap.html() : seg === 'leaks' ? `<p class="legendline">The same position, the same different move. Red is what you played, green is the playbook.</p><div class="leaks">${leaks.map(L => this.leakHTML(L, true)).join('')}</div>`
+    const body = seg === 'last' ? Review.html() : seg === 'recap' ? Recap.html() : seg === 'leaks' ? `<p class="legendline">The same position, the same different move. Red is what you played, green is the playbook.</p><div class="leaks">${leaks.map(L => this.leakHTML(L, true)).join('')}</div>`
       : seg === 'games' ? `${P.facts.length ? `<div class="pcard"><p class="kicker">Where you score</p><ul class="factl">${P.facts.map(f => `<li><b>${f.big}</b><span>${esc(f.text)}</span></li>`).join('')}</ul></div>` : ''}
           <div class="gwrap pcard" style="padding:6px 10px"><table class="gtable"><thead><tr><th>Colour</th><th>Opponent</th><th>Result</th><th>Opening</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`
       : `<p class="legendline">Their move is highlighted, the green arrow is your answer.</p>${group('w')}${group('b')}`;
     const num = (b, w) => `<span><b class="tnum">${b}</b> ${w}</span>`;
     if (Recap.on()) segs[segs.length - 1][4] = Recap.fresh();      // after the body: opening a finished month marks it seen
-    view.innerHTML = `<div class="pv"><div class="chead ghd"><div><p class="kicker">Your games${P.user ? ' · ' + esc(P.user) : ''}</p><h2 style="font-size:clamp(30px,4vw,44px)">What actually happened</h2>
+    view.innerHTML = `<div class="pv"><div class="chead ghd"><div><p class="kicker">Your games${P.user ? ' · ' + esc(P.user) : ''}</p><h2 style="font-size:clamp(30px,4vw,44px)">Your results</h2>
         <p class="grec">${num(P.n, P.n === 1 ? 'game' : 'games')}${num(P.all.w, P.all.w === 1 ? 'win' : 'wins')}${num(P.all.l, P.all.l === 1 ? 'loss' : 'losses')}${P.all.d ? num(P.all.d, P.all.d === 1 ? 'draw' : 'draws') : ''}${P.rating ? num(P.rating, `${P.tc} rating`) : ''}</p></div>
         <button class="btn small" data-pgo="setup">Read my newer games</button></div>
       <div class="pgbody">${segHTML(segs, seg, 'gseg')}<div class="gbody">${body}</div></div></div>`;
     view.querySelectorAll('[data-gseg]').forEach(b => b.onclick = () => { S.gseg = b.dataset.gseg; this.games(); });
-    this.wire(); if (seg === 'recap') Recap.wire(view);
-    Recap.auto();
+    this.wire(); if (seg === 'recap') Recap.wire(view); if (seg === 'last') Review.wire(view);
+    Recap.auto(); Review.auto();
   },
   wire(){
     view.querySelectorAll('[data-acct]').forEach(b => b.onclick = () => Acct.open(b.dataset.acct));
@@ -732,7 +733,7 @@ function renderShop(){
   const list = tab === 'locker' ? locker : sale;
   const groups = SLOTS.map(([slot, name]) => [name, list.filter(I => I.slot === slot)]).filter(([, l]) => l.length);
   const lv = Level.of(), toGo = Array.from({length: Math.max(0, SHOP_AT - lv.n)}, (_, k) => Level.step(lv.n + k)).reduce((a, v) => a + v, 0) - lv.into;
-  const dropNote = !drops.length ? 'Every drop for today is already in your locker.' : drops.every(I => Shop.owns(I.id)) ? `${drops.length === 1 ? 'It\'s' : 'Both are'} yours now, in your locker for good.` : 'What isn\'t bought by midnight goes back in the box, and tomorrow the shelf holds something else.';
+  const dropNote = !drops.length ? 'Every drop for today is already in your locker.' : drops.every(I => Shop.owns(I.id)) ? `${drops.length === 1 ? 'It\'s' : 'Both are'} yours now, in your locker for good.` : 'Drops not bought by midnight are gone. Tomorrow brings two new ones.';
   view.innerHTML = `<div class="chead"><div><p class="kicker">Shop</p><h2 style="font-size:clamp(30px,4vw,46px)">${esc(coachName())}'s wardrobe</h2><p>Tokens come from badges, from levels and from days in a row. Spend them on a new look for your coach.</p></div></div>
     <div class="shop">
       <aside class="shopside">
@@ -899,7 +900,7 @@ const Coach = {
   seen: (() => { try { return JSON.parse(localStorage.getItem('playbook-coach') || '{}'); } catch(e){ return {}; } })(), timer: null, last: null,
   el(){ let e = document.getElementById('coach'); if (!e){ e = document.createElement('div'); e.id = 'coach'; e.className = 'coach'; document.body.appendChild(e);
       e.addEventListener('click', ev => { if (ev.target.closest('.cx')) return this.hush(); const a = ev.target.closest('[data-cgo]');
-        if (a){ this.hush(); const g = a.dataset.cgo; if (g === 'me') return Acct.open(Cloud.user ? 'in' : 'me'); if (g === 'recap'){ S.gseg = 'recap'; Recap.sel = Recap.unseen(); return go('games'); } return go(g); }
+        if (a){ this.hush(); const g = a.dataset.cgo; if (g === 'me') return Acct.open(Cloud.user ? 'in' : 'me'); if (g === 'recap'){ S.gseg = 'recap'; Recap.sel = Recap.unseen(); return go('games'); } if (g === 'last'){ S.gseg = 'last'; return go('games'); } return go(g); }
         if (ev.target.closest('.cav')) this.tap(); }); }
     return e; },
   // on the welcome, reading, findings and choice screens the coach is part of the page, so the corner one stays away
@@ -929,11 +930,12 @@ const Coach = {
   refresh(){ this.hush(); },
   // the first visit to a tab: what it is for
   tip(){
-    const T = {start: 'Connect your chess account and I\'ll build your course around your games.', setup: 'A username is the quickest way. I only read your public games.', sandbox: 'Play your side. The other side answers the way club players really do.',
-      course: 'Work down the path. In Play along you make every move yourself, with an arrow to follow.', learn: 'Pick a lesson, or switch to At a glance for every decision in this opening on one page.', drill: 'Five lines a day keeps your streak. The ones you slipped on come first.',
-      games: 'Your openings, with your record in each. Open one for its lessons and every position in it at a glance.', study: 'Step through with the arrow keys. Play along puts the moves in your hands, with an arrow to follow.',
+    const T = {start: 'Connect your chess account and I\'ll build your course around your games.', setup: 'A username is the quickest way. I only read your public games.', sandbox: 'Play your side; the other side answers the way club players do. Set up a position to practise only what follows it.',
+      course: 'The button on the open unit always takes you to its next step.', learn: 'Pick a lesson, or switch to At a glance for every decision in this opening on one page.', drill: 'A wrong move shows the answer that punishes it. Miss twice and the arrow shows your move.',
+      games: 'Your openings, with your record in each. Open one for its lessons and every position in it at a glance.', study: 'Step through with the arrow keys. Practise from here plays only the lines that go on from this move.',
       shop: 'Tokens come from badges, levels and days in a row. Two drops come out every day and are gone at midnight.'};
     if (S.view === 'drill' && S.drill && S.drill.guided) return 'Play the move the green arrow shows. Then the same line once from memory.';
+    if (S.view === 'games' && S.gseg === 'last') return 'Your three newest games: where each left your book and its first costly move. Drill it plays that spot.';
     if (S.view === 'drill' && S.drill && S.drill.unit) return 'Clean once from memory and the line counts for this unit. A slip: play it again.';
     return T[S.view] || T[tabOf(S.view, S.studyFrom)] || 'Keep going.';
   },
@@ -1130,7 +1132,7 @@ const Recap = {
     const k = this.unseen();
     if (!k || (S.view === 'games' && S.gseg === 'recap')) return false;
     const M = this.month(k), dr = this.rating(M);
-    return Coach.once('recap-' + k, `Your ${this.name(k)} recap is ready: ${plural(M.all[0], 'game')}, ${this.score(M.all)}%${dr ? `, rating ${dr > 0 ? 'up' : 'down'} ${Math.abs(dr)}` : ''}. Here's how the month went.`, {mood: 'cheer', stay: true, head: 'Monthly recap', cta: ['recap', 'See the recap']});
+    return Coach.once('recap-' + k, `Your ${this.name(k)} recap is ready: ${plural(M.all[0], 'game')}, ${this.score(M.all)}%${dr ? `, rating ${dr > 0 ? 'up' : 'down'} ${Math.abs(dr)}` : ''}.`, {mood: 'cheer', stay: true, head: 'Monthly recap', cta: ['recap', 'See the recap']});
   },
   score(t){ return t && t[0] ? Math.round((t[1] + t[3] / 2) / t[0] * 100) : 0; },
   rating(M){ return M.rs.length && M.r0 ? M.rs[M.rs.length - 1][1] - M.r0 : 0; },
@@ -1250,6 +1252,321 @@ const Recap = {
 
 setInterval(() => Recap.auto(), 30 * 6e4);
 setTimeout(() => Recap.auto(), 5000);
+
+/* ---- the last three games, reviewed and ready to drill. A check reads the newest games from the player's account (on
+   the website; the claude.ai copy takes a pasted game instead), at most every quarter of an hour, and keeps three: a
+   new game comes in, the oldest goes. Each review says where the game left the player's book and whose move did it,
+   and what the book plays there, or the engine when the book has nothing; then the first of the player's moves that
+   cost a pawn and a half or more. Drill it plays that spot: the book's own line when the player left the book, else the
+   engine's line from the position in the game, on the drill board (drill kind 'rv'). The engine's part runs while the
+   reviews are on screen, so it never takes the engine from a lesson. Everything sits in d.rg, merged game by game
+   (mergeProg), so the reviews and the drills done on them follow the player to every device. */
+const RG_N = 3, RG_EVERY = 15 * 6e4, RG_PLY = 60;
+const Review = {
+  busy: false, err: '', tried: 0, working: false, prog: null, pasted: null, pasteErr: '',
+  st(){ const r = Prog.d.rg || (Prog.d.rg = {}); r.g = r.g || []; return r; },     // for writing
+  rd(){ const r = Prog.d.rg; return r && r.g ? r : {g: []}; },                         // for reading
+  sorted(gs){ return gs.slice().sort((a, b) => (b.added || 0) - (a.added || 0) || b.t - a.t); },
+  list(){ return this.sorted(this.rd().g).slice(0, RG_N); },
+  get(id){ return this.rd().g.find(R => R.id === id); },
+  on(){ return PERSONA !== 'new'; },
+  acct(){ return Recap.acct(); },
+  can(){ return this.on() && !!SITE && !!this.acct(); },
+  due(){ return Date.now() - Math.max(this.rd().chk || 0, this.tried) >= RG_EVERY; },
+  auto(){ if (this.can() && !this.busy && this.due()) this.check(); },
+  // something to drill that hasn't been drilled clean yet
+  todo(R){ const d = R.d || {}, open = (R.by === 'opp' || R.by === 'me') && !(d.o && d.o[1]), mk = R.mk && !(d.m && d.m[1]); return open || mk; },
+  fresh(){ const seen = this.rd().seen || 0; return this.list().some(R => (R.added || 0) > seen && this.todo(R)); },
+  gid(g){ return g.url || `${g.h.White}~${g.h.Black}~${g.t}`; },
+  // ---- reading the games
+  parse(text, user){ return Analyze.parsePGN(text || '').map(g => { const r = Analyze.replay(g, String(user || '').toLowerCase()); return r ? Object.assign(r, {h: g.h}) : null; }).filter(Boolean); },
+  async read(){
+    const a = this.acct(), cur = Recap.key(Date.now());
+    let gs = this.parse(await Recap.read(a, cur), a.user);
+    if (gs.length < RG_N) gs = gs.concat(this.parse(await Recap.read(a, Recap.shift(cur, -1)), a.user));
+    return gs.sort((x, y) => y.t - x.t).slice(0, RG_N);
+  },
+  async check(){
+    if (this.busy || !this.can()) return;
+    this.busy = true; this.err = ''; this.tried = Date.now(); this.paint();
+    try {
+      const gs = await this.read(), st = this.st(), newest = st.g.filter(R => R.src === 'acct').reduce((m, R) => Math.max(m, R.t), 0);   // a check writes when it is done
+      const fresh = gs.filter(g => g.t > newest && !this.get(this.gid(g))).sort((x, y) => x.t - y.t), now = Date.now();
+      fresh.forEach((g, k) => st.g.push(this.make(g, 'acct', now + k)));
+      this.trim(); st.chk = Date.now(); Prog.save();
+      if (fresh.length) this.announce();
+    } catch(e){ this.err = e && e.missing ? 'missing' : 'net'; }
+    this.busy = false; this.paint(); this.work();
+  },
+  trim(){ const st = this.st(); st.g = this.sorted(st.g).slice(0, RG_N); },
+  make(g, src, added){
+    const us = g.ucis.slice(0, 90), w = this.walk(g.me, us);
+    return {id: this.gid(g), t: g.t, added, src, me: g.me, opp: g.opp || '', oe: g.oppElo || 0, r: g.res, url: /^https?:\/\//.test(g.url || '') ? g.url : '', u: us, at: w.k, by: w.by, w: w.warn ? 1 : 0};
+  },
+  // ---- the book: the positions on the lines in play, and how far a game follows them
+  inBook(s){ const c = this._ib || (this._ib = {}); if (!c[s]){ const set = c[s] = new Set(); for (const l of BOOKS[s].lines) for (const i of l.n) set.add(i); } return c[s]; },
+  walk(me, us){
+    const Nn = BOOKS[me].nodes, ib = this.inBook(me), mine = k => (k % 2 === 0) === (me === 'w'), warn = c => (Nn[c].g || []).includes('warn');
+    let node = 0;
+    for (let k = 0; k < us.length; k++){
+      const c = (Nn[node].k || []).find(x => Nn[x].u === us[k] && ib.has(x));
+      if (c !== undefined && !(mine(k) && warn(c))){ node = c; continue; }
+      const kids = (Nn[node].k || []).filter(x => ib.has(x) && !(mine(k) && warn(x)));
+      return {k, node, by: !kids.length ? 'end' : mine(k) ? 'me' : 'opp', warn: c !== undefined};
+    }
+    return {k: us.length, node, by: 'end'};
+  },
+  bookMove(me, node){ const Nn = BOOKS[me].nodes, ib = this.inBook(me); return (Nn[node].k || []).find(c => ib.has(c) && !!Nn[c].w === (me === 'w') && !(Nn[c].g || []).includes('warn')); },
+  // ---- positions and words
+  fenAt(us, k){ const ch = new Chess(); for (let i = 0; i < k && i < us.length; i++) if (!ch.move(uciObj(us[i]))) break; return ch.fen(); },
+  fenAfter(fen, u){ const ch = new Chess(fen); ch.move(uciObj(u)); return ch.fen(); },
+  words(fen, u){ try { return wordsAt(fen, u) || 'another move'; } catch(e){ return 'another move'; } },
+  idea(fen, u, me, prev){ try { return (Ideas.of(fen, u, {me, prev}).lines || [])[0] || ''; } catch(e){ return ''; } },
+  punish(fen, u, me){ try { return Ideas.punish(fen, u, {me, words: (f, x) => wordsAt(f, x)}); } catch(e){ return null; } },
+  cost(cp){ return cp >= 800 ? 'about a queen' : cp >= 450 ? 'about a rook' : cp >= 250 ? 'about a piece' : cp >= 180 ? 'about two pawns' : 'about a pawn and a half'; },
+  // ---- the engine's part
+  eng(fen, depth, ms){
+    return new Promise((res, rej) => {
+      let over = false; const t = setTimeout(() => { if (!over){ over = true; rej(new Error('stopped')); } }, ms + 6000);
+      Engine.run({fen, depth, ms, multipv: 1, onDone: j => { if (over) return; over = true; clearTimeout(t); res(j); }, onFail: () => { if (over) return; over = true; clearTimeout(t); rej(new Error('engine')); }});
+    });
+  },
+  async line(fen, n){
+    const ch = new Chess(fen), out = [];
+    for (let k = 0; k < n && !ch.game_over(); k++){
+      const j = await this.eng(ch.fen(), 13, 1200), u = j.best && j.best !== '(none)' ? j.best : ((j.lines[0] || {}).pv || [])[0];
+      if (!u || !ch.move(uciObj(u))) break; out.push(u);
+    }
+    return out;
+  },
+  async val(fen, depth, ms){
+    const ch = new Chess(fen);
+    if (ch.in_checkmate()) return {s: ch.turn() === 'w' ? -2000 : 2000}; if (ch.game_over()) return {s: 0};
+    const j = await this.eng(fen, depth, ms), L = j.lines[0];
+    return {s: L ? Math.max(-2000, Math.min(2000, scoreNum(L.s))) : 0, best: j.best && j.best !== '(none)' ? j.best : null};
+  },
+  // the first of the player's moves that cost a pawn and a half or more, looked at again deeper before it is named
+  async scan(R){
+    const us = R.u, sg = R.me === 'w' ? 1 : -1, from = R.by === 'me' ? R.at + 1 : R.at, end = Math.min(us.length - 1, RG_PLY), ev = {};
+    const get = async k => ev[k] || (ev[k] = await this.val(this.fenAt(us, k), 10, 600));
+    for (let k = Math.max(0, from); k <= end; k++){
+      if ((k % 2 === 0) !== (R.me === 'w')) continue;
+      if (!this.visible()) throw new Error('away');
+      this.prog = {id: R.id, k}; this.paintList();
+      const a = await get(k), b = await get(k + 1);
+      if (sg * (a.s - b.s) < 150 || sg * a.s < -300 || a.best === us[k]) continue;
+      const A = await this.val(this.fenAt(us, k), 14, 2500), B = await this.val(this.fenAt(us, k + 1), 14, 2500), loss = sg * (A.s - B.s);
+      if (loss < 120 || sg * A.s < -300 || !A.best || A.best === us[k]) continue;
+      const rest = await this.line(this.fenAfter(this.fenAt(us, k), A.best), 4);
+      return {k, best: A.best, loss, mate: sg * B.s <= -1500 ? 1 : 0, ln: [A.best].concat(rest)};
+    }
+    return 0;
+  },
+  visible(){ return S.view === 'games' && S.gseg === 'last' && !document.hidden; },
+  async work(){
+    if (this.working || !this.visible()) return;
+    this.working = true;
+    try {
+      for (const R0 of this.list()){
+        const id = R0.id;
+        if (R0.by === 'opp' && !R0.ln){ this.prog = {id, line: 1}; this.paintList(); const ln = await this.line(this.fenAt(R0.u, R0.at + 1), 5), R = this.get(id); if (R){ R.ln = ln; Prog.save(); } }
+        const R1 = this.get(id); if (R1 && R1.mk === undefined){ const mk = await this.scan(R1), R = this.get(id); if (R){ R.mk = mk; Prog.save(); } }
+        this.prog = null; this.paintList();
+      }
+    } catch(e){ if (e && e.message === 'engine') this.noEngine = true; }
+    this.working = false; this.prog = null; this.paintList();
+  },
+  // ---- a game pasted in (the claude.ai copy can't read the account; anyone can paste one)
+  add(text, side){
+    const raw = Analyze.parsePGN(text || ''), g0 = raw[0]; this.pasteErr = '';
+    const legal = g0 ? (() => { const c = new Chess(); let n = 0; for (const s of g0.moves){ if (!c.move(s, {sloppy: true})) break; n++; } return n; })() : 0;
+    if (!g0 || legal < 2){ this.pasteErr = 'That doesn\'t look like a game. Paste the whole PGN, headers and moves.'; return this.paint(); }
+    const a = this.acct(), user = (side ? (side === 'w' ? g0.h.White : g0.h.Black) : a && a.user) || '';
+    const g = Analyze.replay(g0, String(user).toLowerCase());
+    if (!g){ if (!side && g0.h.White && g0.h.Black){ this.pasted = text; return this.paint(); } this.pasteErr = 'That game couldn\'t be read: it needs a result and at least a few moves.'; return this.paint(); }
+    g.h = g0.h; this.pasted = null;
+    const st = this.st(), id = this.gid(g), old = this.get(id);
+    if (old) old.added = Date.now(); else st.g.push(this.make(g, 'paste', Date.now()));
+    this.trim(); Prog.save(); this.paint(); this.work();
+  },
+  announce(){
+    const R = this.list()[0]; if (!R || !this.todo(R) || !SET.coach || (S.drill && S.drill.state === 'play')) return;
+    const no = Math.floor(R.at / 2) + 1, oc = R.me === 'w' ? 'Black' : 'White';
+    const t = R.by === 'opp' ? `Your game against ${R.opp}: ${oc} left your book at move ${no}. I've got an answer to drill.` : R.by === 'me' ? `Your game against ${R.opp}: you left your book at move ${no}. Drill your line?` : `Your game against ${R.opp} is reviewed.`;
+    Coach.once('rg-' + R.id, t, {mood: 'think', stay: true, head: 'Your last game', cta: ['last', 'See the review']});
+  },
+  // ---- the part of Your games
+  html(){
+    const top = this.list().reduce((m, R) => Math.max(m, R.added || 0), 0);
+    if (top > (this.rd().seen || 0)){ this.st().seen = top; Prog.saveLocal(); }
+    setTimeout(() => this.work(), 50);
+    return `<div class="rvwrap"><div id="rvStat">${this.statusHTML()}</div><div id="rvList">${this.listHTML()}</div>${this.pasteHTML()}</div>`;
+  },
+  statusHTML(){
+    const a = this.acct(), st = this.rd();
+    if (!SITE || !a) return `<section class="rcstat"><div><b>Paste a game to review it</b><span>${!SITE ? 'This copy can\'t reach chess.com or Lichess. On the website your newest games are read by themselves.' : 'Your newest games are read from your account once it is connected.'}</span></div>${!SITE && HOME ? `<a class="btn small" href="${HOME}#games" target="_blank" rel="noopener">Open the website</a>` : ''}</section>`;
+    const site = a.site === 'lichess' ? 'Lichess' : 'chess.com';
+    const when = this.busy ? 'Reading your newest games…' : this.err === 'missing' ? `${site} doesn't know ${esc(a.user)}.` : this.err ? `${site} didn't answer. Try again in a minute.` : st.chk ? `Checked ${Recap.ago(st.chk)}. Your newest three games are kept here.` : 'Not checked yet.';
+    return `<section class="rcstat"><div><b>${site} · ${esc(a.user)}</b><span>${when}</span></div><button class="btn small" type="button" id="rvGo" ${this.busy ? 'disabled' : ''}>${this.busy ? 'Checking…' : 'Check now'}</button></section>`;
+  },
+  listHTML(){ const L = this.list(); return L.length ? L.map(R => this.cardHTML(R)).join('') : `<p class="rcnone">${this.busy ? 'Reading…' : 'No games here yet.'}</p>`; },
+  pasteHTML(){
+    const ask = this.pasted ? `<div class="rvask"><p>Which side were you?</p><div class="lesson-actions"><button class="btn small" type="button" data-rvside="w">White</button><button class="btn small" type="button" data-rvside="b">Black</button></div></div>` : '';
+    return `<details class="rvpaste" ${!SITE || this.pasted || this.pasteErr ? 'open' : ''}><summary>Paste a game</summary><div class="rvpb"><textarea id="rvPgn" rows="4" placeholder="The game's PGN, from Share or Download on chess.com or Lichess" aria-label="A game's PGN"></textarea>
+      ${this.pasteErr ? `<p class="rverr">${esc(this.pasteErr)}</p>` : ''}${ask}<div class="lesson-actions"><button class="btn small primary" type="button" id="rvAdd">Review it</button></div></div></details>`;
+  },
+  board(R, k, o){ return `<div class="thumb">${boardSVG(this.fenAt(R.u, k).split(' ')[0], Object.assign({mini: true, flip: R.me === 'b'}, o))}</div>`; },
+  item(cls, board, title, rows, acts){ return `<div class="rvi ${cls}">${board || ''}<div class="rvx"><p class="rvt">${esc(title)}</p>${rows.filter(Boolean).length ? bullets(rows.filter(Boolean)) : ''}${acts ? `<div class="lesson-actions">${acts}</div>` : ''}</div></div>`; },
+  sq(u){ return u ? [u.slice(0, 2), u.slice(2, 4)] : null; },
+  cardHTML(R){
+    const col = R.me === 'w' ? 'White' : 'Black', res = R.r === 1 ? 'Won' : R.r === 0 ? 'Lost' : 'Drew';
+    const when = new Date(R.t).toLocaleDateString(undefined, {weekday: 'short', month: 'short', day: 'numeric'});
+    return `<article class="rvcard" data-rv="${esc(R.id)}"><header class="rvh"><span class="chip ${R.r === 1 ? 'win' : R.r === 0 ? 'loss' : 'draw'}">${res}</span><b>${col} against ${esc(R.opp)}${R.oe ? ` <span class="rvelo tnum">${R.oe}</span>` : ''}</b><span class="rvwhen">${when}</span>${R.url ? `<a href="${esc(R.url)}" target="_blank" rel="noopener">Open the game</a>` : ''}</header>
+      ${this.openHTML(R)}${this.mkHTML(R)}</article>`;
+  },
+  openHTML(R){
+    const k = R.at, no = Math.floor(k / 2) + 1, Nn = BOOKS[R.me].nodes, oc = R.me === 'w' ? 'Black' : 'White', id = esc(R.id);
+    if (R.by !== 'opp' && R.by !== 'me') return this.item('ok', '', k >= R.u.length ? 'The whole game stayed in your book' : `Your book's line ended at move ${no}, with the game still on it`, []);
+    const fenB = this.fenAt(R.u, k), node = this.walk(R.me, R.u.slice(0, k + 1)).node;
+    if (R.by === 'me'){
+      const bk = this.bookMove(R.me, node), p = this.punish(fenB, R.u[k], R.me), wk = (Nn[node].k || []).find(c => Nn[c].u === R.u[k]);
+      const known = R.w && wk !== undefined && Nn[wk].t ? `A known mistake here: ${lc(firstSentence(Nn[wk].t))}` : '';
+      const why = bk === undefined ? '' : Nn[bk].t ? `Why: ${noteLine(Nn[bk].t)}` : (x => x ? `Why: ${x}` : '')(this.idea(fenB, Nn[bk].u, R.me));
+      const o = {last: this.sq(R.u[k - 1]), arrows: [R.u[k].slice(0, 4) + 'r'].concat(bk !== undefined ? [Nn[bk].u.slice(0, 4) + 'g'] : [])};
+      return this.item('', this.board(R, k, o), `Move ${no}: you left your book`, [`You played: ${lc(this.words(fenB, R.u[k]))}`, known || (p ? `${p.lines[0]}${p.lines[1] ? ': ' + lc(p.lines[1]) : ''}` : ''), bk !== undefined ? `Your book: ${lc(Nn[bk].l)}` : '', why],
+        bk !== undefined ? `<button class="btn small primary" type="button" data-rvb="${id}">Drill your line</button>${sbCanFromIn(R.me, node) ? `<button class="btn small" type="button" data-rvs="${id}">Practise from here</button>` : ''}` : '');
+    }
+    const fenA = this.fenAt(R.u, k + 1), kids = (Nn[node].k || []).filter(c => this.inBook(R.me).has(c)).sort((a, b) => (Nn[b].q || 0) - (Nn[a].q || 0)).slice(0, 3);
+    const idea = this.idea(fenB, R.u[k], R.me, R.u[k - 1]), ans = R.ln && R.ln[0];
+    const o = {last: this.sq(R.u[k]), arrows: ans ? [ans.slice(0, 4) + 'g'] : []};
+    const wait = !R.ln ? (this.noEngine || Engine.state === 'failed' ? 'The answer needs the engine, which can\'t start here' : 'Working out the answer…') : !R.ln.length ? 'No answer to drill: the game was over' : '';
+    return this.item('', this.board(R, k + 1, o), `Move ${no}: ${oc} left your book`,
+      [`${oc} played: ${lc(this.words(fenB, R.u[k]))}${idea ? `. ${idea}` : ''}`, kids.length ? `Your book has: ${kids.map(c => lc(Nn[c].l) + (Nn[c].q ? ` (${pctTxt(Nn[c].q)})` : '')).join(', ')}` : '',
+       ans ? `The engine's answer: ${lc(this.words(fenA, ans))}` : wait, ans ? (x => x ? `Why: ${x}` : '')(this.idea(fenA, ans, R.me, R.u[k])) : ''],
+      ans ? `<button class="btn small primary" type="button" data-rvd="${id}:o">Drill it</button><button class="btn small ghost" type="button" data-rvx="${id}:o">Play on with the engine</button>` : '');
+  },
+  mkHTML(R){
+    if (R.mk === undefined){
+      const p = this.prog && this.prog.id === R.id && this.prog.k !== undefined ? ` (move ${Math.floor(this.prog.k / 2) + 1})` : '';
+      return this.item('wait', '', this.noEngine || Engine.state === 'failed' ? 'The costly moves need the engine, which can\'t start here' : `Looking for the first costly move${p}…`, []);
+    }
+    if (!R.mk) return this.item('ok', '', `No costly move in the first ${RG_PLY / 2} moves`, []);
+    const M = R.mk, k = M.k, no = Math.floor(k / 2) + 1, fenB = this.fenAt(R.u, k), p = this.punish(fenB, R.u[k], R.me), id = esc(R.id);
+    const o = {last: this.sq(R.u[k - 1]), arrows: [R.u[k].slice(0, 4) + 'r', M.best.slice(0, 4) + 'g']}, why = this.idea(fenB, M.best, R.me, R.u[k - 1]);
+    return this.item('', this.board(R, k, o), `Move ${no}: the first costly move`,
+      [`You played: ${lc(this.words(fenB, R.u[k]))}`, p ? `${p.lines[0]}${p.lines[1] ? ': ' + lc(p.lines[1]) : ''}` : '', `Better: ${lc(this.words(fenB, M.best))}${why ? `. ${why}` : ''}`, M.mate ? 'It allowed a mate' : `The engine puts the cost at ${this.cost(M.loss)}`],
+      `<button class="btn small primary" type="button" data-rvd="${id}:m">Drill it</button><button class="btn small ghost" type="button" data-rvx="${id}:m">Play on with the engine</button>`);
+  },
+  paint(){ if (!this.visible()) return; const s = document.getElementById('rvStat'); if (s){ s.innerHTML = this.statusHTML(); this.wire(view); } this.paintList(); const pb = view.querySelector('.rvpaste'); if (pb){ const t = document.getElementById('rvPgn'), v = t ? t.value : '', open = pb.open; pb.outerHTML = this.pasteHTML(); const pb2 = view.querySelector('.rvpaste'), t2 = document.getElementById('rvPgn'); if (open && pb2) pb2.open = true; if (t2) t2.value = v; this.wire(view); } },
+  paintList(){ if (!this.visible()) return; const el = document.getElementById('rvList'); if (el){ el.innerHTML = this.listHTML(); this.wire(view); } },
+  wire(root){
+    const g = root.querySelector('#rvGo'); if (g) g.onclick = () => this.check();
+    const ad = root.querySelector('#rvAdd'); if (ad) ad.onclick = () => this.add((document.getElementById('rvPgn') || {}).value || '');
+    root.querySelectorAll('[data-rvside]').forEach(b => b.onclick = () => this.add(this.pasted || '', b.dataset.rvside));
+    root.querySelectorAll('[data-rvd]').forEach(b => b.onclick = () => { const [id, part] = b.dataset.rvd.split(/:(?=[om]$)/); this.drill(id, part); });
+    root.querySelectorAll('[data-rvb]').forEach(b => b.onclick = () => this.drillBook(b.dataset.rvb));
+    root.querySelectorAll('[data-rvs]').forEach(b => b.onclick = () => this.practise(b.dataset.rvs));
+    root.querySelectorAll('[data-rvx]').forEach(b => b.onclick = () => { const [id, part] = b.dataset.rvx.split(/:(?=[om]$)/); this.explore(id, part); });
+  },
+  // ---- drilling
+  spot(R, part){ return part === 'o' ? R.at + 1 : R.mk.k; },
+  drill(id, part){
+    const R = this.get(id); if (!R) return;
+    const ln = part === 'o' ? R.ln : R.mk && R.mk.ln; if (!ln || !ln.length) return;
+    const k = this.spot(R, part);
+    if (SIDE !== R.me) useSide(R.me);
+    S.drill = S.drillState = {kind: 'rv', rid: id, part, fen0: this.fenAt(R.u, k), moves: ln.slice(), i: 0, me: R.me, no: Math.floor(k / 2) + 1, opp: R.opp, last: R.u[k - 1] || null,
+      mistakes: 0, tries: 0, sel: null, busy: false, state: 'play', hint: null, flash: null, msg: '', feed: []};
+    S.view = 'drill'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
+  },
+  // the player left the book: the book's own line through its move, from move one, so the spot comes up in order
+  drillBook(id){
+    const R = this.get(id); if (!R) return;
+    if (SIDE !== R.me) useSide(R.me);
+    const node = this.walk(R.me, R.u.slice(0, R.at + 1)).node, bk = this.bookMove(R.me, node); if (bk === undefined) return;
+    const ls = (linesByNode.get(bk) || []).filter(x => DRILLSET.has(x)), lid = ls.find(x => LINES[x].main) || ls.sort((a, b) => lineReach(b) - lineReach(a))[0]; if (!lid) return;
+    startDrillLine(lid, `Your game against ${R.opp}: move ${Math.floor(R.at / 2) + 1} is where it left the book.`, null, {from0: true});
+  },
+  practise(id){
+    const R = this.get(id); if (!R) return;
+    if (SIDE !== R.me) useSide(R.me);
+    SB_FROM[R.me] = this.walk(R.me, R.u.slice(0, R.at + 1)).node; S.drill = S.sbState = null; sbStart();
+  },
+  explore(id, part){
+    const R = this.get(id); if (!R) return;
+    if (SIDE !== R.me) useSide(R.me);
+    const k = part === 'o' ? R.at + 1 : R.mk.k, ln = (part === 'o' ? R.ln : R.mk.ln) || [];
+    exploreFrom(this.fenAt(R.u, k), {pre: R.u.slice(0, k), moves: ln.slice(0, 1), title: `Your game against ${R.opp} · move ${Math.floor(k / 2) + 1}`});
+  },
+  fen(D, i = D.i){ const ch = new Chess(D.fen0); for (let k = 0; k < i; k++) if (!ch.move(uciObj(D.moves[k]))) break; return ch.fen(); },
+  legal(D){ return new Chess(this.fen(D)).moves({verbose: true}).map(m => m.from + m.to + (m.promotion || '')); },
+  lastU(D){ return D.i ? D.moves[D.i - 1] : D.last; },
+  tryRv(u, to){
+    const D = S.drill, exp = D.moves[D.i], fen = this.fen(D); D.sel = null;
+    if (u === exp){
+      D.i++; D.flash = {sq: u.slice(2, 4), ok: true}; D.hint = null; D.msg = ''; D.tries = 0;
+      const w = this.words(fen, u), why = this.idea(fen, u, D.me, D.i > 1 ? D.moves[D.i - 2] : D.last);
+      D.feed = [`<span class="mfeed"><b>${esc(w.charAt(0).toUpperCase() + w.slice(1))}.</b> ${esc(why)}</span>`];
+      renderDrillBoard({u, meta: {}}); renderDrillPanel();
+      D.busy = true; setTimeout(() => { if (S.drill === D){ D.flash = null; this.advance(); } }, 650);
+      return;
+    }
+    if (D.tries === 0) D.mistakes++;
+    D.tries++; D.flash = {sq: to, ok: false};
+    const p = this.punish(fen, u, D.me), ew = this.words(fen, exp), ewhy = this.idea(fen, exp, D.me);
+    D.msg = (D.tries >= 2 ? 'Not that one. The arrow shows the move; play it to continue.' : 'Not the move. Try again.') + (p ? punishHTML(p) : '')
+      + (D.tries >= 2 ? `<span class="pwhy"><b>${esc(ew.charAt(0).toUpperCase() + ew.slice(1))}${ewhy ? ':' : ''}</b> ${esc(lc(ewhy))}</span>` : '');
+    if (D.tries >= 2) D.hint = exp;
+    renderDrillBoard(); renderDrillPanel();
+    setTimeout(() => { if (S.drill === D && D.flash && !D.flash.ok){ D.flash = null; renderDrillBoard(); } }, 650);
+  },
+  advance(){
+    const D = S.drill; if (!D || D.kind !== 'rv' || S.view !== 'drill' || D.state !== 'play') return;
+    if (D.i >= D.moves.length) return this.finish();
+    if (D.i % 2 === 0){ D.busy = false; D.tries = 0; renderDrillPanel(); return; }
+    D.busy = true; const at = D.i;
+    setTimeout(() => { if (S.drill !== D || D.i !== at || D.state !== 'play') return;
+      const fen = this.fen(D), u = D.moves[D.i], why = this.idea(fen, u, D.me, D.moves[D.i - 1]);
+      D.i++; D.busy = false; D.flash = null;
+      D.feed = (D.feed || []).slice(0, 1).concat([`<span class="ofeed"><b>${OPP}: ${esc(lc(this.words(fen, u)))}.</b> ${esc(why)}</span>`]);
+      renderDrillBoard({u, meta: {}}); renderDrillPanel(); this.advance(); }, 520);
+  },
+  finish(){
+    const D = S.drill; if (D.state === 'done') return; D.state = 'done'; D.hint = null; D.busy = false;
+    const R = this.get(D.rid); if (R){ const d = R.d || (R.d = {}), x = d[D.part] || [0, 0, 0]; d[D.part] = [x[0] + 1, x[1] + (D.mistakes ? 0 : 1), Date.now()]; Prog.save(); }
+    render();
+  },
+  panelHTML(D){
+    const mine = Math.ceil(D.moves.length / 2), done = Math.min(mine, Math.ceil(D.i / 2)), pct = D.state === 'done' ? 100 : Math.round(done / mine * 100);
+    const status = D.state === 'done' ? '' : D.busy ? `${OPP} is thinking…` : 'Your move';
+    const intro = D.part === 'o' ? `${OPP}'s move in your game wasn't in your book. Play the engine's answer and the moves after it.` : 'Find the better move from your game, then play the engine\'s line on.';
+    const clean = !D.mistakes;
+    const doneBox = D.state !== 'done' ? '' : `<div class="donebox ${clean ? '' : 'bad'}"><h4>${clean ? 'Clean run' : plural(D.mistakes, 'slip') + ': again until it\'s clean'}</h4>
+      <div class="lesson-actions"><button class="btn ${clean ? '' : 'primary'}" id="rvAgain">Again</button><button class="btn ${clean ? 'primary' : ''}" id="rvBack">Back to your games</button><button class="btn ghost" id="rvEx">Play on with the engine</button></div></div>`;
+    return `<div class="dpanel"><p class="kicker">Your game against ${esc(D.opp)} · move ${D.no}</p><h3>${D.part === 'o' ? 'An answer to the new move' : 'The better move'}</h3>
+      <div class="progressbar" aria-hidden="true"><i style="width:${pct}%"></i></div>
+      ${status ? `<div class="status ${D.busy ? 'wait' : ''} ${D.tries ? 'bad' : ''}"><span class="bub"></span>${status}</div>` : ''}
+      ${D.state === 'done' ? '' : `<p class="feedback">${D.msg || (D.feed && D.feed.length ? D.feed.join('') : intro)}</p>`}${doneBox}</div>`;
+  },
+  wirePanel(){
+    const D = S.drill; if (!D || D.kind !== 'rv') return;
+    const a = document.getElementById('rvAgain'); if (a) a.onclick = () => this.drill(D.rid, D.part);
+    const b = document.getElementById('rvBack'); if (b) b.onclick = () => this.back();
+    const x = document.getElementById('rvEx'); if (x) x.onclick = () => { const R = this.get(D.rid); exploreFrom(this.fen(D, D.moves.length), {pre: R ? R.u.slice(0, this.spot(R, D.part)).concat(D.moves) : [], title: `Your game against ${D.opp} · after the drill`}); };
+  },
+  back(){ S.drill = S.drillState = null; S.gseg = 'last'; go('games'); },
+  // on the Drill page: the spots the last games left to drill, when there are any
+  drillCard(){
+    if (!this.on()) return '';
+    const L = this.list().filter(R => this.todo(R)); if (!L.length) return '';
+    const n = L.reduce((a, R) => { const d = R.d || {}; return a + ((R.by === 'opp' || R.by === 'me') && !(d.o && d.o[1]) ? 1 : 0) + (R.mk && !(d.m && d.m[1]) ? 1 : 0); }, 0), R = L[0];
+    return `<section class="dpanel rvcue"><div><p class="kicker">From your last games</p><p class="tline">${plural(n, 'spot')} to drill, starting with your game against ${esc(R.opp)}.</p></div><div class="lesson-actions"><button class="btn" type="button" id="rvLast">See them</button></div></section>`;
+  }
+};
+// a position the Sandbox can start from, in either book
+function sbCanFromIn(s, idx){ return s === SIDE ? sbCanFrom(idx) : idx !== 0 && (BOOKS[s].nodes[idx].k || []).some(c => Review.inBook(s).has(c)); }
+setInterval(() => Review.auto(), RG_EVERY);
+setTimeout(() => Review.auto(), 6500);
 /* ---- hooks into the app */
 const render0 = render;
 render = function(){
@@ -1576,9 +1893,9 @@ const Tour = {
       {h: 'Every move explained', at: '.mcard', say: ['Step through with the arrows under the board, or the arrow keys', 'Each move says what it does: the book\'s note, and what the board shows']},
       {h: 'The engine in lessons', at: '.engrow', say: ['Switch it on for the best moves, their arrows and the score', 'It stays off in drills, practice games and checkpoints, and comes back when they end']},
       {h: 'Your games', at: '.gseg', go: () => go('games'),
-        say: () => PERSONA === 'ready' ? ['Your openings with both colours, and your record in each', 'Where you leave the book, and your recent games'] : ['Your openings, with your record in each', 'Missed shots from your games, game reviews and the monthly recap']},
+        say: () => PERSONA === 'ready' ? ['Your openings with both colours, and your record in each', 'Last 3 games: your newest games reviewed, with the spot to drill in each', 'Where you leave the book most, and the monthly recap'] : ['Your openings, with your record in each', 'Last 3 games: your newest games reviewed, with the spot to drill in each', 'Missed shots, game reviews and the monthly recap']},
       {h: 'The Sandbox', at: '#sbpanel', go: () => { S.drill = S.drillState = null; go('sandbox'); },
-        say: ['Practice games against an opponent who plays your book\'s lines', 'It picks the lines you know least: choose an opening, or give odds', 'Leave the book and it shows what your move allows']},
+        say: ['Practice games against an opponent who plays your book\'s lines', 'Set up a position, or pick one in a lesson, to practise only the lines that go on from it', 'Leave the book and it shows what your move allows']},
       {h: 'Levels', at: '#lvBtn', skip: () => document.getElementById('lvBtn').hidden, say: ['Every line you play earns points', 'The ring fills toward your next level. Tap it for your badges']},
       {h: 'Your streak', at: '#meBtn', skip: () => document.getElementById('meBtn').hidden, say: ['The flame counts the days in a row you finish today\'s five', 'Every third day in a row earns a shop token']},
       {h: () => `${coachName()}'s wardrobe`, at: () => document.querySelector('#app .chead') || document.querySelector('#app h2'), go: () => go('shop'),
