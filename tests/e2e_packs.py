@@ -127,7 +127,8 @@ with sync_playwright() as p:
     pg.evaluate("window.__before = 1"); pg.click('.repask [type=submit]')
     pg.wait_for_function("typeof __before === 'undefined' && typeof COURSE !== 'undefined' && typeof PERSONA !== 'undefined'"); pg.wait_for_timeout(900)
     d = shape(pg); assert d['chapters'] == a['chapters'] and d['units'] == a['units'] and d['first'] == ['e7e5'] and d['lines'] == a['lines']
-    assert pg.evaluate("[Prog.rec('bck-main-bd3').clean, Prog.rec('bi-main').clean]") == [1, 1]
+    kept = pg.evaluate("[Prog.rec('bck-main-bd3'), Prog.rec('bi-main')]"); print('kept through the switch back:', kept)
+    assert kept[0]['clean'] >= 1 and kept[1]['clean'] == 1, kept     # a Sandbox game can end on the Caro-Kann line and count for it too
     print('switched back: the same', len(d['chapters']), 'chapters and', len(d['units']), 'units')
 
     # a new player who already plays the Caro-Kann is offered it first, as ready

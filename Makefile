@@ -30,16 +30,19 @@ test: build
 	$(PY) tests/e2e_library.py
 	$(PY) tests/e2e_tour.py
 	$(PY) tests/e2e_review.py
+	$(PY) tests/e2e_marks.py
 	node tests/analyze_check.js
 	node tests/nudge_check.mjs
 	node tests/ideas_check.js
 
-# Engine and wording checks: the Black book, and the White book's packs after the first (the London and the English)
+# Engine and wording checks: the Black book, and the White book's packs after the first (the London and the English),
+# and the counts the README quotes against the built books (lint_counts.py --write puts them right)
 check:
 	$(PY) pipeline/check_black.py 14
 	$(PY) pipeline/check_white.py 14
 	$(PY) pipeline/lint_notes.py
 	$(PY) pipeline/lint_claims.py
+	$(PY) pipeline/lint_counts.py
 
 # Regenerate the README images in docs/img
 shots: build

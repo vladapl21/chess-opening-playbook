@@ -119,7 +119,9 @@ with sync_playwright() as p:
                 'the plan at the end of every line': 'plan', 'opening names': "opening's real name",
                 'practice from a position': 'set up a position', 'the last three games': 'last 3 games',
                 'levels': 'level', 'the streak': 'streak', 'the shop': 'new look', 'the account': 'sign in',
-                'the coach': 'tap me'}
+                'the coach': 'tap me', 'marks on the moves': 'key move', 'your moves in order': 'in another order',
+                'numbers on the board': 'numbers on the board', 'a game that left the book': 'leaves your book',
+                'a move played too early': 'wrong moment'}
     missing = [f'tab {t}' for t in tabs if t.lower() not in said] + [f'Your games: {g}' for g in segs if g.lower() not in said] \
         + [f'setting {r}' for r in rows if r not in SETTINGS and r not in slots] \
         + [f'setting {r}' for r, w in SETTINGS.items() if r in rows and w not in said] \

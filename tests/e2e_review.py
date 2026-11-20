@@ -4,8 +4,9 @@ account's newest games: one where White leaves the Black book on move two, one w
 each review says where the game left the book and what to play there (the book's move, or the engine's answer when the
 book has none), the engine finds the first costly move, and Drill it plays each spot on the drill board: a wrong move
 is answered with what punishes it, a clean run is kept with the review. Then: the reviews after a reload, a new game
-pushing the oldest out, a game pasted in (and the question of which side the player was), the coach's word about a new
-review, the Sandbox from the position where the player left the book, and a phone in dark mode."""
+pushing the oldest out, a game pasted in (and the question of which side the player was), the coach's word about a
+game that left the book (the drill itself on its button, the Drill page's pointer and the once-a-day reminder until the
+book's line is drilled clean), the Sandbox from the position where the player left the book, and a phone in dark mode."""
 import json, re, datetime
 import chess, chess.pgn  # python-chess: the fixtures are written move by move, so every game is legal
 from io import StringIO
@@ -63,6 +64,16 @@ def board_click(pg, a, b):
     pg.mouse.click(*xy(a)); pg.wait_for_timeout(120); pg.mouse.click(*xy(b))
 
 
+def play_line(pg):
+    """Play a book line on the drill board to its end, clean."""
+    for _ in range(80):
+        st = pg.evaluate("({s: S.drill.state, b: S.drill.busy})")
+        if st['s'] == 'done': return
+        if st['b']: pg.wait_for_timeout(200); continue
+        u = pg.evaluate("expectedMove()[0]"); board_click(pg, u[:2], u[2:4]); pg.wait_for_timeout(650)
+    raise AssertionError('the line did not end')
+
+
 def play_rv(pg, slip=False):
     """Play the review drill to its end: the player's moves from the line, one wrong move first if asked."""
     for _ in range(40):
@@ -93,10 +104,31 @@ with sync_playwright() as p:
     ids = pg.evaluate("Review.list().map(R => [R.opp, R.me, R.by, R.at])"); print('kept:', ids)
     assert [x[0] for x in ids] == ['rook_lover', 'knightmare', 'queenside'], ids
     assert ids[0][1:] == ['b', 'opp', 2] and ids[1][1:] == ['w', 'me', 6] and ids[2][1:] == ['w', 'opp', 5], ids
-    coach = pg.evaluate("(document.querySelector('#coach .cbub') || {}).innerText || ''"); print('coach:', ' '.join(coach.split())[:120])
-    assert 'White left your book at move 2' in coach, coach
-    pg.click('#coach [data-cgo="last"]'); pg.wait_for_timeout(600)
-    assert pg.evaluate("[S.view, S.gseg]") == ['games', 'last'], 'the coach opens the reviews'
+    # the coach: the game that left the book by the player's own move comes first, with the drill on its button
+    coach = ' '.join(pg.evaluate("(document.querySelector('#coach .cbub') || {}).innerText || ''").split()); print('coach:', coach[:200])
+    assert 'You left your book' in coach and 'Against knightmare, move 4: you played' in coach and 'Your book:' in coach, coach
+    assert not re.search(r'\b[a-h][1-8]\b', coach.replace('f7', '').replace('f2', '')), 'no squares in what the coach says'
+    kid = pg.evaluate("Review.list()[1].id")
+    assert pg.evaluate("[...document.querySelectorAll('#coach [data-cgo]')].map(b => [b.dataset.cgo.split(':')[0], b.innerText.trim()])") == [['rvb', 'Drill the line'], ['last', 'See the game']]
+    pg.click('#coach [data-cgo^="rvb:"]'); pg.wait_for_timeout(900)
+    st = pg.evaluate("[S.view, S.drill.kind, S.drill.rv, SIDE, S.drill.s0]"); print('the coach starts the line:', st)
+    assert st == ['drill', 'line', kid, 'w', 0], st
+    assert pg.evaluate("!document.querySelector('#coach .cbub')"), 'and says nothing while it is played'
+    # left alone: the Drill page leads with it, and the coach says it once there
+    pg.evaluate("S.drill = S.drillState = null; go('drill')"); pg.wait_for_timeout(700)
+    cue = ' '.join(pg.inner_text('.rvcue').split()); print('drill page:', cue[:200])
+    assert 'you left your book in a game' in cue.lower() and 'Against knightmare, move 4' in cue and 'Drill the line' in cue and 'All 3 spots' in cue, cue
+    coach = ' '.join(pg.evaluate("(document.querySelector('#coach .cbub') || {}).innerText || ''").split()); print('coach on the drill page:', coach[:160])
+    assert 'White left your book at move 2' in coach, 'the newest game, where the other side left the book, is next'
+    pg.evaluate("Coach.hush()"); assert pg.evaluate("Review.remind()") is True
+    coach = ' '.join(pg.evaluate("(document.querySelector('#coach .cbub') || {}).innerText || ''").split()); print('the reminder:', coach[:160])
+    assert 'Still open from your games' in coach and 'That line is the one to drill first' in coach and pg.evaluate("Review.remind()") is False, 'once a day'
+    pg.evaluate("Coach.hush()")
+    pg.click('#rvDrillB'); pg.wait_for_timeout(900)
+    assert pg.evaluate("[S.view, S.drill.kind, S.drill.rv]") == ['drill', 'line', kid]
+    pg.screenshot(path=out + 'rv_bookdrill.png')
+    pg.evaluate("S.drill = S.drillState = null; S.gseg = 'last'; go('games')"); pg.wait_for_timeout(600)
+    assert pg.evaluate("[S.view, S.gseg]") == ['games', 'last']
     # the engine's part: the answer to the new move, then the first costly move in each game
     pg.wait_for_function("Review.list().every(R => R.mk !== undefined && (R.by !== 'opp' || R.ln))", timeout=240000)
     revs = pg.evaluate("Review.list().map(R => ({opp: R.opp, ln: R.ln, mk: R.mk && [R.mk.k, R.mk.best, R.mk.loss]}))"); print('engine part:', revs)
@@ -129,6 +161,18 @@ with sync_playwright() as p:
     pg.locator('.rvcard').nth(1).locator('[data-rvb]').click(); pg.wait_for_timeout(900)
     st = pg.evaluate("[S.view, S.drill.kind, SIDE, S.drill.s0, LINES[S.drill.id].n.slice(1, 8).map(i => N[i].u).join(' ')]"); print('book line:', st)
     assert st[:4] == ['drill', 'line', 'w', 0] and st[4].startswith('e2e4 e7e5 g1f3 b8c6 f1c4 g8f6 f3g5'), st
+    # played clean: the game's spot is done, the pointer and the reminder are gone
+    assert pg.evaluate("Review.left().map(R => R.opp)") == ['knightmare']
+    play_line(pg)
+    done = ' '.join(pg.inner_text('#dpanel').split()); print('book line done:', done[:140])
+    assert pg.evaluate("Review.list()[1].d.o.slice(0, 2)") == [1, 1] and pg.evaluate("Review.left().length") == 0, 'the clean run is kept with the game'
+    assert pg.evaluate("[...document.querySelectorAll('#dpanel .lesson-actions .btn')].map(b => b.innerText.trim())")[:2] == ['Back to your games', 'Again']
+    pg.click('#dRvBack'); pg.wait_for_timeout(600)
+    assert pg.evaluate("[S.view, S.gseg]") == ['games', 'last']
+    pg.evaluate("go('drill')"); pg.wait_for_timeout(500)
+    cue = ' '.join(pg.inner_text('.rvcue').split()); print('drill page after:', cue[:120])
+    assert 'you left your book' not in cue.lower() and 'from your last games' in cue.lower() and pg.evaluate("Review.remind()") is False
+    pg.evaluate("S.gseg = 'last'; go('games')"); pg.wait_for_timeout(500)
     pg.evaluate("S.drill = S.drillState = null; S.gseg = 'last'; go('games')"); pg.wait_for_timeout(600)
     pg.locator('.rvcard').nth(1).locator('[data-rvs]').click(); pg.wait_for_timeout(1400)
     st = pg.evaluate("[S.view, S.drill.kind, N[S.drill.from].u, ply(S.drill.from)]"); print('sandbox from the position:', st)
@@ -143,7 +187,7 @@ with sync_playwright() as p:
     # ---- after a reload: everything kept, nothing to work out again
     pg.reload(); pg.wait_for_timeout(1200)
     keep = pg.evaluate("Review.list().map(R => [R.opp, !!R.ln, R.mk === undefined ? 'none' : !!R.mk, R.d ? Object.keys(R.d).sort().join() : ''])"); print('after a reload:', keep)
-    assert keep == [['rook_lover', True, keep[0][2], 'o'], ['knightmare', False, keep[1][2], ''], ['queenside', True, True, 'm']], keep
+    assert keep == [['rook_lover', True, keep[0][2], 'o'], ['knightmare', False, keep[1][2], 'o'], ['queenside', True, True, 'm']], keep
 
     # ---- a new game comes in, the oldest goes
     games['list'] = [G_NEW] + games['list']

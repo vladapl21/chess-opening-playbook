@@ -1,17 +1,50 @@
 """Regression: switching the Sandbox opening mid-game must not block moves. Then practice from a chosen position: set up
 by hand with the book's moves for both sides (back and forward with the arrows under the board and on the keyboard, a tap
 on a move in the list), or picked in a lesson; games start there and only its lines come up. A game that ends on a side
-line ends with that line's plan."""
+line ends with that line's plan. Also: the player's own move lands at once and only the reply slides, the set-up board
+never slides, "What else … could play here" folds away with its arrow and stays the way it was left, the start position
+sits under the board, and the count of lines met is the number of lines a game can end on, counted from the book."""
 import os, random
 from playwright.sync_api import sync_playwright
 from e2e_white import drag, play_sandbox, launch, URL, out  # noqa
 errors = []
+ANIMS = "document.getElementById('db').getAnimations({subtree: true}).length"
+
+
+def own_move(pg):
+    """Play the book's move through the page and say how many pieces were sliding straight after it, then whether the
+    reply slid in."""
+    for _ in range(30):
+        st = pg.evaluate("({busy: S.drill.busy, mine: myTurnAt(S.drill.node)})")
+        if not st['busy'] and st['mine']: break
+        pg.wait_for_timeout(150)
+    at_once = pg.evaluate(f"(() => {{ const u = expectedMove()[0]; tryMove(u.slice(0, 2), u.slice(2, 4)); return {ANIMS}; }})()")
+    reply = pg.evaluate(f"new Promise(r => {{ let k = 0; const t = setInterval(() => {{ const a = {ANIMS}; if (a || ++k > 80){{ clearInterval(t); r(a); }} }}, 15); }})")
+    return at_once, reply
+
+
 with sync_playwright() as p:
     b = launch(p)
     pg = b.new_page(viewport={'width': 1280, 'height': 900})
     pg.on('pageerror', lambda e: errors.append(str(e)))
     pg.goto(URL + '#sandbox'); pg.wait_for_timeout(1000)
     pg.click('[data-sbf="pick:caro"]'); pg.click('#sbGo'); pg.wait_for_timeout(1500)
+    # your own move lands at once; the other side's reply slides in
+    snap = own_move(pg); print('own move, then the reply (pieces sliding):', snap); assert snap[0] == 0 and snap[1] > 0, snap
+    pg.wait_for_timeout(700)
+    # "What else Black could play here": folded until asked for, an arrow on it, and it stays as it was left
+    for _ in range(6):
+        if pg.locator('#sbElse').count(): break
+        own_move(pg); pg.wait_for_timeout(700)
+    fold = lambda: pg.evaluate("[document.getElementById('sbElse').open, !!S.sbElse, getComputedStyle(document.querySelector('#sbElse > summary'), '::before').borderRightWidth, document.querySelector('#sbElse > summary').innerText]")
+    f0 = fold(); print('the fold-out:', f0); assert f0[:3] == [False, False, '2px'] and 'WHAT ELSE BLACK COULD PLAY HERE' in f0[3].upper(), f0
+    pg.click('#sbElse > summary'); pg.wait_for_timeout(200); assert fold()[:2] == [True, True], 'a tap opens it'
+    assert pg.locator('#sbElse > div > *').count() > 0, 'with the other moves in it'
+    pg.evaluate("renderSbPanel()"); assert fold()[:2] == [True, True], 'it stays open when the panel is drawn again'
+    pg.click('#sbElse > summary'); pg.wait_for_timeout(200); assert fold()[:2] == [False, False], 'and a tap on the arrow folds it away'
+    # the count beside the session numbers: every line a game can end on with these settings, counted from the book
+    cnt = pg.evaluate("[document.querySelector('#sbside .queue div:nth-child(3) small').innerText, DRILLABLE.filter(id => inScopeLine(id, SBS.scope)).length, document.querySelector('#sbside .queue div:nth-child(3) span').innerText]")
+    print('lines met, of:', cnt); assert cnt[0] == '/' + str(cnt[1]) and 0 < cnt[1] < pg.evaluate('DRILLABLE.length') and 'of your White lines met here' in cnt[2], cnt
     # play two correct moves, then switch the chips mid-game
     for _ in range(2):
         for _ in range(20):
@@ -50,6 +83,11 @@ with sync_playwright() as p:
         if c != 'caro': pg.click(f'[data-sbf="pick:{c}"]')
     assert pg.evaluate('SBS.scope') == 'all', 'every opening picked is the same as Every opening'
     pg.reload(); pg.wait_for_timeout(800); assert pg.evaluate('SBS.scope') == 'all'
+    allc = pg.evaluate("[document.querySelector('#sbside .queue div:nth-child(3) small').innerText, DRILLABLE.length, DATA.lines.filter(l => LESSONS[l.lesson] && !l.n.some(i => (N[i].g || []).includes('warn') && isMine(N[i]))).length]")
+    print('every opening:', allc); assert allc[0] == '/' + str(allc[1]) and allc[1] == allc[2] and allc[1] > 300, 'every drillable line of the book in play'
+    # the start position has its place under the board, not at the bottom of the side column
+    where = pg.evaluate("(() => { const b = document.getElementById('db').getBoundingClientRect(), w = document.getElementById('sbwhere').getBoundingClientRect(), s = document.getElementById('sbside').getBoundingClientRect(); return [w.top >= b.bottom, Math.abs(w.left - b.left) < 30, w.right <= s.left + 2, document.getElementById('sbwhere').innerText]; })()")
+    print('under the board:', where[:3], ' '.join(where[3].split())[:90]); assert where[:3] == [True, True, True] and 'Games start from the first move' in where[3] and 'Set up a position' in where[3], where
 
     # ---- practice from a chosen position: set it up with the book's moves for both sides, by the board or the chips
     pg.click('#sbSetUp'); pg.wait_for_timeout(400)
@@ -71,6 +109,9 @@ with sync_playwright() as p:
     drag(pg, 'g1', 'f3'); pg.wait_for_timeout(400); assert at() == [3, 1], 'the same move again keeps what came after it'
     assert pg.inner_text('#sbside').strip() == '' and 'lines go on from here' in pg.inner_text('#sbpanel') and pg.locator('#sbpanel .opn').count() == 1
     drag(pg, 'b8', 'c6'); pg.wait_for_timeout(500)
+    # the set-up board never slides: a move for either side, a step back and a step forward are there at once
+    slide = pg.evaluate(f"(() => {{ let n = 0; sbSetStep(-1); n += {ANIMS}; sbSetStep(-1); n += {ANIMS}; sbSetStep(1); n += {ANIMS}; sbSetGo(S.drill.fwd[S.drill.fwd.length - 1] ?? sbBookKids(S.drill.node)[0]); n += {ANIMS}; return [n, ply(S.drill.node)]; }})()")
+    print('set-up board, pieces sliding over four steps:', slide); assert slide == [0, 4], slide
     at = pg.evaluate("S.drill.node"); pg.screenshot(path=out + 'sb_setup.png')
     pg.click('#sbFromGo'); pg.wait_for_timeout(1400)
     st = pg.evaluate("[S.drill.kind, S.drill.from, S.drill.node, S.drill.scope]"); print('a game from the position:', st)
@@ -82,7 +123,11 @@ with sync_playwright() as p:
         assert pg.evaluate(f"LINES['{r['line']}'].n.includes({at}) && S.drill.hist.indexOf({at}) === 4"), 'every game goes through the position'
         lines.add(r['line'])
     print('lines from the position:', sorted(lines))
-    assert 'After move 2' in pg.inner_text('#sbside') and pg.locator('[data-sbf^="pick:"]').count() == 0, 'the side panel shows the position, not the openings'
+    wh = ' '.join(pg.inner_text('#sbwhere').split()); print('under the board:', wh[:120])
+    assert 'Games start after move 2' in wh and 'Change the position' in wh and 'Start from move one' in wh and pg.locator('#sbwhere .thumb').count() == 1
+    assert pg.locator('[data-sbf^="pick:"]').count() == 0 and 'After move' not in pg.inner_text('#sbside'), 'the side panel leaves the openings out and no longer carries the position'
+    frm = pg.evaluate(f"[document.querySelector('#sbside .queue div:nth-child(3) small').innerText, DRILLABLE.filter(id => LINES[id].n.includes({at})).length, document.querySelector('#sbside .queue div:nth-child(3) span').innerText]")
+    print('lines from the position:', frm); assert frm[0] == '/' + str(frm[1]) and frm[1] >= len(lines) and 'of the lines from this position met' in frm[2], frm
     pg.click('#sbFromClear'); pg.wait_for_timeout(300)
     assert pg.evaluate("sbFrom()") is None and pg.locator('[data-sbf^="pick:"]').count() > 0
     # from a lesson: Practise from here
