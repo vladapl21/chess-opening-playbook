@@ -36,9 +36,9 @@ def pgn(sans, white, black, result, ago_h):
 
 
 ME = 'aqua_alpaca'
-G_OPP = pgn('e4 e5 g3 Nf6 d3 d5 exd5 Nxd5 Bg2 Nc6 Nf3 Be7 O-O O-O Re1 Bg4', 'rook_lover', ME, '1/2-1/2', 1)      # White leaves the book on move 2
+G_OPP = pgn('e4 e5 h3 Nf6 d3 d5 exd5 Nxd5 Nf3 Nc6 Be2 Be7 O-O O-O Re1 Bf5', 'rook_lover', ME, '1/2-1/2', 1)      # White leaves the book on move 2
 G_ME = pgn('e4 e5 Nf3 Nc6 Bc4 Nf6 Nxe5 Nxe5 d4 Nxc4 Qe2 d5 exd5 Qe7 Qxe7 Bxe7', ME, 'knightmare', '0-1', 3)      # the player grabs the e-pawn
-G_MK = pgn('e4 e5 Nf3 Nc6 Bc4 a6 d3 Nf6 O-O Bc5 Qe2 d6 Qe3 Bxe3 Bxe3 O-O Nc3 Bg4 h3 Bh5', ME, 'queenside', '0-1', 5)  # the queen goes on move 7
+G_MK = pgn('e4 e5 Nf3 Nc6 Bc4 a5 d3 Nf6 O-O Bc5 Qe2 d6 Qe3 Bxe3 Bxe3 O-O Nc3 Bg4 h3 Bh5', ME, 'queenside', '0-1', 5)  # Black leaves the book on move 3; the queen goes on move 7
 G_OLD = [pgn('e4 c5 Nf3 d6 c3 Nf6 Be2 Nc6 O-O e5', ME, 'old_one', '1-0', 30), pgn('d4 d5 c4 c6 Nc3 Nf6 Nf3 dxc4', 'old_two', ME, '0-1', 40)]
 G_NEW = pgn('e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4 exd4 cxd4 Bb4+ Nc3 Nxe4 O-O Bxc3 d5', ME, 'latecomer', '1-0', 0.2)   # comes in later
 G_PASTE = pgn('e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7', 'strangerA', 'strangerB', '1-0', 50)                          # nobody we know: which side?

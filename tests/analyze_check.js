@@ -41,5 +41,17 @@ const A = ctx.Analyze, assert = (c, m) => { if (!c){ console.error('FAILED:', m)
   // both are in the library now: the Sicilian pack for Black, the London pack for White
   assert(Q.white.off === 0 && Q.black.off === 0, 'both colours inside the library: ' + Q.white.off + ' ' + Q.black.off);
   assert((Q.white.systems.london || {}).n === 30, 'the d-pawn games are sorted into the London: ' + JSON.stringify(Q.white.systems));
+  // a King's Indian player: the games are read against that system, not the first one, and again at once for another pick
+  const kid = Array.from({length: 30}, (_, k) => `[White "opp${k}"]\n[Black "fianchetto"]\n[Result "0-1"]\n[WhiteElo "1100"]\n[BlackElo "1090"]\n[TimeControl "600"]\n[Date "2026.10.${String(k % 28 + 1).padStart(2, '0')}"]\n\n1. d4 Nf6 2. c4 g6 3. Nc3 Bg7 4. e4 O-O 5. Nf3 d6 6. Be2 e5 0-1\n`).join('\n');
+  const K = await A.run(kid, '', books);
+  console.log('\n== fianchetto:', K.n, 'games | home', JSON.stringify(K.home), '| systems', JSON.stringify(Object.keys(K.black.systems)), '| top leak', K.leaks[0] && [K.leaks[0].ch, K.leaks[0].uci, K.leaks[0].n].join(' '));
+  assert(K.home.blackD4 === 'kid' && K.home.blackE4 === 'e5' && K.home.white === 'e4', 'the system the games fit: ' + JSON.stringify(K.home));
+  assert((K.black.systems.kid || {}).n === 30 && K.black.off === 0 && K.leaks[0].ch === 'kid' && K.leaks[0].uci === 'e8g8' && K.leaks[0].n === 30, 'castling before the d-pawn is the leak, inside the King\'s Indian');
+  assert(!('_games' in JSON.parse(JSON.stringify(K))), 'the games as read are never stored with the profile');
+  const K2 = A.again(K, books, {blackD4: 'slav'});
+  assert(K2.home.blackD4 === 'slav' && K2.leaks[0].ch === 'slav' && K2.leaks[0].uci === 'g8f6' && K2.leaks[0].n === 30 && K2.black.off === 30, 'with the Slav picked, the knight on move one is the leak: ' + JSON.stringify(K2.leaks[0]));
+  assert(A.again(JSON.parse(JSON.stringify(K)), books, {blackD4: 'slav'}).home.blackD4 === 'kid', 'a stored profile has no games to read again and stays as it is');
+  const V = await A.run(fs.readFileSync(path.join(root, 'data/games/vladapl_1.pgn'), 'utf8'), 'vladapl', books, null, {blackD4: 'kid'});
+  assert(V.home.blackD4 === 'kid' && V.leaks.some(l => l.ch === 'kid') && !V.leaks.some(l => l.ch === 'slav'), 'given picks win over the habit');
   console.log(process.exitCode ? '\nanalysis checks FAILED' : '\nanalysis checks passed');
 })();

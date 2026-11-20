@@ -107,12 +107,12 @@ def review_seed():
         b = chess.Board(); out = []
         for s in sans.split(): m = b.parse_san(s); out.append(m.uci()); b.push(m)
         return out
-    return [{'id': 'r1', 'src': 'acct', 'me': 'b', 'opp': 'rook_lover', 'oe': 1010, 'r': 0.5, 'url': '', 'u': ucis('e4 e5 g3 Nf6 d3 d5 exd5 Nxd5 Bg2 Nc6 Nf3 Be7 O-O O-O Re1 Bg4'),
-             'at': 2, 'by': 'opp', 'w': 0, 'ln': ['d7d5', 'f1g2', 'd5e4', 'b1c3', 'g8f6'], 'mk': 0},
+    return [{'id': 'r1', 'src': 'acct', 'me': 'b', 'opp': 'rook_lover', 'oe': 1010, 'r': 0.5, 'url': '', 'u': ucis('e4 e5 h3 Nf6 d3 d5 exd5 Nxd5 Nf3 Nc6 Be2 Be7 O-O O-O Re1 Bf5'),
+             'at': 2, 'by': 'opp', 'w': 0, 'ln': ['g8f6', 'b1c3', 'd7d5', 'e4d5', 'f6d5'], 'mk': 0},
             {'id': 'r2', 'src': 'acct', 'me': 'w', 'opp': 'knightmare', 'oe': 1004, 'r': 0, 'url': '', 'u': ucis('e4 e5 Nf3 Nc6 Bc4 Nf6 Nxe5 Nxe5 d4 Nxc4 Qe2 d5 exd5 Qe7 Qxe7 Bxe7'),
              'at': 6, 'by': 'me', 'w': 0, 'mk': 0},
-            {'id': 'r3', 'src': 'acct', 'me': 'w', 'opp': 'queenside', 'oe': 1004, 'r': 0, 'url': '', 'u': ucis('e4 e5 Nf3 Nc6 Bc4 a6 d3 Nf6 O-O Bc5 Qe2 d6 Qe3 Bxe3 Bxe3 O-O Nc3 Bg4 h3 Bh5'),
-             'at': 5, 'by': 'opp', 'w': 0, 'ln': ['d2d4', 'e5d4', 'e1g1', 'd7d6', 'f3d4'], 'mk': {'k': 12, 'best': 'a2a4', 'loss': 725, 'mate': 0, 'ln': ['a2a4']}}]
+            {'id': 'r3', 'src': 'acct', 'me': 'w', 'opp': 'queenside', 'oe': 1004, 'r': 0, 'url': '', 'u': ucis('e4 e5 Nf3 Nc6 Bc4 a5 d3 Nf6 O-O Bc5 Qe2 d6 Qe3 Bxe3 Bxe3 O-O Nc3 Bg4 h3 Bh5'),
+             'at': 5, 'by': 'opp', 'w': 0, 'ln': ['e1g1', 'd7d6', 'd2d4', 'f8e7', 'd4e5'], 'mk': {'k': 12, 'best': 'a2a4', 'loss': 703, 'mate': 0, 'ln': ['a2a4']}}]
 
 
 def idle(pg):

@@ -3,10 +3,11 @@ from content2 import E5, PH, PT, CK, CKX, CKG, SC, SN, SD, SQ, PD, PN, FR, FC
 from content import J
 
 # Systems. A slot is one decision in a repertoire ("what do I open with?") and a pack is one answer to it (see PACKS in
-# content/black/bmeta.py for the Black book). The White book's first system is the e-pawn; the London is the second.
+# content/black/bmeta.py for the Black book). The White book's first system is the e-pawn; the London is the second and the English the third.
 PACKS = dict(
   white=dict(default='e4', packs=dict(e4=['italian', 'e5x', 'caro', 'sic', 'scandi', 'pirc', 'french', 'rare'],
-                                      d4=['london', 'lindian', 'lrare'])),
+                                      d4=['london', 'lindian', 'lrare'],
+                                      flank=['english', 'engsym', 'engrare'])),
 )
 
 CH_META = {
@@ -110,9 +111,46 @@ CH_META = {
            dict(big='1', text='trap in the e-pawn gambit, and one move that avoids it', alert=True),
            dict(big='9', text='first moves covered here, most of them by the same setup')],
     notes=[]),
+  'english': dict(tile='c4 e5 Nc3 Nf6 g3', first='en-main', roots=['c4 e5'],
+    hero='c4 e5 Nc3 Nf6 g3 Nc6 Bg2 Bc5 e4 O-O Nge2 d6 O-O Bg4 d3', arrows=['g2d5g', 'c3d5g', 'e4d5g', 'c4d5g'], circles=['d5g'], cap='The setup, complete: three pawns in a wedge, and four of your men on one square.',
+    kicker='English Opening: the King\'s English',
+    headline='One wedge, <em>one square</em>.',
+    lede='C-pawn, queen\'s knight, g-pawn, bishop to the long diagonal: four moves that all aim at one light square in the middle. Then the e-pawn goes two squares, the king\'s knight tucks in behind it, you castle and the d-pawn moves up one. When Black\'s d-pawn comes two squares instead, take it.',
+    facts=[dict(big='8', text='moves make the whole setup, the same ones in almost every line'),
+           dict(big='1 in 5', text='club players jump a knight at f2 once the bishop aims there. One small pawn move answers it.', alert=True),
+           dict(big='1', text='queen check that wins a bishop, when Black brings it out and then moves the d-pawn')],
+    notes=[]),
+  'engsym': dict(tile='c4 c5 Nc3 Nc6 g3', first='en-sym', roots=['c4 c5', 'c4 Nf6', 'c4 g6'],
+    hero='c4 c5 Nc3 Nc6 g3 g6 Bg2 Bg7 e4 e6 Nge2 Nge7 O-O O-O d3 a6 Be3', arrows=['d3d4g', 'e3c5g'], circles=['d4g'], cap='Black copied every move. Your bishop is out first, and the d-pawn push is next.',
+    kicker='English Opening: Symmetrical and Anglo-Indian',
+    headline='Same moves, <em>your plan</em>.',
+    lede='Black copies your first move, or develops a knight and a fianchetto and waits. The setup comes out in the same order. Against the e-pawn one square the king\'s knight comes out first, and the rule about the d-pawn stays: when it comes two squares, take it.',
+    facts=[dict(big='1 in 10', text='club players copy your first move'),
+           dict(big='1 in 3', text='who start with the knight fianchetto next: all eight moves, no changes'),
+           dict(big='1', text='pawn push ends the symmetry: your d-pawn, two squares')],
+    notes=[]),
+  'engrare': dict(tile='c4 d5 cxd5', first='en-d5', roots=['c4 d5', 'c4 e6', 'c4 c6', 'c4 d6', 'c4 b6', 'c4 Nc6'],
+    hero='c4 d5 cxd5 Qxd5 Nc3 Qd8 Nf3 Nf6 d4 e6 e4 Bb4 Bd3 O-O e5', arrows=['d3h7r'], circles=['f6r'], cap='The e-pawn pushes at the knight. When it leaves, the bishop takes the h-pawn with check.',
+    kicker='English Opening: Black\'s d-pawn',
+    headline='The d-pawn comes? <em>Take it</em>.',
+    lede='At once, or backed up by a pawn first, the answer is the same: take it. When the queen takes back, your knight hits her and you are a move ahead. With the c-pawn traded off there is no wedge to build, so the d-pawn and the e-pawn take the middle instead.',
+    facts=[dict(big='9 in 10', text='take back with the queen, and lose a move to your knight'),
+           dict(big='4 in 10', text='castle into the e-pawn push that drives the knight away from the king', alert=True),
+           dict(big='1', text='first move where your g-pawn stays home: the b-pawn and its bishop on the long diagonal')],
+    notes=[]),
 }
 
 CHEAT2 = [
+  ('c4 e5', 'Nc3', 'Queen\'s knight, then the g-pawn and the bishop', 'en-main'),
+  ('c4 e5 Nc3 Nf6 g3 Nc6 Bg2 Bc5', 'e4', 'Bishop on its diagonal: now the e-pawn two squares', 'en-main'),
+  ('c4 e5 Nc3 Nf6 g3 Nc6 Bg2 Bc5 e4 O-O', 'Nge2', 'Knight behind the e-pawn, then castle', 'en-main'),
+  ('c4 e5 Nc3 Nf6 g3 d5', 'cxd5', 'D-pawn comes two squares: take it', 'en-open'),
+  ('c4 e5 Nc3 Nf6 g3 Bb4 Bg2 Bxc3', 'bxc3', 'Bishop takes your knight: b-pawn takes back', 'en-bb4'),
+  ('c4 e5 Nc3 Nf6 g3 Bb4 Bg2 d6', 'Qa4+', 'Loose bishop, d-pawn moved: queen check wins it', 'en-bb4'),
+  ('c4 e5 Nc3 Nf6 g3 Bc5 Bg2 Ng4', 'e3', 'Knight and bishop at f2: small e-pawn move', 'en-bc5'),
+  ('c4 e5 Nc3 Bc5 g3 Qf6', 'e3', 'Queen and bishop at f2: small e-pawn move', 'en-2bc5'),
+  ('c4 d5', 'cxd5', 'D-pawn at once: take it, then the knight hits the queen', 'en-d5'),
+  ('c4 b6 Nc3 Bb7', 'd4', 'Bishop owns the long diagonal: pawns in the middle', 'en-first'),
   (E5 + ' d6', 'd4', 'Hit the center at once', 'ph-main'),
   (J(PH, 'Nd7'), 'Bc4', 'Bishop at f7; watch for the sacrifice', 'ph-nd7'),
   (J(PH, 'Bg4'), 'dxe5', 'Take first, then the queen hits f7 and the b-pawn', 'ph-bg4'),

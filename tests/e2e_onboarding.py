@@ -96,6 +96,15 @@ with sync_playwright() as p:
     txt = pg.inner_text('.wyr'); assert 'Ready now' in txt and 'What you play now' in txt and 'Being written' not in txt
     for k in range(n):
         q = pg.evaluate('Product.cards[Product.ci]')
+        if q['id'] == 'blackE4':   # four systems on one card: side by side on a wide screen, none cut off, and stacked on a phone
+            assert [o['id'] for o in q['opts']] == ['e5', 'sicilian', 'caro', 'scandi'] and all(o['ready'] for o in q['opts']), q['opts']
+            pg.wait_for_timeout(900)   # the cards pop in
+            bx = [b_.bounding_box() for b_ in pg.locator('.duo .wopt').all()]; pg.screenshot(path=out + 'o_choice_four.png', full_page=True)
+            assert len(bx) == 4 and max(b_['y'] for b_ in bx) - min(b_['y'] for b_ in bx) < 4 and all(bx[i]['x'] + bx[i]['width'] <= bx[i + 1]['x'] for i in range(3)) and bx[3]['x'] + bx[3]['width'] <= 1280, bx
+            pg.set_viewport_size({'width': 390, 'height': 844}); pg.wait_for_timeout(400)
+            xs = [b_.bounding_box()['x'] for b_ in pg.locator('.duo .wopt').all()]
+            assert pg.evaluate('document.documentElement.scrollWidth') <= 390 and max(xs) - min(xs) < 4, xs
+            pg.screenshot(path=out + 'o_choice_four_phone.png', full_page=True); pg.set_viewport_size({'width': 1280, 'height': 900}); pg.wait_for_timeout(300)
         if q['id'] == 'blackD4':
             pg.screenshot(path=out + 'o_choice_system.png', full_page=True)
             txt = pg.inner_text('.wyr'); assert 'Being written' in txt and 'Ready now' in txt and 'What you play now' in txt
