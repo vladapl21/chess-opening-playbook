@@ -103,7 +103,7 @@ if __name__ == '__main__':
         play_sandbox(pg, 0.3, 'all/real')
         pg.screenshot(path=out + 'v2_sb_report.png', full_page=True)
         for scope, odds in [('sic', 'real'), ('caro', 'even'), ('e5x', 'weak'), ('italian', 'real'), ('pirc', 'even'), ('rare', 'even'), ('scandi', 'real'), ('french', 'real')]:
-            pg.click('[data-sbf="scope:all"]'); pg.click(f'[data-sbf="pick:{scope}"]'); pg.click(f'[data-sbf="odds:{odds}"]'); pg.wait_for_timeout(100)
+            pg.click('[data-sbf="scope:all"]'); pg.click(f'[data-sbf="pick:w:{scope}"]'); pg.click(f'[data-sbf="odds:{odds}"]'); pg.wait_for_timeout(100)
             pg.click('#sbAgain'); pg.wait_for_timeout(200)
             r = play_sandbox(pg, 0.15, f'{scope}/{odds}')
             assert r['state'] == 'done'
@@ -113,12 +113,12 @@ if __name__ == '__main__':
         pg.screenshot(path=out + 'v2_sb_report2.png', full_page=True)
         print('sb stats', pg.evaluate("JSON.stringify(Prog.d.sb)")[:200])
         # mid-game screenshot
-        pg.click('[data-sbf="scope:all"]'); pg.click('#sbAgain'); pg.wait_for_timeout(2600)
+        pg.click('[data-sbf="scope:all"]'); pg.click('[data-sbf="side:w"]'); pg.click('#sbAgain'); pg.wait_for_timeout(2600)
         pg.screenshot(path=out + 'v2_sb_mid.png')
         # drill by chapter
         pg.click('.tabs button[data-view="drill"]'); pg.wait_for_timeout(300)
         pg.click('.dmore > summary'); pg.wait_for_timeout(200)   # picking lines yourself is folded under today's five
-        pg.click('[data-f="ch:sic"]'); pg.wait_for_timeout(200)
+        pg.click('[data-f="ch|w:sic"]'); pg.wait_for_timeout(200)
         pg.click('#smart'); pg.wait_for_timeout(900)
         print('drill line:', pg.evaluate('S.drill.id'))
         for _ in range(40):
@@ -132,18 +132,19 @@ if __name__ == '__main__':
         pg.click('.tabs button[data-view="sandbox"]'); pg.wait_for_timeout(300)
         print('sandbox kept state:', pg.evaluate("S.drill && S.drill.kind"))
         pg.click('.tabs button[data-view="games"]'); pg.wait_for_timeout(400)
-        # Your games: the openings first, as tiles; shots and game reviews behind a switch
-        assert pg.locator('.otile').count() == pg.evaluate('DATA.chapters.length') and pg.locator('.mshot, .grev').count() == 0
+        # Your games: the openings first, as tiles, White's and then Black's; shots and game reviews behind a switch
+        WK = '.gside[data-bk="w"] '
+        assert pg.locator(WK + '.otile').count() == pg.evaluate('BOOKS.w.chapters.length') and pg.locator('.otile').count() == pg.evaluate('BOOKS.w.chapters.length + BOOKS.b.chapters.length') and pg.locator('.mshot, .grev').count() == 0
         known, total = pg.evaluate("[chLines('w', CHAPTERS.sic).filter(lineClean).length, chLines('w', CHAPTERS.sic).length]"); print('sicilian lines known:', known, 'of', total)
-        assert f'{known} of {total} lines' in pg.inner_text('.otile[data-ch="sic"]')
+        assert f'{known} of {total} lines' in pg.inner_text(WK + '.otile[data-ch="sic"]')
         pg.screenshot(path=out + 'v2_games.png', full_page=True)
-        pg.click('[data-gseg="shots"]'); pg.wait_for_timeout(300); assert pg.locator('.mshot').count() == 4
-        pg.click('[data-gseg="games"]'); pg.wait_for_timeout(300); assert pg.locator('.grev').count() == pg.evaluate('DATA.games.length')
+        pg.click('[data-gseg="shots"]'); pg.wait_for_timeout(300); assert pg.locator(WK + '.mshot').count() == 4
+        pg.click('[data-gseg="games"]'); pg.wait_for_timeout(300); assert pg.locator(WK + '.grev').count() == pg.evaluate('BOOKS.w.games.length')
         pg.screenshot(path=out + 'v2_games_reviews.png', full_page=True)
-        pg.locator('.grev').nth(2).click(); pg.wait_for_timeout(300); assert pg.evaluate('[S.view, S.studyFrom]') == ['study', 'games']
+        pg.locator(WK + '.grev').nth(2).click(); pg.wait_for_timeout(300); assert pg.evaluate('[S.view, S.studyFrom, SIDE]') == ['study', 'games', 'w']
         pg.click('.crumbs [data-go="games"]'); pg.wait_for_timeout(300); assert pg.locator('.grev').count() > 0, 'back on the same part of the page'
         pg.click('[data-gseg="open"]'); pg.wait_for_timeout(300)
-        pg.click('.otile[data-ch="italian"]'); pg.wait_for_timeout(400)
+        pg.click(WK + '.otile[data-ch="italian"]'); pg.wait_for_timeout(400)
         assert pg.evaluate('[S.view, S.chapter]') == ['learn', 'italian'] and pg.locator('[data-lview]').count() == 2
         pg.click('[data-lview="glance"]'); pg.wait_for_timeout(300)
         n_glance = pg.locator('#view .ccard').count(); print('italian at a glance:', n_glance); assert n_glance == pg.evaluate('glanceCards(CHAPTERS.italian).length') >= 20

@@ -1,7 +1,9 @@
 """The shop and the levels: points from lines played and days kept, a level chip in the corner with a card for each new
-level, a wardrobe that opens at level 5, tokens from badges, days in a row and levels, buying and wearing looks for the
-coach, items that need a badge, today's two drops (gone at midnight unless bought) and the locker, the look on every
-coach and in the corner, and the record of it all."""
+level, a shop that opens at level 5, tokens from badges, days in a row and levels. The whole shop is a daily shop: six
+pieces set by the date (two hats, two colours, one pair of glasses, one for the neck), the same all day on every device
+and different the next day, with only the time left beside it. What is bought goes in the locker, where it is put on;
+pieces that need a badge wait there until the badge is earned and then join the rotation. Also: the fit of every piece
+on every coach, the look in the corner, and the record of it all."""
 from playwright.sync_api import sync_playwright
 from e2e_white import launch, URL, out
 errors = []
@@ -29,7 +31,11 @@ with sync_playwright() as p:
     pg.click('.tabs [data-view="shop"]'); pg.wait_for_timeout(400)
     assert pg.locator('.wlock').count() == 1 and pg.locator('[data-buy]').count() == 0, 'nothing to buy before level 5'
     assert 'level 5' in pg.inner_text('.wlock') and pg.locator('.wlock .wlv i').count() == 5
-    assert pg.locator('.item.lock').count() == pg.evaluate('SHOP.filter(I => !I.daily).length - 1 + Shop.today().length'), 'every item but the classic look is locked, today\'s drops too'
+    assert pg.locator('.items.daily .item.lock').count() == pg.evaluate('Shop.today().length') == 6, 'today\'s shelf is there to look at, with nothing to tap'
+    head = ' '.join(pg.inner_text('.shophd').split()); print('the header:', head)
+    assert head.startswith('Daily shop Locker') and head.endswith(' left') and pg.locator('#dropT').count() == 1
+    page = pg.inner_text('#view').lower()
+    for gone in ('two drops', 'today only', 'gone at midnight', 'tomorrow', 'wardrobe', 'days only', 'fridays', 'saturdays'): assert gone not in page, gone
     pg.screenshot(path=out + 's_locked.png', full_page=True)
 
     # ---- six days in a row, then today's five: a week in a row, but points, not days, open the wardrobe
@@ -65,12 +71,20 @@ with sync_playwright() as p:
     assert pg.evaluate('[Level.n(), Lv.pending, S.drill.state]') == [6, 6, 'play'] and pg.locator('#lvup').count() == 0
     pg.evaluate("delete Prog.d.xpb; S.drillState = S.drill = null; Prog.d.lvl = 5; Lv.pending = 0; Prog.save(); go('shop')"); pg.wait_for_timeout(300)
 
-    # ---- buy and wear: the coach in the corner wears it; what costs too much can't be bought; some items need a badge
+    # ---- buy and wear: the coach in the corner wears it at once, and says nothing about it; what costs too much can't be bought
     bal = pg.evaluate('Shop.balance()')
-    pg.click('[data-buy="h-tophat"]'); pg.wait_for_timeout(300)
-    assert pg.evaluate('Shop.balance()') == bal - 3 and pg.evaluate('Shop.worn().head') == 'h-tophat'
+    shelf = pg.evaluate('Shop.today().map(I => [I.id, I.slot, I.price, I.name])'); print('today:', [x[0] for x in shelf], '| tokens:', bal)
+    assert [x[1] for x in shelf] == ['head', 'head', 'skin', 'skin', 'face', 'neck'] and pg.locator('.items.daily .item').count() == 6
+    hat = min((x for x in shelf if x[1] == 'head'), key=lambda x: x[2]); assert hat[2] <= bal, (hat, bal)
+    poor = [x[0] for x in shelf if x[2] > bal]
+    for i in poor: assert pg.is_disabled(f'[data-buy="{i}"]'), i
+    pg.click(f'[data-buy="{hat[0]}"]'); pg.wait_for_timeout(300)
+    assert pg.evaluate('Shop.balance()') == bal - hat[2] and pg.evaluate('Shop.worn().head') == hat[0]
+    assert pg.locator('#coach .cbub').count() == 0, 'no speech for a purchase'
     vb = pg.get_attribute('#coach .cav svg', 'viewBox'); print('room for the hat:', vb)
-    assert vb == pg.evaluate("hatBox('knight', 'h-tophat')") != '0 0 64 64' and pg.locator('#coach .cav svg .g-ros').count() == 1, 'the corner coach wears the hat'
+    assert vb == pg.evaluate(f"hatBox('knight', '{hat[0]}')") and pg.locator(f'#coach .cav svg [data-g="{hat[0]}"]').count() == 1, 'the corner coach wears the hat'
+    assert pg.evaluate('Shop.today().map(I => I.id)') == [x[0] for x in shelf], 'the shelf stays as it was for the day'
+    assert pg.locator(f'.items.daily [data-buy="{hat[0]}"]').count() == 0 and pg.locator('.items.daily .item').count() == 5, 'what is bought leaves the shelf for the locker'
     # ---- the fit. Every hat on every coach is inside its picture with a shadow under its rim, the picture makes room
     #      for the hat and little more, and what goes round the knight's neck is cut to the neck (each picture its own cut)
     fit = pg.evaluate("""(() => { const host = document.createElement('div'); host.style.cssText = 'position:absolute;left:0;top:0;width:200px;visibility:hidden'; document.body.appendChild(host); const bad = [];
@@ -90,47 +104,53 @@ with sync_playwright() as p:
       host.remove(); return out; })()""")
     print('round the knight\'s neck:', neck)
     assert all(v[0] and v[1] and v[2] and v[3] >= 1 for v in neck.values()) and len(neck) == 7, neck
-    assert 'Needs the badge' in pg.inner_text('.slot .item:has(b:text-is("Crown"))')
-    assert pg.locator('[data-buy="h-crown"]').count() == 0
-    poor = pg.evaluate("SHOP.filter(I => I.price > Shop.balance() && !Shop.owns(I.id) && !Shop.lockOf(I)).map(I => I.id)")
-    for i in poor: assert pg.is_disabled(f'[data-buy="{i}"]'), i
-    assert pg.locator('.shopmain .slot [data-wear="h-tophat"], .shopmain .slot [data-off="head"]').count() == 0, 'what is bought leaves the shop for the locker'
     # a card shows the piece by itself: the hat just put on is on the mannequin, not on the cards for glasses or scarves
-    alone = pg.evaluate("[document.querySelectorAll('.mannequin svg .g-seat').length, document.querySelectorAll('.slot .item .ipv.z-face svg .g-seat, .slot .item .ipv.z-neck svg .g-seat').length, document.querySelectorAll('.slot .item .ipv.z-head svg .g-seat').length > 0]")
-    assert alone == [1, 0, True], alone
-    row = pg.evaluate("[...document.querySelectorAll('.slot .items')].map(ul => [...ul.querySelectorAll('.item > :last-child')].map(e => Math.round(e.getBoundingClientRect().bottom))).filter(r => r.length > 1 && r.length <= 6)")
-    assert row and all(max(r) - min(r) <= 2 for r in row if True), ('what a card does sits on one line across a row', row)
+    alone = [pg.locator(f'.mannequin svg [data-g="{hat[0]}"]').count() == 1, pg.locator('.items.daily .ipv.z-face svg [data-g], .items.daily .ipv.z-neck svg [data-g], .items.daily .ipv.z-skin svg [data-g]').count() > 0, pg.locator('.items.daily .ipv.z-head svg').count()]
+    assert alone == [True, False, 1], alone
+    row = pg.evaluate("[...document.querySelectorAll('.items.daily .item > :last-child')].slice(0, 3).map(e => Math.round(e.getBoundingClientRect().bottom))")
+    assert len(row) == 3 and max(row) - min(row) <= 2, ('what a card does sits on one line across a row', row)
     pg.click('[data-shoptab="locker"]'); pg.wait_for_timeout(200)
     pg.click('[data-off="head"]'); pg.wait_for_timeout(200); assert pg.evaluate('Shop.worn().head') is None
-    pg.click('[data-wear="h-tophat"]'); pg.wait_for_timeout(200); assert pg.evaluate('Shop.worn().head') == 'h-tophat'
+    pg.click(f'[data-wear="{hat[0]}"]'); pg.wait_for_timeout(200); assert pg.evaluate('Shop.worn().head') == hat[0]
+    # the locker: what is owned, by kind, and under it the pieces a badge still has to earn
+    lock = pg.inner_text('.shopmain'); assert hat[3] in lock and 'Earned with a badge' in lock and 'Badge: ' in lock
+    need = pg.evaluate("SHOP.filter(I => I.needs && !(Prog.d.badges || {})[I.needs]).map(I => I.id)"); print('waiting for a badge:', need)
+    assert need and pg.locator('.shopmain .slot:last-child .item.lock').count() == len(need) and pg.locator('.shopmain .slot:last-child [data-buy]').count() == 0
+    assert not set(need) & set(pg.evaluate("Array.from({length: 30}, (_, k) => Shop.on(new Date(2026, 10, 1 + k, 12)).map(I => I.id)).flat()")), 'never on the shelf before the badge'
     pg.click('[data-shoptab="shop"]'); pg.wait_for_timeout(200)
     # a colour, then the same look on another coach
-    if pg.evaluate('Shop.balance()') >= 2: pg.click('[data-buy="c-ruby"]'); pg.wait_for_timeout(200); assert pg.get_attribute('#coach .cav svg', 'class') == 'sk-ruby'
+    sk = next((x for x in shelf if x[1] == 'skin' and x[2] <= pg.evaluate('Shop.balance()')), None)
+    if sk: pg.click(f'[data-buy="{sk[0]}"]'); pg.wait_for_timeout(200); assert pg.get_attribute('#coach .cav svg', 'class') == 'sk-' + pg.evaluate(f"SKINS['{sk[0]}']")
     pg.click('.shopside [data-coachwho="rook"]'); pg.wait_for_timeout(300)
-    assert pg.evaluate('SET.who') == 'rook' and pg.locator('.mannequin svg .g-ros').count() == 1
+    assert pg.evaluate('SET.who') == 'rook' and pg.locator(f'.mannequin svg [data-g="{hat[0]}"]').count() == 1
     pg.evaluate('Coach.hush()'); pg.screenshot(path=out + 's_open.png', full_page=True)
     assert 'Spent' not in pg.inner_text('.shopside') and 'week' not in pg.inner_text('.earn').lower(), 'no spent row and no week token'
 
-    # ---- today's drops: two items set by the date, so every device shows the same two; tomorrow's shelf is a mystery
-    drops = pg.evaluate('Shop.today().map(I => I.id)'); print('drops today:', drops, '| tomorrow:', pg.evaluate('Shop.tomorrow().map(I => I.id)'))
-    assert len(drops) == 2 and pg.locator('.sdrops .sdi:not(.sdnext)').count() == 2 and pg.locator('.sdrops .sdnext').count() == 1
-    assert pg.evaluate("Shop.today().every(I => I.daily.includes(new Date().getDay()))"), 'a drop comes out only on its days'
-    assert pg.evaluate("Shop.on(new Date(2026, 10, 16, 1)).map(I => I.id).join() === Shop.on(new Date(2026, 10, 16, 23)).map(I => I.id).join()"), 'one shelf all day'
-    assert pg.evaluate("Shop.on(new Date(2026, 10, 16, 12)).map(I => I.id).join() !== Shop.on(new Date(2026, 10, 17, 12)).map(I => I.id).join()"), 'a new shelf the next day'
-    assert pg.evaluate("SHOP.filter(I => I.daily && !Shop.today().includes(I)).every(I => Shop.lockOf(I) === 'gone')"), 'the other drops are not for sale today'
-    assert pg.evaluate("[...document.querySelectorAll('.shopmain .slot [data-buy]')].every(e => !SHOP.find(I => I.id === e.dataset.buy).daily)"), 'drops are only on their shelf'
-    pg.evaluate("Prog.d.xpb = (Prog.d.xpb || 0) + 1500; Prog.save()"); pg.wait_for_timeout(300); pg.evaluate("document.querySelectorAll('#lvup').forEach(e => e.remove()); Coach.hush(); renderShop()")
-    assert pg.evaluate('Shop.balance()') >= 4, pg.evaluate('Shop.balance()')
-    d0 = drops[0]; name = pg.evaluate(f"SHOP.find(I => I.id === '{d0}').name")
-    pg.click(f'.sdrops [data-buy="{d0}"]'); pg.wait_for_timeout(300)
-    bub = pg.inner_text('#coach .cbub'); print('bought a drop:', bub.replace('\n', ' | ')); assert 'today only' in bub and 'locker' in bub
-    assert pg.evaluate(f"Shop.owns('{d0}')") and 'In your locker' in pg.inner_text('.sdrops .sdi:first-child')
+    # ---- the daily shop's rules: one shelf all day and the same on every device, another the next day, every piece
+    #      taking its turn, nothing else for sale, and a piece that is owned or still needs its badge staying out
+    on = lambda y, m, d, h=12: pg.evaluate(f"Shop.on(new Date({y}, {m}, {d}, {h})).map(I => I.id)")
+    assert on(2026, 10, 16, 1) == on(2026, 10, 16, 23), 'one shelf all day'
+    assert on(2026, 10, 16) != on(2026, 10, 17) and not set(on(2026, 10, 16)) & set(on(2026, 10, 17)), 'a new shelf the next day'
+    month = set(sum((on(2026, 10, d) for d in range(1, 29)), []))
+    forsale = set(pg.evaluate("SHOP.filter(I => I.price && !Shop.owns(I.id) && (!I.needs || (Prog.d.badges || {})[I.needs])).map(I => I.id)"))
+    print('pieces for sale:', len(forsale), '| on a shelf within four weeks:', len(month & forsale)); assert forsale <= month, forsale - month
+    off = pg.evaluate("SHOP.filter(I => I.price && !Shop.owns(I.id) && !Shop.today().includes(I)).map(I => [I.id, Shop.lockOf(I), Shop.buy(I.id)])")
+    assert off and all(x[1] in ('gone', 'badge') and x[2] is False for x in off), 'what is not on today\'s shelf can\'t be bought'
+    # a badge earned: its piece joins the rotation
+    b0 = pg.evaluate("SHOP.find(I => I.needs && !(Prog.d.badges || {})[I.needs])"); print('a badge piece:', b0['id'], 'needs', b0['needs'])
+    pg.evaluate(f"(Prog.d.badges = Prog.d.badges || {{}})['{b0['needs']}'] = Date.now()")
+    assert b0['id'] in set(sum((on(2026, 10, d) for d in range(1, 29)), [])), 'with the badge it comes up like any other piece'
+    pg.evaluate(f"delete Prog.d.badges['{b0['needs']}']")
+    # bought on an earlier day, a piece is out of the rotation for good
+    pg.evaluate(f"Prog.d.shop.own['{hat[0]}'] = Date.now() - 3 * DAY; Prog.save()")
+    later = pg.evaluate("Array.from({length: 28}, (_, k) => Shop.on(new Date(Date.now() + (k + 1) * DAY)).map(I => I.id)).flat()")
+    assert hat[0] not in pg.evaluate('Shop.today().map(I => I.id)') and hat[0] not in later
+    pg.evaluate("renderShop()"); pg.wait_for_timeout(200)
+    assert pg.locator('.items.daily .item').count() == 6 - (1 if sk else 0), 'the next piece of its kind takes the empty place'
+    assert pg.evaluate("/^\\d+ (h \\d+ )?min left$/.test(document.getElementById('dropT').textContent)"), pg.inner_text('#dropT')
     pg.click('[data-shoptab="locker"]'); pg.wait_for_timeout(200)
-    names = pg.locator('.shopmain .slot .item b').all_inner_texts(); print('locker:', names); assert name in names and 'Top hat' in names
+    names = pg.locator('.shopmain .slot .item b').all_inner_texts(); print('locker:', names[:6]); assert hat[3] in names and (not sk or sk[3] in names)
     pg.screenshot(path=out + 's_locker.png', full_page=True)
-    # bought on an earlier day, a drop leaves the rotation: its days bring another item, or nothing
-    pg.evaluate(f"Prog.d.shop.own['{d0}'] = Date.now() - 3 * DAY; Prog.save()")
-    assert d0 not in pg.evaluate('Shop.today().map(I => I.id)')
     pg.click('[data-shoptab="shop"]'); pg.wait_for_timeout(200)
 
     # ---- the record: bought items stay bought, the newer choice of what to wear wins, tokens are the same everywhere

@@ -101,9 +101,9 @@ with sync_playwright() as p:
     glance = pg.evaluate("DATA.chapters.flatMap(C => glanceCards(C)).map(c => c.rule)"); assert 'Bishop out before the e-pawn' in glance and 'Mirror the bishop' not in glance
     pg.evaluate("S.lview = 'lessons'")
     pg.evaluate("go('course')"); pg.wait_for_timeout(400); pg.evaluate("S.unit = 'b-caro'; S.slide = 0; go('unit')"); pg.wait_for_timeout(500)
-    assert 'Two pawn moves, every game' in pg.inner_text('#view'); pg.screenshot(path=out + 'p_unit.png')
+    assert 'Two pawn moves in every game' in pg.inner_text('#view'); pg.screenshot(path=out + 'p_unit.png')
     seen = set()
-    pg.evaluate("useSide('b'); SBS.scope = 'caro'; SBS.odds = 'even'; go('sandbox')"); pg.wait_for_timeout(300)
+    pg.evaluate("useSide('b'); SB_STATE.b.scope = 'caro'; SB_STATE.w.scope = 'none'; SB_STATE.w.odds = SB_STATE.b.odds = 'even'; go('sandbox')"); pg.wait_for_timeout(300)
     for k in range(4):
         pg.evaluate("sbStart()"); pg.wait_for_timeout(500)
         for _ in range(80):
@@ -175,7 +175,7 @@ with sync_playwright() as p:
     pg.evaluate("go('course')"); pg.wait_for_timeout(400); pg.evaluate("S.unit = 'w-london'; S.slide = 0; go('unit')"); pg.wait_for_timeout(500)
     assert 'Bishop out first' in pg.inner_text('#view'); pg.screenshot(path=out + 'p_london_unit.png')
     seen = set()
-    pg.evaluate("useSide('w'); SBS.scope = 'london'; SBS.odds = 'even'; go('sandbox')"); pg.wait_for_timeout(300)
+    pg.evaluate("useSide('w'); SB_STATE.w.scope = 'london'; SB_STATE.b.scope = 'none'; SB_STATE.w.odds = SB_STATE.b.odds = 'even'; go('sandbox')"); pg.wait_for_timeout(300)
     for k in range(3):
         pg.evaluate("sbStart()"); pg.wait_for_timeout(900)
         assert pg.evaluate("N[S.drill.hist[1]].u") == 'd2d4', 'the Sandbox opens with the d-pawn'
@@ -221,7 +221,7 @@ with sync_playwright() as p:
     pg.evaluate("useSide('w'); startDrillLine('en-main')"); pg.wait_for_timeout(600); assert drill_clean(pg) == 'done'
     pg.evaluate("useSide('w'); S.chapter = 'english'; go('learn')"); pg.wait_for_timeout(500)
     txt = pg.inner_text('#view'); assert 'one square' in txt and 'Black opens the middle' in txt; pg.screenshot(path=out + 'p_english.png')
-    pg.evaluate("useSide('w'); SBS.scope = 'all'; SBS.odds = 'even'; go('sandbox')"); pg.wait_for_timeout(300); pg.evaluate("sbStart()"); pg.wait_for_timeout(1200)
+    pg.evaluate("useSide('w'); SB_STATE.w.scope = 'all'; SB_STATE.b.scope = 'none'; SB_STATE.w.odds = SB_STATE.b.odds = 'even'; go('sandbox')"); pg.wait_for_timeout(300); pg.evaluate("sbStart()"); pg.wait_for_timeout(1200)
     assert pg.evaluate("N[S.drill.hist[1]].u") == 'c2c4', 'the Sandbox opens with the c-pawn'
     assert pg.evaluate('document.documentElement.scrollWidth') <= 1280
     for ask in ('white:e4', 'blackD4:slav', 'blackE4:e5'):

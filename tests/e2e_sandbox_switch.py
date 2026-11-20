@@ -1,4 +1,5 @@
-"""Regression: switching the Sandbox opening mid-game must not block moves. Then practice from a chosen position: set up
+"""The Sandbox plays both books: with everything picked, games come with White and with Black in turn, and openings from
+either book narrow it. Regression: switching the Sandbox opening mid-game must not block moves. Then practice from a chosen position: set up
 by hand with the book's moves for both sides (back and forward with the arrows under the board and on the keyboard, a tap
 on a move in the list), or picked in a lesson; games start there and only its lines come up. A game that ends on a side
 line ends with that line's plan. Also: the player's own move lands at once and only the reply slides, the set-up board
@@ -28,7 +29,41 @@ with sync_playwright() as p:
     pg = b.new_page(viewport={'width': 1280, 'height': 900})
     pg.on('pageerror', lambda e: errors.append(str(e)))
     pg.goto(URL + '#sandbox'); pg.wait_for_timeout(1000)
-    pg.click('[data-sbf="pick:caro"]'); pg.click('#sbGo'); pg.wait_for_timeout(1500)
+    # ---- everything: both colours, taking turns, and the count is every line of both books
+    ev = pg.evaluate("[sbEverything(), sbSides(), document.querySelector('[data-sbf=\"scope:all\"]').getAttribute('aria-pressed'), document.querySelector('#sbside .queue div:nth-child(3) small').innerText, BOOKS.w.drillable.length + BOOKS.b.drillable.length, document.querySelector('#sbside .queue div:nth-child(3) span').innerText, document.querySelectorAll('.top .sidesw').length]")
+    print('everything:', ev); assert ev[:3] == [True, ['w', 'b'], 'true'] and ev[3] == '/' + str(ev[4]) and ev[5] == 'of your lines met here' and ev[6] == 0, ev
+    rows = pg.evaluate("[...document.querySelectorAll('#sbside .sbrow')].map(r => [r.querySelector('.sbcol').innerText.trim(), r.querySelectorAll('[data-sbf^=\"pick:\"]').length])")
+    assert rows == [['White', pg.evaluate('BOOKS.w.chapters.length')], ['Black', pg.evaluate('BOOKS.b.chapters.length')]], rows
+    turns = []
+    for k in range(4):
+        pg.click('#sbGo' if pg.query_selector('#sbGo') else '#sbAgain'); pg.wait_for_timeout(500)
+        turns.append(pg.evaluate("[S.drill.side, SIDE, FLIP, S.drill.scope]"))
+        r = play_sandbox(pg, 0.0, f'both {k}'); assert r['state'] == 'done' and pg.evaluate(f"!!LINES['{r['line']}'] && BOOKS[SIDE].drillSet.has('{r['line']}')"), r
+    print('four games:', turns)
+    assert [t[0] for t in turns] in (['w', 'b', 'w', 'b'], ['b', 'w', 'b', 'w']) and all(t[0] == t[1] and t[2] == (t[0] == 'b') and t[3] == 'all' for t in turns), 'White and Black in turn, the board turned to match'
+    assert pg.evaluate("S.sbSession.games") == 4, 'one session for both colours'
+    # a whole colour, then one opening of it; the last pick taken away is everything again
+    pg.click('[data-sbf="side:b"]'); pg.wait_for_timeout(150)
+    assert pg.evaluate("[SB_STATE.w.scope, SB_STATE.b.scope, sbSides()]") == ['none', 'all', ['b']] and 'of your Black lines met here' in pg.inner_text('#sbside .queue')
+    pg.click('[data-sbf="side:w"]'); pg.wait_for_timeout(150); assert pg.evaluate("sbEverything()"), 'both colours picked is everything'
+    pg.click('[data-sbf="pick:b:ruy"]'); pg.wait_for_timeout(150)
+    assert pg.evaluate("[SB_STATE.w.scope, SB_STATE.b.scope]") == ['none', 'ruy'] and pg.evaluate("sbPool().length") == pg.evaluate("chLines('b', BOOKS.b.chapters.find(c => c.id === 'ruy')).length")
+    pg.click('[data-sbf="pick:w:french"]'); pg.wait_for_timeout(150)
+    assert pg.evaluate("[SB_STATE.w.scope, SB_STATE.b.scope, sbSides()]") == ['french', 'ruy', ['w', 'b']], 'openings from both books at once'
+    both = set()
+    for k in range(4):
+        pg.click('#sbAgain' if pg.query_selector('#sbAgain') else '#sbGo'); pg.wait_for_timeout(500)
+        r = play_sandbox(pg, 0.0, f'two openings {k}'); assert r['state'] == 'done'
+        both.add(pg.evaluate(f"SIDE + ':' + chapterOf(lessonOf('{r['line']}')).id"))
+    print('a French and a Ruy Lopez session:', sorted(both)); assert both == {'w:french', 'b:ruy'}, both
+    pg.click('[data-sbf="pick:b:ruy"]'); pg.click('[data-sbf="pick:w:french"]'); pg.wait_for_timeout(150); assert pg.evaluate("sbEverything()"), 'nothing picked is everything'
+    # an opening's lines are the lines of its lessons, the odd ones filed under it too: every one of them can come up
+    for sd in ('w', 'b'):
+        pg.evaluate(f"useSide('{sd}')")
+        diff = pg.evaluate("DATA.chapters.map(C => [C.id, chLines(SIDE, C).length, DRILLABLE.filter(id => inScopeLine(id, C.id)).length, DRILLABLE.filter(id => inScopeLine(id, C.id)).every(id => LINES[id].n.every(i => !i || inScope(i, C.id)))]).filter(x => x[1] !== x[2] || !x[3])")
+        assert not diff, diff
+    pg.evaluate("useSide('w'); S.drill = S.sbState = null; S.sbSession = null; go('sandbox')"); pg.wait_for_timeout(300)
+    pg.click('[data-sbf="pick:w:caro"]'); pg.click('#sbGo'); pg.wait_for_timeout(1500)
     # your own move lands at once; the other side's reply slides in
     snap = own_move(pg); print('own move, then the reply (pieces sliding):', snap); assert snap[0] == 0 and snap[1] > 0, snap
     pg.wait_for_timeout(700)
@@ -43,7 +78,7 @@ with sync_playwright() as p:
     pg.evaluate("renderSbPanel()"); assert fold()[:2] == [True, True], 'it stays open when the panel is drawn again'
     pg.click('#sbElse > summary'); pg.wait_for_timeout(200); assert fold()[:2] == [False, False], 'and a tap on the arrow folds it away'
     # the count beside the session numbers: every line a game can end on with these settings, counted from the book
-    cnt = pg.evaluate("[document.querySelector('#sbside .queue div:nth-child(3) small').innerText, DRILLABLE.filter(id => inScopeLine(id, SBS.scope)).length, document.querySelector('#sbside .queue div:nth-child(3) span').innerText]")
+    cnt = pg.evaluate("[document.querySelector('#sbside .queue div:nth-child(3) small').innerText, DRILLABLE.filter(id => inScopeLine(id, 'caro')).length, document.querySelector('#sbside .queue div:nth-child(3) span').innerText]")
     print('lines met, of:', cnt); assert cnt[0] == '/' + str(cnt[1]) and 0 < cnt[1] < pg.evaluate('DRILLABLE.length') and 'of your White lines met here' in cnt[2], cnt
     # play two correct moves, then switch the chips mid-game
     for _ in range(2):
@@ -52,45 +87,49 @@ with sync_playwright() as p:
             if not st['busy'] and st['wtm']: break
             pg.wait_for_timeout(200)
         u = pg.evaluate("sbMyKids(S.drill.node).map(c => N[c].u)[0]"); drag(pg, u[:2], u[2:4]); pg.wait_for_timeout(900)
-    pg.click('[data-sbf="pick:sic"]'); pg.click('[data-sbf="pick:caro"]'); pg.click('[data-sbf="odds:even"]')   # add the Sicilian, take the Caro-Kann out; pg.wait_for_timeout(300)
-    print('pending note:', pg.inner_text('.sbpend') if pg.query_selector('.sbpend') else None)
+    pg.click('[data-sbf="pick:w:sic"]'); pg.click('[data-sbf="pick:w:caro"]'); pg.click('[data-sbf="odds:even"]')   # add the Sicilian, take the Caro-Kann out; pg.wait_for_timeout(300)
+    print('pending note:', pg.inner_text('.sbpend') if pg.query_selector('.sbpend') else None); assert 'The change starts with the next one' in pg.inner_text('.sbpend')
     random.seed(1)
     r = play_sandbox(pg, 0.0, 'after switch')
     assert r['state'] == 'done' and r['slips'] == 0, r
-    print('game scope kept:', pg.evaluate("S.drill.scope"), '| next game scope:', pg.evaluate("SBS.scope"))
+    print('game scope kept:', pg.evaluate("S.drill.scope"), '| next game scope:', pg.evaluate("SB_STATE.w.scope")); assert pg.evaluate("[S.drill.scope, SB_STATE.w.scope, SB_STATE.b.scope]") == ['caro', 'sic', 'none']
     pg.click('#sbAgain'); pg.wait_for_timeout(1500)
     print('new game scope:', pg.evaluate("S.drill.scope"), pg.evaluate("S.drill.odds"))
     # start-now button path
-    pg.click('[data-sbf="scope:all"]'); pg.click('[data-sbf="pick:french"]'); pg.wait_for_timeout(200)
+    pg.click('[data-sbf="scope:all"]'); pg.click('[data-sbf="pick:w:french"]'); pg.wait_for_timeout(200)
     pg.click('#sbNow'); pg.wait_for_timeout(1500)
     print('after start-now:', pg.evaluate("S.drill.scope"))
     r = play_sandbox(pg, 0.0, 'french')
     assert r['state'] == 'done'
     # several openings at once: every game stays inside the ones that are picked, and both come up
-    pg.click('[data-sbf="pick:caro"]'); pg.wait_for_timeout(150)
-    assert pg.evaluate('SBS.scope') == 'm:caro,french', pg.evaluate('SBS.scope')
-    assert pg.evaluate("[...document.querySelectorAll('[data-sbf^=\"pick:\"][aria-pressed=\"true\"]')].map(b => b.dataset.sbf)") == ['pick:caro', 'pick:french']
+    pg.click('[data-sbf="pick:w:caro"]'); pg.wait_for_timeout(150)
+    assert pg.evaluate('SB_STATE.w.scope') == 'm:caro,french', pg.evaluate('SB_STATE.w.scope')
+    assert pg.evaluate("[...document.querySelectorAll('[data-sbf^=\"pick:\"][aria-pressed=\"true\"]')].map(b => b.dataset.sbf)") == ['pick:w:caro', 'pick:w:french']
     met = set()
     for k in range(24):                                   # the Caro-Kann is twice as common: play on until the French has come up too
         if k >= 8 and len(met) == 2: break
         pg.click('#sbNow' if pg.query_selector('#sbNow') else '#sbAgain'); pg.wait_for_timeout(300)
         r = play_sandbox(pg, 0.0, f'mix {k}'); assert r['state'] == 'done'
         met.add(pg.evaluate(f"chapterOf(lessonOf('{r['line']}')).id"))
-    print('mixed session met:', sorted(met), '| label:', pg.evaluate('scopeLabel(SBS.scope)')); assert met == {'caro', 'french'}, met
+    print('mixed session met:', sorted(met), '| label:', pg.evaluate('scopeLabel(SB_STATE.w.scope)')); assert met == {'caro', 'french'}, met
     pg.screenshot(path=out + 'sb_mix.png')
-    pg.click('[data-sbf="pick:french"]'); assert pg.evaluate('SBS.scope') == 'caro'
-    for c in pg.evaluate('DATA.chapters.map(C => C.id)'):
-        if c != 'caro': pg.click(f'[data-sbf="pick:{c}"]')
-    assert pg.evaluate('SBS.scope') == 'all', 'every opening picked is the same as Every opening'
-    pg.reload(); pg.wait_for_timeout(800); assert pg.evaluate('SBS.scope') == 'all'
-    allc = pg.evaluate("[document.querySelector('#sbside .queue div:nth-child(3) small').innerText, DRILLABLE.length, DATA.lines.filter(l => LESSONS[l.lesson] && !l.n.some(i => (N[i].g || []).includes('warn') && isMine(N[i]))).length]")
-    print('every opening:', allc); assert allc[0] == '/' + str(allc[1]) and allc[1] == allc[2] and allc[1] > 300, 'every drillable line of the book in play'
+    pg.click('[data-sbf="pick:w:french"]'); assert pg.evaluate('SB_STATE.w.scope') == 'caro'
+    for c in pg.evaluate('BOOKS.w.chapters.map(C => C.id)'):
+        if c != 'caro': pg.click(f'[data-sbf="pick:w:{c}"]')
+    assert pg.evaluate('[SB_STATE.w.scope, SB_STATE.b.scope]') == ['all', 'none'] and pg.get_attribute('[data-sbf="side:w"]', 'aria-pressed') == 'true', 'every White opening picked is the whole colour'
+    pg.reload(); pg.wait_for_timeout(800); assert pg.evaluate('[SB_STATE.w.scope, SB_STATE.b.scope]') == ['all', 'none'], 'the pick is kept on this device'
+    allc = pg.evaluate("[document.querySelector('#sbside .queue div:nth-child(3) small').innerText, DRILLABLE.length, DATA.lines.filter(l => LESSONS[l.lesson] && !l.n.some(i => (N[i].g || []).includes('warn') && isMine(N[i]))).length, SIDE]")
+    print('every White opening:', allc); assert allc[0] == '/' + str(allc[1]) and allc[1] == allc[2] and allc[1] > 300 and allc[3] == 'w', 'every drillable line of the book in play'
     # the start position has its place under the board, not at the bottom of the side column
     where = pg.evaluate("(() => { const b = document.getElementById('db').getBoundingClientRect(), w = document.getElementById('sbwhere').getBoundingClientRect(), s = document.getElementById('sbside').getBoundingClientRect(); return [w.top >= b.bottom, Math.abs(w.left - b.left) < 30, w.right <= s.left + 2, document.getElementById('sbwhere').innerText]; })()")
     print('under the board:', where[:3], ' '.join(where[3].split())[:90]); assert where[:3] == [True, True, True] and 'Games start from the first move' in where[3] and 'Set up a position' in where[3], where
 
     # ---- practice from a chosen position: set it up with the book's moves for both sides, by the board or the chips
     pg.click('#sbSetUp'); pg.wait_for_timeout(400)
+    # whose book the position is in: a switch on the set-up panel, and the board turns with it
+    assert pg.evaluate("[SIDE, document.querySelector('[data-sbset=\"w\"]').getAttribute('aria-pressed')]") == ['w', 'true']
+    pg.click('[data-sbset="b"]'); pg.wait_for_timeout(300); assert pg.evaluate("[SIDE, S.drill.kind, S.drill.node, FLIP]") == ['b', 'sbset', 0, True]
+    pg.click('[data-sbset="w"]'); pg.wait_for_timeout(300); assert pg.evaluate("[SIDE, S.drill.kind, S.drill.node, FLIP]") == ['w', 'sbset', 0, False]
     assert pg.evaluate("[S.drill.kind, S.drill.node, document.getElementById('sbFromGo').disabled]") == ['sbset', 0, True], 'nothing to practise from the start'
     drag(pg, 'e2', 'e4'); pg.wait_for_timeout(500)
     pg.click('[data-sbk] >> nth=0'); pg.wait_for_timeout(500)                      # Black's most common book move, from the chips
@@ -143,7 +182,7 @@ with sync_playwright() as p:
         let k = l.n.length - 1; while (k > 2 && sbBookKids(l.n[k - 1]).length === 1) k--;
         if (k < l.n.length - 2 && sbCanFrom(l.n[k])) return {line: l.id, at: l.n[k], h: l.plan.h}; } return null; })()""")
     print('a side line to the end:', pick); assert pick
-    pg.evaluate(f"SB_FROM[SIDE] = {pick['at']}; sbStart()"); pg.wait_for_timeout(1200)
+    pg.evaluate(f"sbSetFrom(SIDE, {pick['at']}); sbStart()"); pg.wait_for_timeout(1200)
     r = play_sandbox(pg, 0.0, 'to the end of a side line'); assert r['state'] == 'done' and r['line'] == pick['line'], r
     plan = pg.locator('#sbpanel .plan h4').all_inner_texts(); print('its plan:', plan)
     assert plan == [pick['h']], plan

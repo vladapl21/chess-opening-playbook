@@ -61,9 +61,9 @@ def main():
     W['side'] = 'w'; W['oddsRoot'] = W['e4']
     first_puz = lambda gid: next(k for k, p in enumerate(W['puzzles']) if p['game'] == gid)
     W['insights'] = [
-      dict(puz=first_puz('g-joedbm'), big='6', unit='times', h='Bishop takes f7, missed', p='Four times in one Italian, once more in another Italian, and once in a Philidor. Each time the bishop sacrifice on f7 won material.'),
+      dict(puz=first_puz('g-joedbm'), big='6', unit='times', h='The bishop capture on f7 you missed', p='Four times in one Italian, once more in another Italian, and once in a Philidor. Each time the bishop sacrifice on f7 won material.'),
       dict(puz=first_puz('g-bacha'), big='6', unit='chances', h='Push the d-pawn at the knight', p='In three Sicilians, after the pawn trade Black\'s knight sat where your d-pawn could hit it. Pushing the pawn at it was the best move six times, and it was skipped every time.'),
-      dict(puz=first_puz('g-malik'), big='3', unit='in one game', h='The e-pawn push, skipped', p='In the bishop-retreat line of the Italian, kicking the knight with your e-pawn was the best move three turns running.'),
+      dict(puz=first_puz('g-malik'), big='3', unit='in one game', h='The e-pawn push you skipped', p='In the bishop-retreat line of the Italian, kicking the knight with your e-pawn was the best move three turns running.'),
       dict(puz=first_puz('g-gilmar'), big='6', unit='moves', h='Guard the e-pawn first', p='Against the bishop on the long diagonal your e-pawn was attacked twice and guarded once. It fell on move four, and two moves later the same bishop took another pawn with your corner rook next.'),
     ]
     # plans for the end of each lesson's main line (content/plans.py), checked for notation like every other text

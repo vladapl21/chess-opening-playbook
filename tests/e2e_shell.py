@@ -22,28 +22,30 @@ with sync_playwright() as p:
     tabs = [t.split('\n')[0].strip() for t in pg.locator('.tabs button').all_inner_texts()]
     print('tabs:', tabs); assert tabs[:2] == ['Sandbox', 'Course'] and tabs[2].startswith('Drill') and tabs[3] == 'Your games' and tabs[4] == 'Shop' and len(tabs) == 5
 
-    # the colour switch stays on the tab: Drill on White, Course on Black, then switch back and forth
-    pg.click('.tabs [data-view="drill"]'); pg.wait_for_timeout(300)
-    pg.click('.sidesw [data-side="b"]'); pg.wait_for_timeout(400)
-    assert pg.evaluate('[SIDE, S.view]') == ['b', 'drill'], pg.evaluate('[SIDE, S.view]')
-    pg.click('.tabs [data-view="course"]'); pg.wait_for_timeout(300)
-    pg.click('.sidesw [data-side="w"]'); pg.wait_for_timeout(400)
-    assert pg.evaluate('[SIDE, S.view]') == ['w', 'course'] and tab(pg) == 'Course', pg.evaluate('[SIDE, S.view]')
-    for v in ('sandbox', 'games'):
-        pg.click(f'.tabs [data-view="{v}"]'); pg.wait_for_timeout(300)
-        pg.click('.sidesw [data-side="b"]'); pg.wait_for_timeout(400)
-        assert pg.evaluate('[SIDE, S.view]') == ['b', v], (v, pg.evaluate('[SIDE, S.view]'))
-        pg.click('.sidesw [data-side="w"]'); pg.wait_for_timeout(400)
-        assert pg.evaluate('[SIDE, S.view]') == ['w', v], (v, pg.evaluate('[SIDE, S.view]'))
-    # inside a lesson opened from an opening's page: the other book has no such lesson, so the switch lands on Your games
-    # (where the opening pages live); switching back returns to the lesson
-    pg.evaluate("openLine('setup', undefined, 'learn')"); pg.wait_for_timeout(300)
-    assert tab(pg) == 'Your games'
-    pg.click('.sidesw [data-side="b"]'); pg.wait_for_timeout(400)
-    assert pg.evaluate('[SIDE, S.view]') == ['b', 'games'], pg.evaluate('[SIDE, S.view, S.studyFrom, S.line]')
-    pg.click('.sidesw [data-side="w"]'); pg.wait_for_timeout(400)
-    assert pg.evaluate('[SIDE, S.view, S.line]') == ['w', 'study', 'setup']
-    print('switch keeps the tab')
+    # no colour switch: the header is the brand and the player's corner, and every tab holds both books
+    assert pg.locator('.top .sidesw, #brandKick, [data-side]').count() == 0, 'no White/Black switch'
+    pg.click('.tabs [data-view="sandbox"]'); pg.wait_for_timeout(300)
+    assert pg.evaluate("[sbEverything(), document.querySelectorAll('#sbside .sbrow').length]") == [True, 2], 'the Sandbox starts on everything, with a row of openings per colour'
+    pg.click('.tabs [data-view="drill"]'); pg.wait_for_timeout(300); pg.click('.dmore > summary'); pg.wait_for_timeout(300)
+    cols = pg.evaluate("[...document.querySelectorAll('.mside')].map(m => [m.dataset.bk, m.querySelectorAll('.mch').length, m.querySelectorAll('[data-drill]').length])")
+    assert cols == [['w', pg.evaluate('BOOKS.w.chapters.length'), 0], ['b', pg.evaluate('BOOKS.b.chapters.length'), 0]], ('both books on the Drill page, an opening at a time, folded', cols)
+    said = pg.inner_text('.mside[data-bk="b"] .mch'); assert f"{pg.evaluate('chLines(\"b\", BOOKS.b.chapters[0]).length')} lines" in said, said
+    pg.click('.mside[data-bk="b"] .mch > summary'); pg.wait_for_timeout(400)
+    row = pg.locator('.mside[data-bk="b"] .mch[open] [data-drill]').first; lid = row.get_attribute('data-drill'); row.click(); pg.wait_for_timeout(500)
+    assert pg.evaluate('[SIDE, FLIP, S.view, S.drill.id, S.drill.side]') == ['b', True, 'drill', lid, 'b'], 'a Black line loads its own book'
+    # a drill under way is kept with its colour: leave for the other book's opening page, come back, and the board is Black's again
+    pg.click('.tabs [data-view="games"]'); pg.wait_for_timeout(300)
+    cols = pg.evaluate("[...document.querySelectorAll('.gside')].map(g => [g.dataset.bk, g.querySelectorAll('.otile').length])")
+    assert cols == [['w', pg.evaluate('BOOKS.w.chapters.length')], ['b', pg.evaluate('BOOKS.b.chapters.length')]], cols
+    pg.click('.gside[data-bk="w"] .otile'); pg.wait_for_timeout(400)
+    assert pg.evaluate('[SIDE, S.view]') == ['w', 'learn'] and tab(pg) == 'Your games'
+    pg.click('.tabs [data-view="drill"]'); pg.wait_for_timeout(400)
+    assert pg.evaluate('[SIDE, FLIP, S.view, S.drill && S.drill.id]') == ['b', True, 'drill', lid], pg.evaluate('[SIDE, S.view, S.drill && S.drill.id]')
+    pg.evaluate("S.drill = S.drillState = null"); pg.click('.tabs [data-view="course"]'); pg.wait_for_timeout(300); assert tab(pg) == 'Course'
+    # a lesson opened from an opening's page stays under Your games
+    pg.evaluate("useSide('w'); openLine('setup', undefined, 'learn')"); pg.wait_for_timeout(300)
+    assert tab(pg) == 'Your games' and pg.evaluate('[SIDE, S.view, S.line]') == ['w', 'study', 'setup']
+    print('both books under every tab')
     # the cheat sheet lives on each opening's page now: an old link opens that page at a glance, under Your games
     lp = ctx.new_page(); hook(lp); lp.goto(URL + '#cheat'); lp.wait_for_timeout(900)
     assert lp.evaluate('[S.view, S.lview]') == ['learn', 'glance'] and tab(lp) == 'Your games' and lp.locator('#view .ccard').count() > 0
@@ -90,7 +92,7 @@ with sync_playwright() as p:
     assert ph.evaluate("document.getElementById('setPanel').scrollWidth <= document.getElementById('setPanel').clientWidth + 1")
 
     # ---- the header: brand and the player's things (level, streak, settings, account) on one row, the tabs on a row of
-    # their own under it, so nothing ever sits on a tab; on a phone the White/Black switch gets the middle row.
+    # their own under it, so nothing ever sits on a tab.
     # Shown with everything a signed-in player on a streak has, at every width from a small phone to a wide monitor.
     SEED = """(() => { const now = Date.now(); for (const id of DRILLABLE.slice(0, 120)) Prog.d.lines[id] = {box: 3, seen: 3, clean: 3, last: now, due: now + 2 * DAY, v: VER[id] || 1};
       const D = Prog.d.days = Prog.d.days || {}; for (let k = 0; k <= 5; k++) D[dayKey(-k)] = ['a', 'b', 'c', 'd', 'e']; Prog.d.lvl = 99; Prog.save(); Badges.queue = []; Coach.hush();
@@ -98,14 +100,14 @@ with sync_playwright() as p:
     LAYOUT = """(() => { const R = e => e.getBoundingClientRect(), hit = (a, b) => !(a.right <= b.left + 1 || b.right <= a.left + 1 || a.bottom <= b.top + 1 || b.bottom <= a.top + 1);
       const vis = e => e && !e.hidden && R(e).width > 0 && getComputedStyle(e).display !== 'none';
       const mine = [...document.querySelectorAll('.corner > *')].filter(vis), tabs = [...document.querySelectorAll('.tabs button')];
-      const parts = [...mine, document.querySelector('.brand'), document.querySelector('.top .sidesw')].filter(vis);
+      const parts = [...mine, document.querySelector('.brand')].filter(vis);
       const name = e => e.id || e.dataset.view || e.className.split(' ')[0];
       const over = parts.flatMap((x, i) => [...parts.slice(i + 1), ...tabs].filter(y => hit(R(x), R(y))).map(y => name(x) + ' x ' + name(y)));
       const t = document.querySelector('.tabs'), g = R(document.getElementById('setBtn')), tr = R(t), lv = document.getElementById('lvN');
       return {over, mine: mine.map(name), page: document.documentElement.scrollWidth, tabsFit: t.scrollWidth <= t.clientWidth + 1,
         tabsInView: tabs.every(b => R(b).left >= -1 && R(b).right <= innerWidth + 1), gearAboveTabs: g.bottom <= tr.top + 1, gearInHeader: !!document.querySelector('.top #setBtn'),
         ring: getComputedStyle(lv).backgroundImage.includes('conic-gradient'), num: getComputedStyle(lv).color, ink: getComputedStyle(document.body).color}; })()"""
-    for w in (360, 390, 600, 700, 761, 1000, 1280, 1536, 1920):   # phone, tablet (the switch on a middle row), one row from 761px
+    for w in (360, 390, 600, 700, 761, 1000, 1280, 1536, 1920):   # phone, tablet, desktop
         hc = b.new_context(viewport={'width': w, 'height': 800}); lp = hc.new_page(); hook(lp); lp.goto(URL + '#b.drill'); lp.wait_for_timeout(800)
         lp.evaluate(SEED); lp.wait_for_timeout(400); lp.evaluate("document.querySelectorAll('#lvup,.lvfloat').forEach(e => e.remove())")
         m = lp.evaluate(LAYOUT); print('header at', w, {k: m[k] for k in ('over', 'mine', 'page', 'tabsFit')})
@@ -160,7 +162,7 @@ with sync_playwright() as p:
     cp.click('#sbFree'); cp.wait_for_timeout(400)
     st = cp.evaluate("[S.view, S.drill, S.sbState, document.querySelectorAll('.sbcourse, #sbFree').length, document.querySelectorAll('[data-sbf^=\"pick:\"]').length > 3, !!document.getElementById('sbGo')]")
     print('free play:', st); assert st == ['sandbox', None, None, 0, True, True]
-    cp.click('#sbGo'); cp.wait_for_timeout(600); assert cp.evaluate("S.drill.scope") == cp.evaluate("SBS.scope") and cp.locator('.sbcourse, #sbFree').count() == 0
+    cp.click('#sbGo'); cp.wait_for_timeout(600); assert cp.evaluate("S.drill.scope") == 'all' and cp.evaluate("sbEverything()") and cp.locator('.sbcourse, #sbFree').count() == 0
     b.close()
 site.stop()
 print('ERRORS:', errors); assert not errors

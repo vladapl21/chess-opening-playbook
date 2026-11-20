@@ -69,6 +69,17 @@ Facts that shape the design:
 - Settings and the account button moved out of the header into the corner of the screen; the header fits one row on an ordinary monitor and centres its rows when it has to wrap.
 - A lesson opened from a course unit has "Next lesson" at the top. The Sandbox has "Free play: pick openings" to leave a course practice game.
 
+## Phase 1.20: one book, a daily shop, marks on the board (done, November 20)
+
+Notes from play, the same day: the shop said everything twice, the marks were only in lessons, and switching between White and Black by hand was a chore in the Sandbox.
+
+- **No White/Black switch.** The header is the brand, the tabs and the player's corner. The Sandbox plays both books: with Everything picked, games come with White and with Black in turn, a tap on a colour keeps that one, and openings from both books can be picked together. Drill lists both books an opening at a time, Your games shows White's and then Black's in every part, and whatever is opened loads its own book with the board turned to it. A drill or a practice game under way keeps its colour across tabs.
+- **An opening's lines are its lessons' lines.** The Sandbox used to take an opening's lines from what its first moves reach, which left out the odd move orders filed under it: 45 of the 71 lines under Philidor & Petrov could come up, and 16 of the 39 under rare first moves. Found while counting the lines of both books together.
+- **The daily shop.** The whole shop is one shelf of six pieces that changes at midnight (two hats, two colours, glasses, something for the neck, picked by the date from everything not owned), with the locker beside it. The header is the switch and a timer. Gone: the heading, the day names, the card for tomorrow, the sub-lines and the items that were always for sale.
+- **Marks with the usual signs, on the board.** !, ?!, ? and ?? in blue, amber, orange and red (the family other sites use, not their values). In a line drill and a Sandbox game they come up as the moves are played, with the word beside the badge for a moment, and the key move keeps its ! on the piece through the reply. Phase 1.19 held them back until the game was over; in play that only hid the part that helps.
+- **Variation names.** The name of the position is the panel's heading in a drill and sits above the move card in a lesson: the variation large, the names that lead to it as a trail above, a flash when a move starts a named line, and that move tagged with the name in every list of moves.
+- **Plainer words.** Headlines made of two fragments joined by a comma are gone from the app and the content (unit ideas, opening pages, lesson and game titles, badges), and so are lines that repeat a heading, a timer or a number beside them. It is a house rule now.
+
 ## Phase 1.19: key moves, move order, the coach on a game that left the book (done, November 20)
 
 Notes from play: the openings weren't sticking as fast as hoped, least of all a setup whose moves come in another order from line to line.

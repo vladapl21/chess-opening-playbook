@@ -105,7 +105,7 @@ NOTES = {
   'c4 e5 Nc3 c6 Nf3': ('King\'s knight out', 'Black\'s c-pawn gets ready to push the d-pawn. Go at the e-pawn first, before it has a second guard.', ['key']),
   'c4 d5 cxd5': ('Take it', 'The rule against the d-pawn, on move two as well.', ['key']),
   'c4 d5 cxd5 Qxd5 Nc3': ('Knight out', 'The queen has to move again, and you are a move ahead.', ['key']),
-  'c4 d5 cxd5 Qxd5 Nc3 Qd8 Nf3 Nf6 d4': ('D-pawn two squares', 'No c-pawn, no wedge. With Black\'s queen back home, take the whole middle instead.', ['key']),
+  'c4 d5 cxd5 Qxd5 Nc3 Qd8 Nf3 Nf6 d4': ('D-pawn two squares', 'Without the c-pawn there is no wedge. With Black\'s queen back home, take the whole middle instead.', ['key']),
   'c4 d5 cxd5 Qxd5 Nc3 Qd8 Nf3 Nf6 d4 e6 e4 Bb4 Bd3 O-O e5': ('E-pawn pushes at the knight', 'The knight has to leave the king. If it goes to the middle, your bishop takes the h-pawn with check and the attack crashes through.', ['key'], dict(arrows=['d3h7r'])),
   'c4 e6 Nc3 d5 cxd5 exd5 d4': ('D-pawn two squares', 'After the trade Black has a pawn fixed in the middle. Put yours beside it; the dark bishop comes out next.', ['key']),
   'c4 b6 Nc3 Bb7 d4': ('D-pawn two squares', 'Black\'s bishop already owns the long diagonal, so your own g-pawn move would lose the corner rook. Take the middle with pawns instead.', ['key']),

@@ -32,7 +32,7 @@ L('bsl-slow', 'bsl-quiet', 'Small e-pawn: bishop out at once', 'Bishop, e-pawn, 
         ('bsl-slow-qb3', 'Queen hits your b-pawn: offer the queen trade', J(SQ, "e3 Bf5 Nc3 e6 Qb3 Qb6")),
         ('bsl-slow-cxd5', 'Pawn trade: take back with the c-pawn', J(SQ, "e3 Bf5 Nc3 e6 cxd5 cxd5 Nf3 Nc6"))],
   why='About one Queen\'s Gambit player in seven at your level guards the c-pawn with the small e-pawn move. Nothing stops your bishop.', outcome='Equal and solid')
-L('bsl-slow2', 'bsl-quiet', 'Knights out, then the small e-pawn', 'Same setup, same squares: bishop, e-pawn, queen\'s knight, dark bishop, castle', 'core',
+L('bsl-slow2', 'bsl-quiet', 'Knights out, then the small e-pawn', 'The same setup on the same squares: bishop, e-pawn, queen\'s knight, dark bishop, castle', 'core',
   J(SQF, "e3 Bf5 Nc3 e6 Bd3 Bxd3 Qxd3 Nbd7 O-O Bd6"),
   alts=[('bsl-slow2-c5', 'Pawn hits your bishop: step back one square', J(SQF, "e3 Bf5 Nc3 e6 Bd3 Bxd3 Qxd3 Nbd7 O-O Bd6 c5 Bc7")),
         ('bsl-slow2-e4', 'The e-pawn break: trade everything on that square', J(SQF, "e3 Bf5 Nc3 e6 Bd3 Bxd3 Qxd3 Nbd7 O-O Bd6 e4 dxe4 Nxe4 Nxe4 Qxe4 O-O")),

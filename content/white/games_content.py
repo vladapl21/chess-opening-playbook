@@ -65,7 +65,7 @@ GAMES = [
                                          3: dict(label='Bishop to the center'),
                                          5: dict(label='Knight forks queen and rook', tags=['key'], text='You are winning.', arrows=['f7d8g', 'f7h8g'])}}),
   dict(id='g-aeneaux', opp='Aeneaux', opp_elo=768, me_elo=887, result='W', tc='3 min + 2', date='Oct 13',
-       title='Fried Liver, mate in 12', lesson='fried-liver',
+       title='A Fried Liver that mates in 12', lesson='fried-liver',
        summary='The textbook Fried Liver. Black\'s king ran back home, you took the knight, and the king hunt ended in mate.',
        moments={
          11: dict(label='The sacrifice', text='Knight takes f7.', tags=['key']),

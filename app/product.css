@@ -204,7 +204,6 @@ body:has(.coach:not([hidden])) .foot{padding-right:100px}
 .mannequin{background:var(--accent-soft);border-radius:4px;display:grid;place-items:center;padding:16px 0 6px} .mannequin svg{width:min(190px,60%);height:auto}
 .bal{display:flex;align-items:center;gap:8px;margin:0;font-size:15px;color:var(--muted);font-weight:600} .bal .coin{width:28px;height:28px} .bal b{font:700 36px/1 var(--f-display);color:var(--ink)}
 .earn{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:13.5px} .earn li{display:flex;justify-content:space-between;gap:8px;color:var(--muted)} .earn b{color:var(--ink)} .earn .sp b{color:var(--muted)}
-.nextt{margin:0;font-size:13px;color:var(--muted)}
 .coachpick.mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px} .coachpick.mini button{padding:6px 4px} .coachpick.mini .cface{width:42px}
 .shopmain{display:grid;gap:22px;min-width:0}
 .wlock{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;background:var(--flame-soft);border-radius:var(--r);padding:16px 18px}
@@ -220,7 +219,9 @@ body:has(.coach:not([hidden])) .foot{padding-right:100px}
 .ipv.z-face svg{transform:scale(1.4);transform-origin:50% 36%} .ipv.z-face.zk-knight svg{transform-origin:40% 25%} .ipv.z-face.zk-rook svg{transform-origin:50% 55%}
 .ipv.z-neck svg{transform:scale(1.28);transform-origin:50% 76%} .ipv.z-neck.zk-knight svg{transform-origin:60% 72%} .ipv.z-neck.zk-rook svg{transform-origin:50% 100%}
 /* what a card does (buy, wear, what it needs) sits on its bottom edge, so a row of cards lines up */
-.item:not(.sdnext){display:flex;flex-direction:column;align-items:center} .item:not(.sdnext) > :last-child:not(b){margin-top:auto}
+.item{display:flex;flex-direction:column;align-items:center} .item > :last-child:not(b){margin-top:auto}
+.shophd{display:flex;align-items:center;justify-content:space-between;gap:10px 14px;flex-wrap:wrap} .shophd .gseg{margin:0}
+.items.daily{grid-template-columns:repeat(3,minmax(0,1fr))} .items.daily .ipv{width:128px;height:128px} .items.daily .item{padding:18px 8px 16px;gap:8px;font-size:14px}
 .item .price,.item .owned,.item .wearing{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;color:var(--muted);font-weight:600} .item .wearing{color:var(--accent)}
 .item .need{font-size:12px;color:var(--muted)} .item .btn.small{min-height:32px;gap:5px} .item .btn .coin{width:15px;height:15px}
 @media (max-width:860px){ .shop{grid-template-columns:minmax(0,1fr)} .shopside{position:static} .wlock{grid-template-columns:minmax(0,1fr)} }
@@ -332,17 +333,10 @@ button.leak{text-align:left;cursor:pointer;font:inherit;color:inherit;width:100%
 .g-tailst{stroke-dasharray:1.3 2.6;stroke-dashoffset:-3.4} .g-bandsh{fill:none;stroke:var(--gear-ink);stroke-width:1.1;opacity:.2} .g-knot{stroke:var(--gear-ink);stroke-opacity:.22;stroke-width:.7}
 .g-collar{fill:none;stroke-width:2;stroke-linecap:round} .g-bead{stroke:var(--gear-ink);stroke-opacity:.2;stroke-width:.5}
 .g-lensr{fill:var(--surface);fill-opacity:.18;stroke:var(--rosso);stroke-width:1.8} .g-wirer{fill:none;stroke:var(--rosso);stroke-width:1.6;stroke-linecap:round}
-/* today's drops, above the switch between the shop and the locker */
-.sdrop{display:grid;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:inset 4px 0 0 var(--oro)}
-.sdhd{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap} .sdhd h3{margin:2px 0 0;font-size:19px}
+/* the time left on today's shelf */
 .sdt{font-size:13px;font-weight:650;color:var(--oro);background:var(--oro-soft);padding:4px 10px;border-radius:12px;white-space:nowrap}
-.sdrops{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))} .sdi .ipv{width:112px;height:112px} .sdday{font-size:12px;color:var(--oro);font-weight:650}
-.sdnext{background:transparent;border-style:dashed} .sdnext .ipv{position:relative} .sdnext .ipv svg{opacity:.22;filter:grayscale(1)}
-.sdnext .ipv i{position:absolute;inset:0;display:grid;place-items:center;font:700 44px/1 var(--f-display);font-style:normal;color:var(--oro)}
-@media (max-width:620px){ .sdrops{grid-template-columns:repeat(2,minmax(0,1fr))} .sdi .ipv{width:88px;height:88px} .mannequin svg{width:min(140px,44%)}
-  .sdnext{grid-column:1 / -1;grid-template-columns:48px minmax(0,1fr);justify-items:start;align-items:center;column-gap:12px;row-gap:0;padding:8px 12px;text-align:left}
-  .sdnext .ipv{width:48px;height:48px;grid-row:span 3} .sdnext .ipv i{font-size:26px} }
-.sdn{margin:0;font-size:13px;color:var(--muted)} .snone{color:var(--muted);margin:0}
+@media (max-width:620px){ .items.daily{grid-template-columns:repeat(2,minmax(0,1fr))} .items.daily .ipv{width:88px;height:88px} .mannequin svg{width:min(140px,44%)} }
+.snone{color:var(--muted);margin:0}
 .item .need i{display:block;font-style:normal;margin-top:2px;font-weight:650}
 .shopmain > .gseg{margin:0}
 /* the coach's note in the drill panel when a line ends */
