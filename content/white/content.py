@@ -44,12 +44,12 @@ def L(id, part, title, sub, pri, path, alts=None, why=None, start=None, tags=Non
 
 # ---------------------------------------------------------------- SETUP
 L('setup', 'setup', 'The Italian setup', 'Center pawn, knight, then the bishop aimed at f7', 'core', IT, start=0,
-  why='Everything else in this guide starts from this position.', outcome='Black chooses a third move')
+  why='Everything else in your book starts from this position.', outcome='Black chooses a third move')
 n("e4", "Pawn to the center", "Grab the center and open lines for your queen and your light-squared bishop.", ['key'])
 n("e4 e5", "Black copies you", "The most common reply. You met it in 14 of your last 25 games with White.")
 n("e4 e5 Nf3", "Knight out, hits the pawn", "Develop with a threat. Black has to look after the center pawn.", ['key'], arrows=['f3e5g'])
 n("e4 e5 Nf3 Nc6", "Knight defends", "Black protects the pawn with a knight. This is where the Italian begins.")
-n(IT, "Bishop to the long diagonal", "The Italian bishop. It aims at f7, the one pawn that only Black's king protects. Almost every trick in this guide lands on that square.", ['key'], arrows=['c4f7r'], circles=['f7r'])
+n(IT, "Bishop to the long diagonal", "The Italian bishop. It aims at f7, the one pawn that only Black's king protects. Almost every trick in your book lands on that square.", ['key'], arrows=['c4f7r'], circles=['f7r'])
 
 # ---------------------------------------------------------------- BISHOP (Giuoco Piano)
 L('center', 'bishop', 'Build the big center', 'Small pawn move first, then the big push', 'core', CH, start=5,
@@ -92,7 +92,7 @@ n(J(NX, "d5 cxb4 dxc4 Re1+ Ne7 Qe2 Be6 Bg5 Qd5 Bxe7 Kxe7 Qc2 f6 Ng5"), "Knight j
 n(J(NX, "d5 cxb4 dxc4 Re1+ Ne7 Qe2 Be6 Bg5 Qd5 Bxe7 Kxe7 Qc2 f6 Ng5 fxg5"), "Black takes the knight")
 n(J(NX, "d5 cxb4 dxc4 Re1+ Ne7 Qe2 Be6 Bg5 Qd5 Bxe7 Kxe7 Qc2 f6 Ng5 fxg5 Re5"), "Rook hits the queen", "Black's bishop is still pinned, so Black is tied up.", arrows=['e5d5g'])
 n(J(NX, "d5 cxb4 dxc4 Re1+ Ne7 Qe2 Be6 Bg5 Qd5 Bxe7 Kxe7 Qc2 f6 Ng5 fxg5 Re5 Qxd4"), "Queen escapes with a pawn")
-n(J(NX, "d5 cxb4 dxc4 Re1+ Ne7 Qe2 Be6 Bg5 Qd5 Bxe7 Kxe7 Qc2 f6 Ng5 fxg5 Re5 Qxd4 Rae1"), "Both rooks on the pinned bishop", "Bring the other rook. The engine calls this balanced, but Black needs several exact moves to survive. Your study continues into an equal ending; knowing the ideas up to here is what matters.", ['draw'], arrows=['e1e6g', 'e5e6g'])
+n(J(NX, "d5 cxb4 dxc4 Re1+ Ne7 Qe2 Be6 Bg5 Qd5 Bxe7 Kxe7 Qc2 f6 Ng5 fxg5 Re5 Qxd4 Rae1"), "Both rooks on the pinned bishop", "Bring the other rook. The engine calls this balanced, but Black needs several exact moves to survive. The line goes on into an equal ending; knowing the ideas up to here is what matters.", ['draw'], arrows=['e1e6g', 'e5e6g'])
 n(J(NX, "d5 cxb4 dxc4 Re1+ Ne7 Qe2 Be6 Bg5 O-O"), "Black castles", "This looks natural but loses a piece.", ['mistake'])
 n(J(NX, "d5 cxb4 dxc4 Re1+ Ne7 Qe2 Be6 Bg5 O-O Bxe7"), "Take the knight")
 n(J(NX, "d5 cxb4 dxc4 Re1+ Ne7 Qe2 Be6 Bg5 O-O Bxe7 Qxe7"), "Queen takes back", "Black's queen now stands behind the bishop on the e-file.")
@@ -120,13 +120,13 @@ L('trap-d6', 'bishop', 'Trap II: Black blocks with the d-pawn', 'Pins, two rook 
   J(BA, "d6 Rc1 Ba5 Qa4 a6 Bd5 Bb6 Rxc6 Bd7 Re1+ Kf8 Rxd6 cxd6 Bxd6+ Kg8 Ng5 g6 Bxf7+ Kg7 Be5+ Kh6 Ne6 Bxa4 Bg7+ Kh5 Re5+ Kg4 f3+ Kh4 g3+ Kh3 Nf4#"),
   alts=[('trap-d6-castle', 'Black castles', J(BA, "d6 Rc1 Ba5 Qa4 O-O d5")),
         ('trap-d6-bd7', 'Black covers the pin', J(BA, "d6 Rc1 Ba5 Qa4 Bd7 d5 Ne5 Qxa5"))],
-  start=19, why='From your study. Black blocks the bishop so the king can castle.', outcome='Checkmate')
+  start=19, why='Black blocks the bishop so the king can castle.', outcome='Checkmate')
 n(J(BA, "d6"), "Black blocks your bishop", "The pawn shuts your bishop's diagonal so Black can castle. Black is still up material.")
 n(J(BA, "d6 Rc1"), "Rook hits the bishop", "Attack the bishop with your rook. It has to move.", ['key'])
 n(J(BA, "d6 Rc1 Ba5"), "Bishop runs to the edge")
 n(J(BA, "d6 Rc1 Ba5 Qa4"), "Queen pins and attacks", "Your queen attacks the bishop and pins the knight to Black's king.", ['key'], arrows=['a4e8r', 'a4a5g'])
 n(J(BA, "d6 Rc1 Ba5 Qa4 a6"), "Black wants to kick your queen", "Black prepares to push the b-pawn. Black's best is the bishop block in the branch; you still win the bishop there.")
-n(J(BA, "d6 Rc1 Ba5 Qa4 a6 Bd5"), "Bishop to the center", "Pile up on the pinned knight. Pushing the d-pawn here instead runs into the b-pawn kick; your study shows both, and the bishop move is the one that works.", ['key', 'fix'], arrows=['d5c6g'])
+n(J(BA, "d6 Rc1 Ba5 Qa4 a6 Bd5"), "Bishop to the center", "Pile up on the pinned knight. Pushing the d-pawn here instead runs into the b-pawn kick; the bishop move is the one that works.", ['key', 'fix'], arrows=['d5c6g'])
 n(J(BA, "d6 Rc1 Ba5 Qa4 a6 Bd5 Bb6"), "Bishop steps back")
 n(J(BA, "d6 Rc1 Ba5 Qa4 a6 Bd5 Bb6 Rxc6"), "Rook takes the knight", "If the pawn takes back, your bishop takes with check and also hits the rook in the corner.", ['key'])
 n(J(BA, "d6 Rc1 Ba5 Qa4 a6 Bd5 Bb6 Rxc6 Bd7"), "Black pins your rook", "Now your rook stands between Black's bishop and your queen.", arrows=['d7a4b'])
@@ -142,7 +142,7 @@ n(J(BA, "d6 Rc1 Ba5 Qa4 a6 Bd5 Bb6 Rxc6 Bd7 Re1+ Kf8 Rxd6 cxd6 Bxd6+ Kg8 Ng5 g6 
 n(J(BA, "d6 Rc1 Ba5 Qa4 a6 Bd5 Bb6 Rxc6 Bd7 Re1+ Kf8 Rxd6 cxd6 Bxd6+ Kg8 Ng5 g6 Bxf7+ Kg7"), "King steps out")
 n(J(BA, "d6 Rc1 Ba5 Qa4 a6 Bd5 Bb6 Rxc6 Bd7 Re1+ Kf8 Rxd6 cxd6 Bxd6+ Kg8 Ng5 g6 Bxf7+ Kg7 Be5+"), "Bishop check", "Drive the king up the board.")
 n(J(BA, "d6 Rc1 Ba5 Qa4 a6 Bd5 Bb6 Rxc6 Bd7 Re1+ Kf8 Rxd6 cxd6 Bxd6+ Kg8 Ng5 g6 Bxf7+ Kg7 Be5+ Kh6"), "The king walks into your pieces")
-n(J(BA, "d6 Rc1 Ba5 Qa4 a6 Bd5 Bb6 Rxc6 Bd7 Re1+ Kf8 Rxd6 cxd6 Bxd6+ Kg8 Ng5 g6 Bxf7+ Kg7 Be5+ Kh6 Ne6"), "The study's flourish", "If Black grabs your queen, it is mate in five. Black's best is to take this knight with the bishop, and you are still clearly winning. Pulling your queen back to safety here is even stronger.", ['key'])
+n(J(BA, "d6 Rc1 Ba5 Qa4 a6 Bd5 Bb6 Rxc6 Bd7 Re1+ Kf8 Rxd6 cxd6 Bxd6+ Kg8 Ng5 g6 Bxf7+ Kg7 Be5+ Kh6 Ne6"), "The flourish", "If Black grabs your queen, it is mate in five. Black's best is to take this knight with the bishop, and you are still clearly winning. Pulling your queen back to safety here is even stronger.", ['key'])
 n(J(BA, "d6 Rc1 Ba5 Qa4 a6 Bd5 Bb6 Rxc6 Bd7 Re1+ Kf8 Rxd6 cxd6 Bxd6+ Kg8 Ng5 g6 Bxf7+ Kg7 Be5+ Kh6 Ne6 Bxa4"), "Black takes the queen", "Greed again. Now it is a forced mate.", ['blunder'])
 n(J(BA, "d6 Rc1 Ba5 Qa4 a6 Bd5 Bb6 Rxc6 Bd7 Re1+ Kf8 Rxd6 cxd6 Bxd6+ Kg8 Ng5 g6 Bxf7+ Kg7 Be5+ Kh6 Ne6 Bxa4 Bg7+"), "Bishop check")
 n(J(BA, "d6 Rc1 Ba5 Qa4 a6 Bd5 Bb6 Rxc6 Bd7 Re1+ Kf8 Rxd6 cxd6 Bxd6+ Kg8 Ng5 g6 Bxf7+ Kg7 Be5+ Kh6 Ne6 Bxa4 Bg7+ Kh5 Re5+"), "Rook check")
@@ -161,7 +161,7 @@ L('trap-ne7', 'bishop', 'Trap III: knight blocks the bishop', 'Queen and bishop 
   J(BA, "Ne7 Qb3 Bxa1 Bxf7+ Kf8 Ng5 d5 Bxd5 Qxd5 Qxd5 Ke8 Qf7+ Kd7 Qe6+ Kd8 Qxe7#"),
   alts=[('trap-ne7-d6', 'Black\'s best try', J(BA, "Ne7 Qb3 Bxa1 Bxf7+ Kf8 Ng5 d6 Bh5 g6 Qf7#")),
         ('trap-ne7-d5', 'Black hits back in the center', J(BA, "Ne7 Qb3 d5 Qxc3 dxc4 Rfe1 Be6 Bxe7 Qxe7 d5"))],
-  start=19, why='From your study. Another way Black tries to castle.', outcome='You are winning')
+  start=19, why='Another way Black tries to castle.', outcome='You are winning')
 n(J(BA, "Ne7"), "Knight blocks the diagonal", "Black blocks your bishop so the king can castle. But the knight has left the pawn on f7 with only the king guarding it.", ['mistake'])
 n(J(BA, "Ne7 Qb3"), "Queen joins the attack on f7", "Your queen hits Black's bishop and lines up behind your own bishop against f7.", ['key'], arrows=['b3c3g', 'c4f7r'])
 n(J(BA, "Ne7 Qb3 Bxa1"), "Black takes the rook anyway")
@@ -187,7 +187,7 @@ n(J(BA, "Ne7 Qb3 d5 Qxc3"), "Take the bishop")
 n(J(BA, "Ne7 Qb3 d5 Qxc3 dxc4"), "Black takes your bishop")
 n(J(BA, "Ne7 Qb3 d5 Qxc3 dxc4 Rfe1"), "Rook to the open file", "The knight in front of Black's king is pinned.", arrows=['e1e8r'])
 n(J(BA, "Ne7 Qb3 d5 Qxc3 dxc4 Rfe1 Be6"), "Bishop blocks the file")
-n(J(BA, "Ne7 Qb3 d5 Qxc3 dxc4 Rfe1 Be6 Bxe7"), "Remove the knight first", "Take the knight before pushing your pawn. Your study pushes the pawn right away, which lets Black off the hook.", ['key', 'fix'])
+n(J(BA, "Ne7 Qb3 d5 Qxc3 dxc4 Rfe1 Be6 Bxe7"), "Remove the knight first", "Take the knight before pushing your pawn. Pushing the pawn right away lets Black off the hook.", ['key', 'fix'])
 n(J(BA, "Ne7 Qb3 d5 Qxc3 dxc4 Rfe1 Be6 Bxe7 Qxe7"), "Queen takes back")
 n(J(BA, "Ne7 Qb3 d5 Qxc3 dxc4 Rfe1 Be6 Bxe7 Qxe7 d5"), "Pawn hits the pinned bishop", "Same trick as before: the bishop is pinned to the queen behind it, so you win a piece.", ['trap'], arrows=['d5e6g', 'e1e7r'])
 
@@ -216,7 +216,7 @@ n(J(BA, "d5 Bb5 Bxa1 Re1+ Be6 Qa4 Qd7 Ne5 Nxe5 Bxd7+ Nxd7 Rxa1 a6 Rc1 O-O-O Bd6"
 L('be7', 'bishop', 'Bishop retreats: push past it', 'Your pawns roll forward and f7 falls', 'common',
   J(NX, "Be7 d5 Na5 d6 cxd6 Bxf7+ Kxf7 Qd5+ Kf8 Bg5"),
   alts=[('be7-nb8', 'Knight goes home', J(NX, "Be7 d5 Nb8 d6 cxd6 Bxf7+ Kxf7 Qd5+ Kf8 Re1 Nc6 Bg5 Bxg5 Nxg5 Qf6 Re3"))],
-  start=17, why='From your study. Too slow for Black.', outcome='You are winning')
+  start=17, why='Too slow for Black.', outcome='You are winning')
 n(J(NX, "Be7"), "Bishop retreats", "Black pulls the bishop back to safety. Too slow.", ['mistake'])
 n(J(NX, "Be7 d5"), "Pawn kicks the knight", "Push. The knight has to move and your pawn keeps rolling.", ['key'], arrows=['d5c6g'])
 n(J(NX, "Be7 d5 Na5"), "Knight hits your bishop")
@@ -295,7 +295,7 @@ L('moller-ne5', 'bishop', 'The Møller: knight jumps to the center', 'Your queen
         ('moller-ne5-ncd6', 'Black forgets the kingside', J(MO, "Ne5 bxc3 Nxc4 Qd4 Ncd6 Qxg7 Qf6 Qxf6 Nxf6 Re1+ Kf8 Bh6+ Kg8 Re5")),
         ('moller-ne5-ned6', 'The other knight forgets too', J(MO, "Ne5 bxc3 Nxc4 Qd4 Ned6 Qxg7")),
         ('moller-na5', 'Knight to the edge (same position)', J(MO, "Na5 bxc3 Nxc4 Qd4"))],
-  start=17, why='From your study. Black\'s other good answer to the pawn push.', outcome='Balanced')
+  start=17, why='Black\'s other good answer to the pawn push.', outcome='Balanced')
 n(J(MO, "Ne5"), "Knight jumps to the center", "Black moves the attacked knight and hits your bishop.", ['best'])
 n(J(MO, "Ne5 bxc3"), "Now take the bishop", "Grab Black's bishop. Black takes yours next.")
 n(J(MO, "Ne5 bxc3 Nxc4"), "Black takes your bishop")
@@ -334,7 +334,7 @@ L('castle-early', 'bishop', 'Black castles too early', 'Kick the knight, then ma
   J(CH, "O-O e5 Ne4 O-O Nxc3 bxc3 Bxc3 Ng5 Bxa1 Qh5 h6 Nxf7 Qe8 Nxh6+ Kh7 Nf7+ Kg8 Qh8#"),
   alts=[('castle-early-d5', 'Black\'s best: strike the center', J(CH, "O-O e5 d5 Be2 Ne4 Qb3 Bxc3+ bxc3 Na5 Qb2 c5 O-O cxd4 Nxd4 Bd7 f3")),
         ('castle-early-rxf7', 'Black takes the knight', J(CH, "O-O e5 Ne4 O-O Nxc3 bxc3 Bxc3 Ng5 Bxa1 Qh5 h6 Nxf7 Rxf7 Qxf7+ Kh7 Bd3+ Kh8 Bxh6 Qg8 Qh5 g6 Bxg6 Ne7 Bf8+ Qh7 Qxh7#"))],
-  start=13, why='From your study. Castling into your attack.', outcome='Checkmate')
+  start=13, why='Castling into your attack.', outcome='Checkmate')
 n(J(CH, "O-O"), "Black castles early", "Black tucks the king away instead of taking your pawn. Now that pawn can advance with tempo.", ['mistake'])
 n(J(CH, "O-O e5"), "Kick the knight", "Push the e-pawn and drive the knight off its best square.", ['key'], arrows=['e5f6g'])
 n(J(CH, "O-O e5 Ne4"), "Knight jumps forward")
@@ -388,8 +388,8 @@ L('quiet-d6', 'bishop', 'Black declines the pawn', 'Castle, then jump your knigh
   J(QD, "O-O Nd5 Nxd5 exd5 Ne7 Qa4 c5 a3 Ba5 dxc5 dxc5 d6"),
   alts=[('quiet-d6-bxc3', 'Bishop takes your knight', J(QD, "Bxc3 bxc3 Nxe4 Re1 d5 Ba3")),
         ('quiet-d6-nxe4', 'Black grabs the pawn late', J(QD, "Nxe4 Nxe4 d5 Ng3 dxc4 d5 O-O dxc6"))],
-  start=13, tags=['new', 'game'], why='Not in your study. An opponent played it against you.', outcome='You are clearly better')
-n(J(CH, "d6"), "Black declines the pawn", "Black guards the center instead of grabbing your pawn. Not in your study, but you met it in a game.", ['new', 'game'])
+  start=13, tags=['new', 'game'], why='An opponent played it against you.', outcome='You are clearly better')
+n(J(CH, "d6"), "Black declines the pawn", "Black guards the center instead of grabbing your pawn. You met it in a game.", ['new', 'game'])
 n(QD, "Castle", "Same idea as always: king safe first. Your e-pawn is still offered.", ['key'])
 n(J(QD, "O-O"), "Black castles too")
 n(J(QD, "O-O Nd5"), "Knight into the hole", "The knight hits Black's bishop and knight at once, and no black pawn can kick it.", ['key'], arrows=['d5b4g', 'd5f6g'], circles=['d5y'])
@@ -425,7 +425,7 @@ L('bb6', 'bishop', 'Bishop steps back', 'Your center rolls forward with tempo', 
   alts=[('bb6-nb4', 'Knight counterattacks', J(BB, "e5 d5 exf6 dxc4 d5 Nb4 Qa4+ c6 O-O Nxd5 fxg7 Rg8 Re1+ Kd7 Nc3 Nxc3 bxc3 Rxg7 Qd1+ Kc7 Bf4+ Qd6 Qxd6#")),
         ('bb6-ne4', 'Knight jumps forward', J(BB, "e5 Ne4 Bd5 f5 Nc3 Ne7 Nxe4 fxe4 Bxe4")),
         ('bb6-ng4', 'Knight to the side', J(BB, "e5 Ng4 Nc3 d6 h3 Nh6 Bg5"))],
-  start=11, tags=['game'], why='From your study. You met it in a game and pushed the other pawn.', outcome='You are clearly better')
+  start=11, tags=['game'], why='You met it in a game and pushed the other pawn.', outcome='You are clearly better')
 n(BB, "Bishop steps back", "No check this time. Now your center can roll forward.")
 n(J(BB, "e5"), "Kick the knight", "Push the e-pawn and attack the knight. Pushing the d-pawn to hit the other knight is just as strong; what matters is pushing one of them now.", ['key'], arrows=['e5f6g'])
 n(J(BB, "e5 d5"), "Black counterattacks", "Black hits your bishop instead of moving the knight.")
@@ -449,7 +449,7 @@ n(J(BB, "e5 d5 exf6 dxc4 d5 Nb4 Qa4+ c6 O-O Nxd5 fxg7"), "Pawn takes and attacks
 n(J(BB, "e5 d5 exf6 dxc4 d5 Nb4 Qa4+ c6 O-O Nxd5 fxg7 Rg8"), "Rook steps aside")
 n(J(BB, "e5 d5 exf6 dxc4 d5 Nb4 Qa4+ c6 O-O Nxd5 fxg7 Rg8 Re1+"), "Rook check", "Black's best is to block with the bishop; you stay clearly better.")
 n(J(BB, "e5 d5 exf6 dxc4 d5 Nb4 Qa4+ c6 O-O Nxd5 fxg7 Rg8 Re1+ Kd7"), "King runs", "Now there is a mate.", ['blunder'])
-n(J(BB, "e5 d5 exf6 dxc4 d5 Nb4 Qa4+ c6 O-O Nxd5 fxg7 Rg8 Re1+ Kd7 Nc3"), "Knight hits the pinned piece", "Your study's sharpest line.", ['key'])
+n(J(BB, "e5 d5 exf6 dxc4 d5 Nb4 Qa4+ c6 O-O Nxd5 fxg7 Rg8 Re1+ Kd7 Nc3"), "Knight hits the pinned piece", "The sharpest line in your book.", ['key'])
 n(J(BB, "e5 d5 exf6 dxc4 d5 Nb4 Qa4+ c6 O-O Nxd5 fxg7 Rg8 Re1+ Kd7 Nc3 Nxc3"), "Black takes")
 n(J(BB, "e5 d5 exf6 dxc4 d5 Nb4 Qa4+ c6 O-O Nxd5 fxg7 Rg8 Re1+ Kd7 Nc3 Nxc3 bxc3"), "Pawn takes back")
 n(J(BB, "e5 d5 exf6 dxc4 d5 Nb4 Qa4+ c6 O-O Nxd5 fxg7 Rg8 Re1+ Kd7 Nc3 Nxc3 bxc3 Rxg7"), "Rook grabs the pawn")
@@ -480,7 +480,7 @@ L('four-d6', 'bishop', 'Black plays solid with the d-pawn', 'Same center, then a
   alts=[('four-d6-d5', 'Black defends with the pawn', J(FD, "Nxe4 Re1 d5 Bxd5 Qxd5 Nc3 Qf5 Rxe4+ Be6 Bg5")),
         ('four-d6-castle', 'Black castles first', J(FD, "O-O Re1 Nxe4 Rxe4 d5 Bxd5 Qxd5 Nc3")),
         ('four-d6-nf6', 'Black forgets the bishop', J(IT, "Bc5 c3 d6 d4 Nf6 dxc5 Nxe4 Bxf7+ Kxf7 Qd5+ Be6 Qxe4"))],
-  start=7, why='From your study.', outcome='You are better')
+  start=7, why='', outcome='You are better')
 n(J(IT, "Bc5 c3 d6"), "Black plays solid", "Black supports the center pawn instead of attacking yours.")
 n(J(IT, "Bc5 c3 d6 d4"), "Center push anyway", "Same plan: push and attack the bishop.", ['key'])
 n(J(IT, "Bc5 c3 d6 d4 exd4"), "Black takes")
@@ -494,7 +494,7 @@ n(J(FD, "Nxe4 Re1"), "Rook pins the knight", "The knight is pinned to Black's ki
 n(J(FD, "Nxe4 Re1 Bf5"), "Bishop guards the knight", "Natural, but it fails.", ['mistake'])
 n(J(FD, "Nxe4 Re1 Bf5 Bd5"), "Second attacker on the pinned knight", "The knight is attacked twice and can't move. You win a piece.", ['key', 'trap'], arrows=['d5e4g', 'e1e4g'])
 n(J(FD, "Nxe4 Re1 d5"), "Pawn defends and hits your bishop")
-n(J(FD, "Nxe4 Re1 d5 Bxd5"), "Take the pawn", "Your bishop adds a second attacker on the pinned knight. Your study retreats the bishop here, which lets Black untangle. This is stronger.", ['key', 'fix'], arrows=['d5e4g'])
+n(J(FD, "Nxe4 Re1 d5 Bxd5"), "Take the pawn", "Your bishop adds a second attacker on the pinned knight. Retreating the bishop here lets Black untangle.", ['key', 'fix'], arrows=['d5e4g'])
 n(J(FD, "Nxe4 Re1 d5 Bxd5 Qxd5"), "Queen takes")
 n(J(FD, "Nxe4 Re1 d5 Bxd5 Qxd5 Nc3"), "Knight hits the queen", "Black's knight is still pinned.")
 n(J(FD, "Nxe4 Re1 d5 Bxd5 Qxd5 Nc3 Qf5"), "Queen guards the knight")
@@ -524,7 +524,7 @@ L('other-4th', 'bishop', 'Other fourth moves', 'Queen out, bishop back, or a wai
   alts=[('qe7-exd4', 'Queen out, then Black takes', J(IT, "Bc5 c3 Qe7 d4 exd4 O-O")),
         ('bb6-4th', 'Bishop steps back early', J(IT, "Bc5 c3 Bb6 d4 exd4 cxd4 d6 h3")),
         ('a6-4th', 'A waiting move', J(IT, "Bc5 c3 a6 d4 exd4 cxd4 Ba7 Nc3 d6 h3"))],
-  start=7, tags=['new'], why='Not in your study. Same plan works against all of them.', outcome='You are better')
+  start=7, tags=['new'], why='Same plan works against all of them.', outcome='You are better')
 n(J(IT, "Bc5 c3 Qe7"), "Queen guards the pawn", "Black defends the center pawn with the queen.", ['new'])
 n(J(IT, "Bc5 c3 Qe7 d4"), "Push anyway", "Same plan: the d-pawn hits the bishop.", ['key'])
 n(J(IT, "Bc5 c3 Qe7 d4 Bb6"), "Bishop steps back")
@@ -549,7 +549,7 @@ n(J(IT, "Bc5 c3 a6 d4 exd4 cxd4 Ba7 Nc3 d6 h3"), "Stop the pin", "Big center, ea
 # ---- 5...Bb6 trap (NEW)
 L('bb6-early', 'bishop', 'Bishop steps back before taking', 'Win a pawn with a bishop sacrifice on f7', 'common',
   J(IT, "Bc5 c3 Nf6 d4 Bb6 dxe5 Ng4 Bxf7+ Kxf7 Ng5+ Ke8 Qxg4 Nxe5 Qg3"),
-  start=9, tags=['new', 'trap'], why='Not in your study. A common slip at club level.', outcome='You are a pawn up')
+  start=9, tags=['new', 'trap'], why='A common slip at club level.', outcome='You are a pawn up')
 n(J(IT, "Bc5 c3 Nf6 d4 Bb6"), "Bishop retreats instead of taking", "Black leaves the center pawn hanging.", ['mistake', 'new'])
 n(J(IT, "Bc5 c3 Nf6 d4 Bb6 dxe5"), "Take the pawn", "Your pawn also attacks the knight.", ['key'], arrows=['e5f6g'])
 n(J(IT, "Bc5 c3 Nf6 d4 Bb6 dxe5 Ng4"), "Knight jumps forward", "Black hopes to win back the pawn.")
@@ -583,7 +583,7 @@ n(J(FL, "Ke6 Nc3"), "Third attacker on the knight", "Black's knight is pinned an
 n(J(FL, "Ke6 Nc3 Ne7"), "Knight guards the knight", "Black's best here is the other knight jump; see the next lesson.")
 n(J(FL, "Ke6 Nc3 Ne7 d4"), "Open the center", "Pry open lines toward the king in the middle.", ['key'], arrows=['d4e5g'])
 n(J(FL, "Ke6 Nc3 Ne7 d4 exd4"), "Black takes", "This opens lines for you.", ['blunder'])
-n(J(FL, "Ke6 Nc3 Ne7 d4 exd4 Bf4"), "Bishop out, ignore the knight", "Your study's line. Taking the pinned knight first is also crushing.", ['key'])
+n(J(FL, "Ke6 Nc3 Ne7 d4 exd4 Bf4"), "Bishop out, ignore the knight", "Taking the pinned knight first is also crushing.", ['key'])
 n(J(FL, "Ke6 Nc3 Ne7 d4 exd4 Bf4 dxc3"), "Black takes the knight")
 n(J(FL, "Ke6 Nc3 Ne7 d4 exd4 Bf4 dxc3 O-O-O"), "Castle long", "Your rook lands on the d-file, right behind the pinned knight.", ['key'])
 n(J(FL, "Ke6 Nc3 Ne7 d4 exd4 Bf4 dxc3 O-O-O cxb2+"), "Pawn check")
@@ -619,9 +619,9 @@ FN = J(FL, "Ke6 Nc3 Nb4")
 L('fried-liver-nb4', 'knight', 'Fried Liver: Black\'s best defense', 'The other knight jumps to the side', 'common',
   J(FN, "O-O c6 d4 Kd7 a3 Nxc2 Qf5+ Kc7 Qxc2 Nxc3 bxc3 exd4 cxd4"),
   alts=[('fl-nb4-qf6', 'Queen defends', J(FN, "O-O c6 d4 Qf6 Qe2"))],
-  start=15, why='From your study. This is what strong players do against the Fried Liver.', outcome='You are better')
+  start=15, why='This is what strong players do against the Fried Liver.', outcome='You are better')
 n(FN, "Knight jumps to the side", "Black's best defense: the other knight guards the pinned one and eyes a fork on your queenside.", ['best'])
-n(J(FN, "O-O"), "Castle", "Get the king safe. Your study castles here; pulling the bishop back is a slightly safer alternative.")
+n(J(FN, "O-O"), "Castle", "Get the king safe. Pulling the bishop back is a slightly safer alternative.")
 n(J(FN, "O-O c6"), "Pawn guards the knight")
 n(J(FN, "O-O c6 d4"), "Open the center", "Same idea as always: open lines while the king is in the middle.", ['key'], arrows=['d4e5g'])
 n(J(FN, "O-O c6 d4 Kd7"), "King runs toward the corner")
@@ -642,7 +642,7 @@ L('two-knights-na5', 'knight', 'Two Knights: knight to the rim', 'The main line:
   alts=[('na5-cxb5', 'Black gives up the rook', J(TD, "Na5 Bb5+ c6 dxc6 bxc6 Qf3 cxb5 Qxa8 Qc7 Qf3")),
         ('na5-be7', 'Black just develops', J(TD, "Na5 Bb5+ c6 dxc6 bxc6 Qf3 Be7 Bd3")),
         ('na5-bd7', 'Bishop blocks the check', J(TD, "Na5 Bb5+ Bd7 Qe2"))],
-  start=9, why='From your study. Black\'s best answer to your knight jump.', outcome='Better for you; equal if Black develops calmly')
+  start=9, why='Black\'s best answer to your knight jump.', outcome='Better for you; equal if Black develops calmly')
 n(J(TD, "Na5"), "Knight hits your bishop", "The correct move. Black gives a pawn to chase your bishop.", ['best'])
 n(J(TD, "Na5 Bb5+"), "Bishop check", "Keep the bishop alive with check.", ['key'])
 n(J(TD, "Na5 Bb5+ c6"), "Pawn blocks and attacks")
@@ -667,7 +667,7 @@ n(J(TD, "Na5 Bb5+ Bd7 Qe2"), "Queen guards the bishop", "You keep the extra pawn
 L('traxler', 'knight', 'Black ignores f7: the counter-attack', 'Take on f7 with the bishop, not the knight', 'common',
   J(TK, "Bc5 Bxf7+ Ke7 Bc4 Qe8 Nc3 Rf8 O-O"),
   alts=[('traxler-warn', 'The trap Black wants', J(TK, "Bc5 Nxf7 Bxf2+ Kxf2 Nxe4+"))],
-  start=7, tags=['new'], why='Not in your study. Black lets you take f7 and goes for your king.', outcome='You are better')
+  start=7, tags=['new'], why='Black lets you take f7 and goes for your king.', outcome='You are better')
 n(J(TK, "Bc5"), "Bishop out, f7 left hanging", "Black lets you take f7 and plans a counter-attack against your king.", ['new'])
 n(J(TK, "Bc5 Bxf7+"), "Take with the bishop", "Safe and simple: Black's king loses castling rights and you are a pawn up.", ['key'])
 n(J(TK, "Bc5 Bxf7+ Ke7"), "King steps up")
@@ -686,7 +686,7 @@ L('tk-sidelines', 'knight', 'Black ignores f7: other tries', 'Take on f7 and col
   alts=[('tk-h6', 'Pawn kicks the knight', J(TK, "h6 Nxf7 Qe7 Nxh8")),
         ('tk-qe7', 'Queen guards the center', J(TK, "Qe7 Bxf7+ Kd8 Bb3")),
         ('tk-nxe4', 'Knight grabs your pawn', J(TK, "Nxe4 Bxf7+ Ke7 d4"))],
-  start=7, tags=['new', 'game'], why='Not in your study. An opponent tried the knight move against you.', outcome='You are winning')
+  start=7, tags=['new', 'game'], why='An opponent tried the knight move against you.', outcome='You are winning')
 n(J(TK, "Na5"), "Knight hits your bishop", "Black ignores the threat on f7.", ['mistake', 'game'])
 n(J(TK, "Na5 Bxf7+"), "Bishop takes f7", "With check. In your game you took with the knight, which is also good; the bishop is cleaner.", ['key'])
 n(J(TK, "Na5 Bxf7+ Ke7"), "King steps up")
@@ -717,7 +717,7 @@ L('shilling', 'odd', 'The knight jump trap', 'Never take the center pawn here', 
   alts=[('shilling-bc5', 'Bishop out (your game)', J(SH, "Nxd4 exd4 O-O Bc5 Bxf7+ Kf8 Bb3")),
         ('shilling-bc5-kxf7', 'Black takes the bishop', J(SH, "Nxd4 exd4 O-O Bc5 Bxf7+ Kxf7 Qh5+ Kf8 Qxc5+ d6 Qxd4")),
         ('shilling-warn', 'The trap Black wants', J(SH, "Nxe5 Qg5 Nxf7 Qxg2 Rf1 Qxe4+ Be2 Nf3#"))],
-  start=5, tags=['game'], why='From your study. You have met it in a game.', outcome='You are clearly better')
+  start=5, tags=['game'], why='You have met it in a game.', outcome='You are clearly better')
 n(SH, "Knight jumps to the center", "A trap: it leaves the center pawn hanging on purpose.", ['trap'])
 n(J(SH, "Nxd4"), "Trade knights", "Simple and good. Don't take the center pawn.", ['key'])
 n(J(SH, "Nxd4 exd4"), "Pawn takes back")
@@ -735,7 +735,7 @@ n(J(SH, "Nxd4 exd4 O-O Nf6 Re1 d6 c3 dxc3 Qb3 d5 exd5+ Be7 d6"), "Pawn forward",
 n(J(SH, "Nxd4 exd4 O-O Nf6 Re1 d6 c3 dxc3 Qb3 d5 exd5+ Be7 d6 Qxd6"), "Queen takes")
 n(J(SH, "Nxd4 exd4 O-O Nf6 Re1 d6 c3 dxc3 Qb3 d5 exd5+ Be7 d6 Qxd6 Bxf7+"), "Bishop takes f7", "With check.", ['key'])
 n(J(SH, "Nxd4 exd4 O-O Nf6 Re1 d6 c3 dxc3 Qb3 d5 exd5+ Be7 d6 Qxd6 Bxf7+ Kf8"), "King steps aside")
-n(J(SH, "Nxd4 exd4 O-O Nf6 Re1 d6 c3 dxc3 Qb3 d5 exd5+ Be7 d6 Qxd6 Bxf7+ Kf8 h3"), "Quiet move", "Stops Black's knight from jumping forward. Your study marks this as the right move.", ['key'])
+n(J(SH, "Nxd4 exd4 O-O Nf6 Re1 d6 c3 dxc3 Qb3 d5 exd5+ Be7 d6 Qxd6 Bxf7+ Kf8 h3"), "Quiet move", "Stops Black's knight from jumping forward.", ['key'])
 n(J(SH, "Nxd4 exd4 O-O Nf6 Re1 d6 c3 dxc3 Qb3 d5 exd5+ Be7 d6 Qxd6 Bxf7+ Kf8 h3 cxb2"), "Black takes another pawn")
 n(J(SH, "Nxd4 exd4 O-O Nf6 Re1 d6 c3 dxc3 Qb3 d5 exd5+ Be7 d6 Qxd6 Bxf7+ Kf8 h3 cxb2 Bxb2"), "Bishop takes back", "Black's king is stuck and your bishops rake the board. Clearly better.")
 n(J(SH, "Nxd4 exd4 O-O Bc5"), "Bishop out", "This is what your opponent played. It allows a shot.", ['mistake', 'game'])
@@ -762,7 +762,7 @@ L('h6-3rd', 'odd', 'Black makes a waiting move', 'Hit the center at once', 'rare
   alts=[('h6-nf6', 'Knight hits your pawn', J(IT, "h6 d4 exd4 O-O Nf6 e5 d5 Bb5 Nd7 Bxc6 bxc6 Nxd4 Nxe5 Re1 f6 f4")),
         ('h6-a6', 'Black kicks your bishop', J(IT, "h6 d4 exd4 O-O Nf6 e5 d5 Bb5 a6 Bxc6+ bxc6 exf6")),
         ('h6-d6', 'Black plays solid', J(IT, "h6 d4 exd4 O-O d6 Nxd4 Nf6 Nxc6 bxc6 e5 Ng4 e6 d5 Qxg4 Bxe6 Qf3 dxc4 Qxc6+"))],
-  start=5, why='From your study.', outcome='You are better')
+  start=5, why='', outcome='You are better')
 n(J(IT, "h6"), "A waiting move", "Black stops your knight from jumping forward. Use the time to hit the center.")
 n(J(IT, "h6 d4"), "Strike the center", ['key'])
 n(J(IT, "h6 d4 exd4"), "Black takes")
@@ -790,7 +790,7 @@ n(J(IT, "h6 d4 exd4 O-O Nf6 e5 d5 Bb5 Nd7 Bxc6 bxc6 Nxd4 Nxe5 Re1"), "Rook pins 
 n(J(IT, "h6 d4 exd4 O-O Nf6 e5 d5 Bb5 Nd7 Bxc6 bxc6 Nxd4 Nxe5 Re1 f6"), "Pawn guards the knight")
 n(J(IT, "h6 d4 exd4 O-O Nf6 e5 d5 Bb5 Nd7 Bxc6 bxc6 Nxd4 Nxe5 Re1 f6 f4"), "Attack the pinned knight", "It can't move. You win a piece.", ['key'])
 n(J(IT, "h6 d4 exd4 O-O Nf6 e5 d5 Bb5 a6"), "Black kicks your bishop", ['mistake'])
-n(J(IT, "h6 d4 exd4 O-O Nf6 e5 d5 Bb5 a6 Bxc6+"), "Take with check first", "Your study retreats the bishop here. Taking with check is much stronger.", ['key', 'fix'])
+n(J(IT, "h6 d4 exd4 O-O Nf6 e5 d5 Bb5 a6 Bxc6+"), "Take with check first", "Taking with check is much stronger than retreating the bishop.", ['key', 'fix'])
 n(J(IT, "h6 d4 exd4 O-O Nf6 e5 d5 Bb5 a6 Bxc6+ bxc6"), "Pawn takes back")
 n(J(IT, "h6 d4 exd4 O-O Nf6 e5 d5 Bb5 a6 Bxc6+ bxc6 exf6"), "Take the knight", "You win a piece.")
 n(J(IT, "h6 d4 exd4 O-O d6"), "Black plays solid")
@@ -812,7 +812,7 @@ L('d6-3rd', 'odd', 'Black plays the d-pawn one square', 'Take space and develop'
   J(IT, "d6 d4 exd4 Nxd4 Nf6 Nc3 Be7 O-O"),
   alts=[('d6-nf6', 'Knight hits your pawn', J(IT, "d6 d4 Nf6 d5 Ne7 Nc3 g6 Bg5 Bg7 h3")),
         ('d6-f6', 'Black weakens the king (your game)', J(IT, "d6 d4 f6 O-O"))],
-  start=5, tags=['game'], why='From your study. You have met it in a game too.', outcome='Slightly better for you')
+  start=5, tags=['game'], why='You have met it in a game too.', outcome='Slightly better for you')
 n(J(IT, "d6"), "Black plays solid", "Black supports the center pawn.")
 n(J(IT, "d6 d4"), "Strike the center", ['key'])
 n(J(IT, "d6 d4 exd4"), "Black takes")
@@ -835,7 +835,7 @@ n(J(IT, "d6 d4 f6 O-O"), "Castle and develop", "In your game you played the engi
 L('hungarian', 'odd', 'Bishop stays home: the Hungarian', 'Take the center and develop', 'rare',
   J(IT, "Be7 d4 exd4 Nxd4 d6 O-O Nf6 Nc3 O-O"),
   alts=[('hung-d6', 'Black holds the center', J(IT, "Be7 d4 d6 d5 Nb4 Nc3 Nf6 a3 Na6 Bxa6 bxa6"))],
-  start=5, tags=['new'], why='Not in your study. A solid, passive setup.', outcome='Slightly better for you')
+  start=5, tags=['new'], why='A solid, passive setup.', outcome='Slightly better for you')
 n(J(IT, "Be7"), "Bishop stays home", "A passive but solid setup.", ['new'])
 n(J(IT, "Be7 d4"), "Take the center", ['key'])
 n(J(IT, "Be7 d4 exd4"), "Black takes")
@@ -859,7 +859,7 @@ L('rousseau', 'odd', 'Black pushes the f-pawn', 'Don\'t take it: strike the cent
   J(IT, "f5 d4 exd4 e5"),
   alts=[('rousseau-fxe4', 'Black takes your pawn', J(IT, "f5 d4 fxe4 Nxe5 d5 Bb5 Qd6 O-O Nf6 c4")),
         ('rousseau-warn', 'Taking the pawn', J(IT, "f5 exf5 e4"))],
-  start=5, why='From your study. A gambit that weakens Black\'s king.', outcome='You are better')
+  start=5, why='A gambit that weakens Black\'s king.', outcome='You are better')
 n(J(IT, "f5"), "Black pushes the f-pawn", "A gambit. It weakens the diagonal to Black's king.")
 n(J(IT, "f5 d4"), "Strike the center", "Ignore the f-pawn.", ['key'])
 n(J(IT, "f5 d4 exd4"), "Black takes")
