@@ -214,7 +214,13 @@ body:has(.coach:not([hidden])) .foot{padding-right:100px}
 .items{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}
 .item{display:grid;justify-items:center;align-content:start;gap:5px;text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:12px 8px;font-size:13px}
 .item.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)} .item.lock .ipv{opacity:.45;filter:grayscale(1)}
-.ipv{width:76px;height:76px;display:block} .ipv svg{width:100%;height:100%}
+.ipv{width:92px;height:92px;display:block;border-radius:14px;background:var(--accent-soft);overflow:hidden} .ipv svg{width:100%;height:100%}
+/* a card shows the piece up close: the picture leans in on the head, the face or the neck */
+.ipv.z-head svg{transform:scale(1.22);transform-origin:50% 0%} .ipv.z-head.zk-knight svg{transform-origin:62% 0%}
+.ipv.z-face svg{transform:scale(1.4);transform-origin:50% 36%} .ipv.z-face.zk-knight svg{transform-origin:40% 25%} .ipv.z-face.zk-rook svg{transform-origin:50% 55%}
+.ipv.z-neck svg{transform:scale(1.28);transform-origin:50% 76%} .ipv.z-neck.zk-knight svg{transform-origin:60% 72%} .ipv.z-neck.zk-rook svg{transform-origin:50% 100%}
+/* what a card does (buy, wear, what it needs) sits on its bottom edge, so a row of cards lines up */
+.item:not(.sdnext){display:flex;flex-direction:column;align-items:center} .item:not(.sdnext) > :last-child:not(b){margin-top:auto}
 .item .price,.item .owned,.item .wearing{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;color:var(--muted);font-weight:600} .item .wearing{color:var(--accent)}
 .item .need{font-size:12px;color:var(--muted)} .item .btn.small{min-height:32px;gap:5px} .item .btn .coin{width:15px;height:15px}
 @media (max-width:860px){ .shop{grid-template-columns:minmax(0,1fr)} .shopside{position:static} .wlock{grid-template-columns:minmax(0,1fr)} }
@@ -319,13 +325,18 @@ button.leak{text-align:left;cursor:pointer;font:inherit;color:inherit;width:100%
 .g-cloth{fill:var(--surface);stroke:var(--gear-ink);stroke-width:.9} .g-steel{fill:var(--surface-2);stroke:var(--gear-ink);stroke-width:.9}
 .g-halo{fill:none;stroke:var(--oro);stroke-width:2.2} .g-vine{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linecap:round}
 .g-bone{fill:none;stroke:var(--surface);stroke-width:1.2;stroke-linecap:round} .g-chain2{fill:none;stroke:var(--oro);stroke-width:1.5;stroke-dasharray:1.8 1.1;stroke-linecap:round}
-.g-heart{fill:var(--rosso);stroke:var(--gear-ink);stroke-width:.8;stroke-linejoin:round} .g-star{fill:var(--oro);stroke:var(--gear-ink);stroke-width:.8;stroke-linejoin:round}
+/* novelty glasses are frames with a tinted lens, so the eye still shows through; a hat throws a little shade where it sits */
+.g-heart{fill:var(--rosso);fill-opacity:.42;stroke:var(--rosso);stroke-width:1.5;stroke-linejoin:round} .g-star{fill:var(--oro);fill-opacity:.42;stroke:var(--oro);stroke-width:1.5;stroke-linejoin:round}
+.g-seat{fill:var(--gear-ink);opacity:.26}
+.g-band{fill:none;stroke-linecap:round} .g-sblu{stroke:var(--blu)} .g-sros{stroke:var(--rosso)} .g-srib{stroke:var(--ribbon-1)} .g-bandst{fill:none;stroke:var(--surface);stroke-dasharray:1.5 4.6;stroke-dashoffset:-3.2}
+.g-tailst{stroke-dasharray:1.3 2.6;stroke-dashoffset:-3.4} .g-bandsh{fill:none;stroke:var(--gear-ink);stroke-width:1.1;opacity:.2} .g-knot{stroke:var(--gear-ink);stroke-opacity:.22;stroke-width:.7}
+.g-collar{fill:none;stroke-width:2;stroke-linecap:round} .g-bead{stroke:var(--gear-ink);stroke-opacity:.2;stroke-width:.5}
 .g-lensr{fill:var(--surface);fill-opacity:.18;stroke:var(--rosso);stroke-width:1.8} .g-wirer{fill:none;stroke:var(--rosso);stroke-width:1.6;stroke-linecap:round}
 /* today's drops, above the switch between the shop and the locker */
 .sdrop{display:grid;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:inset 4px 0 0 var(--oro)}
 .sdhd{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap} .sdhd h3{margin:2px 0 0;font-size:19px}
 .sdt{font-size:13px;font-weight:650;color:var(--oro);background:var(--oro-soft);padding:4px 10px;border-radius:12px;white-space:nowrap}
-.sdrops{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))} .sdi .ipv{width:104px;height:104px} .sdday{font-size:12px;color:var(--oro);font-weight:650}
+.sdrops{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))} .sdi .ipv{width:112px;height:112px} .sdday{font-size:12px;color:var(--oro);font-weight:650}
 .sdnext{background:transparent;border-style:dashed} .sdnext .ipv{position:relative} .sdnext .ipv svg{opacity:.22;filter:grayscale(1)}
 .sdnext .ipv i{position:absolute;inset:0;display:grid;place-items:center;font:700 44px/1 var(--f-display);font-style:normal;color:var(--oro)}
 @media (max-width:620px){ .sdrops{grid-template-columns:repeat(2,minmax(0,1fr))} .sdi .ipv{width:88px;height:88px} .mannequin svg{width:min(140px,44%)}
@@ -417,3 +428,4 @@ button.rcrow{cursor:pointer} button.rcrow:hover{border-color:var(--accent)}
 @media (max-width:560px){.rvi{grid-template-columns:92px minmax(0,1fr);gap:10px} .rvi .thumb{max-width:92px} .rvh a{margin-left:0}}
 .rvcue{display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap}
 .rvcue .tline{margin:2px 0 0}
+.rvcue .rvsub{margin:3px 0 0;color:var(--muted);font-size:.92rem}

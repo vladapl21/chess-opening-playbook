@@ -69,6 +69,18 @@ Facts that shape the design:
 - Settings and the account button moved out of the header into the corner of the screen; the header fits one row on an ordinary monitor and centres its rows when it has to wrap.
 - A lesson opened from a course unit has "Next lesson" at the top. The Sandbox has "Free play: pick openings" to leave a course practice game.
 
+## Phase 1.19: key moves, move order, the coach on a game that left the book (done, November 20)
+
+Notes from play: the openings weren't sticking as fast as hoped, least of all a setup whose moves come in another order from line to line.
+
+- **Marks on the moves.** In every lesson the other side's inaccuracies, mistakes and blunders carry a mark, and so does your key move: the answer that makes one cost. Judged from the stored engine numbers as a share of the point, a move into a forced mate, and what the notes already call a mistake. Their own shapes and colours. Nothing is marked while a line is being played; the Sandbox marks its list when the game is over. The old "Key move" chip, which sat on half the moves, is gone.
+- **Your moves, in order.** A strip under a lesson's board: each of your moves as a small picture, the main line above a line that plays them in another order with the move that changed places ringed in both, and a switch that puts each move's number on its piece. A drill names a move of the line played before its turn as that (right move, wrong moment), and the coach's note says the order slipped, not the move.
+- **A game that left the book.** When your own move left it, the coach says which move and what your book plays, with the drill on the bubble; the Drill page leads with that line and the coach brings it up once a day until it has been drilled clean, which is now kept with the game.
+- **The Sandbox.** The fold-out of the other side's moves has an arrow and keeps its state; the start position moved under the board; the count of lines met is every line a game can end on with the openings picked, counted from the book on the page (274 for the house White book until the odd lines made it 343; 524 for Black), and from a set position it counts the lines through it.
+- **Moves land at once.** Your own move in every drill, game and checkpoint and on the explore board, and every move on the set-up board. Only the reply slides.
+- **Counts that keep up.** `pipeline/lint_counts.py` works out every number the README quotes from the built books and the build fails on a stale one. It found the At a glance table two releases behind (278 lines for 343, 79 lessons for 82, a count of positions from the first release).
+- **The wardrobe, refitted.** Hats sit on their rim with a shadow and the picture makes room for them; scarves, leis, chains and ties are drawn along each coach's neck, and on the knight they are cut to its outline so they read as worn. Shop cards show the piece by itself.
+
 ## Phase 1.18: three more systems and the odd lines (done, November 19)
 
 - **The Scandinavian** for Black (slot `blackE4`, pack `scandi`; `content/black/bscandi.py`): 10 lessons, 120 lines, unit `b-scandi` with a deep dive.

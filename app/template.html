@@ -11,6 +11,7 @@
   --rosso:#B93628; --rosso-soft:#F6DDD8; --oro:#9C6F0E; --oro-soft:#F4E8C9; --blu:#2D5DAA; --blu-soft:#DCE5F5; --viola:#674C9E; --viola-soft:#E8E1F4;
   --sq-light:#E6ECE2; --sq-dark:#84A390; --hl:rgba(240,201,64,.55); --sel:rgba(13,106,78,.38);
   --arr-g:#11843F; --arr-r:#D2302A; --arr-b:#2F63C9; --arr-y:#E3A90E; --arr-e:#7646D6;
+  --mk-key:#0E6B50; --mk-slip:#476FA6; --mk-mis:#7B48A8; --mk-blun:#A6215A; --mk-ink:#FFFFFF;
   --shadow:0 0 0 1px var(--line),0 2px 0 rgba(18,32,26,.05);
   --flame:#D9541E; --flame-2:#F4A21F; --flame-ink:#FFFFFF; --flame-soft:#FBE4D7; --tour-shade:rgba(12,24,18,.6); --tour-ring:#FFFFFF;
   --gear-ink:#18211D; --gear-edge:transparent;
@@ -27,6 +28,7 @@
   --rosso:#F2685B; --rosso-soft:#3D1C18; --oro:#E2B54C; --oro-soft:#3A2F14; --blu:#86AEF2; --blu-soft:#1B2A45; --viola:#B9A2EC; --viola-soft:#2C2342;
   --sq-light:#CFD8CC; --sq-dark:#6F8D7B; --hl:rgba(240,201,64,.5); --sel:rgba(67,192,143,.42);
   --arr-g:#1FA155; --arr-r:#E8463D; --arr-b:#4F82E6; --arr-y:#F0B92A; --arr-e:#A78BF5;
+  --mk-key:#3DB98C; --mk-slip:#8CADE0; --mk-mis:#B890E4; --mk-blun:#EC6FA0; --mk-ink:#10201A;
   --flame:#FF8746; --flame-2:#FFC24A; --flame-ink:#2A1205; --flame-soft:#3B2216; --tour-shade:rgba(0,0,0,.68); --tour-ring:#CFE9DA;
   --gear-ink:#1C2420; --gear-edge:rgba(230,240,234,.55);
   --sk-mid:#6E8FDA; --sk-mid-2:#2A3A5E; --sk-ruby:#E2605A; --sk-ruby-2:#4A2422; --sk-plum:#A78BF5; --sk-plum-2:#3A2E52; --sk-tang:#FF9A57; --sk-tang-2:#4A2E1C; --sk-gold:#E2B54C; --sk-gold-2:#4A3A12; --sk-mint:#5FD0AA; --sk-mint-2:#173B30; --sk-ocean:#5DB4DD; --sk-ocean-2:#16323F; --sk-rose:#F08AB0; --sk-rose-2:#47202F; --sk-slate:#A6B1C6; --sk-slate-2:#272D38; --sk-sand:#DDB874; --sk-sand-2:#3F3320;
@@ -38,6 +40,7 @@
   --rosso:#F2685B; --rosso-soft:#3D1C18; --oro:#E2B54C; --oro-soft:#3A2F14; --blu:#86AEF2; --blu-soft:#1B2A45; --viola:#B9A2EC; --viola-soft:#2C2342;
   --sq-light:#CFD8CC; --sq-dark:#6F8D7B; --hl:rgba(240,201,64,.5); --sel:rgba(67,192,143,.42);
   --arr-g:#1FA155; --arr-r:#E8463D; --arr-b:#4F82E6; --arr-y:#F0B92A; --arr-e:#A78BF5;
+  --mk-key:#3DB98C; --mk-slip:#8CADE0; --mk-mis:#B890E4; --mk-blun:#EC6FA0; --mk-ink:#10201A;
   --flame:#FF8746; --flame-2:#FFC24A; --flame-ink:#2A1205; --flame-soft:#3B2216; --tour-shade:rgba(0,0,0,.68); --tour-ring:#CFE9DA;
   --gear-ink:#1C2420; --gear-edge:rgba(230,240,234,.55);
   --sk-mid:#6E8FDA; --sk-mid-2:#2A3A5E; --sk-ruby:#E2605A; --sk-ruby-2:#4A2422; --sk-plum:#A78BF5; --sk-plum-2:#3A2E52; --sk-tang:#FF9A57; --sk-tang-2:#4A2E1C; --sk-gold:#E2B54C; --sk-gold-2:#4A3A12; --sk-mint:#5FD0AA; --sk-mint-2:#173B30; --sk-ocean:#5DB4DD; --sk-ocean-2:#16323F; --sk-rose:#F08AB0; --sk-rose-2:#47202F; --sk-slate:#A6B1C6; --sk-slate-2:#272D38; --sk-sand:#DDB874; --sk-sand-2:#3F3320;
@@ -277,6 +280,19 @@ p{margin:0}
 .timeline li:first-child{border-top:0}
 .trow{display:grid;grid-template-columns:44px 24px minmax(0,1fr) auto;gap:8px;align-items:center;width:100%;text-align:left;background:none;border:0;padding:8px 12px;cursor:pointer;font-size:14px}
 .trow:hover{background:var(--surface-2)}
+/* move marks (a key, a wave, a cross, two crosses) and the strip of your moves in order */
+.mk-key{--mk:var(--mk-key)} .mk-slip{--mk:var(--mk-slip)} .mk-mistake{--mk:var(--mk-mis)} .mk-blunder{--mk:var(--mk-blun)}
+.mki{width:18px;height:18px;flex:none;vertical-align:-4px} .mki circle,.mkb circle{fill:var(--mk);stroke:var(--surface);stroke-width:2.2} .mki g,.mkb g{fill:none;stroke:var(--mk-ink);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.mkc{display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-size:12.5px;font-weight:700;color:var(--mk);white-space:nowrap} .mkw{margin:6px 0 0;font-size:13.5px;color:var(--muted)}
+.mklegend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:10px 0 0;font-size:12.5px;color:var(--muted)} .mklegend span{display:inline-flex;align-items:center;gap:5px}
+.onum circle{fill:var(--ink);opacity:.86} .onum text{fill:var(--surface);font:700 17px var(--f-mono)}
+.ostrip{margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)} .ohead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.otoks{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px} .otok{position:relative;width:50px;display:grid;justify-items:center;gap:2px;padding:3px 0 5px;border:1.5px solid var(--line);border-radius:6px;background:var(--surface-2);opacity:.5;font:inherit;color:inherit}
+button.otok{cursor:pointer} .otok .pico{width:26px;height:26px;margin-top:5px} .otok .on{position:absolute;top:2px;left:4px;font:700 11px var(--f-mono);color:var(--muted)} .otok.done{opacity:1} .otok.cur{opacity:1;border-color:var(--accent);background:var(--accent-soft)}
+.otok.odd{border-style:dashed;border-color:var(--mk-mis)} .otok.odd .on{color:var(--mk-mis)} .ocap{margin:9px 0 0;font-size:13px;color:var(--muted)} .ocap b{color:var(--ink);font-weight:650}
+.omap{width:38px;height:38px} .omb{fill:var(--surface);stroke:var(--line);stroke-width:1} .omg{stroke:var(--line);stroke-width:.6} .oml{stroke:var(--accent);stroke-width:1.6;stroke-linecap:round;opacity:.55} .omf{fill:var(--surface);stroke:var(--accent);stroke-width:1.1} .omt{fill:var(--accent)}
+.otok.odd .oml,.otok.odd .omf{stroke:var(--mk-mis)} .otok.odd .omt{fill:var(--mk-mis)} .olab{margin:10px 0 -4px;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)} .otoks.ref .otok{background:transparent}
+@media (max-width:460px){ .otoks{gap:5px} .otok{width:42px} .omap{width:32px;height:32px} }
 .trow.cur{background:var(--accent-soft)}
 .trow .n{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
 .trow .pico{width:22px;height:22px}
@@ -339,6 +355,10 @@ p{margin:0}
 .week li.on i{background:var(--flame);color:var(--flame-ink)} .week li.now i{box-shadow:0 0 0 2px var(--flame)}
 .dmore > summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
 .dmore > summary::-webkit-details-marker{display:none}
+.xmore{margin-top:10px} .xmore > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:9px;width:max-content;max-width:100%;padding:4px 0}
+.xmore > summary::-webkit-details-marker{display:none}
+.xmore > summary::before{content:"";flex:none;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform .15s}
+.xmore[open] > summary::before{transform:rotate(45deg) translate(-2px,-2px)}
 .dmore > summary::after{content:"";flex:none;width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translateY(-3px);transition:transform .15s}
 .dmore[open] > summary::after{transform:rotate(225deg) translateY(-1px)}
 .dmore > summary > span{display:grid;gap:2px} .dmore > summary b{font-size:14.5px} .dmore > summary span span{font-size:13px;color:var(--muted)}
@@ -432,7 +452,8 @@ p{margin:0}
 .sbks{display:flex;flex-wrap:wrap;gap:6px}
 .sbks .sbk{cursor:pointer;display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:13.5px;padding:6px 10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px}
 .sbks .sbk:hover{border-color:var(--accent)} .sbks .sbk svg{width:18px;height:18px}
-.sbfrom{display:grid;gap:8px} .sbfpos{display:grid;grid-template-columns:84px minmax(0,1fr);gap:12px;align-items:center}
+.sbwhere{display:flex;align-items:center;justify-content:space-between;gap:10px 14px;flex-wrap:wrap;margin-top:12px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)} .sbwhere .lesson-actions{margin:0}
+.sbfpos{display:grid;grid-template-columns:60px minmax(0,1fr);gap:12px;align-items:center;flex:1 1 230px;min-width:0} .sbfpos.one{grid-template-columns:minmax(0,1fr)}
 .sbfpos b{display:block;font-size:14px} .sbfpos span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
 .slips{display:grid;gap:10px}
 .slipc{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;align-items:center;background:var(--surface);border-radius:4px;padding:8px}
@@ -777,7 +798,7 @@ const OPENINGS_RAW = /*__OPENINGS__*/'';
 const BOOKS = {w: DATA_W, b: DATA_B};
 const SIDE_KEY = 'playbook-side';
 let SIDE = 'w', DATA, N, LINES, LESSONS, PARTS, GAMES, CHAPTERS, E4, REPN, ODDS_ROOT, ME, MYC, OPP, FLIP, LESSON_ORDER, linesByNode, DRILLABLE, DRILLSET;
-const _reach = new Map(), _sbl = new Map(); let _anc = {};
+const _reach = new Map(), _sbl = new Map(), _mk = new Map(); let _anc = {};
 function drillableOf(D){ const les = new Set(D.lessons.map(l => l.id)), me = D.side === 'b' ? 0 : 1;
   return D.lines.filter(l => les.has(l.lesson) && !l.n.some(i => (D.nodes[i].g || []).includes('warn') && D.nodes[i].w === me)).map(l => l.id); }
 // Systems. A slot is one decision ("what do I play against the e-pawn?") and a pack is one answer to it; a player has one
@@ -820,7 +841,7 @@ function loadBook(side){
 // whose pieces you move and which way the board faces; a threat puzzle can face the other way from the loaded book
 function setPerspective(side){
   ME = side === 'w' ? 1 : 0; FLIP = side === 'b'; MYC = side === 'w' ? 'White' : 'Black'; OPP = side === 'w' ? 'Black' : 'White';
-  TAGNAMES.best = OPP + "'s best";
+  TAGNAMES.best = OPP + "'s best"; _mk.clear();          // the marks are read from this side of the board
 }
 const isMine = nd => nd.w === ME;
 const isMyPiece = p => !!p && (ME === 1 ? p === p.toUpperCase() : p === p.toLowerCase());
@@ -907,10 +928,90 @@ function boardSVGInner(fen, o){
   for (const d of (o.dots || [])){ const [x, y] = sqxy(sqi(d)); s += a[sqi(d)] ? `<circle cx="${x+50}" cy="${y+50}" r="44" class="capring"/>` : `<circle cx="${x+50}" cy="${y+50}" r="15" class="dot"/>`; }
   for (const ar of (o.arrows || [])){ s += arrowSVG(ar.slice(0, 2), ar.slice(2, 4), ar[4], o.mini ? 22 : 17, ''); }
   if (o.hint){ s += arrowSVG(o.hint.slice(0, 2), o.hint.slice(2, 4), 'g', o.mini ? 22 : 17, 'hint'); }
+  for (const [sq, n] of (o.nums || [])){ const [x, y] = sqxy(sqi(sq)); s += `<g class="onum" transform="translate(${x + 17} ${y + 83})"><circle r="14"/><text y="6" text-anchor="middle">${n}</text></g>`; }
+  if (o.mark && !o.mini){ const [x, y] = sqxy(sqi(o.mark.sq)); s += `<g class="mkb mk-${o.mark.k}" transform="translate(${x + 82} ${y + 18})"><circle r="15.5"/><g>${MARK_GLYPH[o.mark.k]}</g></g>`; }
   return s + '</svg>';
 }
+/* ---- move marks: what the other side's move gave away, read from the engine numbers the build stored on every
+   position, and your own key moves. The app's own shapes and colours: a key, a wave, a cross, two crosses. */
+function cpOf(e){ return typeof e === 'number' ? e : e === '#W' ? 3000 : e === '#B' ? -3000 : e === 'M0' || e == null ? 0 : (parseInt(String(e).slice(1), 10) > 0 ? 2000 : -2000); }
+const shareOf = e => 1 / (1 + Math.pow(10, -Math.max(-1500, Math.min(1500, cpOf(e))) / 400));      // White's share of the point
+/* Marks on the moves of a line. The other side's moves are judged by what they hand you: the share of the point the engine
+   gives you after the move against before it (a pawn matters less when the game is already won), a move that walks into a
+   forced mate, and what the book's own notes call a mistake or a blunder. Yours get one mark, the key move: the answer
+   that makes a mistake or a blunder cost. A move of yours the book shows as one to avoid reads as a mistake. */
+const MARKS = {key: ['Key move', 'It makes the mistake cost'], slip: ['Inaccuracy', 'A better move was there'], mistake: ['Mistake', 'It hands you the better game'], blunder: ['Blunder', 'It should lose']};
+const MARK_BY = [null, 'slip', 'mistake', 'blunder'];
+function markOf(idx){
+  if (_mk.has(idx)) return _mk.get(idx);
+  const nd = N[idx]; let r = null;
+  if (idx && nd){
+    const g = nd.g || [], p = N[nd.p];
+    if (isMine(nd)){
+      // the answer to a mistake or a blunder, and to any move the book's own notes call a mistake, however small the engine makes it
+      const was = p && nd.p ? markOf(nd.p) : null, told = was && (p.g || []).some(t => t === 'mistake' || t === 'blunder');
+      r = g.includes('warn') || g.includes('blunder') ? (g.includes('blunder') ? 'blunder' : 'mistake') : g.includes('mistake') ? 'slip' : was === 'mistake' || was === 'blunder' || told ? 'key' : null;
+    } else {
+      let lvl = g.includes('blunder') ? 3 : g.includes('mistake') ? 1 : 0;
+      if (p && nd.e !== undefined && p.e !== undefined){
+        const sg = ME === 1 ? 1 : -1, give = (shareOf(nd.e) - shareOf(p.e)) * sg;      // how much of the point the move handed you
+        const mate = e => typeof e === 'string' && cpOf(e) * sg >= 2000;
+        lvl = Math.max(lvl, give >= .28 || (mate(nd.e) && !mate(p.e)) ? 3 : give >= .16 ? 2 : give >= .09 ? 1 : 0);
+      }
+      r = MARK_BY[lvl];
+    }
+  }
+  _mk.set(idx, r); return r;
+}
+// what the mark says in a sentence, for the move card
+function markWords(idx, k){
+  const nd = N[idx];
+  if (k === 'key') return `It makes the ${{blunder: 'blunder', mistake: 'mistake', slip: 'inaccuracy'}[markOf(nd.p)] || 'mistake'} cost`;
+  if (isMine(nd)) return (nd.g || []).includes('warn') ? 'A move to avoid: it is here so you know why' : k === 'blunder' ? 'This is the move to take back' : 'A better move was there';
+  return MARKS[k][1];
+}
+const MARK_GLYPH = {key: '<circle cx="-4.6" cy="0" r="3.9"/><path d="M-.7 0H9.4M6 0v4M9.4 0v3.2"/>', slip: '<path d="M-7.5 1.6q3.75-6.4 7.5 0t7.5 0"/>', mistake: '<path d="M-5.2-5.2L5.2 5.2M5.2-5.2L-5.2 5.2"/>',
+  blunder: '<path d="M-8.6-4.6l5.6 9.2m0-9.2l-5.6 9.2M3-4.6l5.6 9.2m0-9.2L3 4.6"/>'};
+const markIcon = k => `<svg class="mki mk-${k}" viewBox="-17 -17 34 34" role="img" aria-label="${MARKS[k][0]}"><title>${MARKS[k][0]}</title><circle r="15.5"/><g>${MARK_GLYPH[k]}</g></svg>`;
+const markChip = k => `<span class="mkc mk-${k}">${markIcon(k)}${MARKS[k][0]}</span>`;
+const markLegend = () => `<p class="mklegend">${['key', 'slip', 'mistake', 'blunder'].map(k => `<span>${markIcon(k)}${MARKS[k][0]}</span>`).join('')}</p>`;
+/* ---- your moves in order: a strip under the board in a lesson. The opening's main line is the order to know; a move
+   that changes places with another, or that the main line doesn't have, is ringed and named. */
+function myMoves(line){ const o = []; for (let k = 1; k < line.n.length; k++){ const nd = N[line.n[k]]; if (isMine(nd)) o.push({k, u: nd.u, nd}); } return o; }
+function orderOf(line){
+  const les = LESSONS[line.lesson], C = les && chapterOf(les), ref = C && C.first && DATA.lines.find(l => l.lesson === C.first && l.main);
+  const mine = myMoves(line); if (!ref || ref.id === line.id) return {mine, ref: null, diff: [], shared: mine.length};
+  const R = myMoves(ref).map(m => m.u), at = mine.map(m => R.indexOf(m.u)), sh = at.map((x, i) => [x, i]).filter(q => q[0] >= 0), n = sh.length;
+  // the shared moves that keep the main line's order (the longest run that only goes up); the rest have changed places
+  const keep = new Set(), len = Array(n).fill(1), prev = Array(n).fill(-1); let best = -1;
+  for (let i = 0; i < n; i++){ for (let j = 0; j < i; j++) if (sh[j][0] < sh[i][0] && len[j] + 1 > len[i]){ len[i] = len[j] + 1; prev[i] = j; } if (best < 0 || len[i] > len[best]) best = i; }
+  for (let i = best; i >= 0; i = prev[i]) keep.add(sh[i][1]);
+  const lastShared = n ? sh[n - 1][1] : -1, diff = [];
+  if (n >= 3) mine.forEach((m, i) => { m.was = at[i]; if (at[i] >= 0 && !keep.has(i)) m.odd = 'swap'; else if (at[i] < 0 && i < lastShared) m.odd = 'new'; if (m.odd) diff.push(m); });
+  return {mine, ref, diff, shared: n};
+}
+// a move as a picture: the board from your side, the square the piece left and the one it lands on. No names needed.
+function moveMap(u){
+  const sq = q => { let f = q.charCodeAt(0) - 97, r = +q[1] - 1; if (FLIP){ f = 7 - f; r = 7 - r; } return [f * 4 + 2, (7 - r) * 4 + 2]; };
+  const [x1, y1] = sq(u.slice(0, 2)), [x2, y2] = sq(u.slice(2, 4));
+  return `<svg class="omap" viewBox="0 0 32 32" aria-hidden="true"><rect class="omb" width="32" height="32" rx="2.5"/><path class="omg" d="M0 16H32M16 0V32"/><line class="oml" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/><circle class="omf" cx="${x1}" cy="${y1}" r="1.7"/><circle class="omt" cx="${x2}" cy="${y2}" r="2.7"/></svg>`;
+}
+function orderStripHTML(line, i){
+  const O = orderOf(line); if (O.mine.length < 2) return '';
+  const tok = (m, j, cls, tag) => `<${tag} class="otok ${cls} ${m.odd ? 'odd' : ''}" ${tag === 'button' ? `type="button" data-step="${m.k}" aria-label="Your move ${j + 1}: ${esc(m.nd.l)}"` : ''} title="${esc(m.nd.l)}"><span class="on">${j + 1}</span>${pieceIcon(m.nd.pc, m.nd.w === 1)}${moveMap(m.u)}</${tag}>`;
+  const toks = O.mine.map((m, j) => tok(m, j, m.k === i ? 'cur' : m.k < i ? 'done' : '', 'button')).join('');
+  const two = O.ref && O.shared >= 3 && O.diff.length > 0, moved = new Set(O.diff.filter(m => m.odd === 'swap').map(m => m.u));
+  const ref = two ? myMoves(O.ref).slice(0, Math.max(O.mine.length, 6)).map((m, j) => tok(Object.assign(m, {odd: moved.has(m.u) ? 'swap' : null}), j, 'done', 'span')).join('') : '';
+  const cap = !O.ref ? 'This is the order to know for this opening' : O.shared < 3 ? 'This line goes its own way early' : !O.diff.length ? 'The same order as the main line'
+    : O.diff.slice(0, 2).map(m => `<b>${esc(m.nd.l)}</b> ${m.odd === 'new' ? 'is not in the main line' : O.mine.indexOf(m) < m.was ? 'comes earlier than in the main line' : 'comes later than in the main line'}`).join(' · ');
+  return `<div class="ostrip"><div class="ohead"><p class="kicker">Your moves, in order</p><button class="eswitch" id="cNums" type="button" aria-pressed="${!!S.onums}"><i aria-hidden="true"></i>Numbers on the board</button></div>
+    ${two ? `<p class="olab">The main line</p><div class="otoks ref">${ref}</div><p class="olab">This line</p>` : ''}<div class="otoks">${toks}</div><p class="ocap">${cap}</p></div>`;
+}
+// where each of your pieces stands, with the number of the move that put it there
+function orderNums(line, i){ const at = {}; let j = 0; for (let k = 1; k <= i; k++){ const nd = N[line.n[k]], f = nd.u.slice(0, 2), t = nd.u.slice(2, 4); if (isMine(nd)){ delete at[f]; at[t] = ++j; } else delete at[t]; } return Object.entries(at); }
 function nodeBoardOpts(idx, extra = {}){
-  const nd = N[idx], o = {coords: true};
+  const nd = N[idx], o = {coords: true}, mk = markOf(idx);
+  if (mk && nd.u) o.mark = {sq: nd.u.slice(2, 4), k: mk};
   if (nd.u) o.last = [nd.u.slice(0, 2), nd.u.slice(2, 4)];
   if (nd.a) o.arrows = nd.a.slice();
   if (nd.c) o.circles = nd.c.slice();
@@ -1689,7 +1790,8 @@ function heroReplay(){
 function sideBadge(nd){ return isMine(nd) ? '<span class="side you">You</span>' : `<span class="side blk">${OPP}</span>`; }
 const TAGNAMES = {key: 'Key move', best: "Black's best", mistake: 'Inaccuracy', blunder: 'Blunder', trap: 'Trap', mate: 'Checkmate', draw: 'Equal', fix: 'Changed from study', swap: 'Fixes a habit', new: 'Not in your study', game: 'From your games', warn: 'Avoid', missed: 'You missed this', good: 'Good move'};
 // "new" and "fix" were about the study the first book came from: they mean nothing in your book, so they are not shown
-const QUIET_TAGS = new Set(['new', 'fix']);
+// ("key" sat on half of the book's moves; the key move is a mark now: markOf)
+const QUIET_TAGS = new Set(['new', 'fix', 'key']);
 function tagChips(tags){ return (tags || []).filter(t => !QUIET_TAGS.has(t)).map(t => `<span class="chip ${t}">${esc(TAGNAMES[t] || t)}</span>`).join(''); }
 const noStudy = t => ((t || '').match(/[^.!?]+[.!?]+["')]*\s*|[^.!?]+$/g) || []).filter(x => !/^\s*(From|Not in) your study\b/i.test(x)).join('').trim();
 function optionsFor(idx, curLine){
@@ -1739,9 +1841,10 @@ function renderStudy(){
   let mcard;
   if (S.i === 0){ mcard = `<div class="mcard empty"><h3>Starting position</h3><p class="note">Press the forward arrow (or the → key) to step through the moves.</p></div>`; }
   else {
-    mcard = `<div class="mcard"><div class="who">${sideBadge(nd)}<span class="stepno">Move ${moveNo(p)}</span></div>
-      <h3>${pieceIcon(nd.pc, nd.w === 1)}<span>${esc(nd.l)}</span></h3>
-      ${nd.t ? bullets(nd.t, 'note') : ''}${(xs => xs.length ? `<div class="mideas"><p class="ideak">On the board</p>${bullets(xs, 'ideas')}</div>` : '')(ideasBeyond(idx))}${nd.g ? `<div class="chips">${tagChips(nd.g)}</div>` : ''}</div>`;
+    const mk = markOf(idx), said = mk ? ['mistake', 'blunder', 'warn'] : [];
+    mcard = `<div class="mcard"><div class="who">${sideBadge(nd)}<span class="stepno">Move ${moveNo(p)}</span>${mk ? markChip(mk) : ''}</div>
+      <h3>${pieceIcon(nd.pc, nd.w === 1)}<span>${esc(nd.l)}</span></h3>${mk ? `<p class="mkw">${markWords(idx, mk)}</p>` : ''}
+      ${nd.t ? bullets(nd.t, 'note') : ''}${(xs => xs.length ? `<div class="mideas"><p class="ideak">On the board</p>${bullets(xs, 'ideas')}</div>` : '')(ideasBeyond(idx))}${(c => c ? `<div class="chips">${c}</div>` : '')(tagChips((nd.g || []).filter(t => !said.includes(t))))}</div>`;
   }
   // options at this node
   const opts = optionsFor(idx, S.line);
@@ -1765,7 +1868,7 @@ function renderStudy(){
   for (let k = 1; k < line.n.length; k++){
     if (k <= preEnd && !S.showPre) continue;
     const m = N[line.n[k]], pk = k;
-    rows.push(`<li><button class="trow ${isMine(m) ? 'you' : 'blk'} ${k === S.i ? 'cur' : ''}" data-step="${k}"><span class="n">${moveNo(pk)}${m.w === 1 ? '' : '…'}</span>${pieceIcon(m.pc, m.w === 1)}<span class="lbl">${esc(m.l)}</span><span class="tg">${(m.g || []).filter(t => t !== 'game').slice(0, 2).map(t => `<i class="${t}" title="${esc(TAGNAMES[t])}"></i>`).join('')}</span></button></li>`);
+    rows.push(`<li><button class="trow ${isMine(m) ? 'you' : 'blk'} ${k === S.i ? 'cur' : ''}" data-step="${k}"><span class="n">${moveNo(pk)}${m.w === 1 ? '' : '…'}</span>${pieceIcon(m.pc, m.w === 1)}<span class="lbl">${esc(m.l)}</span><span class="tg">${(q => (q ? markIcon(q) : '') + (m.g || []).filter(t => t !== 'game' && !QUIET_TAGS.has(t) && !(q && ['mistake', 'blunder', 'warn'].includes(t))).slice(0, 2).map(t => `<i class="${t}" title="${esc(TAGNAMES[t])}"></i>`).join(''))(markOf(line.n[k]))}</span></button></li>`);
   }
   const endIdx = line.n[line.n.length - 1], ei = evalInfo(N[endIdx].e);
   const outcome = les ? `<div class="outcome"><span class="kicker">Where it ends</span><b>${esc(LINES[S.line].main ? (les.outcome || (ei && ei.txt)) : (ei ? ei.txt : ''))}</b></div>` : '';
@@ -1789,7 +1892,7 @@ function renderStudy(){
   <div class="sgrid study">
     <header class="lhead"><div class="chips">${chips}</div><h2>${esc(title)}</h2>${les ? `<p class="sub">${esc(sub)}</p>` : bullets(sub, 'sub')}${why ? bullets(why, 'why') : ''}</header>
     <div class="bcol">
-      <div class="board-wrap">${evalBarHTML(idx, 'sbar')}<div class="board" id="sb">${boardSVG(nd.f, nodeBoardOpts(idx, {aria: nd.l}))}</div></div>
+      <div class="board-wrap">${evalBarHTML(idx, 'sbar')}<div class="board" id="sb">${boardSVG(nd.f, nodeBoardOpts(idx, {aria: nd.l, nums: les && S.onums ? orderNums(line, S.i) : null}))}</div></div>
       <div class="controls">
         <button class="ctl" id="cFirst" aria-label="To the start" ${S.i === 0 ? 'disabled' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5v14M18 6l-8 6 8 6V6z"/></svg></button>
         <button class="ctl" id="cPrev" aria-label="Back one move" ${S.i === 0 ? 'disabled' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -1798,15 +1901,17 @@ function renderStudy(){
         <button class="ctl" id="cLast" aria-label="To the end" ${S.i >= line.n.length - 1 ? 'disabled' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 5v14M6 6l8 6-8 6V6z"/></svg></button>
       </div>
       <div class="engrow"><button class="eswitch" id="cEng" type="button" aria-pressed="${engOn}"><i aria-hidden="true"></i>Engine</button><p class="evaltext" id="stext">${curEval ? `Engine: <b>${esc(curEval.txt)}</b>${curEval.num ? ` <span class="tnum" title="${NUMHINT}">(${curEval.num})</span>` : ''}` : ''}</p></div>
+      ${les ? orderStripHTML(line, S.i) : ''}
     </div>
     <div class="ccol">
       ${opnHTML(Openings.ofNode(idx))}${mcard}${engOn ? '<div id="engcard"></div>' : ''}${optHTML}${linesHTML}
-      <ol class="timeline" aria-label="Moves in this line">${rows.join('')}</ol>
+      <ol class="timeline" aria-label="Moves in this line">${rows.join('')}</ol>${line.n.some((x, k) => k && markOf(x)) ? markLegend() : ''}
       ${outcome}${plan ? planCardHTML(plan, planKick(S.line)) : ''}
       <div class="lesson-actions">${unitBtns}${drillBtn}${fromBtn}${lessonBtn}<button class="btn ${lineEnd && !unitBtns && !drillBtn ? 'primary' : 'ghost'}" id="exHere">${lineEnd ? 'Play on from here' : 'Explore from here'}</button></div>
     </div></div>`;
   const svg = document.querySelector('#sb svg');
   if (S.anim){ const a = S.anim; S.anim = null; animateMove(svg, a.u, a.meta, a.back); }
+  const cn = document.getElementById('cNums'); if (cn) cn.onclick = () => { S.onums = !S.onums; render(); };
   document.getElementById('cFirst').onclick = () => step(-999);
   document.getElementById('cPrev').onclick = () => step(-1);
   document.getElementById('cNext').onclick = () => step(1);
@@ -1889,7 +1994,7 @@ function startDrillLine(id, why, unit, o = {}){
   const line = LINES[id];
   const s0 = o.from0 || S.dfilter.from === 'start' ? 0 : lineStart(id);
   if (!why && Prog.stale(id)) why = 'This line has changed since you last drilled it. If a move is new to you, two tries and the arrow shows it.';
-  S.drill = S.drillState = {kind: 'line', id, i: s0, s0, mistakes: 0, tries: 0, sel: null, busy: false, msg: why || '', state: 'play', hint: null, flash: null, unit: unit || null, daily: !!o.daily, tour: !!o.tour};
+  S.drill = S.drillState = {kind: 'line', id, i: s0, s0, mistakes: 0, tries: 0, sel: null, busy: false, msg: why || '', state: 'play', hint: null, flash: null, unit: unit || null, daily: !!o.daily, tour: !!o.tour, rv: o.rv || null};
   S.view = 'drill'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
   setTimeout(drillAdvance, 450);
 }
@@ -1933,6 +2038,11 @@ function drillAdvance(){
 }
 function expectedMove(){ const D = S.drill; if (D.kind === 'rv') return [D.moves[D.i]]; if (D.kind === 'puz') return DATA.puzzles[D.k].ok; if (D.kind === 'q'){ const it = D.items[D.k]; return it.ok || it.safe; } if (D.kind === 'sb') return sbMyKids(D.node).map(c => N[c].u); return [N[LINES[D.id].n[D.i + 1]].u]; }
 function legalFor(){ const D = S.drill; if (D.kind === 'rv') return Review.legal(D); if (D.kind === 'sbset') return sbLegal(D.node); if (D.kind === 'puz') return DATA.puzzles[D.k].legal; if (D.kind === 'q'){ const it = D.items[D.k]; return it.legal || DATA.legal[String(it.node)] || []; } return DATA.legal[String(dNode())] || []; }
+// how many of your moves later the line plays this move (0: it doesn't)
+function laterInLine(D, u){ const n = LINES[D.id].n; let c = 0; for (let k = D.i + 2; k < n.length; k++){ if (!isMine(N[n[k]])) continue; c++; if (N[n[k]].u === u) return c; } return 0; }
+const HOWMANY = ['', 'one move', 'two moves', 'three moves', 'four moves', 'five moves', 'six moves'];
+const movesLater = c => HOWMANY[c] || `${c} moves`;
+const earlyHTML = c => `<b>Right move, wrong moment.</b> In this line it comes ${movesLater(c)} later: something else has to happen first.`;
 function tryMove(from, to){
   const D = S.drill; if (!D || D.busy || D.state !== 'play') return;
   let u = from + to;
@@ -1955,12 +2065,12 @@ function tryMove(from, to){
       D.state = 'done'; const P = DATA.puzzles[D.k]; if (D.tries === 0) Prog.puz(P.id, true);
       const fen = puzAfter(dNode(), u);
       D.after = {fen, u}; D.flash = {sq: to, ok: true}; D.msg = '';
-      renderDrillBoard({u, meta: {}}); renderDrillPanel(); return;
+      renderDrillBoard(); renderDrillPanel(); return;
     }
     D.i++; D.flash = {sq: u.slice(2, 4), ok: true}; D.hint = null; D.said = null;
     const ni = LINES[D.id].n[D.i], nd = N[ni];
     D.msg = ''; D.feed = [`<span class="mfeed"><b>${esc(nd.l)}.</b> ${esc(moveWhy(ni, 1)[0] || '')}</span>`];
-    renderDrillBoard({u, meta: nd}); renderDrillPanel();
+    renderDrillBoard(); renderDrillPanel();                    // your own move snaps into place; only the other side's slides
     D.busy = true; setTimeout(() => { if (S.drill === D){ D.flash = null; drillAdvance(); } }, 700);
   } else if (D.guided){
     D.flash = {sq: to, ok: false}; D.msg = 'Not that one: follow the green arrow.';
@@ -1974,7 +2084,10 @@ function tryMove(from, to){
       // what the move tried allows, when it loses something: kept for the coach's note at the end of the line
       const p = punishOf(nodeFen(dNode()), u), ni = LINES[D.id].n[D.i + 1];
       if (p && D.tries === 1) (D.slipWhy || (D.slipWhy = {}))[D.i + 1] = p.lines;
-      D.msg = (D.tries >= 2 ? TXT[SIDE].miss2 : TXT[SIDE].miss) + (p ? punishHTML(p) : '') + (D.tries >= 2 ? whyHTML(ni) : '');
+      // a move of this very line, played before its turn: the order slipped, not the move. Saying so gives nothing away.
+      const early = laterInLine(D, u);
+      if (early && D.tries === 1) (D.slipOrd || (D.slipOrd = {}))[D.i + 1] = early;
+      D.msg = (D.tries >= 2 ? TXT[SIDE].miss2 : early ? earlyHTML(early) : TXT[SIDE].miss) + (p ? punishHTML(p) : '') + (D.tries >= 2 ? whyHTML(ni) : '');
     }
     if (D.tries >= 2) D.hint = exp[0];
     renderDrillBoard(); renderDrillPanel();
@@ -2033,6 +2146,7 @@ function drillPanelHTML(){
     const acts = CU ? (!clean ? `<button class="btn primary" id="dAgain">Again</button><button class="btn" data-unit="${CU.id}">Back to the ${uword(CU)}</button>`
         : `${un ? `<button class="btn primary" id="dUnitNext">${esc(un.label)}</button>` : nxU ? `<button class="btn primary" id="dNextU">Next line in this ${uword(CU)}</button>` : ''}<button class="btn ${un || nxU ? '' : 'primary'}" data-unit="${CU.id}">Back to the ${uword(CU)}</button><button class="btn" id="dAgain">Again</button>`)
       : D.daily ? (left ? `<button class="btn primary" id="dDaily">Next line · ${dk + 1} of ${DAILY}</button><button class="btn" id="dAgain">Again</button>` : `<button class="btn primary" id="dDaily">Keep going</button><button class="btn" id="dToday">Done for today</button>`)
+      : D.rv ? `<button class="btn primary" id="${clean ? 'dRvBack' : 'dAgain'}">${clean ? 'Back to your games' : 'Again'}</button><button class="btn" id="${clean ? 'dAgain' : 'dRvBack'}">${clean ? 'Again' : 'Back to your games'}</button><button class="btn ghost" data-line="${D.id}">Study it</button>`
       : `<button class="btn primary" id="dNext">Next line</button><button class="btn" id="dAgain">Again</button><button class="btn ghost" data-line="${D.id}">Study it</button>`;
     const pl = planOf(D.id);
     const cnote = CU ? `${CU.lines.filter(lineClean).length} of ${CU.lines.length} lines in this ${uword(CU)} clean` : D.daily ? (left ? `Today: ${dk} of ${DAILY}` : `That's today's five: ${Daily.streak()} ${Daily.streak() === 1 ? 'day' : 'days'} in a row`) : '';
@@ -2073,7 +2187,8 @@ function wireDrillPanel(){
   const D = S.drill;
   if (D && D.kind === 'rv') return Review.wirePanel();
   const nx = document.getElementById('dNext'); if (nx) nx.onclick = () => { const s = nextSmart(D.id); if (s){ startDrillLine(s.id); S.drill.msgWhy = s.why; renderDrillPanel(); } };
-  const ag = document.getElementById('dAgain'); if (ag) ag.onclick = () => startDrillLine(D.id, '', D.unit, {from0: D.s0 === 0, daily: D.daily});
+  const rb = document.getElementById('dRvBack'); if (rb) rb.onclick = () => Review.back();
+  const ag = document.getElementById('dAgain'); if (ag) ag.onclick = () => startDrillLine(D.id, '', D.unit, {from0: D.s0 === 0, daily: D.daily, rv: D.rv});
   const dd = document.getElementById('dDaily'); if (dd) dd.onclick = dailyGo;
   const dt = document.getElementById('dToday'); if (dt) dt.onclick = () => { S.drill = S.drillState = null; renderDrill(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'}); };
   const nu = document.getElementById('dNextU'); if (nu) nu.onclick = () => { const s = unitNextLine(UNIT[D.unit], D.id); if (s) startDrillLine(s, '', D.unit); };
@@ -2145,6 +2260,7 @@ function renderDrill(){
   const rc = document.getElementById('rvCrumb'); if (rc) rc.onclick = () => Review.back();
   const dg = document.getElementById('dailyGo'); if (dg) dg.onclick = dailyGo;
   const rl = document.getElementById('rvLast'); if (rl) rl.onclick = () => { S.gseg = 'last'; go('games'); };
+  const rdb = document.getElementById('rvDrillB'); if (rdb) rdb.onclick = () => Review.drillBook(rdb.dataset.id);
   const dm = view.querySelector('.dmore'); if (dm) dm.ontoggle = () => { S.dmore = dm.open; };
   document.getElementById('smart').onclick = () => { const s = nextSmart(); if (s){ startDrillLine(s.id); S.drill.msgWhy = s.why; renderDrillPanel(); } };
   const sh = document.getElementById('shots'); if (sh) sh.onclick = () => startPuzzle(0);
@@ -2294,7 +2410,7 @@ function sbTry(u, to){
     const nd = N[ok]; D.msg = `<b>${esc(nd.l)}.</b> ${esc(moveWhy(ok, 1)[0] || '')}`;
     D.busy = true;
     D.node = ok; D.hist.push(ok);
-    renderDrillBoard({u, meta: nd});
+    renderDrillBoard();
     const t = ++D.tick; setTimeout(() => { if (S.drill === D && D.tick === t){ D.flash = null; sbContinue(); } }, 380);
     renderSbPanel();
     return;
@@ -2317,7 +2433,7 @@ function sbSetupStart(){
 }
 function sbSetGo(c){
   const D = S.drill; if (D.fwd[D.fwd.length - 1] === c) D.fwd.pop(); else D.fwd = [];      // the same move again keeps what came after it
-  D.node = c; D.hist.push(c); D.msg = ''; D.flash = null; D.sel = null; renderDrillBoard({u: N[c].u, meta: N[c]}); renderSbPanel();
+  D.node = c; D.hist.push(c); D.msg = ''; D.flash = null; D.sel = null; renderDrillBoard(); renderSbPanel();       // no slide while setting up: the piece is there at once
 }
 function sbSetTry(u, to){
   const D = S.drill; D.sel = null;
@@ -2333,7 +2449,7 @@ function sbSetAll(){ const D = S.drill; return D.hist.concat(D.fwd.slice().rever
 function sbSetJump(k){
   const D = S.drill, all = sbSetAll(), was = D.hist.length - 1; k = Math.max(0, Math.min(all.length - 1, k)); if (k === was) return;
   D.hist = all.slice(0, k + 1); D.fwd = all.slice(k + 1).reverse(); D.node = all[k]; D.msg = ''; D.sel = null; D.flash = null;
-  renderDrillBoard(k === was + 1 ? {u: N[all[k]].u, meta: N[all[k]]} : undefined); renderSbPanel();
+  renderDrillBoard(); renderSbPanel();
 }
 function sbSetStep(d){ sbSetJump(d <= -999 ? 0 : d >= 999 ? 1e9 : S.drill.hist.length - 1 + d); }
 function sbSetBack(){ sbSetStep(-1); }
@@ -2387,9 +2503,10 @@ function sbFeed(){
   for (let k = 1; k < D.hist.length; k++){
     const i = D.hist[k], m = N[i], p = k;
     const slip = !!D.slipAt && D.slipAt.has(D.hist[k - 1]) && isMine(m), pre = D.kind === 'sb' && D.from && k <= D.hist.indexOf(D.from);
-    rows.push(`<li class="${isMine(m) ? 'you' : 'blk'} ${slip ? 'slip' : ''} ${pre ? 'pre' : ''} ${k === D.hist.length - 1 ? 'last' : ''}"><span class="n">${moveNo(p)}${m.w === 1 ? '' : '…'}</span>${pieceIcon(m.pc, m.w === 1)}<span class="fl">${esc(m.l)}</span><span class="fq">${!isMine(m) && m.q ? pctTxt(m.q) : slip ? 'slip' : ''}</span></li>`);
+    rows.push(`<li class="${isMine(m) ? 'you' : 'blk'} ${slip ? 'slip' : ''} ${pre ? 'pre' : ''} ${k === D.hist.length - 1 ? 'last' : ''}"><span class="n">${moveNo(p)}${m.w === 1 ? '' : '…'}</span>${pieceIcon(m.pc, m.w === 1)}<span class="fl">${esc(m.l)}</span><span class="fq">${(q => q && D.state === 'done' ? markIcon(q) : '')(markOf(i))}${!isMine(m) && m.q ? pctTxt(m.q) : slip ? 'slip' : ''}</span></li>`);
   }
-  return rows.length ? `<ol class="feed" id="sbfeed" aria-label="Moves this game">${rows.join('')}</ol>` : '';
+  // the marks come with the finished game only: during one they would say where to look
+  return rows.length ? `<ol class="feed" id="sbfeed" aria-label="Moves this game">${rows.join('')}</ol>${D.state === 'done' && D.hist.some((i, k) => k && markOf(i)) ? markLegend() : ''}` : '';
 }
 function sbReport(){
   const D = S.drill, lid = D.line, L = lid ? lessonOf(lid) : null, C = L ? chapterOf(L) : null;
@@ -2424,7 +2541,7 @@ function sbPanelHTML(){
   const bnode = lastBlack ? N[lastBlack.pick] : null;
   const black = bnode ? `<div class="mcard"><div class="who"><span class="side blk">${OPP}</span><span class="stepno">${pctTxt(bnode.q || 0)} of ${lastBlack.at === ODDS_ROOT ? 'your games' : 'players at your level'} go this way</span></div>
       <h3>${pieceIcon(bnode.pc, bnode.w === 1)}<span>${esc(bnode.l)}</span></h3>${bnode.t ? bullets(bnode.t, 'note') : ''}${bnode.g ? `<div class="chips">${tagChips(bnode.g)}</div>` : ''}
-      ${lastBlack.kids.length > 1 ? `<details style="margin-top:10px"><summary class="kicker" style="cursor:pointer">What else ${OPP} could play here</summary><div style="margin-top:8px">${oddsRows(lastBlack)}</div></details>` : ''}</div>` : '';
+      ${lastBlack.kids.length > 1 ? `<details class="xmore" id="sbElse" ${S.sbElse ? 'open' : ''}><summary class="kicker">What else ${OPP} could play here</summary><div style="margin-top:8px">${oddsRows(lastBlack)}</div></details>` : ''}</div>` : '';
   const CU = D.scope.startsWith('u:') ? UNIT[D.scope.slice(2)] : null, cs = CU ? Math.min(up(CU.id).spar || 0, SPAR) : 0;
   const strip = CU ? `<div class="sbcourse"><div><p class="kicker">${CU.deep ? `Deep dive · ${esc(DEEPOF[CU.deep].title)}` : 'Course'} · ${unitNo(CU)} · ${esc(CU.title)}</p>
       <p class="sbcl"><span class="pdots" aria-hidden="true">${Array.from({length: SPAR}, (_, k) => `<i class="${k < cs ? 'on' : ''}"></i>`).join('')}</span>${cs} of ${SPAR} clean practice games${cs >= SPAR ? ': this step is done' : ''}</p></div>
@@ -2443,6 +2560,7 @@ function renderSbPanel(){
   const f = document.getElementById('sbfeed'); if (f) f.scrollTop = f.scrollHeight;
 }
 function wireSbPanel(){
+  const el = document.getElementById('sbElse'); if (el) el.ontoggle = () => { S.sbElse = el.open; };
   const g = document.getElementById('sbGo'); if (g) g.onclick = () => sbStart();
   const a = document.getElementById('sbAgain'); if (a) a.onclick = () => { const D = S.drill; if (D && D.kind === 'sb' && D.scope.startsWith('u:')) sbStart(D.scope, D.odds); else sbStart(); };
   const dr = document.getElementById('sbDrill'); if (dr && S.drill && S.drill.line) dr.onclick = () => startDrillLine(S.drill.line);
@@ -2454,21 +2572,27 @@ function wireSbPanel(){
   const ex = document.getElementById('sbExplore'); if (ex && S.drill) ex.onclick = () => { const D = S.drill, lid = D.line, L = lid ? lessonOf(lid) : null;
     exploreNode(D.node, {title: `Practice game · ${L ? L.title : 'end of your book'}`, plan: lid && planOf(lid) ? {side: SIDE, line: lid} : null}); };
 }
+// where games start, kept under the board so it is always in the same place
+function sbFromHTML(){
+  const D = S.drill; if ((D && D.kind === 'sbset') || (D && D.kind === 'sb' && D.scope.startsWith('u:'))) return '';
+  const f = sbFrom(), fl = f && N[f].u ? [N[f].u.slice(0, 2), N[f].u.slice(2, 4)] : null;
+  return `<div class="sbwhere">${f ? `<div class="sbfpos">${thumb(f, {coords: false, last: fl})}<div><b>Games start after move ${moveNo(ply(f))}: ${esc(N[f].l)}</b><span>Only the lines that go on from this position come up.</span></div></div>`
+      : '<div class="sbfpos one"><div><b>Games start from the first move</b><span>Or set up a position and practise only what follows it.</span></div></div>'}
+    <div class="lesson-actions"><button class="btn small" id="sbSetUp" type="button">${f ? 'Change the position' : 'Set up a position'}</button>${f ? '<button class="btn small ghost" id="sbFromClear" type="button">Start from move one</button>' : ''}</div></div>`;
+}
+const sbPool = () => { const f = sbFrom(); return f ? DRILLABLE.filter(id => LINES[id].n.includes(f)) : DRILLABLE.filter(id => inScopeLine(id, SBS.scope)); };
 function sbSideHTML(){
   const segBtn = (key, val, label) => `<button data-sbf="${key}:${val}" aria-pressed="${SBS[key] === val}">${label}</button>`;
   const ses = S.sbSession, all = Prog.d.sb;
-  const pool = DRILLABLE.filter(id => inScopeLine(id, SBS.scope)), seen = all ? pool.filter(id => all.seen[id]).length : 0;
   const D = S.drill, CU = D && D.kind === 'sb' && D.scope.startsWith('u:') ? UNIT[D.scope.slice(2)] : null;
   if (CU || (D && D.kind === 'sbset')) return '';
-  const f = sbFrom(), fl = f && N[f].u ? [N[f].u.slice(0, 2), N[f].u.slice(2, 4)] : null;
-  const from = `<div class="sbfrom"><p class="kicker" style="margin-bottom:6px">Start from</p>
-      ${f ? `<div class="sbfpos">${thumb(f, {coords: false, last: fl})}<div><b>After move ${moveNo(ply(f))}: ${esc(N[f].l)}</b><span>Only the lines that go on from this position come up.</span></div></div>` : '<p class="evaltext" style="text-align:left;margin:0">The first move</p>'}
-      <div class="lesson-actions"><button class="btn small" id="sbSetUp" type="button">${f ? 'Change the position' : 'Set up a position'}</button>${f ? '<button class="btn small ghost" id="sbFromClear" type="button">Start from move one</button>' : ''}</div></div>`;
-  return `<div class="dpanel">${from}
+  // the lines a game can end on with these settings, counted from the book on the page: never a number written down
+  const f = sbFrom(), pool = sbPool(), seen = all ? pool.filter(id => all.seen[id]).length : 0;
+  return `<div class="dpanel">
       ${f ? '' : `<div><p class="kicker" style="margin-bottom:6px">Openings</p><div class="seg">${segBtn('scope', 'all', 'Every opening')}${DATA.chapters.map(C => `<button data-sbf="pick:${C.id}" aria-pressed="${scopeChs(SBS.scope).includes(C.id)}">${esc(C.name)}</button>`).join('')}</div></div>`}
       <div><p class="kicker" style="margin-bottom:6px">${OPP}'s odds</p><div class="seg">${segBtn('odds', 'real', 'Like real games')}${segBtn('odds', 'even', 'Even spread')}${segBtn('odds', 'weak', 'My weak spots')}</div>
       <p class="evaltext" style="text-align:left;margin-top:8px">${SBS.odds === 'real' ? 'Common replies come up often and rare ones rarely, as in real games.' : SBS.odds === 'even' ? 'Every line in your book is equally likely, so rare branches get their turn.' : 'Lines you haven\'t played, are due, or slipped on come up more.'}</p>${sbPendingHTML()}</div>
-      <div class="queue"><div><b class="tnum">${ses ? ses.games : 0}</b><span>games this session</span></div><div><b class="tnum">${ses ? ses.slips : 0}</b><span>slips this session</span></div><div><b class="tnum">${seen}<small style="font-size:.5em;color:var(--muted)">/${pool.length}</small></b><span>lines met in the sandbox</span></div></div>
+      <div class="queue"><div><b class="tnum">${ses ? ses.games : 0}</b><span>games this session</span></div><div><b class="tnum">${ses ? ses.slips : 0}</b><span>slips this session</span></div><div><b class="tnum">${seen}<small style="font-size:.5em;color:var(--muted)">/${pool.length}</small></b><span>${f ? 'of the lines from this position met' : `of your ${MYC} lines met here`}</span></div></div>
     </div>`;
 }
 function sbPendingHTML(){
@@ -2480,7 +2604,7 @@ function sbPendingHTML(){
   const what = fNow !== fGame ? (fNow ? 'The new position starts with the next game.' : 'The next game starts from move one.') : sc ? `This game stays in ${nm(D.scope)}; ${nm(SBS.scope)} starts with the next one.` : 'The new odds start with the next game.';
   return `<div class="sbpend" role="status"><span>${esc(what)}</span><button class="btn small" id="sbNow">Start it now</button></div>`;
 }
-function renderSbSide(){ const el = document.getElementById('sbside'); if (el){ el.innerHTML = sbSideHTML(); wireSbSide(); } }
+function renderSbSide(){ const el = document.getElementById('sbside'), w = document.getElementById('sbwhere'); if (w) w.innerHTML = sbFromHTML(); if (el){ el.innerHTML = sbSideHTML(); wireSbSide(); } }
 function wireSbSide(){
   view.querySelectorAll('[data-sbf]').forEach(b => b.onclick = () => { const [k, v] = b.dataset.sbf.split(':'); if (k === 'pick') SBS.scope = scopeToggle(SBS.scope, v); else SBS[k] = v; sbSave(); renderSbSide(); if (!S.drill) renderSbPanel(); });
   const now = document.getElementById('sbNow'); if (now) now.onclick = () => { sbStart(); renderSbSide(); };
@@ -2491,7 +2615,7 @@ function renderSandbox(){
   const D = S.drill;
   view.innerHTML = `  <div class="sgrid">
     <div class="bcol"><div class="board ${D && D.state === 'play' ? 'input' : ''}" id="db">${D ? '' : boardSVG(N[0].f, {coords: true})}</div>
-      <div id="sbctl">${sbCtlHTML()}</div>
+      <div id="sbctl">${sbCtlHTML()}</div><div id="sbwhere">${sbFromHTML()}</div>
       ${D && D.kind === 'sb' && D.scope.startsWith('u:') ? `<button class="btn freeplay" id="sbFree"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M4 12h16M4 18h7"/><circle cx="17" cy="6" r="2.2"/><circle cx="14" cy="18" r="2.2"/></svg>Free play: pick your own openings</button>` : ''}</div>
     <div class="ccol"><div id="sbpanel">${sbPanelHTML()}</div><div id="sbside">${sbSideHTML()}</div></div>
   </div>`;
@@ -2883,7 +3007,7 @@ function quizTry(u, to){
     if (!threat){
       Q.view = applyMove(dFen(), u); Q.lastU = u; Q.arrows = null;
       Q.msg = `<b>${first ? 'Right' : 'That\'s it'}: ${esc(it.rule)}.</b> ${esc(it.note || '')}`;
-      renderDrillBoard({u, meta: {}});
+      renderDrillBoard();
     } else {
       const danger = it.threat || it.reply;
       Q.arrows = [u.slice(0, 4) + 'g'].concat(danger ? [danger.slice(0, 4) + 'r'] : []);
@@ -2907,7 +3031,7 @@ function quizTry(u, to){
   const r = it.refute[u], after = applyMove(dFen(), u), game = u === it.played;
   Q.state = 'refuted'; Q.busy = !!r; Q.view = after; Q.lastU = u; Q.flash = {sq: to, ok: false}; Q.arrows = null; Q.hint = null;
   Q.msg = game ? 'That\'s the move you played in the game.' : '';
-  renderDrillBoard({u, meta: {}}); renderQuizPanel();
+  renderDrillBoard(); renderQuizPanel();
   if (!r){ Q.busy = false; return; }
   setTimeout(() => {
     if (S.drill !== Q || Q.state !== 'refuted') return;
@@ -3472,7 +3596,7 @@ function exPush(u, byUser){
   const X = S.ex; if (!X) return;
   if (X.i < X.moves.length && X.moves[X.i] === u) X.i++;
   else { if (X.i < (X.base || 0)) X.base = 0; X.moves = X.moves.slice(0, X.i).concat([u]); X.i = X.moves.length; }
-  X.anim = u; X.sel = null; exSave();
+  X.anim = byUser ? null : u; X.sel = null; exSave();         // a move you make yourself lands at once; the engine's answer slides in
   if (byUser && X.answer && !exChess().game_over()){ X.busy = true; renderExplore(); exReply(); return; }
   renderExplore();
 }

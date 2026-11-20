@@ -25,17 +25,18 @@ const coachWho = () => COACHES.find(c => c.id === SET.who) || COACHES[0], coachN
 // two eyes for the characters that face you: round and looking at you, looking up when thinking, shut and smiling when pleased
 const eyes2 = (x1, x2, y, r, mood) => mood === 'cheer' ? `<path class="kn-line" d="M${x1 - r + 1} ${y + 1}q${r - 1}-${r} ${2 * r - 2} 0M${x2 - r + 1} ${y + 1}q${r - 1}-${r} ${2 * r - 2} 0"/>`
   : [x1, x2].map(x => `<circle class="kn-eye" cx="${x}" cy="${y}" r="${r}"/><circle class="kn-pupil" cx="${x + (mood === 'think' ? 1.1 : 0)}" cy="${y + (mood === 'think' ? -1.5 : .5)}" r="${r / 2}"/><circle class="kn-eye" cx="${x + (mood === 'think' ? 1.9 : .9)}" cy="${y - (mood === 'think' ? 2.3 : .5)}" r=".9"/>`).join('');
+const KN_MANE = 'M33 6c12 1 22 11 23 26l1 26H44c4-16 2-34-11-52z', KN_BODY = 'M22 58c-2-12 1-19 8-25l-5-3c-4 5-11 9-15 5-4-5 1-15 12-21l1-10 8 6c13 0 22 11 22 26v22z';
 const FACES = {
   knight(mood){
     const eye = mood === 'cheer' ? '<path class="kn-line" d="M25 22q3.5-4.5 7 0"/>' : `<circle class="kn-eye" cx="28.5" cy="21" r="5"/><circle class="kn-pupil" cx="${mood === 'think' ? 29.6 : 27.6}" cy="${mood === 'think' ? 19.4 : 21.4}" r="2.5"/><circle class="kn-eye" cx="${mood === 'think' ? 30.4 : 28.4}" cy="${mood === 'think' ? 18.6 : 20.4}" r=".9"/>`;
-    return `<path class="kn-mane" d="M33 6c12 1 22 11 23 26l1 26H44c4-16 2-34-11-52z"/>
-    <path class="kn-body" d="M22 58c-2-12 1-19 8-25l-5-3c-4 5-11 9-15 5-4-5 1-15 12-21l1-10 8 6c13 0 22 11 22 26v22z"/>
+    return `<path class="kn-mane" d="${KN_MANE}"/>
+    <path class="kn-body" d="${KN_BODY}"/>
     <path class="kn-muzzle" d="M10 35c-3-4 0-11 7-16 2 4 6 7 10 8-5 6-12 11-17 8z"/>${eye}
     <ellipse class="kn-pupil" cx="13.2" cy="29.6" rx="1.3" ry="1.7"/><path class="kn-line" d="M13.5 34.5q3.6 2.6 7.4-.6"/><circle class="kn-blush" cx="24" cy="29.5" r="2.6"/>
     <rect class="kn-base" x="16" y="56" width="42" height="7" rx="3.5"/>`;
   },
-  rook(mood){
-    return `<path class="kn-mane" d="M13 7h9v6h5V7h10v6h5V7h9v15H13z"/><path class="kn-body" d="M17 21h30l4 37H13z"/><rect class="kn-muzzle" x="15" y="20" width="34" height="5.5" rx="2.2"/>
+  rook(mood, L){
+    return `<path class="kn-mane" d="M13 7h9v6h5V7h10v6h5V7h9v15H13z"/>${L && L.head && !HAT_LOOSE[L.head] ? '<rect class="kn-mane" x="21" y="8.6" width="22" height="5"/>' : ''}<path class="kn-body" d="M17 21h30l4 37H13z"/><rect class="kn-muzzle" x="15" y="20" width="34" height="5.5" rx="2.2"/>
     ${eyes2(25, 39, 35.5, 5.2, mood)}<path class="kn-line" d="M${mood === 'think' ? '28 46q4 1.6 8 0' : '26.5 45q5.5 5 11 0'}"/><circle class="kn-blush" cx="19.5" cy="43" r="2.6"/><circle class="kn-blush" cx="44.5" cy="43" r="2.6"/>
     <rect class="kn-base" x="9" y="56" width="46" height="7" rx="3.5"/>`;
   },
@@ -48,17 +49,44 @@ const FACES = {
 // What the coach wears (the Shop tab). Colours are CSS tokens; each piece is drawn once around its own anchor and
 // placed on each character: hats on the head, glasses over the eyes, ties at the neck.
 const SKINS = {'c-midnight': 'mid', 'c-ruby': 'ruby', 'c-plum': 'plum', 'c-tangerine': 'tang', 'c-gold': 'gold', 'c-mint': 'mint', 'c-ocean': 'ocean', 'c-rose': 'rose', 'c-slate': 'slate', 'c-sand': 'sand'};
+// where each kind of piece sits on each character. head: x, y, tilt, size (a hat is drawn around the middle of its own
+// rim, so y is the line it is pulled down to)
 const SPOT = {
-  knight: {head: 'translate(35.5 11.5) rotate(16) scale(.78)', eyes: [[28.5, 21, 5]], side: true, neck: 'translate(30.5 39.5) rotate(-18) scale(.8)'},
-  rook: {head: 'translate(32 7.4)', eyes: [[25, 35.5, 5.2], [39, 35.5, 5.2]], neck: 'translate(32 28.6) scale(.9)'},
-  pawn: {head: 'translate(32 12.2) scale(.95)', eyes: [[26, 25, 4.8], [38, 25, 4.8]], neck: 'translate(32 42.3) scale(.86)'}
+  knight: {head: [38.2, 12.4, 21, 1.02], eyes: [[28.5, 21, 5]], side: true},
+  rook: {head: [32, 8.8, 0, 1.24], eyes: [[25, 35.5, 5.2], [39, 35.5, 5.2]]},
+  pawn: {head: [32, 15.6, 0, 1.2], eyes: [[26, 25, 4.8], [38, 25, 4.8]]}
 };
+/* The neck of each character as a line, and everything worn there is drawn along it: a scarf is that line as a band, a
+   lei is beads on it, a chain hangs from its ends, a tie or a bow sits at one point of it. a and b are its ends (for the
+   knight, seen from the side, the throat and the back of the mane), sag how far it dips, low where the dip is, knot where
+   a bow or a tie hangs and at what tilt, tail where a scarf's end hangs and which way. cut: the knight's neck ends at its
+   outline, so what goes round it is cut to the body there; anything that ran past the outline would read as stuck on. */
+const NECKLINE = {
+  knight: {a: [24.4, 42.2], b: [57.6, 35], sag: 2.5, low: .42, knot: [.17, 13, .86], tail: [.2, -1.4], cut: true, wide: 6.8},
+  rook: {a: [13.2, 52.3], b: [50.8, 52.3], sag: 1, low: .5, knot: [.5, 0, .94, -1.6], tail: [.74, 1.9], wide: 6.6},
+  pawn: {a: [18.8, 42.3], b: [45.2, 42.3], sag: .8, low: .5, knot: [.5, 0, .92, .5], tail: [.74, 1.9], wide: 6.4}
+};
+const r2 = n => Math.round(n * 100) / 100;
+function neckCurve(who, deep = 1){
+  const Q = NECKLINE[who] || NECKLINE.knight, [ax, ay] = Q.a, [bx, by] = Q.b, cx = ax + (bx - ax) * Q.low, cy = ay + (by - ay) * Q.low + 2 * Q.sag * deep;
+  const at = t => [r2((1 - t) * (1 - t) * ax + 2 * (1 - t) * t * cx + t * t * bx), r2((1 - t) * (1 - t) * ay + 2 * (1 - t) * t * cy + t * t * by)];
+  return {Q, d: `M${ax} ${ay}Q${r2(cx)} ${r2(cy)} ${bx} ${by}`, at, len: Math.hypot(bx - ax, by - ay) + Math.abs(Q.sag * deep) * .9};
+}
+// how tall each hat stands above its rim, so the picture makes room for it and no more
+const HAT_H = {'h-cap': 10.5, 'h-beanie': 15, 'h-party': 20, 'h-tophat': 16, 'h-wizard': 19.5, 'h-grad': 12, 'h-crown': 14, 'h-beret': 14.5, 'h-chef': 19, 'h-cowboy': 14.5, 'h-halo': 13.5, 'h-pirate': 14, 'h-propeller': 15, 'h-viking': 16, 'h-flower': 7};
+const HAT_LOOSE = {'h-halo': 1, 'h-flower': 1};        // these don't sit on a rim: no shadow under them
+function hatBox(who, head){
+  if (!head || !HATS[head]) return '0 0 64 64';
+  // a tilted hat (the knight's) also lifts one side of its brim: half its width, by the sine of the tilt
+  const [, y, rot, k] = (SPOT[who] || SPOT.knight).head, a = rot * Math.PI / 180, top = Math.min(0, Math.floor(y - k * ((HAT_H[head] || 16) * Math.cos(a) + 9.5 * Math.abs(Math.sin(a))) - 2));
+  return `${top / 2} ${top} ${64 - top} ${64 - top}`;
+}
 const HATS = {
   'h-cap': '<path class="g-blu" d="M-10.5 0C-10.5-11.5 10.5-11.5 10.5 0Z"/><ellipse class="g-blu2" cx="3.5" cy=".4" rx="14" ry="2.6"/><circle class="g-surf" cx="0" cy="-9.2" r="1.3"/>',
   'h-beanie': '<path class="g-ros" d="M-10.5 0C-10.5-12.5 10.5-12.5 10.5 0Z"/><path class="g-dash" d="M-5-2.5v-6M0-2.5v-8M5-2.5v-6"/><rect class="g-surf g-edge" x="-11.5" y="-3.4" width="23" height="4.8" rx="2.4"/><circle class="g-surf g-edge" cx="0" cy="-11.6" r="3.2"/>',
   'h-party': '<path class="g-vio" d="M-7.5 0L0-17L7.5 0Z"/><circle class="g-oro" cx="-2.6" cy="-4.5" r="1.3"/><circle class="g-oro" cx="2.4" cy="-8.6" r="1.2"/><circle class="g-oro" cx="-.4" cy="-12.6" r="1"/><circle class="g-oro" cx="0" cy="-17.4" r="2.3"/>',
   'h-tophat': '<rect class="g-ink" x="-7.5" y="-15.5" width="15" height="14.5" rx="1.2"/><rect class="g-ros" x="-7.5" y="-5.6" width="15" height="2.8"/><rect class="g-ink" x="-12.5" y="-2" width="25" height="3.2" rx="1.6"/>',
-  'h-wizard': '<path class="g-vio" d="M-11 0Q-4-8 1.5-23.5Q5.5-9 11 0Z"/><ellipse class="g-vio2" cx="0" cy="0" rx="13.5" ry="2.4"/><path class="g-oro" d="M1.5-13.8l1.2 2.5 2.7.4-2 1.9.5 2.7-2.4-1.3-2.4 1.3.5-2.7-2-1.9 2.7-.4z"/>',
+  'h-wizard': '<path class="g-vio" d="M-11 0Q-5-6.5 3.6-19.4Q5-8 11 0Z"/><ellipse class="g-vio2" cx="0" cy="0" rx="13.5" ry="2.4"/><path class="g-oro" d="M1.2-11.6l1.1 2.3 2.5.4-1.8 1.7.4 2.5-2.2-1.2-2.2 1.2.4-2.5-1.8-1.7 2.5-.4z"/>',
   'h-grad': '<path class="g-ink" d="M-7.5-1v-5.5h15V-1q-7.5 3.2-15 0z"/><path class="g-ink" d="M-14.5-7.2L0-11.8L14.5-7.2L0-2.6Z"/><path class="g-tass" d="M0-7.2L9.5-5.8V1.6"/><circle class="g-oro" cx="9.5" cy="2.4" r="1.6"/>',
   'h-crown': '<path class="g-oro g-edge2" d="M-10.5 0L-12-11.5L-5.8-5.8L0-13.8L5.8-5.8L12-11.5L10.5 0Z"/><circle class="g-ros" cx="0" cy="-4" r="1.7"/><circle class="g-blu" cx="-6.2" cy="-3" r="1.2"/><circle class="g-blu" cx="6.2" cy="-3" r="1.2"/>',
   // the daily drops
@@ -71,19 +99,38 @@ const HATS = {
   'h-viking': '<path class="g-cloth" d="M-9.8-5.6Q-14.6-9-15.8-15.6Q-11-12.4-8-8.4Z"/><path class="g-cloth" d="M9.8-5.6Q14.6-9 15.8-15.6Q11-12.4 8-8.4Z"/><path class="g-steel" d="M-10.5 0C-10.5-13 10.5-13 10.5 0Z"/><rect class="g-steel" x="-11.2" y="-2.6" width="22.4" height="3.6" rx="1.2"/><circle class="g-ink" cx="-5.6" cy="-.8" r=".8"/><circle class="g-ink" cx="0" cy="-.8" r=".8"/><circle class="g-ink" cx="5.6" cy="-.8" r=".8"/>',
   'h-flower': '<path class="g-vine" d="M-11.5-1Q0-5.6 11.5-1"/><circle class="g-ros" cx="-8.2" cy="-2.6" r="2.6"/><circle class="g-oro" cx="-2.8" cy="-4" r="2.6"/><circle class="g-vio" cx="2.8" cy="-4" r="2.6"/><circle class="g-ros" cx="8.2" cy="-2.6" r="2.6"/><circle class="g-surf" cx="-8.2" cy="-2.6" r=".9"/><circle class="g-ros" cx="-2.8" cy="-4" r=".9"/><circle class="g-surf" cx="2.8" cy="-4" r=".9"/><circle class="g-surf" cx="8.2" cy="-2.6" r=".9"/>'
 };
-const NECKS = {
-  'n-bowtie': '<path class="g-ros" d="M0 0L-7.5-4.6V4.6ZM0 0L7.5-4.6V4.6Z"/><circle class="g-ros2" cx="0" cy="0" r="2"/>',
-  'n-scarf': '<rect class="g-blu" x="-12.5" y="-3.2" width="25" height="6.4" rx="3.2"/><path class="g-dash2" d="M-6-3v6M0-3v6M6-3v6"/><path class="g-blu" d="M4.5 1.5l2.5 11.5 5-1.2-2.6-10.8z"/>',
-  'n-medal': '<path class="g-rib1" d="M-4.5-3.5L-.6 6.5H2.4L-1.5-3.5Z"/><path class="g-rib2" d="M4.5-3.5L.6 6.5H-2.4L1.5-3.5Z"/><circle class="g-oro g-edge2" cx="0" cy="9.6" r="4.4"/>',
-  // the daily drops
-  'n-tie': '<path class="g-blu g-edge2" d="M-1.8 1.4H1.8L3.4 10.6L0 13.8L-3.4 10.6Z"/><path class="g-dash2" d="M-2.2 5.6l4.4-1.6M-2.8 9l5.4-2"/><path class="g-blu g-edge2" d="M-2.6-2.6H2.6L1.8 1.4H-1.8Z"/>',
-  'n-lei': [[-11, -.6, 'ros'], [-7.4, 1.6, 'oro'], [-3.7, 3, 'vio'], [0, 3.5, 'ros'], [3.7, 3, 'oro'], [7.4, 1.6, 'vio'], [11, -.6, 'ros']].map(([x, y, c]) => `<circle class="g-${c}" cx="${x}" cy="${y}" r="2.6"/><circle class="g-surf" cx="${x}" cy="${y}" r=".8"/>`).join(''),
-  'n-chain': '<path class="g-chain2" d="M-10.5-2.4Q0 10.5 10.5-2.4"/><circle class="g-oro g-edge2" cx="0" cy="6.6" r="2.8"/>',
-  'n-stripe': '<rect class="g-ros" x="-12.5" y="-3.2" width="25" height="6.4" rx="3.2"/><path class="g-dash2" d="M-6-3v6M0-3v6M6-3v6"/><path class="g-ros" d="M4.5 1.5l2.5 11.5 5-1.2-2.6-10.8z"/><path class="g-dash2" d="M5.6 6.2l4-1M6.5 10.2l4-1"/>'
+// what hangs from one point of the neck, drawn around that point
+const KNOTS = {
+  'n-bowtie': ['ros', '<path class="g-ros" d="M0 0L-7.5-4.6V4.6ZM0 0L7.5-4.6V4.6Z"/><circle class="g-ros2" cx="0" cy="0" r="2"/>'],
+  'n-medal': ['rib', '<path class="g-rib1" d="M-4.5-3.5L-.6 6.5H2.4L-1.5-3.5Z"/><path class="g-rib2" d="M4.5-3.5L.6 6.5H-2.4L1.5-3.5Z"/><circle class="g-oro g-edge2" cx="0" cy="9.6" r="4.4"/>'],
+  'n-tie': ['blu', '<path class="g-blu g-edge2" d="M-1.8 1.4H1.8L3.4 10.6L0 13.8L-3.4 10.6Z"/><path class="g-dash2" d="M-2.2 5.6l4.4-1.6M-2.8 9l5.4-2"/><path class="g-blu g-edge2" d="M-2.6-2.6H2.6L1.8 1.4H-1.8Z"/>']
 };
+const NECKS = {'n-bowtie': 1, 'n-medal': 1, 'n-tie': 1, 'n-scarf': 1, 'n-stripe': 1, 'n-lei': 1, 'n-chain': 1};
+// [what goes round the neck, what lies on top of it]: the first part is cut to the knight's outline
+function neckSVG(who, id){
+  const C = neckCurve(who), Q = C.Q, w = Q.wide;
+  if (id === 'n-scarf' || id === 'n-stripe'){
+    const c = id === 'n-scarf' ? 'blu' : 'ros', [tx, ty] = C.at(Q.tail[0]), dx = Q.tail[1], end = `M${tx} ${r2(ty + 1)}l${dx} 10.4`;
+    return [`<path class="g-band g-s${c}" style="stroke-width:${w}" d="${C.d}"/><path class="g-bandst" style="stroke-width:${w}" d="${C.d}"/><path class="g-bandsh" d="${neckCurve(who, 1).d}" transform="translate(0 ${r2(w / 2 - .5)})"/>`,
+      `<path class="g-band g-s${c}" style="stroke-width:${r2(w - 1.5)}" d="${end}"/>${id === 'n-stripe' ? `<path class="g-bandst g-tailst" style="stroke-width:${r2(w - 1.5)}" d="${end}"/>` : ''}<circle class="g-${c} g-knot" cx="${tx}" cy="${r2(ty + .3)}" r="${r2(w / 2 + .5)}"/>`];
+  }
+  if (id === 'n-lei'){
+    const D = neckCurve(who, 2.1), n = Math.max(6, Math.round(D.len / 4.5)), cols = ['ros', 'oro', 'vio'];
+    return [Array.from({length: n + 1}, (_, k) => { const [x, y] = D.at(k / n); return `<circle class="g-${cols[k % 3]} g-bead" cx="${x}" cy="${y}" r="2.55"/><circle class="g-surf" cx="${x}" cy="${y}" r=".8"/>`; }).join(''), ''];
+  }
+  if (id === 'n-chain'){
+    const D = neckCurve(who, Q.cut ? 3.4 : 5.4), [x, y] = D.at(Q.low);
+    return [`<path class="g-chain2" d="${D.d}"/>`, `<circle class="g-oro g-edge2" cx="${x}" cy="${r2(y + 1.6)}" r="2.9"/>`];
+  }
+  const K = KNOTS[id], [t, rot, k, dy] = Q.knot, [x, y] = C.at(t);
+  // a tie, a bow or a medal: on the knight it hangs from a thin band round the neck, so it has something to hang from
+  return [Q.cut ? `<path class="g-collar g-s${K[0]}" d="${C.d}"/>` : '', `<g transform="translate(${x} ${r2(y + (dy || 0))})${rot ? ` rotate(${rot})` : ''} scale(${k})">${K[1]}</g>`];
+}
+let KN_N = 0;
 function gearSVG(who, L){
   const P = SPOT[who] || SPOT.knight, E = P.eyes; let s = '';
-  if (L.neck && NECKS[L.neck]) s += `<g transform="${P.neck}">${NECKS[L.neck]}</g>`;
+  if (L.neck && NECKS[L.neck]){ const [round, top] = neckSVG(who, L.neck), cut = (NECKLINE[who] || {}).cut, id = 'kc' + (++KN_N);
+    s += cut && round ? `<clipPath id="${id}"><path d="${KN_MANE}"/><path d="${KN_BODY}"/></clipPath><g clip-path="url(#${id})">${round}</g>${top}` : round + top; }
   if (L.face === 'f-glasses') s += E.map(([x, y, r]) => `<circle class="g-lens" cx="${x}" cy="${y}" r="${r + 1.6}"/>`).join('') + (E.length > 1 ? `<path class="g-wire" d="M${E[0][0] + E[0][2] + 1.6} ${E[0][1]}H${E[1][0] - E[1][2] - 1.6}"/>` : `<path class="g-wire" d="M${E[0][0] + E[0][2] + 1.5} ${E[0][1] - .6}L${E[0][0] + 13} ${E[0][1] - 2}"/>`);
   if (L.face === 'f-shades') s += E.map(([x, y, r]) => `<rect class="g-shade" x="${x - r - 1.8}" y="${y - r + .2}" width="${2 * r + 3.6}" height="${2 * r - .6}" rx="${r - .4}"/><path class="g-glint" d="M${x - r + .4} ${y - 1.6}l2.4-2.2"/>`).join('') + (E.length > 1 ? `<path class="g-wire" d="M${E[0][0] + E[0][2] + 1.8} ${E[0][1] - 1}H${E[1][0] - E[1][2] - 1.8}"/>` : `<path class="g-wire" d="M${E[0][0] + E[0][2] + 1.8} ${E[0][1] - 1}L${E[0][0] + 13} ${E[0][1] - 2.4}"/>`);
   if (L.face === 'f-monocle'){ const [x, y, r] = E[E.length - 1]; s += `<circle class="g-mono" cx="${x}" cy="${y}" r="${r + 1.4}"/><path class="g-chain" d="M${x + r * .7} ${y + r + .6}q3 6 -1 12"/>`; }
@@ -92,12 +139,12 @@ function gearSVG(who, L){
   if (L.face === 'f-hearts') s += E.map(([x, y, r]) => { const h = r + 1.8; return `<path class="g-heart" d="M${f(x)} ${f(y + h * .95)}C${f(x - h * 2)} ${f(y - h * .1)} ${f(x - h * 1.05)} ${f(y - h * 1.75)} ${f(x)} ${f(y - h * .55)}C${f(x + h * 1.05)} ${f(y - h * 1.75)} ${f(x + h * 2)} ${f(y - h * .1)} ${f(x)} ${f(y + h * .95)}Z"/>`; }).join('') + bridge('g-wire', 2.2);
   if (L.face === 'f-stars') s += E.map(([x, y, r]) => { const R = r + 2.6, q = R * .45; return `<path class="g-star" d="M${Array.from({length: 10}, (_, k) => { const a = -Math.PI / 2 + k * Math.PI / 5, d = k % 2 ? q : R; return `${f(x + d * Math.cos(a))} ${f(y + d * Math.sin(a))}`; }).join('L')}Z"/>`; }).join('') + bridge('g-wire', 1.4);
   if (L.face === 'f-redspecs') s += E.map(([x, y, r]) => `<circle class="g-lensr" cx="${x}" cy="${y}" r="${r + 1.6}"/>`).join('') + bridge('g-wirer', 1.6);
-  if (L.head && HATS[L.head]) s += `<g transform="${P.head}">${HATS[L.head]}</g>`;
+  if (L.head && HATS[L.head]){ const [x, y, rot, k] = P.head; s += `<g transform="translate(${x} ${y})${rot ? ` rotate(${rot})` : ''} scale(${k})">${HAT_LOOSE[L.head] ? '' : '<ellipse class="g-seat" cx="0" cy="1.1" rx="9" ry="1.5"/>'}${HATS[L.head]}</g>`; }
   return s;
 }
 function knightSVG(mood, who, look){
   const w = who || coachWho().id, L = look || (typeof Shop !== 'undefined' ? Shop.worn() : {}), sk = SKINS[L.skin];
-  return `<svg viewBox="${L.head ? '-6 -12 76 76' : '0 0 64 64'}" aria-hidden="true"${sk ? ` class="sk-${sk}"` : ''}>${(FACES[w] || FACES.knight)(mood, L)}${gearSVG(w, L)}</svg>`;
+  return `<svg viewBox="${hatBox(w, L.head)}" aria-hidden="true"${sk ? ` class="sk-${sk}"` : ''}>${(FACES[w] || FACES.knight)(mood, L)}${gearSVG(w, L)}</svg>`;
 }
 // the three faces to choose from (Settings, and the first screen after an account is made)
 function coachPickHTML(){ return `<div class="coachpick" role="group" aria-label="Your coach">${COACHES.map(c => `<button type="button" data-coachwho="${c.id}" aria-pressed="${coachWho().id === c.id}"><span class="cface">${knightSVG('', c.id)}</span><b>${c.name}</b><span>${c.what}</span></button>`).join('')}</div>`; }
@@ -722,14 +769,15 @@ function renderShop(){
   const st = Daily.streak(), toNext = 3 - (st % 3), drops = Shop.today(), next = Shop.tomorrow(), tab = S.shopTab === 'locker' ? 'locker' : 'shop', have = Prog.d.badges || {};
   const card = (I, drop) => {
     const lk = Shop.lockOf(I), own = Shop.owns(I.id), on = L[I.slot] === I.id, B = I.needs && BADGES.find(x => x.id === I.needs), needB = B && !have[B.id] && !Owner.on;
-    const look = Object.assign({}, L, {[I.slot]: I.id}), x = needB ? badgeStats() : null;
+    // a card shows the piece itself, on the coach in the colour worn; the whole outfit is on the mannequin beside the shelf
+    const look = I.slot === 'skin' ? {skin: I.id} : {skin: L.skin, [I.slot]: I.id}, x = needB ? badgeStats() : null;
     const act = needB ? `<span class="need">Needs the badge “${esc(B.name)}”<i>${Math.min(B.n(x), badgeNeed(B, x))} of ${badgeNeed(B, x)}</i></span>` : lk ? (drop && lk === 'level' ? `<span class="need">Opens at level ${SHOP_AT}</span>` : '')
       : on ? (I.slot === 'skin' && I.id === 'c-classic' ? '<span class="wearing">Wearing</span>' : `<button class="btn small" data-off="${I.slot}">Take off</button>`)
       : own ? `<button class="btn small" data-wear="${I.id}">Wear</button>`
       : `<button class="btn small primary" data-buy="${I.id}" ${bal < I.price ? 'disabled' : ''} aria-label="Buy ${esc(I.name)} for ${I.price} ${I.price === 1 ? 'token' : 'tokens'}">${COIN}${I.price}</button>`;
     const tag = drop && own ? '<span class="owned">In your locker</span>' : own && !on && I.id !== 'c-classic' && !drop ? '' : !own && lk === 'level' && I.price && !needB ? `<span class="price">${COIN}${I.price}</span>` : '';
     const days = drop ? `<span class="sdday">${I.daily.length === 1 ? WEEKDAYS[I.daily[0]] + 's only' : I.daily.map(d => WEEKDAYS[d] + 's').join(' and ')}</span>` : '';
-    return `<li class="item ${drop ? 'sdi' : ''} ${lk && lk !== 'gone' ? 'lock' : ''} ${on ? 'on' : ''}"><span class="ipv">${knightSVG('', who, look)}</span><b>${esc(I.name)}</b>${days}${tag}${act}</li>`;
+    return `<li class="item ${drop ? 'sdi' : ''} ${lk && lk !== 'gone' ? 'lock' : ''} ${on ? 'on' : ''}"><span class="ipv z-${I.slot} zk-${who}">${knightSVG('', who, look)}</span><b>${esc(I.name)}</b>${days}${tag}${act}</li>`;
   };
   const sale = SHOP.filter(I => !Shop.owns(I.id) && (!I.daily || Owner.on)), locker = SHOP.filter(I => Shop.owns(I.id));
   const list = tab === 'locker' ? locker : sale;
@@ -902,7 +950,7 @@ const Coach = {
   seen: (() => { try { return JSON.parse(localStorage.getItem('playbook-coach') || '{}'); } catch(e){ return {}; } })(), timer: null, last: null,
   el(){ let e = document.getElementById('coach'); if (!e){ e = document.createElement('div'); e.id = 'coach'; e.className = 'coach'; document.body.appendChild(e);
       e.addEventListener('click', ev => { if (ev.target.closest('.cx')) return this.hush(); const a = ev.target.closest('[data-cgo]');
-        if (a){ this.hush(); const g = a.dataset.cgo; if (g === 'me') return Acct.open(Cloud.user ? 'in' : 'me'); if (g === 'recap'){ S.gseg = 'recap'; Recap.sel = Recap.unseen(); return go('games'); } if (g === 'last'){ S.gseg = 'last'; return go('games'); } return go(g); }
+        if (a){ this.hush(); const g = a.dataset.cgo; if (g === 'me') return Acct.open(Cloud.user ? 'in' : 'me'); if (g === 'recap'){ S.gseg = 'recap'; Recap.sel = Recap.unseen(); return go('games'); } if (g === 'last'){ S.gseg = 'last'; return go('games'); } if (g.startsWith('rvb:')) return Review.drillBook(g.slice(4)); return go(g); }
         if (ev.target.closest('.cav')) this.tap(); }); }
     return e; },
   // on the welcome, reading, findings and choice screens the coach is part of the page, so the corner one stays away
@@ -911,7 +959,7 @@ const Coach = {
   say(t, o = {}){
     if (typeof Tour !== 'undefined' && Tour.on) return;
     if (!SET.coach) return; clearTimeout(this.timer); this.last = {t, o, v: S.view}; this.mood = o.mood;
-    this.draw(`<div class="cbub ${o.art ? 'art' : ''}" role="status"><button class="cx" type="button" aria-label="Close">×</button>${o.art ? `<span class="cart">${o.art}</span>` : ''}<span class="cwho">${coachName()}</span>${o.head ? `<b class="chead2">${esc(o.head)}</b>` : ''}${Array.isArray(t) || sentences(t).length > 1 ? bullets(Array.isArray(t) ? t : sentences(t), 'cbul') : esc(t)}${o.cta ? `<div class="cacts"><button class="btn small primary" data-cgo="${o.cta[0]}">${esc(o.cta[1])}</button></div>` : ''}</div>`);
+    this.draw(`<div class="cbub ${o.art ? 'art' : ''}" role="status"><button class="cx" type="button" aria-label="Close">×</button>${o.art ? `<span class="cart">${o.art}</span>` : ''}<span class="cwho">${coachName()}</span>${o.head ? `<b class="chead2">${esc(o.head)}</b>` : ''}${Array.isArray(t) || sentences(t).length > 1 ? bullets(Array.isArray(t) ? t : sentences(t), 'cbul') : esc(t)}${o.cta ? `<div class="cacts"><button class="btn small primary" data-cgo="${esc(o.cta[0])}">${esc(o.cta[1])}</button>${o.cta2 ? `<button class="btn small ghost" data-cgo="${esc(o.cta2[0])}">${esc(o.cta2[1])}</button>` : ''}</div>` : ''}</div>`);
     if (!o.stay) this.timer = setTimeout(() => this.hush(), 9000 + String(t).length * 45);
   },
   hush(){ clearTimeout(this.timer); this.mood = null; this.draw(''); },
@@ -983,6 +1031,8 @@ const Coach = {
     }
     if (PERSONA === 'ready' && v === 'course' && this.once('ready-course', 'This is your course, in the order your games asked for. Start with the unit at the top.')) return;
     if (Recap.announce()) return;                                                      // a finished month's recap that hasn't been opened yet
+    if (!(v === 'games' && S.gseg === 'last') && Review.announce()) return;            // a game that left the book: the line to drill
+    if (v === 'drill' && !S.drill && Review.remind()) return;                          // and once a day on the Drill page until it is drilled
     const tab = ['course', 'learn', 'drill', 'games', 'sandbox', 'shop', 'study'].includes(v) ? v : null;
     if (tab && this.once('tab-' + tab, this.tip())) return;
     const n = tab && this.news(tab); if (n && this.today('news-' + tab, n)) return;
@@ -1010,11 +1060,13 @@ const Coach = {
       // what was played, what it allowed (the book's word on it, or the answer that punishes it), the line's move and why
       const pw = D.slipWhy && D.slipWhy[i], why = moveWhy(line.n[i], 1)[0];
       out.push(`You played: ${played ? lc(played) : 'another move'}`);
-      if (alt && alt.t) out.push(`${(alt.g || []).includes('warn') ? 'A known mistake here' : 'About your move'}: ${firstSentence(alt.t)}`);
+      const ord = D.slipOrd && D.slipOrd[i];                 // a move of this line, played before its turn
+      if (ord) out.push(`That move is in this line, ${movesLater(ord)} later: the order slipped, not the move`);
+      else if (alt && alt.t) out.push(`${(alt.g || []).includes('warn') ? 'A known mistake here' : 'About your move'}: ${firstSentence(alt.t)}`);
       else if (pw) out.push(pw[0] + (pw[1] ? ': ' + lc(pw[1]) : ''));
       out.push(`The line's move: ${lc(nd.l)}`); if (why) out.push(`Why: ${why}`);
       if (D.slipAt.length > 1 && out.length < 5) out.push(`${D.slipAt.length === 2 ? 'One more slip' : `${D.slipAt.length - 1} more slips`} after that`);
-      cta = `<button class="linkish" type="button" data-line="${id}" data-i="${i - 1}">Study move ${no}</button>`;
+      cta = `<button class="linkish" type="button" data-line="${id}" data-i="${ord ? i : i - 1}">${ord ? 'See the order' : `Study move ${no}`}</button>`;
     } else if (clean){
       const was = prev && prev.sl ? Object.keys(prev.sl).map(Number).sort((a, b) => prev.sl[b] - prev.sl[a]) : [], spot = was[0];
       const ls = L ? L.lines.filter(x => DRILLSET.has(x)) : [], all = ls.length > 1 && ls.every(lineClean) && !(prev && prev.clean);
@@ -1391,12 +1443,40 @@ const Review = {
     if (old) old.added = Date.now(); else st.g.push(this.make(g, 'paste', Date.now()));
     this.trim(); Prog.save(); this.paint(); this.work();
   },
-  announce(){
-    const R = this.list()[0]; if (!R || !this.todo(R) || !SET.coach || (S.drill && S.drill.state === 'play')) return;
-    const no = Math.floor(R.at / 2) + 1, oc = R.me === 'w' ? 'Black' : 'White';
-    const t = R.by === 'opp' ? `Your game against ${R.opp}: ${oc} left your book at move ${no}. I've got an answer to drill.` : R.by === 'me' ? `Your game against ${R.opp}: you left your book at move ${no}. Drill your line?` : `Your game against ${R.opp} is reviewed.`;
-    Coach.once('rg-' + R.id, t, {mood: 'think', stay: true, head: 'Your last game', cta: ['last', 'See the review']});
+  // a game where the player's own move left the book, with the book's line not yet drilled clean since
+  left(){ return this.list().filter(R => R.by === 'me' && !(R.d && R.d.o && R.d.o[1]) && this.bookLine(R)); },
+  // the book's move where the game left it, and the line to drill for it: the lesson's main line when it has that move,
+  // else the line through it that comes up most. Read from the book of the game's colour, whichever side is open.
+  bookLine(R){
+    const B = BOOKS[R.me], bk = this.bookMove(R.me, this.walk(R.me, R.u.slice(0, R.at + 1)).node); if (bk === undefined) return null;
+    const can = new Set(B.drillable), ls = B.lines.filter(l => can.has(l.id) && l.n.includes(bk)); if (!ls.length) return null;
+    const mine = R.me === 'w', reach = l => l.n.reduce((a, i) => a * (!!B.nodes[i].w !== mine && B.nodes[i].q || 1), 1);
+    return {bk, id: (ls.find(l => l.main) || ls.sort((a, b) => reach(b) - reach(a))[0]).id};
   },
+  leftWords(R){
+    const k = R.at, no = Math.floor(k / 2) + 1, Nn = BOOKS[R.me].nodes, B = this.bookLine(R), fenB = this.fenAt(R.u, k);
+    return [`Against ${R.opp}, move ${no}: you played ${lc(this.words(fenB, R.u[k]))}`, B ? `Your book: ${lc(Nn[B.bk].l)}` : ''].filter(Boolean);
+  },
+  // the coach's word about the newest games: a game that left the book by the player's own move comes with the drill
+  // itself, the others with the way to the review. Once per game; nothing while a line is being played.
+  announce(){
+    if (!this.on() || !SET.coach || PERSONA === 'new' || (S.drill && S.drill.state === 'play') || (typeof Tour !== 'undefined' && Tour.on)) return false;
+    for (const R of this.left()){
+      if (Coach.once('rg-' + R.id, this.leftWords(R), {mood: 'think', stay: true, head: 'You left your book', cta: ['rvb:' + R.id, 'Drill the line'], cta2: ['last', 'See the game']})) return true;
+    }
+    const R = this.list()[0]; if (!R || R.by === 'me' || !this.todo(R)) return false;
+    const no = Math.floor(R.at / 2) + 1, oc = R.me === 'w' ? 'Black' : 'White';
+    const t = R.by === 'opp' ? `Your game against ${R.opp}: ${oc} left your book at move ${no}. I've got an answer to drill.` : `Your game against ${R.opp} is reviewed.`;
+    return Coach.once('rg-' + R.id, t, {mood: 'think', stay: true, head: 'Your last game', cta: ['last', 'See the review']});
+  },
+  // on the Drill page, once a day for as long as the line hasn't been drilled clean
+  remind(){
+    if (!this.on() || !SET.coach || PERSONA === 'new') return false;
+    const R = this.left()[0]; if (!R) return false;
+    return Coach.today('rgd-' + R.id, this.leftWords(R).concat(['That line is the one to drill first']), {mood: 'think', head: 'Still open from your games', cta: ['rvb:' + R.id, 'Drill the line']});
+  },
+  // the book's line was drilled from a game: counted like the other spots (runs, clean, last)
+  drilled(id, clean){ const R = this.get(id); if (!R) return; const d = R.d || (R.d = {}), x = d.o || [0, 0, 0]; d.o = [x[0] + 1, x[1] + (clean ? 1 : 0), Date.now()]; },
   // ---- the part of Your games
   html(){
     const top = this.list().reduce((m, R) => Math.max(m, R.added || 0), 0);
@@ -1485,9 +1565,8 @@ const Review = {
   drillBook(id){
     const R = this.get(id); if (!R) return;
     if (SIDE !== R.me) useSide(R.me);
-    const node = this.walk(R.me, R.u.slice(0, R.at + 1)).node, bk = this.bookMove(R.me, node); if (bk === undefined) return;
-    const ls = (linesByNode.get(bk) || []).filter(x => DRILLSET.has(x)), lid = ls.find(x => LINES[x].main) || ls.sort((a, b) => lineReach(b) - lineReach(a))[0]; if (!lid) return;
-    startDrillLine(lid, `Your game against ${R.opp}: move ${Math.floor(R.at / 2) + 1} is where it left the book.`, null, {from0: true});
+    const B = this.bookLine(R); if (!B || !B.id) return;
+    startDrillLine(B.id, `Your game against ${R.opp}: move ${Math.floor(R.at / 2) + 1} is where it left the book.`, null, {from0: true, rv: R.id});
   },
   practise(id){
     const R = this.get(id); if (!R) return;
@@ -1509,7 +1588,7 @@ const Review = {
       D.i++; D.flash = {sq: u.slice(2, 4), ok: true}; D.hint = null; D.msg = ''; D.tries = 0;
       const w = this.words(fen, u), why = this.idea(fen, u, D.me, D.i > 1 ? D.moves[D.i - 2] : D.last);
       D.feed = [`<span class="mfeed"><b>${esc(w.charAt(0).toUpperCase() + w.slice(1))}.</b> ${esc(why)}</span>`];
-      renderDrillBoard({u, meta: {}}); renderDrillPanel();
+      renderDrillBoard(); renderDrillPanel();
       D.busy = true; setTimeout(() => { if (S.drill === D){ D.flash = null; this.advance(); } }, 650);
       return;
     }
@@ -1562,6 +1641,9 @@ const Review = {
     if (!this.on()) return '';
     const L = this.list().filter(R => this.todo(R)); if (!L.length) return '';
     const n = L.reduce((a, R) => { const d = R.d || {}; return a + ((R.by === 'opp' || R.by === 'me') && !(d.o && d.o[1]) ? 1 : 0) + (R.mk && !(d.m && d.m[1]) ? 1 : 0); }, 0), R = L[0];
+    const lf = this.left()[0];
+    if (lf){ const w = this.leftWords(lf);
+      return `<section class="dpanel rvcue"><div><p class="kicker">You left your book in a game</p><p class="tline">${esc(w[0])}.</p>${w[1] ? `<p class="rvsub">${esc(w[1])}.</p>` : ''}</div><div class="lesson-actions"><button class="btn primary" type="button" id="rvDrillB" data-id="${esc(lf.id)}">Drill the line</button><button class="btn" type="button" id="rvLast">${n > 1 ? `All ${n} spots` : 'See the game'}</button></div></section>`; }
     return `<section class="dpanel rvcue"><div><p class="kicker">From your last games</p><p class="tline">${plural(n, 'spot')} to drill, starting with your game against ${esc(R.opp)}.</p></div><div class="lesson-actions"><button class="btn" type="button" id="rvLast">See them</button></div></section>`;
   }
 };
@@ -1582,6 +1664,7 @@ const record0 = Prog.record.bind(Prog);
 Prog.record = function(id, clean, slips){
   const before = Daily.count(), nb = Badges.n, r0 = Prog.rec(id), prev = r0 ? JSON.parse(JSON.stringify(r0)) : null;
   const D = S.view === 'drill' && S.drill && S.drill.kind === 'line' && S.drill.id === id ? S.drill : null;   // a line played in Drill: its panel speaks
+  if (D && D.rv) Review.drilled(D.rv, clean);          // before the save inside the record
   record0(id, clean, slips);
   if (D) D.note = Coach.lineNote(id, clean, prev, D);
   const day = before < DAILY && Daily.count() >= DAILY;
@@ -1882,7 +1965,7 @@ const Tour = {
       {h: 'Drill: today\'s five', at: '.today', go: () => { S.drill = S.drillState = null; go('drill'); },
         say: ['Five lines a day, from memory, keep your streak going', 'A line you slip on comes back sooner, a clean one later']},
       {h: 'A wrong move, explained', at: '#dpanel', go: () => startDrillLine(lid, '', null, {tour: true, from0: true}), demo: slip, ready: () => !!S.drill && S.drill.tries >= 1,
-        say: ['Watch: I\'ll play a move that isn\'t in the book', 'You see the answer that punishes it, and what it costs']},
+        say: ['Watch: I\'ll play a move that isn\'t in the book', 'You see the answer that punishes it, and what it costs', 'A move of the line played before its turn is named as that: right move, wrong moment']},
       {h: 'Miss twice and the arrow shows it', at: '#db', ready: () => !!S.drill && S.drill.tries >= 2, demo: () => { const D = S.drill; if (D && D.tour && D.state === 'play' && D.tries < 2){ const exp = N[LINES[D.id].n[D.i + 1]].u, u = legalFor().find(x => x !== exp); if (u) setTimeout(() => tryMove(u.slice(0, 2), u.slice(2, 4)), 500); } },
         say: ['The arrow shows the book\'s move, with the reason for it', 'Play it and the line goes on']},
       {h: 'Play on with the engine', at: '#dExplore', go: () => { const D = S.drill; if (D && D.tour && D.state === 'play'){ D.hint = null; D.i = LINES[D.id].n.length - 1; finishLine(); } },
@@ -1893,6 +1976,10 @@ const Tour = {
       {h: 'Lessons: the other side\'s answers', at: '.opts', go: () => { S.drill = S.drillState = null; openLine(lid, choiceAt(lid), 'games'); },
         say: ['Every position lists what the other side can play, and how often at your level', 'Tap one to see how your book meets it']},
       {h: 'Every move explained', at: '.mcard', say: ['Step through with the arrows under the board, or the arrow keys', 'Each move says what it does: the book\'s note, and what the board shows', 'Above it: the opening\'s real name, the one players know it by']},
+      {h: 'Marks on the moves', at: () => document.querySelector('.mklegend') || document.querySelector('.timeline'),
+        say: ['The other side\'s inaccuracies, mistakes and blunders carry a mark', 'Key move: your answer that makes a mistake cost', 'In the Sandbox the marks come once the game is over']},
+      {h: 'Your moves, in order', at: '.ostrip', skip: () => myMoves(LINES[lid]).length < 2,
+        say: ['Every move of yours in this line as a small picture, in the order you play them', 'When a line plays them in another order, the main line sits above it and the move that changed places is ringed', 'Numbers on the board puts each move\'s number on its piece']},
       {h: 'The engine in lessons', at: '.engrow', say: ['Switch it on for the best moves, their arrows and the score', 'It stays off in drills, practice games and checkpoints, and comes back when they end']},
       {h: 'The plan from here', at: '.ccol .plan', skip: () => !planOf(lid), go: () => { S.drill = S.drillState = null; openLine(lid, LINES[lid].n.length - 1, 'games'); },
         say: ['Every line ends with a plan: what to aim for once the moves you know run out', 'You get it at the end of lessons, clean drills and practice games']},
@@ -1906,7 +1993,7 @@ const Tour = {
         say: () => ['Tokens from badges, levels and streaks buy me a new look', 'Two new drops every day'].concat(Level.of().n < SHOP_AT ? [`It opens at level ${SHOP_AT}`] : [])},
       {h: 'Settings', at: '#setBtn', go: () => go('course'), say: ['Light or dark, text size, board colours, your coach and your systems', 'You can take this tour again from there']},
       {h: 'Your account', at: '#acctBtn', skip: () => document.getElementById('acctBtn').hidden, say: ['Sign in and your progress follows you to every device']},
-      {h: 'That\'s me', at: '#coach .cav', skip: () => !SET.coach, say: ['Tap me any time for a tip', 'I speak up when a line ends, and when something new happens']},
+      {h: 'That\'s me', at: '#coach .cav', skip: () => !SET.coach, say: ['Tap me any time for a tip', 'I speak up when a line ends, and when something new happens', 'When a game of yours leaves your book, I\'ll say so and bring the line to drill']},
       {h: 'You\'re all set', say: () => this.replay ? ['That\'s everything', 'Back to where you were'] : ['Start with the course: your first unit is waiting', 'Five lines a day and the openings stick']}
     ];
   }

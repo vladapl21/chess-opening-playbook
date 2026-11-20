@@ -69,12 +69,37 @@ with sync_playwright() as p:
     bal = pg.evaluate('Shop.balance()')
     pg.click('[data-buy="h-tophat"]'); pg.wait_for_timeout(300)
     assert pg.evaluate('Shop.balance()') == bal - 3 and pg.evaluate('Shop.worn().head') == 'h-tophat'
-    assert pg.get_attribute('#coach .cav svg', 'viewBox') == '-6 -12 76 76' and pg.locator('#coach .cav svg .g-ros').count() == 1, 'the corner coach wears the hat'
+    vb = pg.get_attribute('#coach .cav svg', 'viewBox'); print('room for the hat:', vb)
+    assert vb == pg.evaluate("hatBox('knight', 'h-tophat')") != '0 0 64 64' and pg.locator('#coach .cav svg .g-ros').count() == 1, 'the corner coach wears the hat'
+    # ---- the fit. Every hat on every coach is inside its picture with a shadow under its rim, the picture makes room
+    #      for the hat and little more, and what goes round the knight's neck is cut to the neck (each picture its own cut)
+    fit = pg.evaluate("""(() => { const host = document.createElement('div'); host.style.cssText = 'position:absolute;left:0;top:0;width:200px;visibility:hidden'; document.body.appendChild(host); const bad = [];
+      for (const c of COACHES) for (const I of SHOP.filter(x => x.slot === 'head')){
+        host.innerHTML = `<div style="width:200px;height:200px">${knightSVG('', c.id, {head: I.id}).replace('<svg ', '<svg width="200" height="200" style="overflow:visible" ')}</div>`; const svg = host.querySelector('svg'), r = svg.getBoundingClientRect(), hat = svg.lastElementChild.getBoundingClientRect();
+        const vb = svg.getAttribute('viewBox').split(' ').map(Number), top = (hat.top - r.top) / r.height * vb[3];
+        if (hat.top < r.top - .5 || hat.left < r.left - .5 || hat.right > r.right + .5) bad.push([c.id, I.id, 'outside']);
+        if (vb[1] < 0 && top > 6.5) bad.push([c.id, I.id, 'too much room: ' + top.toFixed(1)]);
+        if (!HAT_LOOSE[I.id] && !svg.querySelector('.g-seat')) bad.push([c.id, I.id, 'no shadow']);
+      }
+      host.remove(); return bad; })()""")
+    assert not fit, fit
+    neck = pg.evaluate("""(() => { const host = document.createElement('div'); host.style.cssText = 'position:absolute;left:0;top:0;width:200px;visibility:hidden'; document.body.appendChild(host); const out = {};
+      for (const I of SHOP.filter(x => x.slot === 'neck')){ host.innerHTML = knightSVG('', 'knight', {neck: I.id}) + knightSVG('', 'knight', {neck: I.id}) + knightSVG('', 'rook', {neck: I.id});
+        const [a, b, r] = host.querySelectorAll('svg'), ca = a.querySelector('clipPath'), cb = b.querySelector('clipPath'), g = a.querySelector('[clip-path]');
+        out[I.id] = [!!ca && !!g && g.getAttribute('clip-path') === `url(#${ca.id})`, ca && cb && ca.id !== cb.id, !r.querySelector('clipPath'), g ? g.children.length : 0]; }
+      host.remove(); return out; })()""")
+    print('round the knight\'s neck:', neck)
+    assert all(v[0] and v[1] and v[2] and v[3] >= 1 for v in neck.values()) and len(neck) == 7, neck
     assert 'Needs the badge' in pg.inner_text('.slot .item:has(b:text-is("Crown"))')
     assert pg.locator('[data-buy="h-crown"]').count() == 0
     poor = pg.evaluate("SHOP.filter(I => I.price > Shop.balance() && !Shop.owns(I.id) && !Shop.lockOf(I)).map(I => I.id)")
     for i in poor: assert pg.is_disabled(f'[data-buy="{i}"]'), i
     assert pg.locator('.shopmain .slot [data-wear="h-tophat"], .shopmain .slot [data-off="head"]').count() == 0, 'what is bought leaves the shop for the locker'
+    # a card shows the piece by itself: the hat just put on is on the mannequin, not on the cards for glasses or scarves
+    alone = pg.evaluate("[document.querySelectorAll('.mannequin svg .g-seat').length, document.querySelectorAll('.slot .item .ipv.z-face svg .g-seat, .slot .item .ipv.z-neck svg .g-seat').length, document.querySelectorAll('.slot .item .ipv.z-head svg .g-seat').length > 0]")
+    assert alone == [1, 0, True], alone
+    row = pg.evaluate("[...document.querySelectorAll('.slot .items')].map(ul => [...ul.querySelectorAll('.item > :last-child')].map(e => Math.round(e.getBoundingClientRect().bottom))).filter(r => r.length > 1 && r.length <= 6)")
+    assert row and all(max(r) - min(r) <= 2 for r in row if True), ('what a card does sits on one line across a row', row)
     pg.click('[data-shoptab="locker"]'); pg.wait_for_timeout(200)
     pg.click('[data-off="head"]'); pg.wait_for_timeout(200); assert pg.evaluate('Shop.worn().head') is None
     pg.click('[data-wear="h-tophat"]'); pg.wait_for_timeout(200); assert pg.evaluate('Shop.worn().head') == 'h-tophat'

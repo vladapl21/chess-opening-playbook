@@ -3,7 +3,7 @@
 Writes data/build/playbook.html (the page body, as published to Claude artifacts; no accounts) and
 docs/index.html (a complete standalone page for GitHub Pages; accounts through Supabase when
 app/site.json has a project URL and publishable key)."""
-import hashlib, json
+import hashlib, json, sys
 import paths
 from pieces import piece_svg_inner
 try:
@@ -145,6 +145,13 @@ def main():
     page = site_html(body, site)
     (paths.DOCS / 'index.html').write_text(page)
     print('playbook.html', len(body), '| docs/index.html', len(page), '| lines changed since first release', changed, '| accounts', 'on' if site.get('supabaseUrl') and site.get('supabaseKey') else 'off (app/site.json has no project yet)')
+    # the counts the README quotes, against the books just built: the page is written either way, the build fails on a stale one
+    import lint_counts
+    stale = lint_counts.run()[1]
+    if stale:
+        for x in stale: print('STALE:', x)
+        print(f'{len(stale)} counts in the README are out of date. Run: python3 pipeline/lint_counts.py --write')
+        sys.exit(3)
 
 
 if __name__ == '__main__':

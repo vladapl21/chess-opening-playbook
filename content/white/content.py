@@ -49,7 +49,7 @@ n("e4", "Pawn to the center", "Grab the center and open lines for your queen and
 n("e4 e5", "Black copies you", "The most common reply. You met it in 14 of your last 25 games with White.")
 n("e4 e5 Nf3", "Knight out, hits the pawn", "Develop with a threat. Black has to look after the center pawn.", ['key'], arrows=['f3e5g'])
 n("e4 e5 Nf3 Nc6", "Knight defends", "Black protects the pawn with a knight. This is where the Italian begins.")
-n(IT, "Bishop to the long diagonal", "The Italian bishop. It aims at f7, the one pawn that only Black's king protects. Almost every trick in your book lands on that square.", ['key'], arrows=['c4f7r'], circles=['f7r'])
+n(IT, "Bishop aims at f7", "The Italian bishop. It aims at f7, the one pawn that only Black's king protects. Almost every trick in your book lands on that square.", ['key'], arrows=['c4f7r'], circles=['f7r'])
 
 # ---------------------------------------------------------------- BISHOP (Giuoco Piano)
 L('center', 'bishop', 'Build the big center', 'Small pawn move first, then the big push', 'core', CH, start=5,
