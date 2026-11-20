@@ -4,7 +4,7 @@
 
 **A chess opening course built from my own games, with no notation anywhere.**
 
-One path through a White and a Black repertoire, ordered by what my games say matters most. Each unit has the idea, the lines, spaced-repetition drills, practice games against an opponent who plays like real club players, and a checkpoint that opens the next unit. Three skill units come straight from my own games: threats I walked into, wins I let slip and endings I gave away. Every move says why it is played, and a wrong one is met with the answer that punishes it. Your three newest games are reviewed as they come in, with the spot where each went wrong ready to drill. Where a line ends, a plan says what to aim for next, and a built-in engine plays the position on. A two-minute tour, led by the coach, shows a new player where everything is. It all ships as one HTML page with Stockfish running in the browser beside it.
+One path through a White and a Black repertoire, ordered by what my games say matters most. Each unit has the idea, the lines, spaced-repetition drills, practice games against an opponent who plays like real club players, and a checkpoint that opens the next unit. Three skill units come straight from my own games: threats I walked into, wins I let slip and endings I gave away. Every move says why it is played, and a wrong one is met with the answer that punishes it. Your three newest games are reviewed as they come in, with the spot where each went wrong ready to drill. Every line ends with a plan for what to aim for next, every position carries its opening's real name, and a built-in engine plays the position on. A two-minute tour, led by the coach, shows a new player where everything is. It all ships as one HTML page with Stockfish running in the browser beside it.
 
 [**Open the app →**](https://vladapl21.github.io/chess-opening-playbook/)
 
@@ -26,12 +26,12 @@ Most opening courses are written for everyone. They give long lines in algebraic
 
 - **The chapters come from the games.** Each book is split by what the opponent actually played, ordered by how often it happened, with the win–loss record next to it.
 - **The opponent plays like a real opponent.** Every opponent move in the book carries the odds that a club player at this level would choose it. The first move's odds come from the games themselves. After that they come from [Maia](https://maiachess.com), a neural network trained to predict human moves at a given rating. The drills, the sandbox and every "how often" figure use these odds, so preparation goes where the games actually go.
-- **Words instead of notation.** Moves are described the way you would explain them over a board: *Bishop aims at f7*, *Knight takes back*, *Queen breaks the pin*. Positions that matter get a short note explaining why.
+- **Words instead of notation, and real names.** Moves are described the way you would explain them over a board: *Bishop aims at f7*, *Knight takes back*, *Queen breaks the pin*. Positions that matter get a short note explaining why. Where an opening or a gambit has a name, it is called by it: the *Englund Gambit*, not "the e-pawn gambit"; the *Nimzowitsch Defense*, not "knight first". Every position shows its opening's name the way lichess.org gives it.
 - **Every move says why, on both sides.** On top of the written notes, the board is read for each move: the piece it wins, the threat it makes or stops, the fork, the pin. The opponent's moves get the same, so their idea is never a mystery, and a wrong move is answered with the reply that punishes it and what that costs.
 - **Checked by an engine, built for a human.** Every move in both books was checked with Stockfish 17.1. Lines were chosen to be easy to remember, such as one setup against a whole family of move orders, rather than to squeeze out the last hundredth of a pawn.
 - **One position, one move.** However a position is reached, the answer is the same, and each setup brings its pieces out in one order with a stated reason wherever the order has to change. The build stops if two lines disagree about a position, or if a label speaks of a pin, a guard or an attack that is not on the board.
 - **One path, unlocked as you go.** The course mixes White and Black units by how often each system comes up and how I score in it. Passing a unit's checkpoint opens the next one, so there is never everything at once.
-- **A line ends, the game doesn't.** Where a lesson's main line stops, a plan takes over in a few lines: where the king goes, which pawns move, what to aim at and what the opponent wants. A built-in engine shows the best moves and the other side's threat in words, and plays the position on from there.
+- **A line ends, the game doesn't.** Wherever a line stops, a plan takes over in a few lines: where the king goes, which pawns move, what to aim at and what the opponent wants. The main lines' plans are written by hand; every other line's is read off its last position and the engine's line from there. A built-in engine shows the best moves and the other side's threat in words, and plays the position on from there.
 - **The games feed back in.** Missed tactics become puzzles. Habits that cost games become "insights" with a button that drills the real positions. Notes point back to the games they came from: *"Against ZhoskaStreezh: your knight came out on move four, a pawn kicked it and you pushed the d-pawn; the pawn took the knight."* Every month the newest games come back in as a recap.
 
 ## Where it is going: a playbook for any player
@@ -100,7 +100,7 @@ Everything is reached from the header: the **White | Black** switch, five tabs (
 
 ## First time here: the tour
 
-<img src="docs/img/tour.png" alt="The tour's Play along step: the board lit with a green arrow on the e-pawn, the rest of the page dimmed, and Pip's card beside it, step 7 of 24, asking to play the arrow's move, with Back, Fast forward and Show me" width="100%">
+<img src="docs/img/tour.png" alt="The tour's Play along step: the board lit with a green arrow on the e-pawn, the rest of the page dimmed, and Pip's card beside it, step 7 of 25, asking to play the arrow's move, with Back, Fast forward and Show me" width="100%">
 
 The first time the app opens, the coach shows the player around (a new player gets the tour as soon as their playbook is ready). It starts with the choice of coach, Pip the knight, Rocco the rook or Dot the pawn, and the one picked leads the rest and stays on as the player's coach. It takes about two minutes, one thing at a time, with the rest of the page dimmed:
 
@@ -109,8 +109,10 @@ The first time the app opens, the coach shows the player around (a new player ge
 - **Play along.** The player makes the move on the green arrow and sees what the coach's card says about it.
 - **Drills.** Today's five. Then the coach plays a wrong move on purpose to show the answer that punishes it, and a second one to show the arrow that follows two misses.
 - **Play on with the engine.** The player taps it at the end of the line and lands on the explore board: moves for both sides, the engine's best moves and the other side's threat.
-- **Lessons.** The other side's answers with how often they come up, the move card with what each move does, and the engine switch.
-- **The rest.** Your games, the Sandbox, the level, the streak, the shop, Settings, the account and the coach.
+- **Lessons.** The other side's answers with how often they come up, the move card with what each move does, the opening's name above it, the engine switch and the plan at the end of the line.
+- **The rest.** Your games, the Sandbox (where every game ends with its plan), the level, the streak, the shop, Settings, the account and the coach.
+
+The tour keeps up with the app: its test fails when a tab, a part of Your games, a setting or a listed feature isn't named in it, so a new feature comes with its step.
 
 It can't be skipped, but it never has to be read: **Fast forward** plays it through by itself, the coach doing every tap, and **Show me** does one step's tap. **Back** goes back a step, and the arrow keys and Enter work too. Nothing done in the tour counts: no line is recorded and no points or streak days are given. It is taken once per player rather than once per device, since it is kept with the progress, and **Settings → Take the tour again** runs it from wherever the player is and comes back there. On a phone the card docks at the top or the bottom, away from what it points at.
 
@@ -204,9 +206,9 @@ The **White | Black** switch swaps the whole app: board orientation, chapters, d
 
 <img src="docs/img/demo.gif" alt="Stepping through the Scotch lesson move by move: each move has a plain-English label and a note" width="100%">
 
-Each lesson is a board you step through with the buttons or the arrow keys. Every move has its label, an optional note, what the board shows under **On the board** (a threat made or stopped, a piece won, a fork, a pin; see [Every move explained](#every-move-explained)), arrows and circles where they help, and the engine's verdict in words (*Equal*, *Better for White*) with the number beside it. Wherever the opponent has a choice, the alternatives are listed with how often players at this level pick them, and one click jumps into that branch.
+Each lesson is a board you step through with the buttons or the arrow keys. Above the move card is the opening's name for the position on the board (*Italian Game: Two Knights Defense, Traxler Counterattack*), the one lichess.org uses. Every move has its label, an optional note, what the board shows under **On the board** (a threat made or stopped, a piece won, a fork, a pin; see [Every move explained](#every-move-explained)), arrows and circles where they help, and the engine's verdict in words (*Equal*, *Better for White*) with the number beside it. Wherever the opponent has a choice, the alternatives are listed with how often players at this level pick them, and one click jumps into that branch.
 
-<img src="docs/img/study.png" alt="Study view: flipped board for Black, the move card with its note and, under On the board, the threat to the queen, the other lines in the lesson as chips, and the move list" width="100%">
+<img src="docs/img/study.png" alt="Study view: flipped board for Black, the opening's name (Scotch Game: Classical Variation) above the move card with its note and, under On the board, the threat to the queen, the other lines in the lesson as chips, and the move list" width="100%">
 
 ### The engine, and what to do when the line ends
 
@@ -214,7 +216,7 @@ Each lesson is a board you step through with the buttons or the arrow keys. Ever
 
 A line in a book has to stop somewhere, and the position it stops in can still look dangerous. Two things pick up from there.
 
-**A plan.** The last position of a lesson's main line comes with a short card: where your king goes, which pawns to push, where the pieces belong, what to aim at, what the opponent wants and what to watch for. It shows in Study, after a drill and at the end of a practice game.
+**A plan.** The last position of every line comes with a short card: where your king goes, which pawns to push, where the pieces belong, what to aim at, what the opponent wants and what to watch for. It shows at the end of a line in Study, after a clean drill and at the end of every practice game. The main lines' plans are written by hand and checked against Stockfish's continuation. A side line that ends where a main line ends shares its plan; every other line gets one read off the board and Stockfish's line from there (depth 18): the pieces still at home, castling now or once a piece is out, the pawn move the engine plays next and what it hits, the material and what it means for trades, a king that can't castle, a pawn with no neighbour, and the other side's next two moves in words. Lines that end in mate have none.
 
 **The engine.** Stockfish runs in the browser. Switch it on under the board in Study, or press **Play on with the engine** when a drill, puzzle or practice game ends. It stays out of the way while you are being tested. The card shows:
 
@@ -254,7 +256,7 @@ The wardrobe opens at **level 5**, about a week of drills in, and tokens come in
 
 ### Sandbox: play your book against a realistic opponent
 
-<img src="docs/img/sandbox.png" alt="Sandbox slip report after an Italian game: the slip shown on a mini board, the opponent's choices with their odds, and how rare the exact line was" width="100%">
+<img src="docs/img/sandbox.png" alt="Sandbox slip report with Black: the opening's name above it, the slip shown on a mini board, White's choices with their odds, how rare the exact line was, and the plan from the last position" width="100%">
 
 The sandbox plays one branch of the book as a full game. The opponent only plays moves that are in your book, picked with one of three settings:
 
@@ -266,7 +268,7 @@ The opening chips are a multi-select: pick the French and the Caro-Kann and the 
 
 To practise one position, **Set up a position** turns the board into a set-up board: play the moves for both sides (only moves in your book go, and the book's moves for the side to move are listed as buttons), then **Practise from here**. Every game until you change it starts there, and only the lines that go on from it come up. **Practise from here** under a lesson's board does the same from the move on the board, and a review in Last 3 games does it from the move where you left your book.
 
-A move that leaves the book is answered on the spot with the reply that punishes it, when there is one, and a second miss shows the book's move with its reason. At the end you get a slip report. Each mistake is shown on a mini board (red for what you tried, green for the move in your book), along with the chain of the opponent's choices and their odds and how rare the exact line was (*"under 1 in 2,000 games"*). Any line you slipped on goes straight back into today's drill. Changing the opening or the odds mid-game applies to the next game, with a button to start it right away, so the current game is never cut off.
+A move that leaves the book is answered on the spot with the reply that punishes it, when there is one, and a second miss shows the book's move with its reason. The opening's name sits above the game and follows it move by move. At the end you get a slip report and the plan from the last position, whichever line the game took. Each mistake is shown on a mini board (red for what you tried, green for the move in your book), along with the chain of the opponent's choices and their odds and how rare the exact line was (*"under 1 in 2,000 games"*). Any line you slipped on goes straight back into today's drill. Changing the opening or the odds mid-game applies to the next game, with a button to start it right away, so the current game is never cut off.
 
 ### Your games: the record and the reviews
 
@@ -444,11 +446,13 @@ flowchart LR
 
 ## Under the hood
 
-- **One file.** The app is one HTML file of about 2 MB with both books inline: plain HTML, CSS and JavaScript, with no framework or bundler. [chess.js](https://github.com/jhlywa/chess.js) is inlined for the explore board. The only scripts loaded from elsewhere are the engine, when you ask for it, and supabase-js, on the website when accounts are set up. Fonts come from Google Fonts (Barlow Condensed, Barlow, JetBrains Mono); offline, the app falls back to system fonts.
+- **One file.** The app is one HTML file of about 3 MB with both books inline: plain HTML, CSS and JavaScript, with no framework or bundler. [chess.js](https://github.com/jhlywa/chess.js) is inlined for the explore board. The only scripts loaded from elsewhere are the engine, when you ask for it, and supabase-js, on the website when accounts are set up. Fonts come from Google Fonts (Barlow Condensed, Barlow, JetBrains Mono); offline, the app falls back to system fonts.
 - **Board.** The board is SVG, drawn with an original piece set ([`app/pieces.py`](app/pieces.py)). It supports drag and tap input, legal-move hints, arrows, circles and a flipped view for Black. Legal moves are precomputed for every book position where you move, so lessons, drills and the sandbox need no chess library.
 - **Engine.** [`docs/engine`](docs/engine) holds the lite single-threaded build of [Stockfish.js](https://github.com/nmrugg/stockfish.js) 19: a 28 KB script and a 1.8 MB WebAssembly file, fetched the first time the engine is switched on and run in a web worker. The page talks to it in plain UCI text. Each position gets two searches: a short one with the move handed to the other side (their idea), then the three best moves to depth 22 or seven seconds. Results are kept for the session, so stepping back and forth is instant. The engine's moves are put into words by a small JavaScript twin of `label2.py`. The single-threaded build needs no special server headers, so it runs on GitHub Pages; it can't start from a page opened as a file, and the card says so.
 - **Explanations.** [`app/ideas.js`](app/ideas.js) reads a position with chess.js and a few rules (attack maps, a static exchange that leaves pinned pieces out, threats found with a null move, a two-move look for forcing checks) and returns at most two plain-English lines for a move: `Ideas.of` for what a move does, `Ideas.punish` for the best answer to a move off the book, `Ideas.reply` for why a known answer works. It has no DOM, so `tests/ideas_check.js` runs it under Node over every book move. The page calls it when a move is shown, never ahead of time.
 - **Last three games.** `Review` in [`app/product.js`](app/product.js) reads the newest games through the recap's reader, walks each through the lines in play to find where it left the book, and asks the in-browser engine for an answer line (each move at depth 13) and for the first costly move (every position at depth 10, a candidate checked again at depth 14). The reviews live in the progress record and merge game by game. Drill it is its own drill kind on the drill board: a start position and a list of moves, played with chess.js.
+- **Opening names.** [`pipeline/names.py`](pipeline/names.py) reads lichess's list (a name for each position, keyed by the position rather than the moves, so a transposition gets the same name) and the page carries it as one table of about 150 KB: a hash of each position, its family and its variation. A position is named after the last named position on the way to it, the way lichess names a game, so the explore board and the reviews name positions the book never reaches. The renames in [`content/opening_names.py`](content/opening_names.py) are applied at the end of both book builds and checked: every path and id in it must be in the book.
+- **Plans for every line.** [`pipeline/plan_lines.py`](pipeline/plan_lines.py) gives each line that isn't a main line its plan: one written in `content/plans.py`, the plan of a main line that ends on the same position, or one read off the board from Stockfish's line (depth 18, cached by position by `plan_pv.py`). Each bullet states something the board or that line shows, and the assembly checks every plan for notation like the written ones.
 - **The tour.** `Tour` in [`app/product.js`](app/product.js) is a list of steps, each naming what to light up, what to set up first (a view, a guided line, a drill started with `tour: true` so nothing is recorded), what to say and, on some steps, a tap to wait for. A dimmed SVG layer with a hole lets clicks through only where the step asks for one. Taking the tour is stamped in the progress record (the earliest stamp wins on merge) and in the browser, so it starts once per player.
 - **Two books, one engine.** `loadBook()` swaps every index (nodes, lines, lessons, chapters, whose move is whose, board orientation) when you flip the switch. Line ids never collide between the books (the build checks this), so one progress store holds both.
 - **Who is looking.** The page shows one of three things ([`app/product.js`](app/product.js)): the hand-built playbook (the personal build, and any account that had progress before personal playbooks existed), the welcome state for a player without games, or a personal playbook. The profile from the analysis is saved with the progress record, so it follows the account. For anyone but the house player, sentences about my own games are removed from the lesson notes when the page starts.
@@ -526,7 +530,8 @@ supabase/
   functions/nudge/         the reminder-email function: index.ts (Deno), pick.js (who gets which email), titles.json
 content/
   course.py                the course: units, idea boards, checkpoint positions; the deep dives (DEEP)
-  plans.py                 the plan shown where each lesson's main line ends
+  plans.py                 the plans written by hand: each lesson's main line (W, B) and side lines (LW, LB)
+  opening_names.py         real names in place of move descriptions: labels, lesson and line titles, parts
   white/                   White book: lessons, labels and notes, chapter text, game reviews; london.py, the London pack
   black/                   Black book: bcontent (lessons), bnotes + bnotes2 (labels, notes, arrows),
                            bmeta (chapters, game reviews, puzzles, cheat sheet, insights)
@@ -534,7 +539,10 @@ pipeline/
   build_white.py           build the White book    -> data/build/data_white.json
   build_black.py           build the Black book    -> data/build/data_black.json
   build_course.py          build the course        -> data/build/data_course.json
-  assemble.py              inject the books, the course and the plans into the template -> docs/index.html
+  plan_pv.py, plan_lines.py
+                           Stockfish's line from every line end (cached); a plan for every line -> data/line_plans.json
+  names.py                 the opening names: every book position's, the curated renames, the page's lookup table
+  assemble.py              inject the books, the course, the plans and the names into the template -> docs/index.html
   tree.py, label2.py       move tree; context-aware plain-English labels
   maia.py, expand.py       human move odds (Maia, NumPy only) and the coverage walk
   human_odds.py, sf.py     command-line helpers: Maia odds and Stockfish top moves for any line
@@ -549,6 +557,8 @@ pipeline/
 data/
   games/                   PGN exports of my games
   cache/                   Stockfish and Maia results, so builds need no engine
+  openings/                opening names from lichess-org/chess-openings (CC0), unchanged
+  line_plans.json          the plan for every line that isn't a main line: its own, a main line's, or read off the board
   black_*.json             Black games, per-move scans, candidate shots
   line_versions.json       a fingerprint of every line's moves; a line's version goes up when they change
   course_threats.json, course_finish.json, course_endings.json
@@ -648,7 +658,7 @@ The tests drive the real page in Chromium. Run them one at a time, as `make test
 | Suite | What it covers |
 | --- | --- |
 | `e2e_white.py`, `e2e_black.py` | Every chapter in both books, lessons stepped through, drills played by dragging and tapping (correct moves, slips, castling), every puzzle solved, sandbox games across every opening and odds setting, deep links, switching books with state kept, and the phone layout in light and dark mode with nothing scrolling sideways. |
-| `e2e_sandbox_switch.py` | Changing the Sandbox opening in the middle of a game never blocks a move. A position set up by hand (by the board and by the move buttons, a move not in the book refused, a move taken back) and practised: every game goes through it. **Practise from here** in a lesson does the same. |
+| `e2e_sandbox_switch.py` | Changing the Sandbox opening in the middle of a game never blocks a move. A position set up by hand (by the board and by the move buttons, a move not in the book refused, a move taken back) and practised: every game goes through it. **Practise from here** in a lesson does the same. A game that ends on a side line ends with that line's plan. |
 | `e2e_course.py` | The first units the way a person would: the idea boards, a lesson played along with the arrows (a wrong move that doesn't count), the same line from memory with a slip (Again leads) and then clean (the next lesson leads), a checkpoint with a deliberate miss, practice games against a unit's lines, and a threat set where wrong moves get played out and punished. |
 | `e2e_skills.py` | The skill units: Show me the danger, any move that loses nothing accepted, the reason for a wrong move in words (a longer trick move by move, playable on the board), the engine after each answer in a practice set but not in a checkpoint, and engine numbers from White's side with the words from yours. |
 | `e2e_engine.py` | The real engine over local HTTP: the switch in Study, three different best moves with their arrows, the plan at the end of a line, moves for both sides on the explore board by tap and by drag, the engine answering, its line played out, a reload that keeps the position, and the note when the page is opened as a file. |
@@ -662,7 +672,7 @@ The tests drive the real page in Chromium. Run them one at a time, as `make test
 | `e2e_shop.py` | The levels climbed line by line (the points floating up, a card for each level, one held back while a line is played) until level 5 opens the wardrobe; buying and wearing; the tokens adding up; today's drops: the same two all day, a new shelf the next day, the rest not for sale, and a bought drop in the locker and out of the rotation. |
 | `e2e_recap.py` | chess.com stubbed with three months of the house account's games: the first check reads all three, past months come out final, the month sits beside the one before, the chart has a tip for each day, Check now reads only what can still change, a failed check saves nothing, the coach says when a finished month is new and opens it, and the claude.ai copy points to the website instead. |
 | `e2e_library.py` | The course finished through its last checkpoint and the big moment (shown once, with the badge kept quiet); the library: the coach's pick, reasons that change when the course record changes, the path of the first course; a deep dive part by part: the boards and their words, a practice game limited to the part, checkpoints that open the next part, a finished deep dive with its badge, each page's link after a reload, and the phone layout in dark mode. |
-| `e2e_tour.py` | The tour starts by itself with the coach the player picks; there is no way to close it (Escape explains why, clicks outside the light do nothing); the colour switch by hand and with Show me; Back; Fast forward to the end through Play along, a punished slip, the arrow, the explore board and a lesson's other answers; no progress left behind; the stamp in the record and on the device; no second start after a reload; the replay from Settings ending where it began; and the card on screen at phone width in dark mode with nothing scrolling sideways. |
+| `e2e_tour.py` | The tour starts by itself with the coach the player picks; there is no way to close it (Escape explains why, clicks outside the light do nothing); the colour switch by hand and with Show me; Back; Fast forward to the end through Play along, a punished slip, the arrow, the explore board and a lesson's other answers; no progress left behind; the stamp in the record and on the device; no second start after a reload; the replay from Settings ending where it began; and the card on screen at phone width in dark mode with nothing scrolling sideways. The tour names every tab, every part of Your games, every setting and every feature on its list, so a new one fails here until the tour speaks of it. |
 | `e2e_review.py` | chess.com stubbed with the house account's newest games and the real engine over local HTTP: the first check keeps the newest three; a game where White leaves the Black book on move two gets the engine's answer, one where the player leaves the White book gets the book's move and why, and one where the queen goes on move seven gets the first costly move; each is drilled (a wrong move punished, the arrow after two, a clean run kept); the reviews after a reload; a new game pushing the oldest out; a pasted game and the question of which side; the coach's word; the Sandbox from the position; a phone in dark mode. |
 | `ideas_check.js` | The move explainer under Node: known positions (a threat, a guard, the aim at f7, a mate threat made and stopped, a pin, a trade, a recapture that wins nothing, a fork, castling, the answers that punish a wrong move), then every move of both books, with no notation in any line. |
 | `analyze_check.js` | The game analysis on `data/games`, checked against known facts. |
@@ -673,6 +683,7 @@ The tests drive the real page in Chromium. Run them one at a time, as `make test
 - **[Stockfish](https://stockfishchess.org)** 17.1 produced every evaluation and move check in the books (GPL-3.0; not included).
 - **[Stockfish.js](https://github.com/nmrugg/stockfish.js)** 19 by Nathan Rugg and Chess.com, a WebAssembly port of Stockfish, is the engine in the app (GPL-3.0; unchanged release files in [`docs/engine`](docs/engine) with their license and a link to the source).
 - **[chess.js](https://github.com/jhlywa/chess.js)** 0.10.3 by Jeff Hlywa supplies the rules on the explore board (BSD-2-Clause; inlined with its notice).
+- **[lichess-org/chess-openings](https://github.com/lichess-org/chess-openings)** supplies the opening names: the name of every position, in the book or off it (CC0; unchanged in [`data/openings`](data/openings)).
 - **[Maia Chess](https://maiachess.com)** by the University of Toronto's Computational Social Science Lab supplied the human move odds. See McIlroy-Young, Sen, Kleinberg and Anderson, *Aligning Superhuman AI with Human Behavior: Chess as a Model System*, KDD 2020. Weights are not included.
 - **[lczero-training](https://github.com/LeelaChessZero/lczero-training)** provided the policy index used to read Maia's output.
 - **[python-chess](https://github.com/niklasf/python-chess)** by Niklas Fiekas handles move generation, PGN parsing and engine communication in the pipeline (GPL-3.0).

@@ -375,18 +375,18 @@ L('rr-stgeorge', 'rare-all', 'The a-pawn and b-pawn', 'Take the center, then hit
   why='Black spends early moves on the edge. Take the middle.', outcome='A big center and a lead in development')
 
 CHAPTERS = [
-  dict(id='italian', name='The Italian', move='e-pawn mirrors yours, then the knight', parts=['setup', 'bishop', 'knight', 'odd']),
-  dict(id='e5x', name='Philidor & Petrov', move='e-pawn mirrors yours, no knight', parts=['e5x-phil', 'e5x-pet', 'e5x-misc']),
-  dict(id='caro', name='Caro-Kann', move='c-pawn one square', parts=['caro-main', 'caro-other4', 'caro-third']),
-  dict(id='sic', name='Sicilian', move='c-pawn two squares', parts=['sic-knight', 'sic-pawn', 'sic-rare']),
-  dict(id='scandi', name='Scandinavian', move='d-pawn hits your e-pawn', parts=['scandi-queen', 'scandi-other']),
-  dict(id='pirc', name='Pirc & Modern', move='d-pawn one square, or the fianchetto', parts=['pirc-150', 'pirc-other']),
-  dict(id='french', name='French', move='e-pawn one square', parts=['french-adv', 'french-other']),
-  dict(id='rare', name='Rare first moves', move='knights, b-pawn, a-pawn', parts=['rare-all']),
+  dict(id='italian', name='The Italian', move='Giuoco Piano, Two Knights, Fried Liver, Traxler', parts=['setup', 'bishop', 'knight', 'odd']),
+  dict(id='e5x', name='Philidor & Petrov', move='Philidor, Petrov, Stafford, Latvian, Elephant', parts=['e5x-phil', 'e5x-pet', 'e5x-misc']),
+  dict(id='caro', name='Caro-Kann', move='Classical, Karpov, Tartakower, Bronstein-Larsen', parts=['caro-main', 'caro-other4', 'caro-third']),
+  dict(id='sic', name='Sicilian', move='The Alapin against every second move', parts=['sic-knight', 'sic-pawn', 'sic-rare']),
+  dict(id='scandi', name='Scandinavian', move='Main Line, Valencian, Modern, the gambits', parts=['scandi-queen', 'scandi-other']),
+  dict(id='pirc', name='Pirc & Modern', move='Pirc, Modern, Lion', parts=['pirc-150', 'pirc-other']),
+  dict(id='french', name='French', move='Advance Variation', parts=['french-adv', 'french-other']),
+  dict(id='rare', name='Rare first moves', move='Alekhine, Nimzowitsch, Owen, St. George', parts=['rare-all']),
   # the London System: a second pack for White (PACKS in content2_meta.py), lessons and notes in london.py
-  dict(id='london', name='The London', move='d-pawn mirrors yours', parts=['ld-setup', 'ld-cpawn', 'ld-knight', 'ld-bishop', 'ld-side']),
-  dict(id='lindian', name='Knight first', move='king\'s knight, then the g-pawn or e-pawn', parts=['ln-fian', 'ln-epawn', 'ln-cpawn']),
-  dict(id='lrare', name='Other first moves', move='e-pawn, c-pawn, gambits, fianchetto', parts=['lr-epawn', 'lr-gambit', 'lr-cpawn', 'lr-fian', 'lr-other']),
+  dict(id='london', name='The London', move="Queen's Pawn Game, Accelerated London", parts=['ld-setup', 'ld-cpawn', 'ld-knight', 'ld-bishop', 'ld-side']),
+  dict(id='lindian', name='Indian Defenses', move="King's Indian setup and the rest", parts=['ln-fian', 'ln-epawn', 'ln-cpawn']),
+  dict(id='lrare', name='Other first moves', move='Horwitz, Englund, Old Benoni, Dutch, Modern', parts=['lr-epawn', 'lr-gambit', 'lr-cpawn', 'lr-fian', 'lr-other']),
 ]
 
 for _p in PARTS:

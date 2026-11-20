@@ -1,5 +1,6 @@
 """Regression: switching the Sandbox opening mid-game must not block moves. Then practice from a chosen position: set up
-by hand with the book's moves for both sides, or picked in a lesson; games start there and only its lines come up."""
+by hand with the book's moves for both sides, or picked in a lesson; games start there and only its lines come up. A
+game that ends on a side line ends with that line's plan."""
 import os, random
 from playwright.sync_api import sync_playwright
 from e2e_white import drag, play_sandbox, launch, URL, out  # noqa
@@ -78,6 +79,18 @@ with sync_playwright() as p:
     pg.click('#sbHere'); pg.wait_for_timeout(1400)
     assert pg.evaluate("[S.view, SIDE, S.drill.from]") == ['sandbox', 'b', idx]
     r = play_sandbox(pg, 0.0, 'from a lesson'); assert r['state'] == 'done' and pg.evaluate(f"LINES['{r['line']}'].n.includes({idx})")
+    # ---- every game ends with the plan from its last position, side lines too: a position from which the book has
+    #      one way on, to the end of a side line with a plan read off the board
+    pg.evaluate("useSide('w'); S.drill = S.sbState = null; go('sandbox')"); pg.wait_for_timeout(400)
+    pick = pg.evaluate("""(() => { for (const l of Object.values(LINES)){ if (l.main || !l.plan || !DRILLABLE.includes(l.id)) continue;
+        let k = l.n.length - 1; while (k > 2 && sbBookKids(l.n[k - 1]).length === 1) k--;
+        if (k < l.n.length - 2 && sbCanFrom(l.n[k])) return {line: l.id, at: l.n[k], h: l.plan.h}; } return null; })()""")
+    print('a side line to the end:', pick); assert pick
+    pg.evaluate(f"SB_FROM[SIDE] = {pick['at']}; sbStart()"); pg.wait_for_timeout(1200)
+    r = play_sandbox(pg, 0.0, 'to the end of a side line'); assert r['state'] == 'done' and r['line'] == pick['line'], r
+    plan = pg.locator('#sbpanel .plan h4').all_inner_texts(); print('its plan:', plan)
+    assert plan == [pick['h']], plan
+    pg.screenshot(path=out + 'sb_plan.png')
     print('errors', errors)
     assert not [e for e in errors if 'ERR_' not in e], 'page errors'
     b.close()
