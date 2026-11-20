@@ -1,6 +1,7 @@
 """Regression: switching the Sandbox opening mid-game must not block moves. Then practice from a chosen position: set up
-by hand with the book's moves for both sides, or picked in a lesson; games start there and only its lines come up. A
-game that ends on a side line ends with that line's plan."""
+by hand with the book's moves for both sides (back and forward with the arrows under the board and on the keyboard, a tap
+on a move in the list), or picked in a lesson; games start there and only its lines come up. A game that ends on a side
+line ends with that line's plan."""
 import os, random
 from playwright.sync_api import sync_playwright
 from e2e_white import drag, play_sandbox, launch, URL, out  # noqa
@@ -37,7 +38,8 @@ with sync_playwright() as p:
     assert pg.evaluate('SBS.scope') == 'm:caro,french', pg.evaluate('SBS.scope')
     assert pg.evaluate("[...document.querySelectorAll('[data-sbf^=\"pick:\"][aria-pressed=\"true\"]')].map(b => b.dataset.sbf)") == ['pick:caro', 'pick:french']
     met = set()
-    for k in range(8):
+    for k in range(24):                                   # the Caro-Kann is twice as common: play on until the French has come up too
+        if k >= 8 and len(met) == 2: break
         pg.click('#sbNow' if pg.query_selector('#sbNow') else '#sbAgain'); pg.wait_for_timeout(300)
         r = play_sandbox(pg, 0.0, f'mix {k}'); assert r['state'] == 'done'
         met.add(pg.evaluate(f"chapterOf(lessonOf('{r['line']}')).id"))
@@ -58,6 +60,16 @@ with sync_playwright() as p:
     assert pg.evaluate("ply(S.drill.node)") == 2 and "isn't in your book" in pg.inner_text('#sbpanel')
     drag(pg, 'g1', 'f3'); pg.wait_for_timeout(500); drag(pg, 'b8', 'c6'); pg.wait_for_timeout(500)
     pg.click('#sbSetBack'); pg.wait_for_timeout(300); assert pg.evaluate("ply(S.drill.node)") == 3, 'back a move'
+    # the arrows under the board and on the keyboard step through the moves made; a tap on a move in the list jumps there
+    at = lambda: pg.evaluate("[ply(S.drill.node), S.drill.fwd.length]")
+    pg.click('#sbSetFwd'); pg.wait_for_timeout(300); assert at() == [4, 0], 'forward again'
+    pg.keyboard.press('ArrowLeft'); pg.wait_for_timeout(200); pg.keyboard.press('ArrowLeft'); pg.wait_for_timeout(200); assert at() == [2, 2]
+    pg.keyboard.press('ArrowRight'); pg.wait_for_timeout(200); assert at() == [3, 1]
+    pg.keyboard.press('Home'); pg.wait_for_timeout(200); assert at() == [0, 4] and pg.evaluate("document.getElementById('sbFromGo').disabled")
+    pg.keyboard.press('End'); pg.wait_for_timeout(200); assert at() == [4, 0]
+    pg.click('[data-sbj="2"]'); pg.wait_for_timeout(200); assert at() == [2, 2], 'a tap on the second move in the list'
+    drag(pg, 'g1', 'f3'); pg.wait_for_timeout(400); assert at() == [3, 1], 'the same move again keeps what came after it'
+    assert pg.inner_text('#sbside').strip() == '' and 'lines go on from here' in pg.inner_text('#sbpanel') and pg.locator('#sbpanel .opn').count() == 1
     drag(pg, 'b8', 'c6'); pg.wait_for_timeout(500)
     at = pg.evaluate("S.drill.node"); pg.screenshot(path=out + 'sb_setup.png')
     pg.click('#sbFromGo'); pg.wait_for_timeout(1400)

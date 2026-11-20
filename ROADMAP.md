@@ -69,6 +69,12 @@ Facts that shape the design:
 - Settings and the account button moved out of the header into the corner of the screen; the header fits one row on an ordinary monitor and centres its rows when it has to wrap.
 - A lesson opened from a course unit has "Next lesson" at the top. The Sandbox has "Free play: pick openings" to leave a course practice game.
 
+## Phase 1.17: a set-up board with arrows, no stale counts (done, November 19)
+
+- **The Sandbox's set-up board.** Arrows under the board and on the keyboard step back and forward through the moves made, a tap on a move in the list jumps to it, the heading says how many lines go on from the position, the other side's moves show how often they are played, and the opening's name follows along. The rest of the Sandbox's settings are out of the way while a position is set up.
+- **Your games** opens straight on its parts: the header with a count of games is gone, and no text quotes a total any more.
+- **Wording.** The last "your study" and "this guide" notes in the Italian now say "your book" or say nothing; the Italian page's two panels about changes to the study are gone; a Sandbox report no longer repeats its slip count, and a plan read off the board says "soon" where "then" had nothing before it.
+
 ## Phase 1.16: a plan at the end of every line, real names, a tour that keeps up (done, November 19)
 
 - **A plan at the end of every line.** The main lines kept their written plans; the other 811 lines got one (767 read off the board, 42 shared with a main line, two written). A side line that ends where a main line ends shares its plan; the rest are read off the last position and Stockfish's line from there: pieces still at home, castling now or once a piece is out, the pawn or piece move the engine plays next and what it hits, the material and what it means for trades, a king that can't castle, a pawn with no neighbour, the other side's next two moves in words. Six Black lessons got written plans. The card shows at the end of a line in study, after a clean drill and in every Sandbox report.

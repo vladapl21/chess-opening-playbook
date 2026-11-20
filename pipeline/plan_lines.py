@@ -359,6 +359,13 @@ def plan_for(pos):
     th = [x for x in bullets if x[0] == 'them']
     rest = sorted([x for x in bullets if x[0] != 'them'], key=lambda x: order[x[0]])
     bullets = rest[:4 - len(th[:1])] + th[:1]
+    # "Then ..." needs a bullet before it that says what comes first; without one it becomes "... soon"
+    first_said = False; fixed = []
+    for k, t in bullets:
+        if t.startswith('Then ') and not first_said: t = cap(t[5:-1]) + ' soon.'
+        if t.endswith(' next.') or ' next. ' in t or t.startswith('Then '): first_said = True
+        fixed.append((k, t))
+    bullets = fixed
     if len(bullets) < 2:
         nxt = [m[0] for m in mine_x[:2] if m[1] not in weak]
         if nxt and not any(k in ('pieces', 'pawns') for k, _ in bullets):

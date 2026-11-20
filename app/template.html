@@ -424,6 +424,11 @@ p{margin:0}
 .feed li.slip{background:var(--rosso-soft)}
 .feed li.last{background:var(--accent-soft)}
 .feed li.pre{opacity:.6}
+.feed.sbjump li{display:block;padding:0} .feed.sbjump button{display:grid;grid-template-columns:40px 24px minmax(0,1fr) auto;gap:8px;align-items:center;width:100%;padding:7px 12px;border:0;background:none;font:inherit;font-size:14px;color:var(--ink);text-align:left;cursor:pointer}
+.feed.sbjump button:hover{background:var(--surface-2)} .feed.sbjump button.last{background:var(--accent-soft)} .feed.sbjump button.fut{opacity:.5}
+.feed.sbjump button.blk .fl{color:var(--muted)}
+.sbks .sbk .tnum{font-family:var(--f-mono);font-size:11.5px;color:var(--muted)} .sbkeys{margin-top:6px;text-align:center} .sbhow{margin:0}
+@media (hover:none){ .sbkeys{display:none} }
 .sbks{display:flex;flex-wrap:wrap;gap:6px}
 .sbks .sbk{cursor:pointer;display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:13.5px;padding:6px 10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px}
 .sbks .sbk:hover{border-color:var(--accent)} .sbks .sbk svg{width:18px;height:18px}
@@ -1399,12 +1404,8 @@ const CH_KEY = s => s === 'w' ? 'e4-playbook-chapter' : 'playbook-b-chapter';
 function savedChapter(s){ try { const c = localStorage.getItem(CH_KEY(s)); if (c && BOOKS[s].chapters.some(x => x.id === c)) return c; } catch(e){} return BOOKS[s].chapters[0].id; }
 const TXT = {
   w: {kick: 'White repertoire', piece: 'p-wb',
-      learnKick: st => `Your ${st.total} games with White · every one started with the e-pawn`, learnH: 'What Black plays against your e-pawn',
-      gamesP: st => `Your last ${st.total} games with White: ${st.wins} wins, ${st.losses} losses. Every one started with the e-pawn.`,
       byHead: 'Black\'s reply', miss: 'Not the move in your book. Try again.', miss2: 'Not that one. The arrow shows the move in your book; play it to continue.'},
   b: {kick: 'Black repertoire', piece: 'p-bb',
-      learnKick: st => `Your ${st.total} games with Black`, learnH: 'What White plays against you',
-      gamesP: st => `Your ${st.total} games with Black: ${st.wins} wins, ${st.losses} losses${st.draws ? `, ${st.draws} draw${st.draws === 1 ? '' : 's'}` : ''}.`,
       byHead: 'White\'s opening', miss: 'Not the move in your book. Try again.', miss2: 'Not that one. The arrow shows the move in your book; play it to continue.'}};
 function renderChrome(){
   const T = TXT[SIDE];
@@ -1649,7 +1650,7 @@ function renderLearn(){
   const st = DATA.stats, C = CHAPTERS[S.chapter] || DATA.chapters[0];
   let html = `<div class="crumbs"><button class="btn small" data-go="games">← Your games</button><span class="where">${esc(C.name)}</span></div>
     <nav class="chnav" aria-label="Openings">${DATA.chapters.map(c => `<button class="chip ${c.id === C.id ? 'on' : ''}" data-ch="${c.id}" ${c.id === C.id ? 'aria-current="page"' : ''}>${esc(c.name)}</button>`).join('')}</nav><div id="chapter" class="chapter">`;
-  if (SIDE !== 'w' || C.id !== 'italian' || PERSONA !== 'house'){ // the Italian's own page tells the story of the house player's study
+  if (SIDE !== 'w' || C.id !== 'italian' || PERSONA !== 'house'){ // the Italian's own page: the replayed hero board and the house player's record
     html += chapterHero(C) + learnBody(C, chapterNotes(C)) + '</div>';
     view.innerHTML = html; wireLearn(); return;
   }
@@ -1657,31 +1658,16 @@ function renderLearn(){
   html += `<section class="hero">
     <div class="hero-board"><div class="board" id="heroBoard">${boardSVG(N[heroIdx].f, {coords: true, last: ['f1','c4'], arrows: ['c4f7r', 'f3g5g'], circles: ['f7r'], aria: 'The Italian setup: your bishop aims at f7'})}</div>
       <div class="hero-cap"><span>Bishop and knight both aim at f7.</span><button class="btn small" id="heroReplay" aria-label="Replay the first moves"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Replay</button></div></div>
-    <div><p class="kicker">Your coach's study · rebuilt · engine-checked</p>
-      <h2>Aim everything at <em>f7</em>.</h2>
+    <div><h2>Aim everything at <em>f7</em>.</h2>
       ${bullets(['The pawn beside Black\'s king has only one defender', 'Your bishop, your knight and often your queen all point at it', 'Every line below is a board to play along with or step through'], 'lede')}
       <div class="stats">
-        <div class="stat"><b class="tnum">${C.stats.n}</b><span>Italian games in your ${st.total} with White</span></div>
+        <div class="stat"><b class="tnum">${C.stats.n}</b><span>Italian games with White</span></div>
         <div class="stat"><b class="tnum">${C.stats.w}–${C.stats.l}</b><span>your record in them</span></div>
         <div class="stat alert"><b class="tnum">5×</b><span>you missed the bishop shot on f7 in two of those losses</span></div>
       </div>
       <div class="cta"><button class="btn primary" data-lesson="setup">Start with the setup</button><button class="btn" data-sbch="italian">Spar in the Sandbox</button><button class="btn ghost" data-drillch="italian">Drill this opening</button></div>
     </div></section>`;
-  html += learnBody(C, `<section class="changes">
-    <div class="panel"><h3>Where I changed your study</h3><ul>
-      <li><b>Trap II, after the queen pin:</b> the bishop goes to the center, not the pawn push (which fails to a pawn kick). Your study's own d-pawn chapter already does this. <button class="linkish" data-lesson="trap-d6">Open</button></li>
-      <li><b>Trap III, the center branch:</b> take the knight before pushing your pawn. <button class="linkish" data-line="trap-ne7-d5">Open</button></li>
-      <li><b>Solid d-pawn line:</b> when Black defends the pinned knight with the pawn, take it with your bishop instead of retreating. <button class="linkish" data-line="four-d6-d5">Open</button></li>
-      <li><b>Waiting-move line:</b> when Black kicks your bishop, take the knight with check instead of retreating. <button class="linkish" data-line="h6-a6">Open</button></li>
-      <li><b>Møller, Black castles:</b> after winning the knight back, the queen goes toward the kingside, not back to the center. <button class="linkish" data-line="moller-ne5-castle">Open</button></li>
-    </ul></div>
-    <div class="panel"><h3>What I added</h3><ul>
-      <li><b>Black declines the pawn</b>, as it did in one of your games. <button class="linkish" data-lesson="quiet-d6">Open</button></li>
-      <li><b>Black ignores f7</b> in the Two Knights: the counter-attack and the knight-to-the-rim move from one of your games. <button class="linkish" data-lesson="traxler">Open</button></li>
-      <li><b>Bishop steps back before taking:</b> a club-level slip with a bishop sacrifice on f7. <button class="linkish" data-lesson="bb6-early">Open</button></li>
-      <li><b>Other fourth moves</b> and <b>the Hungarian</b>: same plan, quick answers. <button class="linkish" data-lesson="other-4th">Open</button></li>
-      <li><b>Fried Liver king moves</b> you'll actually see: the king running home or to the corner. <button class="linkish" data-line="fl-ke8">Open</button></li>
-    </ul></div></section>`) + '</div>';
+  html += learnBody(C, chapterNotes(C)) + '</div>';
   view.innerHTML = html;
   document.getElementById('heroReplay').onclick = heroReplay; wireLearn();
 }
@@ -1874,6 +1860,10 @@ document.addEventListener('keydown', e => {
     else if (e.key === 'End'){ e.preventDefault(); step(999); }
   }
   else if (S.view === 'unit' && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')){ e.preventDefault(); ideaStep(e.key === 'ArrowRight' ? 1 : -1); }
+  else if (S.view === 'sandbox' && S.drill && S.drill.kind === 'sbset'){
+    const k = {ArrowRight: 1, ArrowLeft: -1, Home: -999, End: 999}[e.key];
+    if (k){ e.preventDefault(); sbSetStep(k); }
+  }
   else if (S.view === 'explore' && S.ex){
     const k = {ArrowRight: 1, ArrowLeft: -1, Home: -999, End: 999}[e.key];
     if (k){ e.preventDefault(); exStopAuto(); exStep(k); }
@@ -2320,27 +2310,56 @@ function sbTry(u, to){
 }
 function sbSetupStart(){
   const f = sbFrom() || 0;
-  S.drill = S.sbState = {kind: 'sbset', node: f, hist: pathTo(f), sel: null, busy: false, state: 'play', flash: null, hint: null, msg: ''};
+  // hist: the moves on the board; fwd: moves stepped back from, nearest last, so the forward arrow can replay them
+  S.drill = S.sbState = {kind: 'sbset', node: f, hist: pathTo(f), fwd: [], sel: null, busy: false, state: 'play', flash: null, hint: null, msg: ''};
   if (S.view !== 'sandbox'){ S.view = 'sandbox'; setHash(); }
   render();
 }
-function sbSetGo(c){ const D = S.drill; D.node = c; D.hist.push(c); D.msg = ''; D.flash = null; D.sel = null; renderDrillBoard({u: N[c].u, meta: N[c]}); renderSbPanel(); }
+function sbSetGo(c){
+  const D = S.drill; if (D.fwd[D.fwd.length - 1] === c) D.fwd.pop(); else D.fwd = [];      // the same move again keeps what came after it
+  D.node = c; D.hist.push(c); D.msg = ''; D.flash = null; D.sel = null; renderDrillBoard({u: N[c].u, meta: N[c]}); renderSbPanel();
+}
 function sbSetTry(u, to){
   const D = S.drill; D.sel = null;
   const c = sbBookKids(D.node).find(k => N[k].u === u);
   if (c !== undefined) return sbSetGo(c);
-  D.flash = {sq: to, ok: false}; D.msg = 'That move isn\'t in your book here. The moves under the board are.';
+  D.flash = {sq: to, ok: false}; D.msg = 'That move isn\'t in your book here. Pick one of the moves listed below.';
   renderDrillBoard(); renderSbPanel();
   setTimeout(() => { if (S.drill === D && D.flash){ D.flash = null; renderDrillBoard(); } }, 650);
 }
-function sbSetBack(){ const D = S.drill; if (D.hist.length <= 1) return; D.hist.pop(); D.node = D.hist[D.hist.length - 1]; D.msg = ''; D.sel = null; renderDrillBoard(); renderSbPanel(); }
+// every move made on the set-up board, the ones stepped back from included
+function sbSetAll(){ const D = S.drill; return D.hist.concat(D.fwd.slice().reverse()); }
+// to move k of them (0: the start)
+function sbSetJump(k){
+  const D = S.drill, all = sbSetAll(), was = D.hist.length - 1; k = Math.max(0, Math.min(all.length - 1, k)); if (k === was) return;
+  D.hist = all.slice(0, k + 1); D.fwd = all.slice(k + 1).reverse(); D.node = all[k]; D.msg = ''; D.sel = null; D.flash = null;
+  renderDrillBoard(k === was + 1 ? {u: N[all[k]].u, meta: N[all[k]]} : undefined); renderSbPanel();
+}
+function sbSetStep(d){ sbSetJump(d <= -999 ? 0 : d >= 999 ? 1e9 : S.drill.hist.length - 1 + d); }
+function sbSetBack(){ sbSetStep(-1); }
+// the arrows under the set-up board (the legend under a game's board otherwise)
+function sbCtlHTML(){
+  const D = S.drill;
+  if (!D || D.kind !== 'sbset') return `<div class="legend" style="margin-top:10px"><span><i style="background:var(--arr-g)"></i>the move in your book</span><span><i style="background:var(--arr-r)"></i>what you tried</span></div>`;
+  const back = D.hist.length > 1, fwd = D.fwd.length > 0, ic = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
+  return `<div class="controls"><button class="ctl" data-sbstep="-999" aria-label="To the start" ${back ? '' : 'disabled'}>${ic('M6 5v14M18 6l-8 6 8 6V6z')}</button>
+      <button class="ctl" id="sbSetBack" data-sbstep="-1" aria-label="Back one move" ${back ? '' : 'disabled'}>${ic('M15 6l-6 6 6 6')}</button>
+      <button class="ctl" id="sbSetFwd" data-sbstep="1" aria-label="Forward one move" ${fwd ? '' : 'disabled'}>${ic('M9 6l6 6-6 6')}</button>
+      <button class="ctl" data-sbstep="999" aria-label="To the last move" ${fwd ? '' : 'disabled'}>${ic('M18 5v14M6 6l8 6-8 6V6z')}</button></div>
+    <p class="evaltext sbkeys">The arrow keys step back and forward too</p>`;
+}
 function sbSetPanelHTML(){
-  const D = S.drill, kids = sbBookKids(D.node), wt = ply(D.node) % 2 === 0, mine = (ME === 1) === wt;
-  const moves = kids.map(c => `<button class="chip sbk" type="button" data-sbk="${c}">${pieceIcon(N[c].pc, N[c].w === 1)}${esc(N[c].l)}</button>`).join('');
-  return `<div class="dpanel"><p class="kicker">Set up a position</p><h3>Play the moves for both sides</h3>
-    ${D.msg || D.hist.length <= 1 ? `<p class="feedback">${D.msg || 'Only moves in your book. Practise from there and only the lines that go on from it come up.'}</p>` : ''}
-    ${kids.length ? `<div><p class="kicker" style="margin-bottom:6px">${mine ? 'Your moves' : `${wt ? 'White' : 'Black'}'s moves`} in your book</p><div class="sbks">${moves}</div></div>` : '<p class="evaltext" style="text-align:left">Your book ends here. Go back a move.</p>'}
-    <div class="lesson-actions"><button class="btn primary" id="sbFromGo" ${sbCanFrom(D.node) ? '' : 'disabled'}>Practise from here</button><button class="btn" id="sbSetBack" ${D.hist.length > 1 ? '' : 'disabled'}>Back a move</button><button class="btn ghost" id="sbSetCancel">Cancel</button></div></div>${sbFeed()}`;
+  const D = S.drill, kids = sbBookKids(D.node), wt = ply(D.node) % 2 === 0, mine = (ME === 1) === wt, all = sbSetAll(), at = D.hist.length - 1;
+  const can = sbCanFrom(D.node), nl = can ? sbLinesThrough(D.node).length : 0;
+  const moves = kids.slice().sort((a, b) => (N[b].q || 0) - (N[a].q || 0)).map(c => `<button class="chip sbk" type="button" data-sbk="${c}">${pieceIcon(N[c].pc, N[c].w === 1)}${esc(N[c].l)}${!mine && N[c].q ? `<span class="tnum">${pctTxt(N[c].q)}</span>` : ''}</button>`).join('');
+  const rows = all.slice(1).map((i, j) => { const k = j + 1, m = N[i];
+    return `<li><button type="button" class="${isMine(m) ? 'you' : 'blk'} ${k === at ? 'last' : ''} ${k > at ? 'fut' : ''}" data-sbj="${k}" ${k === at ? 'aria-current="step"' : ''}><span class="n">${moveNo(k)}${m.w === 1 ? '' : '…'}</span>${pieceIcon(m.pc, m.w === 1)}<span class="fl">${esc(m.l)}</span><span class="fq">${!isMine(m) && m.q ? pctTxt(m.q) : ''}</span></button></li>`; }).join('');
+  const where = D.msg ? `<p class="feedback">${D.msg}</p>` : at === 0 ? bullets(['Make the moves for both sides, on the board or from the list below', 'Stop at the position you want to practise', 'Practise from here then starts every game there'], 'sbhow') : '';
+  return `<div class="dpanel"><p class="kicker">Set up a position</p><h3>${at === 0 ? 'Play the moves up to your position' : `After move ${moveNo(at)}${can ? `: ${nl} ${nl === 1 ? 'line goes' : 'lines go'} on from here` : ''}`}</h3>
+    ${at ? opnHTML(Openings.ofNode(D.node)) : ''}${where}
+    ${kids.length ? `<div><p class="kicker" style="margin-bottom:6px">${mine ? 'Your move in your book' : `What ${wt ? 'White' : 'Black'} can play in your book`}</p><div class="sbks">${moves}</div></div>` : '<p class="evaltext" style="text-align:left">Your book ends here. Step back a move to practise.</p>'}
+    <div class="lesson-actions"><button class="btn primary" id="sbFromGo" ${can ? '' : 'disabled'}>Practise from here</button><button class="btn ghost" id="sbSetCancel">Cancel</button></div></div>
+    ${rows ? `<ol class="feed sbjump" id="sbfeed" aria-label="Moves to this position">${rows}</ol>` : ''}`;
 }
 function sbLineFor(idx){
   const ls = (linesByNode.get(idx) || []).filter(id => DRILLSET.has(id));
@@ -2388,7 +2407,7 @@ function sbReport(){
       <p class="kicker">${C ? esc(C.name) + ' · ' : ''}${L ? esc(L.title) : 'Line complete'}${lid && !LINES[lid].main ? ' · ' + esc(LINES[lid].title) : ''}</p>
       <div class="bigstat"><b class="tnum">${n}</b><span>${n === 1 ? 'slip' : 'slips'} in this game · ${n ? 'this line is back in today\'s review' : `clean; it comes back in ${days} ${days === 1 ? 'day' : 'days'}`}</span></div>
       ${n ? `<div class="slips">${slipCards}</div>` : ''}
-      ${D.choices.length ? `<div><p class="kicker" style="margin-bottom:6px">${OPP}'s choices</p><div class="chain">${chain}</div><p class="evaltext" style="text-align:left">This exact line: ${oneIn(prob)}.</p></div>` : ''}
+      ${D.choices.length ? `<div><p class="kicker" style="margin-bottom:6px">${OPP}'s choices</p><div class="chain">${chain}</div>${prob < .67 ? `<p class="evaltext" style="text-align:left">${D.from ? 'From your position, this' : 'This'} exact line: ${oneIn(prob)}.</p>` : ''}</div>` : ''}
       <div class="lesson-actions"><button class="btn ${CU && cs >= SPAR ? '' : 'primary'}" id="sbAgain">Next game</button>${CU ? `<button class="btn ${cs >= SPAR ? 'primary' : ''}" data-unit="${CU.id}">Back to the ${uword(CU)}</button>` : ''}${lid ? `<button class="btn" data-line="${lid}">Study this line</button><button class="btn ghost" id="sbDrill">Drill it</button>` : ''}<button class="btn ghost" id="sbExplore">Play on with the engine</button></div></div>
       ${lid && planOf(lid) ? planCardHTML(planOf(lid), planKick(lid)) : ''}`;
 }
@@ -2410,7 +2429,9 @@ function sbPanelHTML(){
   const strip = CU ? `<div class="sbcourse"><div><p class="kicker">${CU.deep ? `Deep dive · ${esc(DEEPOF[CU.deep].title)}` : 'Course'} · ${unitNo(CU)} · ${esc(CU.title)}</p>
       <p class="sbcl"><span class="pdots" aria-hidden="true">${Array.from({length: SPAR}, (_, k) => `<i class="${k < cs ? 'on' : ''}"></i>`).join('')}</span>${cs} of ${SPAR} clean practice games${cs >= SPAR ? ': this step is done' : ''}</p></div>
       <button class="btn small" data-unit="${CU.id}">Back to the ${uword(CU)}</button></div>` : '';
-  const head = `<div class="dpanel">${strip}<p class="kicker">${D.from ? 'From your position · ' : ''}${D.slips.length} ${D.slips.length === 1 ? 'slip' : 'slips'} so far${CU ? ` · ${OPP} plays only this ${uword(CU)}'s moves` : ''}</p>
+  // while a game is on: the count so far; once it is over the report has the count, so the line only says where it started
+  const kick = D.state === 'done' ? (D.from ? 'A game from your position' : '') : `${D.from ? 'From your position · ' : ''}${D.slips.length} ${D.slips.length === 1 ? 'slip' : 'slips'} so far${CU ? ` · ${OPP} plays only this ${uword(CU)}'s moves` : ''}`;
+  const head = `<div class="dpanel">${strip}${kick ? `<p class="kicker">${kick}</p>` : ''}
       ${opnHTML(Openings.ofNode(D.node))}
       ${status ? `<div class="status ${D.busy ? 'wait' : ''} ${D.tries ? 'bad' : ''}"><span class="bub"></span>${status}</div>` : ''}
       ${D.state === 'done' ? sbReport() : `<p class="feedback">${D.msg || (D.hist.length <= 2 ? 'Drag a piece or tap it, then tap where it goes.' : '&nbsp;')}</p>`}</div>`;
@@ -2427,7 +2448,8 @@ function wireSbPanel(){
   const dr = document.getElementById('sbDrill'); if (dr && S.drill && S.drill.line) dr.onclick = () => startDrillLine(S.drill.line);
   view.querySelectorAll('[data-sbk]').forEach(b => b.onclick = () => sbSetGo(+b.dataset.sbk));
   const fg = document.getElementById('sbFromGo'); if (fg) fg.onclick = () => { SB_FROM[SIDE] = S.drill.node; S.drill = S.sbState = null; sbStart(); };
-  const sbb = document.getElementById('sbSetBack'); if (sbb) sbb.onclick = sbSetBack;
+  view.querySelectorAll('[data-sbj]').forEach(b => b.onclick = () => sbSetJump(+b.dataset.sbj));
+  const ctl = document.getElementById('sbctl'); if (ctl){ ctl.innerHTML = sbCtlHTML(); ctl.querySelectorAll('[data-sbstep]').forEach(b => b.onclick = () => sbSetStep(+b.dataset.sbstep)); }
   const sc = document.getElementById('sbSetCancel'); if (sc) sc.onclick = () => { S.drill = S.sbState = null; render(); };
   const ex = document.getElementById('sbExplore'); if (ex && S.drill) ex.onclick = () => { const D = S.drill, lid = D.line, L = lid ? lessonOf(lid) : null;
     exploreNode(D.node, {title: `Practice game · ${L ? L.title : 'end of your book'}`, plan: lid && planOf(lid) ? {side: SIDE, line: lid} : null}); };
@@ -2437,7 +2459,7 @@ function sbSideHTML(){
   const ses = S.sbSession, all = Prog.d.sb;
   const pool = DRILLABLE.filter(id => inScopeLine(id, SBS.scope)), seen = all ? pool.filter(id => all.seen[id]).length : 0;
   const D = S.drill, CU = D && D.kind === 'sb' && D.scope.startsWith('u:') ? UNIT[D.scope.slice(2)] : null;
-  if (CU) return '';
+  if (CU || (D && D.kind === 'sbset')) return '';
   const f = sbFrom(), fl = f && N[f].u ? [N[f].u.slice(0, 2), N[f].u.slice(2, 4)] : null;
   const from = `<div class="sbfrom"><p class="kicker" style="margin-bottom:6px">Start from</p>
       ${f ? `<div class="sbfpos">${thumb(f, {coords: false, last: fl})}<div><b>After move ${moveNo(ply(f))}: ${esc(N[f].l)}</b><span>Only the lines that go on from this position come up.</span></div></div>` : '<p class="evaltext" style="text-align:left;margin:0">The first move</p>'}
@@ -2469,7 +2491,7 @@ function renderSandbox(){
   const D = S.drill;
   view.innerHTML = `  <div class="sgrid">
     <div class="bcol"><div class="board ${D && D.state === 'play' ? 'input' : ''}" id="db">${D ? '' : boardSVG(N[0].f, {coords: true})}</div>
-      <div class="legend" style="margin-top:10px"><span><i style="background:var(--arr-g)"></i>the move in your book</span><span><i style="background:var(--arr-r)"></i>what you tried</span></div>
+      <div id="sbctl">${sbCtlHTML()}</div>
       ${D && D.kind === 'sb' && D.scope.startsWith('u:') ? `<button class="btn freeplay" id="sbFree"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M4 12h16M4 18h7"/><circle cx="17" cy="6" r="2.2"/><circle cx="14" cy="18" r="2.2"/></svg>Free play: pick your own openings</button>` : ''}</div>
     <div class="ccol"><div id="sbpanel">${sbPanelHTML()}</div><div id="sbside">${sbSideHTML()}</div></div>
   </div>`;
@@ -2542,9 +2564,7 @@ function renderGames(){
     : seg === 'games' ? `<div class="grevs">${DATA.games.map(gameRow).join('')}</div>`
     : `<p class="legendline">${OPP}'s move is highlighted, the green arrow is your answer.</p><div class="otiles">${DATA.chapters.map(C => openTile(SIDE, C, C.stats, `data-ch="${C.id}"`)).join('')}</div>`;
   if (rc) segs[segs.length - 1][4] = Recap.fresh();      // after the body: opening a finished month marks it seen
-  view.innerHTML = `<div class="chead ghd"><div><p class="kicker">Your games</p><h2>${st.total} games with ${MYC}</h2>
-      <p class="grec"><span><b class="tnum">${st.wins}</b> ${st.wins === 1 ? 'win' : 'wins'}</span><span><b class="tnum">${st.losses}</b> ${st.losses === 1 ? 'loss' : 'losses'}</span>${st.draws ? `<span><b class="tnum">${st.draws}</b> ${st.draws === 1 ? 'draw' : 'draws'}</span>` : ''}</p></div></div>
-    ${segHTML(segs, seg, 'gseg')}<div class="gbody">${body}</div>`;
+  view.innerHTML = `${segHTML(segs, seg, 'gseg')}<div class="gbody">${body}</div>`;
   view.querySelectorAll('[data-gseg]').forEach(b => b.onclick = () => { S.gseg = b.dataset.gseg; renderGames(); });
   view.querySelectorAll('[data-puz]').forEach(b => b.onclick = () => startPuzzle(+b.dataset.puz));
   if (rc){ if (seg === 'recap') Recap.wire(view); Recap.auto(); }
