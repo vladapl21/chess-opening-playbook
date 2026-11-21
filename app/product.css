@@ -94,6 +94,11 @@
 @media (max-width:980px){ .duo.trio{grid-template-columns:minmax(0,1fr)} .duo.trio .or{justify-self:center} }
 .duo.quad{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr);width:min(100%,1240px);gap:8px}
 .duo.quad .wopt{padding:12px} .duo.quad .wopt b{font-size:19px} .duo.quad .or{font-size:18px}
+/* five or six systems to choose from: a grid, three to a row, with no "or" between them */
+.duo.many{grid-template-columns:repeat(5,minmax(0,1fr));width:min(100%,1320px);gap:10px;align-items:stretch} .duo.many .or{display:none}
+.duo.many .wopt{padding:12px} .duo.many .wopt b{font-size:18px}
+@media (max-width:1240px){ .duo.many{grid-template-columns:repeat(3,minmax(0,1fr));width:min(100%,900px)} }
+@media (max-width:760px){ .duo.many{grid-template-columns:minmax(0,1fr);width:min(100%,520px)} .duo.many .wopt .board{max-width:240px} }
 @media (max-width:1100px){ .duo.quad{grid-template-columns:minmax(0,1fr);width:min(100%,520px)} .duo.quad .or{justify-self:center} .duo.quad .wopt .board{max-width:260px} }
 .duo .or{align-self:center;font-family:var(--f-display);font-style:italic;font-size:22px;color:var(--muted)}
 .wopt{display:grid;gap:12px;align-content:start;text-align:left;padding:16px;border-radius:6px;border:2px solid var(--line);background:var(--surface);cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s;min-width:0}
@@ -118,6 +123,11 @@
 /* one size on every tab; while you are being tested the coach only steps back a little */
 .coach.quiet .cav{opacity:.8}
 .cface svg{display:block;width:100%;height:auto}
+/* depth on the characters and their gear: a see-through shade and light over the flat shapes (tokens --kn-sh, --kn-hi) */
+.kn-sh,.g-sh{fill:var(--kn-sh)} .kn-hi,.g-hi{fill:var(--kn-hi)} .kn-strand{fill:none;stroke:var(--kn-hi);stroke-width:1.3;stroke-linecap:round} .kn-brick,.g-seam{fill:none;stroke:var(--kn-sh);stroke-width:.8;stroke-linecap:round}
+.kn-glint{fill:var(--surface)} .kn-lid{fill:none;stroke:var(--ink);stroke-width:1;stroke-linecap:round} .kn-brow{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round} .kn-ear{fill:var(--km,var(--accent-soft));opacity:.7} .kn-foot{fill:var(--ink)} .kn-jewel{fill:var(--rosso)} .kn-mouth{fill:var(--ink);stroke:var(--ink);stroke-width:1.6;stroke-linejoin:round} .kn-tongue{fill:var(--rosso)}
+.g-trim{fill:none;stroke:var(--oro);stroke-width:1.1;stroke-linecap:round} .g-leaf{fill:var(--accent)}
+svg [data-g]{filter:drop-shadow(0 .5px .45px var(--kn-drop))} .g-halo{filter:drop-shadow(0 0 1.6px var(--oro))}
 .kn-body{fill:var(--kb,var(--accent))} .kn-mane{fill:var(--ink)} .kn-muzzle{fill:var(--km,var(--accent-soft))} .kn-eye{fill:var(--surface)} .kn-pupil{fill:var(--ink)} .kn-line{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round} .kn-blush{fill:var(--rosso);opacity:.35} .kn-base{fill:var(--ink)} .kn-crown{fill:var(--oro)}
 .coachpick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .coachpick button{display:grid;justify-items:center;gap:2px;padding:12px 6px 10px;border-radius:6px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font:inherit;min-width:0}
@@ -228,6 +238,15 @@ body:has(.coach:not([hidden])) .foot{padding-right:100px}
 .item .price,.item .owned,.item .wearing{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;color:var(--muted);font-weight:600} .item .wearing{color:var(--accent)}
 .item .need{font-size:12px;color:var(--muted)} .item .btn.small{min-height:32px;gap:5px} .item .btn .coin{width:15px;height:15px}
 @media (max-width:860px){ .shop{grid-template-columns:minmax(0,1fr)} .shopside{position:static} .wlock{grid-template-columns:minmax(0,1fr)} }
+/* one column: the coach sits small beside the tokens, so the shelf is on the first screen of a phone */
+@media (max-width:860px){
+  .shopside{grid-template-columns:112px minmax(0,1fr);grid-template-areas:"man bal" "man earn" "pick pick";gap:8px 14px;padding:14px;align-items:start}
+  .shopside .mannequin{grid-area:man;align-self:stretch;padding:8px 0 2px} .shopside .mannequin svg{width:88%}
+  .shopside .bal{grid-area:bal} .shopside .bal b{font-size:30px} .shopside .earn{grid-area:earn;font-size:13px;gap:3px}
+  .shopside .coachpick{grid-area:pick;margin-top:4px}
+  .coachpick.mini button{display:flex;align-items:center;justify-content:center;gap:7px;padding:5px 6px;min-height:44px} .coachpick.mini .cface{width:30px;height:30px;margin:0;padding:3px 2px 0} .coachpick.mini b{font-size:14px}
+  .shop{gap:16px} .shopmain{gap:16px}
+}
 /* after the first course: the big moment */
 .gradv{position:relative;display:grid;gap:22px;justify-items:center;text-align:center;overflow:hidden;background:radial-gradient(ellipse at 50% 0%,var(--oro-soft),transparent 64%),var(--surface);border:1px solid var(--line);border-radius:8px;padding:34px 22px 28px;box-shadow:var(--shadow);margin:4px 0 24px}
 .grhero{display:grid;justify-items:center;gap:6px;max-width:660px;position:relative;z-index:1}
@@ -297,7 +316,7 @@ body:has(.coach:not([hidden])) .foot{padding-right:100px}
 .lvring i:nth-child(odd){background:var(--accent)}
 @keyframes lvray{0%{opacity:1;transform:rotate(var(--a)) translateY(-26px)}100%{opacity:0;transform:rotate(var(--a)) translateY(-50px)}}
 .lvsay{display:grid;gap:3px;min-width:0} .lvsay .kicker{margin:0} .lvsay b{font:700 22px/1.1 var(--f-display)} .lvsay span{font-size:13.5px;color:var(--muted);line-height:1.4} .lvsay .btn{justify-self:start;margin-top:6px}
-.lvup .x{position:absolute;top:6px;right:6px}
+.lvup .x{position:absolute;top:4px;right:4px;width:34px;height:34px;display:grid;place-items:center;border:0;background:none;color:var(--muted);font-size:20px;line-height:1;cursor:pointer;border-radius:50%} .lvup .x:hover{background:var(--surface-2);color:var(--ink)}
 /* the level at the top of the profile */
 .plevel{display:flex;align-items:center;gap:14px;padding:4px 0 2px} .plevel > div{display:grid;gap:4px;flex:1;min-width:0}
 .plevel b{font:700 20px/1.1 var(--f-display)} .plevel span{font-size:13px;color:var(--muted)}
@@ -389,22 +408,34 @@ button.rcrow{cursor:pointer} button.rcrow:hover{border-color:var(--accent)}
 .twdim{fill:var(--tour-shade);pointer-events:auto}
 .twblock{fill:transparent;pointer-events:auto} .twalk.free .twblock{pointer-events:none}
 .twring{position:absolute;border-radius:12px;box-shadow:0 0 0 3px var(--accent),0 0 0 7px var(--tour-ring);pointer-events:none;transition:left .25s,top .25s,width .25s,height .25s}
-.twcard{position:absolute;left:12px;top:12px;width:min(410px,calc(100vw - 24px));box-sizing:border-box;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:16px;
-  box-shadow:0 18px 50px rgba(0,0,0,.3);padding:16px 16px 14px;display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;pointer-events:auto;outline:none;transition:left .25s,top .25s}
-.twface{width:52px;height:52px} .twface svg{width:100%;height:100%}
+.twcard{position:absolute;left:12px;top:12px;width:min(420px,calc(100vw - 24px));box-sizing:border-box;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:16px;
+  box-shadow:0 18px 50px rgba(0,0,0,.3);padding:0 18px 16px;pointer-events:auto;outline:none;transition:left .25s,top .25s;overflow:hidden}
+.twbar{height:4px;background:var(--line);margin:0 -18px;overflow:hidden} .twbar i{display:block;height:100%;background:var(--accent);border-radius:0 4px 4px 0;transition:width .3s}
+.twhead{display:flex;align-items:center;gap:10px;margin:14px 0 8px}
+.twface{flex:none;width:44px;height:44px;border-radius:50%;background:var(--accent-soft);display:grid;place-items:center;overflow:hidden} .twface svg{width:82%;height:82%}
+.twstep{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex:1;min-width:0;margin:0;font-size:12px;color:var(--muted);font-weight:600} .twstep b{color:var(--ink);font-size:15px}
 .twbody{min-width:0}
-.twstep{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:2px 0 0;font-weight:600} .twstep b{color:var(--accent)}
-.twbar{height:3px;background:var(--line);border-radius:3px;margin:7px 0 10px;overflow:hidden} .twbar i{display:block;height:100%;background:var(--accent);transition:width .25s}
-.twcard h3{font-size:19px;line-height:1.25;margin:0 0 6px;text-wrap:balance}
+.twcard h3{font-family:var(--f-display);font-size:22px;line-height:1.15;margin:0 0 8px;text-wrap:balance}
 .twcard .bul{font-size:14.5px;margin:0}
-.twdo{margin:10px 0 0;font-weight:700;color:var(--accent)} .twdo::before{content:"→ "} .twdo.ok::before{content:"✓ "}
+.twdo{margin:12px 0 0;padding:8px 12px;border-radius:8px;background:var(--accent-soft);font-weight:700;color:var(--accent)} .twdo::before{content:"→ "} .twdo.ok::before{content:"✓ "}
 .twnote{font-size:13px;color:var(--muted);margin:8px 0 0}
-.twacts{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;justify-content:flex-end;align-items:center}
-.twacts .btn{min-height:38px}
+.twacts{display:flex;gap:8px;margin-top:16px;align-items:stretch}
+.twacts .btn{min-height:44px} .twback{flex:none} .twnext{flex:1;justify-content:center;position:relative;overflow:hidden;min-width:112px}
+/* Next is held while the step is read: greyed, with a bar that fills along its lower edge */
+.twnext.holding{background:var(--surface-2);border-color:var(--line);color:var(--muted);opacity:1;cursor:default}
+.twnext i{position:absolute;left:0;bottom:0;height:4px;width:100%;background:var(--accent);transform-origin:0 50%;animation:twhold var(--hold) linear var(--held) both}
+@keyframes twhold{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 .twff[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
-.twcard .coachpick{margin-top:10px}
-@media (max-width:640px){ .twcard{grid-template-columns:40px minmax(0,1fr);padding:14px 14px 12px;gap:10px} .twface{width:40px;height:40px} .twcard h3{font-size:17px} .twcard .bul{font-size:14px} .twacts{margin-top:10px} }
-@media (prefers-reduced-motion: reduce){ .twring,.twcard,.twbar i{transition:none} }
+.twcard .coachpick{margin-top:12px}
+/* a phone: the card is a sheet across the bottom of the screen (or the top), and the page can scroll far enough for
+   anything to sit clear of it */
+@media (max-width:640px){
+  .twcard{width:100vw;left:0;border-radius:18px 18px 0 0;border-width:1px 0 0;padding:0 16px calc(14px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 34px rgba(0,0,0,.28);max-height:62vh;overflow-y:auto;transition:top .25s}
+  .twcard.attop{border-radius:0 0 18px 18px;border-width:0 0 1px;box-shadow:0 10px 34px rgba(0,0,0,.28);padding:env(safe-area-inset-top,0px) 16px 14px}
+  .twbar{margin:0 -16px} .twhead{margin:12px 0 6px} .twface{width:38px;height:38px} .twcard h3{font-size:20px} .twcard .bul{font-size:14px} .twacts{margin-top:12px}
+  html.twon body{padding-bottom:64vh}
+}
+@media (prefers-reduced-motion: reduce){ .twring,.twcard,.twbar i{transition:none} .twnext i{animation-timing-function:steps(1,end)} }
 
 /* the last three games: a card per game, a row per thing to drill */
 .rvwrap{display:grid;gap:14px}
@@ -448,6 +479,22 @@ button.rcrow{cursor:pointer} button.rcrow:hover{border-color:var(--accent)}
 /* the crate */
 .cratebox{display:grid;grid-template-columns:150px minmax(0,1fr);gap:18px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin-bottom:12px}
 .crateart svg{display:block;width:100%;height:auto} .cr-wood{fill:var(--sk-sand)} .cr-lid{fill:var(--sk-clay)} .cr-band{fill:var(--oro)} .cr-lock{fill:var(--ink)} .cr-key{fill:var(--oro)}
+.cr-shadow{fill:var(--kn-drop);opacity:.5} .cr-dark{fill:var(--kn-sh)} .cr-lite{fill:var(--kn-hi)} .cr-plank{fill:none;stroke:var(--kn-sh);stroke-width:1.2} .cr-rivet{fill:var(--gear-ink)}
+.cratebox[data-cratepage]{cursor:pointer;transition:border-color .15s,transform .15s} .cratebox[data-cratepage]:hover{border-color:var(--oro)} .crateacts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.crateback{margin-bottom:10px;gap:6px} .items.daily + .cratebox{margin-top:16px}
+/* the crate bought and waiting: it floats and glows until it is tapped, then shakes open into the reel */
+.cratewait{position:relative;display:grid;justify-items:center;gap:12px;padding:30px 10px 10px;overflow:hidden;border-radius:6px} .cratewait[hidden]{display:none}
+.cratetap{position:relative;z-index:1;width:min(230px,60vw);padding:0;border:0;background:none;cursor:pointer;animation:crfloat 2.6s ease-in-out infinite;filter:drop-shadow(0 0 14px var(--oro))}
+.cratetap svg{display:block;width:100%;height:auto}
+.crays{position:absolute;left:50%;top:46%;width:470px;height:470px;margin:-235px 0 0 -235px;border-radius:50%;opacity:.3;animation:rays 18s linear infinite;
+  background:repeating-conic-gradient(from 0deg,var(--oro) 0 8deg,transparent 8deg 24deg);-webkit-mask-image:radial-gradient(circle,#000 0 30%,transparent 66%);mask-image:radial-gradient(circle,#000 0 30%,transparent 66%)}
+/* no box round the crate when it has the focus: it glows brighter instead */
+.cratetap:focus-visible{outline:none} .cratetap:focus-visible svg{filter:drop-shadow(0 0 5px var(--accent))}
+.cratehint{margin:0;position:relative;z-index:1;font-weight:700;color:var(--ink);background:var(--surface);border:1px solid var(--line);padding:6px 16px;border-radius:999px;animation:crpulse 1.6s ease-in-out infinite}
+@keyframes crfloat{0%,100%{transform:translateY(0) rotate(-1.5deg)}50%{transform:translateY(-10px) rotate(1.5deg)}} @keyframes crpulse{50%{opacity:.62}}
+.cratewait.opening .cratetap{animation:crshake .64s cubic-bezier(.3,0,.3,1) forwards} .cratewait.opening .cratehint{visibility:hidden}
+@keyframes crshake{0%{transform:scale(1)}14%{transform:scale(1.05) rotate(-6deg)}28%{transform:scale(1.08) rotate(6deg)}42%{transform:scale(1.1) rotate(-5deg)}58%{transform:scale(1.14) rotate(4deg)}100%{transform:scale(1.55);opacity:0;filter:brightness(2.2) drop-shadow(0 0 32px var(--oro))}}
+@media (prefers-reduced-motion: reduce){ .cratetap,.crays,.cratehint{animation:none} }
 .crateinfo{display:grid;gap:9px;justify-items:start} .crateinfo h3{font-family:var(--f-display);font-size:24px;line-height:1.1;margin:0} .crateinfo p{margin:0;color:var(--muted);font-size:14px}
 .crateinfo .btn{gap:7px} .crateinfo .btn .coin{width:17px;height:17px} .codds{display:flex;flex-wrap:wrap;gap:6px}
 .cratein .item .ipv{width:84px;height:84px}
@@ -479,3 +526,13 @@ button.rcrow{cursor:pointer} button.rcrow:hover{border-color:var(--accent)}
 .au-nova circle{fill:var(--rar-legendary-soft)} .au-nova .aurays{transform-origin:32px 33px;animation:rays 18s linear infinite} .au-nova .aurays path{fill:var(--rar-legendary);opacity:.6}
 @keyframes autwink{0%,100%{opacity:1}50%{opacity:.25}}
 @media (prefers-reduced-motion: reduce){ .sk-aurora .kn-body,.aura *,.prays{animation:none} }
+
+/* a phone: things to tap are at least a fingertip high, and a long choice in Advanced settings gets a row of its own */
+@media (max-width:640px){
+  .chnav .chip{min-height:32px;padding:6px 11px} .crumbs .btn.small, .lesson-head .btn.small{min-width:36px}
+  .repdet .setseg:has(> :nth-child(3)){grid-auto-flow:row;grid-auto-columns:auto;grid-template-columns:minmax(0,1fr)} .repdet .setseg button{min-height:40px}
+}
+@media (pointer:coarse), (max-width:640px){ button.linkish{padding-block:7px;margin-block:-7px} }
+/* four or five systems in one row of Advanced settings: two to a line */
+.repdet .setseg:has(> :nth-child(4)){grid-auto-flow:row;grid-auto-columns:auto;grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:640px){ .repdet .setseg:has(> :nth-child(3)){grid-template-columns:minmax(0,1fr)} }

@@ -356,8 +356,8 @@ L('rr-owen', 'rare-all', 'Bishop to the long diagonal', 'Guard your e-pawn with 
         ('rr-owen-g6', 'Double fianchetto', J("e4 b6 d4 Bb7 Bd3 g6 Nf3 Bg7 O-O")),
         ('rr-owen-nf6', 'Knight hits your e-pawn', J("e4 b6 d4 Bb7 Bd3 Nf6 Qe2"))],
   why='You lost your e-pawn and the game in 6 moves against this.', outcome='A big center, safely guarded', tags=['game'])
-L('rr-nimzo', 'rare-all', 'Knight first', 'Knight out too; often you are back in the Italian', 'common',
-  J("e4 Nc6 Nf3 e5 Bc4"),
+L('rr-nimzo', 'rare-all', 'Knight first', 'Knight out too; often you are back in your own opening', 'common',
+  J("e4 Nc6 Nf3 e5"),
   alts=[('rr-nimzo-d5', 'Pawn strike', J("e4 Nc6 Nf3 d5 exd5 Qxd5 Nc3 Qd8 d4")),
         ('rr-nimzo-qe6', 'Pawn strike, queen check', J("e4 Nc6 Nf3 d5 exd5 Qxd5 Nc3 Qe6+ Be2")),
         ('rr-nimzo-nf6', 'Knight hits your e-pawn', J("e4 Nc6 Nf3 Nf6 e5 Nd5 d4 d6 c4 Nb6 exd6")),
@@ -378,6 +378,8 @@ CHAPTERS = [
   dict(id='italian', name='The Italian', move='Giuoco Piano, Two Knights, Fried Liver, Traxler', parts=['setup', 'bishop', 'knight', 'odd']),
   # the slow Italian: a second variation of the Italian (slot whiteItalian in content2_meta.py), lessons and notes in italslow.py
   dict(id='italians', name='The slow Italian', move='Giuoco Pianissimo, Two Knights with the small d-pawn', parts=['sl-bishop', 'sl-knight', 'sl-odd']),
+  # the Ruy Lopez: a third variation of the same step (the bishop comes at the knight), lessons and notes in ruylopez.py
+  dict(id='ruy', name='Ruy Lopez', move='Closed, Berlin, Steinitz, Classical, Bird, Cozio', parts=['rl-morphy', 'rl-third']),
   dict(id='e5x', name='Philidor & Petrov', move='Philidor, Petrov, Stafford, Latvian, Elephant', parts=['e5x-phil', 'e5x-pet', 'e5x-misc']),
   dict(id='caro', name='Caro-Kann', move='Classical, Karpov, Tartakower, Bronstein-Larsen', parts=['caro-main', 'caro-other4', 'caro-third']),
   dict(id='sic', name='Sicilian', move='The Alapin against every second move', parts=['sic-knight', 'sic-pawn', 'sic-rare']),
@@ -408,5 +410,6 @@ import english  # noqa: E402,F401  the English Opening for White (its own pack)
 import sicopen  # noqa: E402,F401  the Open Sicilian: the Sicilian's second variation for White (its own pack, beside the Alapin)
 import caroadv  # noqa: E402,F401  the Advance against the Caro-Kann (its own pack, beside the main line)
 import italslow  # noqa: E402,F401  the slow Italian (its own pack, beside the center attack)
+import ruylopez  # noqa: E402,F401  the Ruy Lopez (its own pack, a third way after both knights come out)
 import odd  # noqa: E402,F401  odd first, second and third moves, in the house chapters
 import wfill  # noqa: E402,F401  replies that came up often and had no line, and named gambits (side lines of the lessons above)

@@ -69,6 +69,23 @@ Facts that shape the design:
 - Settings and the account button moved out of the header into the corner of the screen; the header fits one row on an ordinary monitor and centres its rows when it has to wrap.
 - A lesson opened from a course unit has "Next lesson" at the top. The Sandbox has "Free play: pick openings" to leave a course practice game.
 
+## Phase 1.25: the last openings on the cards, and a polish pass (done, November 21)
+
+Nothing on a choice card says "being written" any more, and the app was gone over screen by screen on a phone and a desktop.
+
+- **The French** for Black (13 lessons, 107 lines): the Advance with three pieces on the base of the chain, the Exchange, the Steinitz, the Burn and the Tarrasch, and the second moves that hold the d-pawn back.
+- **The Queen's Gambit Declined** for Black (two chapters, 13 lessons, 124 lines): the Lasker Defense against the pin, the Exchange, the Catalan and the quiet lines; and against the London, the Colle and the Jobava, where your own c-pawn goes two squares.
+- **The Ruy Lopez** for White (10 lessons, 89 lines), a third answer to "where does the bishop go on move three" beside the two Italians: the Closed, the pawns that chase the bishop, the Berlin, the Steinitz, the Classical, the Bird, the Cozio and the Schliemann. The Nimzowitsch line that reaches that position by another order now ends a move earlier, where the three part.
+- **Drafted and checked like the packs before them**: each has a course unit, a deep dive, cards at a glance and written plans for its main lessons, and no line loses ground to the engine at depth 14. A setup's order now only brings a piece out from home, so a drafted line never moves a developed piece twice for nothing.
+- **A choice card holds up to six systems** (five against the e-pawn): from five on they stand in a grid.
+- **The shop.** Every piece on the shelf has a rarity: mostly common, a rare one now and then, an epic one on one day of each week, never a legendary one. The crate is a banner under the shelf with a page of its own, and a bought crate floats and glows until it is tapped.
+- **A line that changes keeps its record.** Nothing on the page says a line changed, and nothing comes due because of it.
+- **The tour.** On a phone the card is a sheet at the bottom of the screen and never covers what it points at. A first run has no Fast forward, and Next waits behind a bar that fills while the step is read.
+- **The coaches and the hats** were redrawn with light and shade.
+- **The sweep.** Every screen at 390 and 1280 pixels in both themes, with checks for sideways scrolling, clipped labels, overlapping and undersized buttons, and 2,800 random taps with no script error. Fixed on the way: the shop's shelf below the fold on a phone, small things to tap, long choices in Advanced settings.
+- **The cost.** The page is 11.4 MB (was 10).
+- **Next** is outside the code: more friends on it, a real address, and the app stores. In the library, the one large opening not written is the Queen's Gambit for White (the London and the English are the d-pawn and flank repertoires for now).
+
 ## Phase 1.24: two variations of four openings (done, November 20)
 
 The choice the last phase ended on: which Sicilian, which line against the Caro-Kann, the center attack or the slow Italian.
@@ -79,7 +96,7 @@ The choice the last phase ended on: which Sicilian, which line against the Caro-
 - **Drafted like the Scandinavian** (`pipeline/drafts/`): the other side by the Maia odds, yours from the setup's order where Stockfish accepts it. Each has a course unit, a deep dive, cards at a glance and plans, and no line loses ground to the engine at depth 14.
 - **One line shortened.** The Nimzowitsch line that runs into the Italian is held with both Italians, so it ends where they part.
 - **The cost.** The page is 10 MB (was 8.7).
-- **Next: the French and the Queen's Gambit Declined** for Black, then second variations where players ask for them (the Najdorf, the Exchange against the Caro-Kann, the Ruy Lopez for White as a variation of the e-pawn's second step).
+- **Next** (done in Phase 1.25): the French and the Queen's Gambit Declined for Black, and the Ruy Lopez for White as a third variation of the e-pawn's second step. Still open: second variations where players ask for them (the Najdorf, the Exchange against the Caro-Kann).
 
 ## Phase 1.23: notes from play, one commit each (done, November 20)
 
@@ -280,7 +297,7 @@ The original plan for this phase, for reference:
 2. ~~A d-pawn system for White~~ Done on November 19: the London (`content/white/london.py`, lessons and notes in one file): 3 chapters (`london` against the d-pawn, `lindian` against the king's knight, `lrare` for the rest), 18 lessons, 102 lines, units `w-london`, `w-lindian` and `w-lrare`, deep dives for the first two, a plan for every lesson, 19 cheat-sheet rows. One setup, one order (README); Black's moves from the Maia odds, every White move checked at depth 14 with no line losing ground (`pipeline/check_white.py`, now part of `make check`). `PACKS` for White sits in `content/white/content2_meta.py`; the e-pawn book is untouched (same lines, same node numbers; only the root gained a second child). The page sets the book's first move to the system in play (`applyPacks`), so the Sandbox opens with the d-pawn; `oddsRoot` stays on the e-pawn node, where the odds are the house player's own games. Original note: (slot `white`). The White build has no packs yet: give its chapters `slot`/`pack` the way `build_black.py` does and write `packs` into the book. The White book's root has one first move today; the chapter stats, `e4` and `oddsRoot` fields assume it.
 3. ~~The English for White~~ Done on November 19 (Phase 1.18).
 4. Coverage gaps in the Caro-Kann that `check_black.py` lists as `W-MISS` (the most common: the Two Knights after the bishop comes out, the pawn trade with the bishop check taken), and in the London that `check_white.py` lists as `B-MISS`. The London's are almost all move orders into positions the book already has, by a path it doesn't (the tree is kept by moves, not positions): the most common is the king's knight before the queen's knight and then the e-pawn or the bishop, about one game in 150 each.
-5. ~~A second answer to the d-pawn for Black~~ Done on November 19: the King's Indian, and the Scandinavian as a fourth answer to the e-pawn (Phase 1.18). **Next: the French** (slot `blackE4`, pack `french`) **and the Queen's Gambit Declined** (slot `blackD4`, pack `qgd`), both already on the cards as "being written"; then the shared chapter for White's other first moves, split into packs so a King's Indian player can fianchetto there too.
+5. ~~A second answer to the d-pawn for Black~~ Done on November 19: the King's Indian, and the Scandinavian as a fourth answer to the e-pawn (Phase 1.18). ~~The French and the Queen's Gambit Declined~~ Done on November 21 (Phase 1.25), with the Ruy Lopez for White. Left for later: the shared chapter for White's other first moves, split into packs so a King's Indian player can fianchetto there too.
 
 **The tools these need** (none are in the repository, and each new chat starts on a clean machine): `pip install chess`; Stockfish built from source (`git clone https://github.com/official-stockfish/Stockfish`, `make -j build ARCH=x86-64-avx2` in `src`, with the two network files fetched from the Stockfish repository's releases or raw files); the Maia weights (`git clone https://github.com/CSSLab/maia-chess`, the `maia_weights` folder); and `git clone https://github.com/LeelaChessZero/lczero-training`. Point `STOCKFISH`, `MAIA_WEIGHTS` and `LCZERO_TRAINING` at them. With network access on, a chat can set all of this up in about ten minutes. The exact commands that worked on November 17 are in the README ("Changing the books"): the tag `sf_17.1`, so new evaluations match the cached ones; `make net` is blocked by the proxy, but `raw.githubusercontent.com/official-stockfish/networks` serves both network files; a sparse clone of maia-chess fetches only the weights.
 

@@ -309,10 +309,9 @@ W = {
   'rr-owen': dict(h='Big center, guarded', b=[
     ('pawns', 'Push the e-pawn past the knight when it gains space.'),
     ('pieces', 'Castle, rook behind the center pawns.')]),
-  'rr-nimzo': dict(h='Back in your Italian', b=[
-    ('pieces', 'The position is the one your Italian lessons start from. Every move from here is theirs.'),
-    ('king', 'Castle short.'),
-    ('target', 'f7.')]),
+  'rr-nimzo': dict(h='Back where your own lessons start', b=[
+    ('pieces', 'Both knights are out and both e-pawns are in the middle: the position your lessons after the two knights start from. Your bishop goes where it goes there.'),
+    ('king', 'Castle short.')]),
   'rr-alekhine': dict(h='Two bishops and space', b=[
     ('pawns', 'The c-pawn kicks the knight; your pawns take space.'),
     ('pieces', 'Keep the position open for the bishops.')]),
@@ -410,6 +409,23 @@ W = {
     ('pieces', 'If the knight goes to the middle, the bishop takes the h-pawn with check and the attack crashes through.'),
     ('watch', 'If the knight jumps forward instead, the small h-pawn move sends it to the edge, and your bishop takes it there.')]),
   # ---------------------------------------------------------------- the slow Italian
+  'rl-b5': dict(h='The same setup, with the bishop already home', b=[
+    ('pieces', 'Rook beside the king, c-pawn one square, then the d-pawn: the same order as in the main line.'),
+    ('pawns', 'The a-pawn two squares hits the pawns that chased your bishop.'),
+    ('target', 'f7. The bishop looks at it from a square where no pawn can ask it to move again.')]),
+  'rl-berlin': dict(h='Level pawns, better pieces', b=[
+    ('pieces', 'The bishop has stepped out of the knight\'s reach. Queen\'s knight out, d-pawn two squares, and your rook already has the open file.'),
+    ('target', 'Black\'s knight stands in front of its own d-pawn. While it stays there, the bishop behind it can\'t come out.'),
+    ('them', 'Black wants to castle and bring that knight round to a better square.')]),
+  'rl-steinitz': dict(h='More room: use it slowly', b=[
+    ('pieces', 'Queen\'s knight out, the bishop back out of reach to keep the pair, the queen to the middle.'),
+    ('pawns', 'Your e-pawn holds more of the middle than Black\'s d-pawn. Keep it where it is.'),
+    ('them', 'Black wants to trade pieces: with less room, every trade helps.')]),
+  'rl-main': dict(h='The d-pawn forward, then the knight goes round', b=[
+    ('pawns', 'The d-pawn two squares, with the c-pawn behind it. If Black trades, a pawn stands in the middle again.'),
+    ('pieces', 'The queen\'s knight goes behind the d-pawn, back to the first rank and out again on the king\'s side.'),
+    ('target', 'Black\'s king. Bishop, knights and queen all end up pointing at it.'),
+    ('them', 'Black wants to push the c-pawn and play on the queen\'s side, where the pawns have already moved up.')]),
   'sl-main': dict(h='Knight round, then the d-pawn forward', b=[
     ('pieces', 'The knight goes behind the rook and out to the kingside. The bishop steps back out of reach when a pawn or a knight comes at it.'),
     ('pawns', 'When every piece is ready, the d-pawn goes one more square.'),
@@ -719,6 +735,35 @@ B = {
     ('pieces', 'The king\'s knight comes out behind the e-pawn and heads for the square where it hits the d-pawn too.'),
     ('them', 'White wants to keep the chain and use the extra space on the kingside.')]),
   # ---------------------------------------------------------------- the Dragon
+  'bqg-exch': dict(h='Knights behind the pawns, then the bishop out', b=[
+    ('pieces', 'The queen\'s knight comes out behind the c-pawn and the rook takes the open file. Then the knight swings round to guard the king, and the light bishop comes out.'),
+    ('pawns', 'Keep the c-pawn and the d-pawn where they are: together they can\'t be broken.'),
+    ('watch', 'White\'s queen and bishop line up on the pawn beside your king. The knight that swings round covers it.'),
+    ('them', 'White wants to push the b-pawn up the board at your c-pawn.')]),
+  'bfr-adv': dict(h='Pile up on the d-pawn', b=[
+    ('pieces', 'The king\'s knight goes round to the square that hits the d-pawn a fourth time. Then the bishop one square, and castle.'),
+    ('target', 'The d-pawn. Every piece White needs to hold it is a piece that can\'t attack you.'),
+    ('pawns', 'Later the f-pawn goes one square at the head of the chain.'),
+    ('them', 'White wants to keep the chain whole and use the room on the king\'s side.')]),
+  'bfr-exch': dict(h='The same position for both: be the one who is ready first', b=[
+    ('pieces', 'Queen\'s knight behind the bishop, then a rook to the open file.'),
+    ('watch', 'White\'s bishop is at your knight and yours is at White\'s. Back your knight up with the queen\'s knight before anything else.'),
+    ('them', 'White wants the open file too. If you can\'t win it, trade the rooks there.')]),
+  'bqg-main': dict(h='Fewer pieces, more room', b=[
+    ('pawns', 'The pawn that took the knight chases White\'s knight away. Then the e-pawn or the c-pawn goes two squares, and your bishop has an open line.'),
+    ('pieces', 'Queen\'s knight out, then the bishop: by then it has somewhere to go.'),
+    ('king', 'Your king is safe, with a square of its own from the h-pawn move.'),
+    ('them', 'White wants to go after your pawn in the middle. Your f-pawn can back it up.')]),
+  'bqx-london': dict(h='Castled; now the e-pawn', b=[
+    ('pieces', 'The queen goes one square and the rooks come to the middle.'),
+    ('pawns', 'The e-pawn two squares is the break: it opens the game for your pieces. The b-pawn one square, with the bishop behind it, is the quiet way.'),
+    ('watch', 'White\'s knight wants the square in front of your e-pawn. Take it when it lands there.'),
+    ('them', 'White wants a knight in the middle and a pawn storm on the king\'s side behind it.')]),
+  'bfr-steinitz': dict(h='Break the chain from both ends', b=[
+    ('pawns', 'Trade the c-pawn in the middle when it suits you; later the f-pawn goes one square at the head of the chain.'),
+    ('pieces', 'Bishop one square and castle. The knight that stepped back comes to the queen\'s side.'),
+    ('target', 'The pawn at the base of the chain. Queen and knight already hit it.'),
+    ('them', 'White wants to keep the chain whole and attack on the king\'s side behind it.')]),
   'bdr-yugo': dict(h='Your attack runs down the half-open file', b=[
     ('pieces', 'The knight in the middle can jump in beside White\'s king; if a bishop takes it, your rook takes back and stays on the file.'),
     ('target', 'The knight in front of White\'s king. Rook, bishop and queen all bear on it, and giving the rook for it often breaks the king\'s cover.'),

@@ -8,6 +8,7 @@
 :root{
   --bg:#EDF1EC; --surface:#FFFFFF; --surface-2:#E3E9E2; --ink:#12201A; --muted:#566960; --line:#D0D9D2;
   --accent:#0D6A4E; --accent-ink:#FFFFFF; --accent-soft:#D3EBE0;
+  --kn-sh:rgba(8,24,18,.2); --kn-hi:rgba(255,255,255,.22); --kn-drop:rgba(8,24,18,.34);
   --rosso:#B93628; --rosso-soft:#F6DDD8; --oro:#9C6F0E; --oro-soft:#F4E8C9; --blu:#2D5DAA; --blu-soft:#DCE5F5; --viola:#674C9E; --viola-soft:#E8E1F4;
   --sq-light:#E6ECE2; --sq-dark:#84A390; --hl:rgba(240,201,64,.55); --sel:rgba(13,106,78,.38);
   --arr-g:#11843F; --arr-r:#D2302A; --arr-b:#2F63C9; --arr-y:#E3A90E; --arr-e:#7646D6;
@@ -28,6 +29,7 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0D1411; --surface:#151F1A; --surface-2:#1C2822; --ink:#E4EDE8; --muted:#97ACA2; --line:#2A3832;
   --accent:#43C08F; --accent-ink:#06231A; --accent-soft:#173A2D;
+  --kn-sh:rgba(0,0,0,.26); --kn-hi:rgba(255,255,255,.2); --kn-drop:rgba(0,0,0,.5);
   --rosso:#F2685B; --rosso-soft:#3D1C18; --oro:#E2B54C; --oro-soft:#3A2F14; --blu:#86AEF2; --blu-soft:#1B2A45; --viola:#B9A2EC; --viola-soft:#2C2342;
   --sq-light:#CFD8CC; --sq-dark:#6F8D7B; --hl:rgba(240,201,64,.5); --sel:rgba(67,192,143,.42);
   --arr-g:#1FA155; --arr-r:#E8463D; --arr-b:#4F82E6; --arr-y:#F0B92A; --arr-e:#A78BF5;
@@ -43,6 +45,7 @@
 :root[data-theme="dark"]{
   --bg:#0D1411; --surface:#151F1A; --surface-2:#1C2822; --ink:#E4EDE8; --muted:#97ACA2; --line:#2A3832;
   --accent:#43C08F; --accent-ink:#06231A; --accent-soft:#173A2D;
+  --kn-sh:rgba(0,0,0,.26); --kn-hi:rgba(255,255,255,.2); --kn-drop:rgba(0,0,0,.5);
   --rosso:#F2685B; --rosso-soft:#3D1C18; --oro:#E2B54C; --oro-soft:#3A2F14; --blu:#86AEF2; --blu-soft:#1B2A45; --viola:#B9A2EC; --viola-soft:#2C2342;
   --sq-light:#CFD8CC; --sq-dark:#6F8D7B; --hl:rgba(240,201,64,.5); --sel:rgba(67,192,143,.42);
   --arr-g:#1FA155; --arr-r:#E8463D; --arr-b:#4F82E6; --arr-y:#F0B92A; --arr-e:#A78BF5;
@@ -1194,14 +1197,13 @@ const Prog = {
   // A record made before a line's moves changed describes other moves. It reads as seen, never clean and due now,
   // so the line comes back in review and in its unit's counts; the next attempt writes a fresh record.
   stale(id){ const r = this.d.lines[id]; return !!r && (r.v || 1) !== (VER[id] || 1); },
-  rec(id){ const r = this.d.lines[id]; if (!r) return null; return this.stale(id) ? {box: 0, seen: r.seen || 1, clean: 0, due: 0, last: r.last, changed: true} : r; },
+  rec(id){ return this.d.lines[id] || null; },
   staleCount(side){ return (side ? BOOKS[side].drillable : BOOKS.w.drillable.concat(BOOKS.b.drillable)).filter(id => this.stale(id)).length; },
   // slips: [[index in the line, the move played instead], …]; r.sl counts the slips at each move of the line, so the coach
   // can tell a move that keeps catching the player from a one-off
   record(id, clean, slips){
     let r = this.d.lines[id];
-    if (!r || this.stale(id)){ const o = r; r = {box: 0, seen: 0, clean: 0};
-      if (o && (o.seen || o.ps)){ r.ps = (o.ps || 0) + (o.seen || 0); r.pc = (o.pc || 0) + (o.clean || 0); } }
+    if (!r) r = {box: 0, seen: 0, clean: 0};
     if (VER[id]) r.v = VER[id];
     r.seen++; r.last = Date.now();
     if (clean){ r.clean++; r.box = Math.min(5, (r.box || 0) + 1); } else r.box = 0;
@@ -1311,8 +1313,7 @@ function dailyNext(){
       const l = lines[id], L = LIDX[s][l.lesson]; if (!L) continue;
       const r = Prog.rec(id), cr = rank[s + L.id] === undefined ? 1e4 : rank[s + L.id], pri = PR[L.pri] === undefined ? 1 : PR[L.pri], fresh = [cr, pri, l.main ? 0 : 1];
       let tier, key;
-      if (r && r.changed){ tier = 1; key = [cr]; }
-      else if (r && r.seen && !r.box){ tier = 0; key = [r.last || 0]; }
+      if (r && r.seen && !r.box){ tier = 0; key = [r.last || 0]; }
       else if (r && r.due <= now){ tier = 2; key = [r.box, r.due]; }
       else if (!r && lessonSeen(s, L.id)){ tier = 3; key = fresh; }
       else if (!r && cr < 1e4){ tier = 4; key = fresh; }
@@ -1323,7 +1324,7 @@ function dailyNext(){
   }
   c.sort((a, b) => a.tier - b.tier || cmpArr(a.key, b.key));
   const x = c[0]; if (!x) return null;
-  return {s: x.s, id: x.id, why: ['You slipped here last time', 'Changed line', 'Due for review', 'New line from a lesson you studied', 'New line', 'Extra practice'][x.tier]};
+  return {s: x.s, id: x.id, why: ['You slipped here last time', 'Due for review', 'Due for review', 'New line from a lesson you studied', 'New line', 'Extra practice'][x.tier]};
 }
 
 /* ------------------------------------------------------------------ accounts (site build only) */
@@ -2174,7 +2175,7 @@ function eligibleLines(){
 function nextSmart(exclude){
   const now = Date.now(), el = eligibleLines().filter(x => x.id !== exclude), rec = x => Prog.rec(x.id);
   const due = el.filter(x => { const r = rec(x); return r && r.due <= now; }).sort((a, b) => (rec(a).box - rec(b).box) || (rec(a).due - rec(b).due));
-  if (due.length) return {id: due[0].id, s: due[0].s, why: Prog.stale(due[0].id) ? 'Changed line' : 'Due for review'};
+  if (due.length) return {id: due[0].id, s: due[0].s, why: 'Due for review'};
   const pr = {core: 0, common: 1, rare: 2}, B = x => BOOKS[x.s].nodes, me = x => x.s === 'w' ? 1 : 0;
   const reach = x => x.n.reduce((a, i) => a * (B(x)[i].w !== me(x) && B(x)[i].q || 1), 1);       // how often the line comes up (lineReach, for either book)
   // a new line: core before common before rare, the likelier first, and the colours taking turns among equals
@@ -2188,7 +2189,6 @@ function startSmart(x){ if (!x) return; if (x.s !== SIDE) useSide(x.s); startDri
 function startDrillLine(id, why, unit, o = {}){
   const line = LINES[id];
   const s0 = o.from0 || S.dfilter.from === 'start' ? 0 : lineStart(id);
-  if (!why && Prog.stale(id)) why = 'This line has changed since you last drilled it. If a move is new to you, two tries and the arrow shows it.';
   S.drill = S.drillState = {kind: 'line', side: SIDE, id, i: s0, s0, mistakes: 0, tries: 0, sel: null, busy: false, msg: why || '', state: 'play', hint: null, flash: null, unit: unit || null, daily: !!o.daily, tour: !!o.tour, rv: o.rv || null};
   S.view = 'drill'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
   setTimeout(drillAdvance, 450);
@@ -2431,7 +2431,7 @@ function todayHTML(){
     <div class="tmain"><p class="kicker">Today</p><p class="tline">${line}</p>${cta ? `<div class="lesson-actions">${cta}</div>` : ''}</div>
     <div class="tside"><p class="streak ${st ? '' : 'zero'}">${FLAME}<b class="tnum">${st}</b><span>${st === 1 ? 'day' : 'days'} in a row</span></p><ol class="week" aria-label="The last seven days">${week}</ol></div></section>`;
 }
-function fmtDue(r){ if (!r) return 'new'; if (r.changed) return 'changed'; const d = r.due - Date.now(); if (d <= 0) return 'due'; const days = Math.ceil(d / DAY); return `in ${days}d`; }
+function fmtDue(r){ if (!r) return 'new'; const d = r.due - Date.now(); if (d <= 0) return 'due'; const days = Math.ceil(d / DAY); return `in ${days}d`; }
 function renderDrill(){
   const f = S.dfilter, now = Date.now();
   const el = eligibleLines();
@@ -3194,14 +3194,10 @@ function renderCourse(){
 // the account nudge and the changed-lines note, on the path, the library and a deep dive's page
 function courseNotes(){
   renderNudge();
-  const cg = document.getElementById('changedGo'); if (cg) cg.onclick = () => { const side = ['b', 'w'].find(x => Prog.staleCount(x)); if (!side) return;
-    useSide(side); startDrillLine(BOOKS[side].drillable.find(id => Prog.stale(id))); S.drill.msgWhy = 'Changed line'; renderDrillPanel(); };
 }
-// Lines whose moves changed after you drilled them (the build gives each line a version). They sit in review until redone.
-function changedNote(){
-  const n = Prog.staleCount(); if (!n) return '';
-  return `<div class="nudge" id="changed"><span><b>${n} ${n === 1 ? 'line you drilled has' : 'lines you drilled have'} changed.</b> The same position now always gets the same move, whichever order it arrives in, and each setup comes out in one order. ${n === 1 ? 'It is' : 'They are'} back in review, marked Changed.</span><span class="nbtns"><button class="btn primary small" type="button" id="changedGo">Drill ${n === 1 ? 'it' : 'them'}</button></span></div>`;
-}
+// A line whose moves change keeps its record and its place in the schedule: nothing on the page says it changed (the
+// next review plays the new moves). The version is still stamped on the record for the merge between devices.
+function changedNote(){ return ''; }
 function unitRow(U, cur){
   const open = unitOpen(U), passed = unitPassed(U), isCur = U === cur, steps = U.soon ? [] : unitSteps(U), done = steps.filter(s => s.done).length, due = passed ? unitDue(U) : 0;
   const bub = U.soon ? `<span class="ubub soon">${U.k + 1}</span>` : passed ? `<span class="ubub pass" title="Passed">${ICON.check}</span>` : isCur ? `<span class="ubub cur">${U.k + 1}</span>` : open ? `<span class="ubub">${U.k + 1}</span>` : `<span class="ubub" title="Locked">${ICON.lock}</span>`;
@@ -3221,7 +3217,7 @@ function lessonRow(U, lid){
   return `<button class="lrow" data-ulesson="${lid}">${thumb(idx, o)}<span><b>${esc(L.title)}</b><span class="s">${esc(L.sub)}</span></span><span class="tick ${seen ? '' : 'no'}">${seen ? ICON.check + 'Played' : 'Not yet'}</span></button>`;
 }
 function drillRow(U, id){
-  const r = Prog.rec(id), L = lessonOf(id), now = Date.now(), st = !r ? ['no', 'Not yet'] : r.changed ? ['due', 'Changed'] : r.due <= now ? ['due', r.clean ? 'Review now' : 'Again today'] : r.clean ? ['', 'Clean'] : ['due', 'Again today'];
+  const r = Prog.rec(id), L = lessonOf(id), now = Date.now(), st = !r ? ['no', 'Not yet'] : r.due <= now ? ['due', r.clean ? 'Review now' : 'Again today'] : r.clean ? ['', 'Clean'] : ['due', 'Again today'];
   return `<button class="mrow" data-udrill="${id}"><span>${esc(L.title)}</span><span class="pips">${[1,2,3,4,5].map(k => `<i class="${k <= ((r || {}).box || 0) ? 'on' : ''}"></i>`).join('')}</span><span class="tick ${st[0]}">${st[0] === '' ? ICON.check : ''}${st[1]}</span></button>`;
 }
 function stepHTML(U, s, k, nx, open){

@@ -33,7 +33,7 @@ with sync_playwright() as p:
     assert 'level 5' in pg.inner_text('.wlock') and pg.locator('.wlock .wlv i').count() == 5
     assert pg.locator('.items.daily .item.lock').count() == pg.evaluate('Shop.today().length') == 6, 'today\'s shelf is there to look at, with nothing to tap'
     head = ' '.join(pg.inner_text('.shophd').split()); print('the header:', head)
-    assert head.startswith('Daily shop Crates Locker') and head.endswith(' left') and pg.locator('#dropT').count() == 1
+    assert head.startswith('Daily shop Locker') and head.endswith(' left') and pg.locator('#dropT').count() == 1
     page = pg.inner_text('#view').lower()
     for gone in ('two drops', 'today only', 'gone at midnight', 'tomorrow', 'wardrobe', 'days only', 'fridays', 'saturdays'): assert gone not in page, gone
     pg.screenshot(path=out + 's_locked.png', full_page=True)
@@ -142,12 +142,24 @@ with sync_playwright() as p:
     month = set(sum((on(2026, 10, d) for d in range(1, 29)), []))
     forsale = set(pg.evaluate("SHOP.filter(I => I.price && !Shop.owns(I.id) && (!I.needs || (Prog.d.badges || {})[I.needs])).map(I => I.id)"))
     print('pieces for sale:', len(forsale), '| on a shelf within four weeks:', len(month & forsale)); assert forsale <= month, forsale - month
+    # rarities on the shelf: every piece has one, none is legendary, an epic comes on one day of each week and commons
+    # come up more often than rares
+    rar = pg.evaluate("""(() => { const R = Object.fromEntries(SHOP.map(I => [I.id, I.rar])), days = [], n = {common: 0, rare: 0, epic: 0};
+        for (let d = 0; d < 84; d++){ const D = new Date(2026, 8, 7 + d, 12), ids = Shop.on(D).map(I => I.id), day = Math.floor(Date.UTC(D.getFullYear(), D.getMonth(), D.getDate()) / 864e5);
+          ids.forEach(id => n[R[id]]++); days.push([Math.floor((day + 3) / 7), ids.filter(id => R[id] === 'epic').length, ids.length]); }
+        const weeks = {}; for (const [w, e] of days) (weeks[w] = weeks[w] || []).push(e);
+        return {n, weeks: Object.values(weeks).filter(w => w.length === 7).map(w => [w.filter(e => e).length, Math.max(...w)]), six: days.every(d => d[2] === 6),
+          every: SHOP.filter(I => I.price).every(I => ['common', 'rare', 'epic'].includes(I.rar)), shown: document.querySelectorAll('.items.daily .item .rar').length}; })()""")
+    print('rarities over twelve weeks:', rar['n'], '| epic days a week:', rar['weeks'])
+    assert rar['every'] and rar['six'] and rar['shown'] == 6 and rar['weeks'] and all(w == [1, 1] for w in rar['weeks']), rar
+    assert rar['n']['common'] > 2 * rar['n']['rare'] > 0 and rar['n']['epic'] == sum(w[0] for w in rar['weeks']) + sum(1 for _ in [0] if False), rar['n']
     off = pg.evaluate("SHOP.filter(I => I.price && !Shop.owns(I.id) && !Shop.today().includes(I)).map(I => [I.id, Shop.lockOf(I), Shop.buy(I.id)])")
     assert off and all(x[1] in ('gone', 'badge') and x[2] is False for x in off), 'what is not on today\'s shelf can\'t be bought'
     # a badge earned: its piece joins the rotation
     b0 = pg.evaluate("SHOP.find(I => I.needs && !(Prog.d.badges || {})[I.needs])"); print('a badge piece:', b0['id'], 'needs', b0['needs'])
     pg.evaluate(f"(Prog.d.badges = Prog.d.badges || {{}})['{b0['needs']}'] = Date.now()")
-    assert b0['id'] in set(sum((on(2026, 10, d) for d in range(1, 29)), [])), 'with the badge it comes up like any other piece'
+    span = 29 if b0['rar'] != 'epic' else 1 + 7 * pg.evaluate("SHOP.filter(I => I.rar === 'epic' && I.price && (!I.needs || Prog.d.badges[I.needs])).length")
+    assert b0['id'] in set(sum((on(2026, 10, d) for d in range(1, span)), [])), 'with the badge it comes up like any other piece'
     pg.evaluate(f"delete Prog.d.badges['{b0['needs']}']")
     # bought on an earlier day, a piece is out of the rotation for good
     pg.evaluate(f"Prog.d.shop.own['{hat[0]}'] = Date.now() - 3 * DAY; Prog.save()")
@@ -179,10 +191,21 @@ with sync_playwright() as p:
     odds = pg.evaluate("(() => { const n = {}; for (let i = 0; i < 4000; i++){ const I = Shop.crateRoll(); n[I.rar] = (n[I.rar] || 0) + 1; } return n; })()"); print('  4,000 draws:', odds)
     assert odds['common'] > odds['rare'] > odds['epic'] > odds['legendary'] > 40
     pg.evaluate("Prog.d.badges = Object.assign({}, Prog.d.badges, {s3: 1, s7: 1, u1: 1, m10: 1}); Prog.save(); renderShop()"); bal = pg.evaluate('Shop.balance()'); assert bal >= crate[1] * 2, bal
-    pg.click('[data-shoptab="crate"]'); pg.wait_for_timeout(300)
+    # the crate is in the shop itself, under the shelf: no tab of its own. The banner leads to its page (what is inside, the odds)
+    assert pg.locator('[data-shoptab]').count() == 2 and pg.locator('.items.daily + .cratebox[data-cratepage]').count() == 1 and not pg.is_disabled('.cratebox [data-crate]')
+    pg.screenshot(path=out + 's_shop_crate.png', full_page=True)
+    pg.click('button[data-cratepage]'); pg.wait_for_timeout(300)
+    assert pg.evaluate('S.shopTab') == 'crate' and pg.locator('.crumbs [data-shoptab="shop"]').count() == 1 and pg.locator('[data-shoptab]').count() == 3
     assert pg.locator('.cratein .item').count() == len(crate[0]) and pg.locator('.codds .rar').count() == 4 and not pg.is_disabled('[data-crate]')
     pg.screenshot(path=out + 's_crate.png', full_page=True)
     pg.click('[data-crate]'); pg.wait_for_timeout(700)
+    # bought: the tokens are spent and the piece is drawn, but nothing shows yet. The crate floats and waits for a tap
+    wait = pg.evaluate("[!document.querySelector('#crateSheet .cratewait').hidden, document.querySelector('#crateSheet .reel').hidden, document.querySelector('#crateSheet .prize').hidden, Shop.balance(), document.querySelector('#crateSheet .cratehint').textContent, Sound.last]")
+    print('  a crate bought:', wait); assert wait[:3] == [True, True, True] and wait[3] == bal - crate[1] and 'Tap the crate' in wait[4]
+    assert pg.evaluate("getComputedStyle(document.querySelector('.cratetap')).animationName") == 'crfloat'
+    pg.screenshot(path=out + 's_crate_wait.png')
+    pg.wait_for_timeout(1500); assert pg.evaluate("document.querySelector('#crateSheet .reel').hidden"), 'it waits for the tap'
+    pg.click('[data-cratetap]', force=True); pg.wait_for_timeout(1000)        # it bobs up and down, so the click is forced
     spin = pg.evaluate("[document.querySelectorAll('#crateSheet .strip .rt').length, document.querySelector('#crateSheet .prize').hidden, new DOMMatrixReadOnly(getComputedStyle(document.querySelector('#crateSheet .strip')).transform).m41 < -200, Sound.last]")
     print('  the reel, under way:', spin); assert spin[0] >= 40 and spin[1] is True and spin[2] and spin[3] == 'tick', spin
     pg.screenshot(path=out + 's_crate_spin.png')

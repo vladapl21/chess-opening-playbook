@@ -8,6 +8,8 @@ KEEP    line ids that stay as written.
 The build sees a kept answer that a fix here has overtaken and works that line out again (it needs the engines for
 that one line). SAN is internal."""
 FIXED = {
+    # the Milner-Barry with the bishop behind the pawns: after the knight check the queen takes a second pawn
+    'e4 e6 d4 d5 e5 c5 c3 Nc6 Nf3 Qb6 Bd3 cxd4 cxd4 Bd7 Be3 Qxb2 Nbd2 Nb4 Rb1 Nxd3+ Ke2': 'Qxa2',
     # the bishop comes at the knight in front of the castled king's square: the h-pawn asks it first, as everywhere in this book
     'e4 e5 Nf3 Nc6 Nc3 Nf6 Bb5 Bc5 Nxe5 Nxe5 d4 Bd6 dxe5 Bxe5 Bg5': 'h6',
     # the Slav setup against the London: with the knights traded off, the c-pawn hits the middle before the knight blocks it
@@ -16,6 +18,6 @@ FIXED = {
     'e4 d5 exd5 Qxd5 Nc3 Qa5 Nf3 Nf6 Bc4 c6 O-O Bf5 Ng5 e6 d3 Be7 Bd2': 'Qc7',
 }
 REPLY = {}
-# rr-nimzo runs into the Italian by another move order and is held with either Italian (the center attack or the slow
-# one), so it stops where they part: its last move is the bishop's, and the Italian lessons take it from there
+# rr-nimzo reaches the position after both knights by another move order and is held with every variation of White's
+# third move (the two Italians and the Ruy Lopez), so it stops where they part: on Black's e-pawn move
 KEEP = {'rr-nimzo'}
