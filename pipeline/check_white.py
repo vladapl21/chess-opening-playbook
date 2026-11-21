@@ -40,6 +40,8 @@ def score(b):
 
 
 # the lessons of every chapter that belongs to a pack other than the slot's first one
+import deepen
+deepen.apply(content.LESSONS, 'w', content.PARTS, CM.PACKS, quiet=True)      # the lines as the build plays them on
 later = {c for s in CM.PACKS.values() for p, chs in s['packs'].items() if p != s['default'] for c in chs}
 part_ch = {p['id']: p['ch'] for p in content.PARTS}
 lessons = [l for l in content.LESSONS if (l['id'] in only or l['part'] in only if only else part_ch[l['part']] in later)]   # named ids: any pack
@@ -72,7 +74,13 @@ for lid, p in lines:
             bv, bm = score(before); av, _ = score(b)
             loss = bv - av      # White-POV drop = worse for you
             if ((loss > 45 and av < -30) or loss > 150) and abs(bv) < 5000:
-                issues.append(f"W-LOSS {lid}: {pre} || {s} ({av / 100:+.2f}) best {bm} ({bv / 100:+.2f}) loss {loss}")
+                # two searches of two positions can disagree by themselves: measure again, your move against the
+                # engine's own move, both one ply on at the same depth (the same move is no loss at all)
+                t = before.copy()
+                if bm and bm != s: t.push_san(bm); bv = score(t)[0]; loss = bv - av
+                else: loss = 0
+                if (loss > 45 and av < -30) or loss > 150:
+                    issues.append(f"W-LOSS {lid}: {pre} || {s} ({av / 100:+.2f}) best {bm} ({bv / 100:+.2f}) loss {loss}")
         seen.add(key)
     save()
     end = score(b)[0]

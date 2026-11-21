@@ -284,6 +284,17 @@ with sync_playwright() as p:
     settle(q, 400); q.evaluate("Tour.place()"); q.wait_for_timeout(200)
     save(q.screenshot(), 'tour.png'); c.close()
 
+    # The README's opening picture, once for each theme (GitHub shows the one that fits the reader's): the Fried Liver at
+    # the knight sacrifice, with its mark, the move numbers on the pieces and the opening's name. And the brand mark.
+    for scheme in ('light', 'dark'):
+        c = b.new_context(viewport={'width': 1280, 'height': 800}, device_scale_factor=2, color_scheme=scheme); local_fonts(c)
+        q = c.new_page(); q.on('pageerror', lambda e: errors.append(str(e))); q.goto(URL + '#course'); q.wait_for_timeout(900)
+        q.evaluate("useSide('w'); openLine('fried-liver', 11)"); q.wait_for_timeout(600)
+        q.evaluate("Coach.hush(); document.getElementById('coach').style.visibility = 'hidden'; window.scrollTo(0, 0)"); settle(q, 400)
+        save(q.screenshot(), f'hero-{scheme}.png')
+        if scheme == 'light': q.locator('.brand .mark').screenshot(path=str(IMG / 'mark.png'))
+        c.close()
+
     # Three phones: Learn (light), a lesson (dark), the openings in Your games (light)
     phones = []
     for scheme, hash_ in [('light', '#b.learn'), ('dark', '#b.line.bsl-slow'), ('light', '#b.games')]:

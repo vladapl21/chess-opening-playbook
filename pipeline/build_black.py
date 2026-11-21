@@ -43,6 +43,10 @@ def add_node(parent_idx, board_before, move, board_after, label, note):
     if parent_idx is not None: nodes[parent_idx]['k'].append(idx)
     return idx
 
+# ---------------- lines that stop while the opening is still going on are played on (pipeline/deepen.py)
+import deepen
+DEEPER = deepen.apply(BC.LESSONS, 'b', BC.PARTS, BM.PACKS)
+
 # ---------------- repertoire tree
 T = Tree()
 for les in BC.LESSONS:
@@ -85,10 +89,10 @@ for les in BC.LESSONS:
     for p in [les['path']] + [a[2] for a in les['alts']]:
         t = p.split()
         for i in range(1, len(t) + 1): seen_prefixes.add(tuple(t[:i]))
-    lines.append(dict(id=lid, lesson=lid, title=les['title'], n=path_idx_list(les['path']), main=1))
+    lines.append(dict(id=lid, lesson=lid, title=les['title'], n=path_idx_list(les['path']), main=1, **({'dp': DEEPER[lid]} if DEEPER.get(lid) else {})))   # dp: plies the build played on
     alt_ids = []
     for aid, atitle, p in les['alts']:
-        lines.append(dict(id=aid, lesson=lid, title=atitle, n=path_idx_list(p), main=0)); alt_ids.append(aid)
+        lines.append(dict(id=aid, lesson=lid, title=atitle, n=path_idx_list(p), main=0, **({'dp': DEEPER[aid]} if DEEPER.get(aid) else {}))); alt_ids.append(aid)
     lesson_out.append(dict(id=lid, part=les['part'], title=les['title'], sub=les['sub'], pri=les['pri'], start=start or 0,
                            why=les['why'], tags=les['tags'], outcome=les['outcome'], lines=[lid] + alt_ids))
 

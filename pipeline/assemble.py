@@ -72,8 +72,11 @@ def main():
     for D, P in ((W, PLAN_W), (B, PLAN_B)):
         ids = {l['id'] for l in D['lessons']}
         assert set(P) <= ids, sorted(set(P) - ids)
+        # a main line the build played on ends somewhere else now: its written plan stays with the position it was written
+        # for (plan0, shown there in the lesson) and the line's end gets a plan read off the board
+        played_on = {l['lesson'] for l in D['lines'] if l['main'] and l.get('dp')}
         for L in D['lessons']:
-            if L['id'] in P: L['plan'] = P[L['id']]
+            if L['id'] in P: L['plan0' if L['id'] in played_on else 'plan'] = P[L['id']]
     # plans for the other lines (data/line_plans.json, written by pipeline/plan_lines.py): a line's own plan, or "ps", the
     # lesson whose main line ends on the same position
     LP = json.load(open(paths.DATA / 'line_plans.json'))

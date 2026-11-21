@@ -1,6 +1,8 @@
 """Plans for the end of every book line, not only the main lines.
 
-A main line keeps its lesson's hand-written plan (content/plans.py W and B). A side line gets, in this order:
+A main line keeps its lesson's hand-written plan (content/plans.py W and B) as long as it ends where it was written
+(a line the build played on, pipeline/deepen.py, ends later, and gets a plan like a side line). A side line gets, in
+this order:
   1. its own hand-written plan (content/plans.py LW and LB, keyed by line id);
   2. the plan of a main line that ends on the same position;
   3. a plan read off the board and the engine's line from there (data/cache/plan_cache.json, pipeline/plan_pv.py).
@@ -370,7 +372,10 @@ def plan_for(pos):
         nxt = [m[0] for m in mine_x[:2] if m[1] not in weak]
         if nxt and not any(k in ('pieces', 'pawns') for k, _ in bullets):
             bullets.insert(0, ('pieces', f'Next: {say_all(nxt)}.'))
-    if len(bullets) < 2: return None
+    if len(bullets) < 2:                                   # a quiet position, pieces out and nothing forced: the engine's next moves for both sides, whatever their kind
+        if mine and not any(k in ('pieces', 'pawns') for k, _ in bullets): bullets.insert(0, ('pieces', f'Next: {say_all([m[0] for m in mine[:2]])}.'))
+        if theirs and not any(k == 'them' for k, _ in bullets): bullets.append(('them', f'{opp} wants to {say_all([m[0] for m in theirs[:2]])}.'))
+    if not bullets: return None
 
     # the headline: the material (or the engine's verdict), then the first two things to do, in the engine's order
     acts = []
@@ -390,7 +395,7 @@ def plan_for(pos):
         if mat: return cap(mat) + (': ' + ' and '.join(act) if act else '')
         if kind == 'cp' and n >= 150: return 'Better for you' + (': ' + ', then '.join(act) if act else '')
         return cap(', then '.join(act)) if act else None
-    if not acts: acts = [m[0] for m in mine_x[:2] if m[1] not in weak]
+    if not acts: acts = [m[0] for m in mine_x[:2] if m[1] not in weak] or [m[0] for m in mine[:1]]
     h = head(acts[:2])
     if h and len(h) > 60: h = head(acts[:1])      # a headline is read at a glance: one thing to do when two run long
     if not h: return None
@@ -401,7 +406,7 @@ def main_plans(D, P):
     """Main-line end position -> lesson id, for the lessons that have a written plan."""
     out = {}
     for l in D['lines']:
-        if l['main'] and l['lesson'] in P:
+        if l['main'] and l['lesson'] in P and not l.get('dp'):         # a main line the build played on ends somewhere else now
             out.setdefault(D['nodes'][l['n'][-1]]['f'], l['lesson'])
     return out
 
@@ -416,7 +421,7 @@ def build():
         st = dict(written=0, same=0, read=0, none=0, mate=0, missing=0)
         assert set(L) <= {l['id'] for l in D['lines']}, sorted(set(L) - {l['id'] for l in D['lines']})
         for l in D['lines']:
-            if l['main'] and l['lesson'] in P: continue
+            if l['main'] and l['lesson'] in P and not l.get('dp'): continue      # the written plan still fits where the line ends
             if l['id'] in L:
                 out[l['id']] = dict(L[l['id']]); st['written'] += 1; continue
             b = chess.Board()

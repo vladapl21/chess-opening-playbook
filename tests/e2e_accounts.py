@@ -103,8 +103,11 @@ def sheet(pg, mode, email=None, password=None):
 
 
 def synced(pg):
-    for _ in range(40):
-        if pg.evaluate("!!Cloud.user && Cloud.state === 'ok' && !Cloud.writing && !Cloud.pulling"): return True
+    for _ in range(60):
+        try:
+            if pg.evaluate("!!Cloud.user && Cloud.state === 'ok' && !Cloud.writing && !Cloud.pulling"): return True
+        except Exception as e:                      # the page is loading again (a new account opens on its own playbook)
+            if 'navigation' not in str(e) and 'context' not in str(e): raise
         pg.wait_for_timeout(150)
     return False
 
