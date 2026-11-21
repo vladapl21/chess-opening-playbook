@@ -2,8 +2,9 @@
 
 1. The claims check (pipeline/lint_claims.py) on boards where the answer is known: a bishop that comes at a knight
    with the pawn still behind it is not a pin; the same bishop with the queen behind the knight is.
-2. Line versions in the page: a progress record made before a line's moves changed counts as due again, says so,
-   and a clean run on the new moves replaces it. Two copies of a record merge to the one made on the current moves."""
+2. Line versions in the page: a progress record made before a line's moves changed stands as it was, and nothing on
+   the page says the line changed; the next run counts on top of it and stamps the new moves. Two copies of a record
+   merge to the one made on the current moves."""
 import json, sys
 from pathlib import Path
 from playwright.sync_api import sync_playwright
@@ -84,31 +85,26 @@ with sync_playwright() as p:
     pg = ctx.new_page(); hook(pg)
     pg.goto(URL); pg.wait_for_timeout(1200)
     st = pg.evaluate(f"({{ver: VER['{CHANGED}'], stale: Prog.stale('{CHANGED}'), same: Prog.stale('{SAME}'), rec: Prog.rec('{CHANGED}'), keep: Prog.rec('{SAME}').box,"
-                     f" due: Prog.dueCount('b'), n: Prog.staleCount(), clean: lineClean('{CHANGED}')}})")
+                     f" due: Prog.dueCount('b'), clean: lineClean('{CHANGED}')}})")
     print('old record on a changed line:', st)
-    assert st['ver'] == V and st['stale'] and not st['same'] and st['rec']['changed'] and st['rec']['box'] == 0 and st['keep'] == 4
-    assert st['due'] == 1 and st['n'] == 1 and not st['clean']
-    note = pg.inner_text('#changed'); print('course note:', note.replace('\n', ' | '))
-    assert note.startswith('1 line you drilled has changed.')
+    # the record made on the old moves stands as it was: same box, same due date, still clean, nothing due because of it
+    assert st['ver'] == V and st['stale'] and not st['same'] and st['rec']['box'] == 4 and 'changed' not in st['rec'] and st['keep'] == 4
+    assert st['due'] == 0 and st['clean']
+    # and nothing on the page says so: no note on the course, no label in the unit, no word in the drill panel
+    assert pg.query_selector('#changed') is None and 'changed' not in pg.inner_text('#view').lower()
     pg.screenshot(path=out + 'v_course_note.png')
-
     pg.click(f'[data-unit="{UNIT}"]'); pg.wait_for_timeout(500)
     row = pg.inner_text(f'[data-udrill="{CHANGED}"]').replace('\n', ' | '); print('unit row:', row)
-    assert 'Changed' in row and 'Changed' not in pg.inner_text(f'[data-udrill="{SAME}"]')
+    assert 'Changed' not in row and row.split('|')[-1].strip() == pg.inner_text(f'[data-udrill="{SAME}"]').split('\n')[-1].strip(), 'both rows read the same'
     pg.screenshot(path=out + 'v_unit.png', full_page=True)
-
-    pg.evaluate("go('course')"); pg.wait_for_timeout(400)
-    pg.click('#changedGo'); pg.wait_for_timeout(900)
-    assert pg.evaluate('[S.view, S.drill.id, SIDE]') == ['drill', CHANGED, 'b']
-    txt = pg.inner_text('.dpanel'); print('drill panel:', txt.replace('\n', ' | ')[:230])
-    assert 'CHANGED LINE' in txt.upper() and 'has changed since you last drilled it' in txt and 'arrow shows' in txt
-    pg.screenshot(path=out + 'v_drill.png')
+    pg.evaluate(f"useSide('b'); startDrillLine('{CHANGED}')"); pg.wait_for_timeout(900)
+    txt = pg.inner_text('.dpanel'); print('drill panel:', txt.replace('\n', ' | ')[:160])
+    assert 'changed' not in txt.lower()
     assert drill_clean(pg) == 'done'
-    rec = pg.evaluate(f"Prog.d.lines['{CHANGED}']"); print('new record:', {k: rec[k] for k in ('v', 'box', 'seen', 'clean')})
-    assert rec['v'] == V and rec['box'] == 1 and rec['seen'] == 1 and rec['clean'] == 1
-    assert pg.evaluate(f"!Prog.stale('{CHANGED}') && Prog.staleCount() === 0 && lineClean('{CHANGED}')")
-    pg.evaluate("go('course')"); pg.wait_for_timeout(400)
-    assert pg.query_selector('#changed') is None
+    rec = pg.evaluate(f"Prog.d.lines['{CHANGED}']"); print('record after a clean run:', {k: rec.get(k) for k in ('v', 'box', 'seen', 'clean')})
+    # the run counts on top of the old record, and stamps the moves it was played on
+    assert rec['v'] == V and rec['box'] == 5 and rec['seen'] == 6 and rec['clean'] == 5 and 'ps' not in rec
+    assert pg.evaluate(f"!Prog.stale('{CHANGED}') && lineClean('{CHANGED}')")
 
     # two devices: the copy made on the current moves wins, even when the old copy was touched later
     m = pg.evaluate(f"""(() => {{ const t = Date.now(), a = {{lines: {{'{CHANGED}': {{box: 5, clean: 9, last: t}}}}, puz: {{}}}},
@@ -116,7 +112,7 @@ with sync_playwright() as p:
         return [mergeProg(a, b).lines['{CHANGED}'].box, mergeProg(b, a).lines['{CHANGED}'].box]; }})()""")
     print('merge old + new copy:', m); assert m == [1, 1]
 
-    # phone width: the note wraps, the page does not scroll sideways
+    # phone width: the page does not scroll sideways
     ctx2 = b.new_context(viewport={'width': 390, 'height': 844}); ctx2.add_init_script(SEED)
     ph = ctx2.new_page(); hook(ph); ph.goto(URL); ph.wait_for_timeout(1000)
     w = ph.evaluate('document.documentElement.scrollWidth'); print('phone scrollWidth', w); assert w <= 390

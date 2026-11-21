@@ -1142,7 +1142,7 @@ const Coach = {
       if (Daily.count() >= DAILY){ const due = Prog.dueCount(); return due ? `Today's five are done. ${due} more ${due === 1 ? 'line is' : 'lines are'} due if you want to keep going.` : null; }
       const x = dailyNext(); if (!x) return null; const t = lineTitleOf(x.s, x.id); if (!t) return null;
       const due = Prog.dueCount();
-      return {'You slipped here last time': `Today's five start with ${t}. It caught you last time.`, 'Changed line': `${t} has new moves since you last played it, so it comes first today.`,
+      return {'You slipped here last time': `Today's five start with ${t}. It caught you last time.`, 
         'Due for review': `${due} ${due === 1 ? 'line is' : 'lines are'} due today. First up: ${t}.`, 'New line from a lesson you studied': `Nothing is due, so today's five bring new lines, starting with ${t} from a lesson you studied.`,
         'New line': `Nothing is due, so today's five bring new lines, starting with ${t}.`}[x.why] || null;
     }
