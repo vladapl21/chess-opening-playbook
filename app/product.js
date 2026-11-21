@@ -48,7 +48,16 @@ const FACES = {
 };
 // What the coach wears (the Shop tab). Colours are CSS tokens; each piece is drawn once around its own anchor and
 // placed on each character: hats on the head, glasses over the eyes, ties at the neck.
-const SKINS = {'c-midnight': 'mid', 'c-ruby': 'ruby', 'c-plum': 'plum', 'c-tangerine': 'tang', 'c-gold': 'gold', 'c-mint': 'mint', 'c-ocean': 'ocean', 'c-rose': 'rose', 'c-slate': 'slate', 'c-sand': 'sand'};
+const SKINS = {'c-midnight': 'mid', 'c-ruby': 'ruby', 'c-plum': 'plum', 'c-tangerine': 'tang', 'c-gold': 'gold', 'c-mint': 'mint', 'c-ocean': 'ocean', 'c-rose': 'rose', 'c-slate': 'slate', 'c-sand': 'sand',
+  'c-moss': 'moss', 'c-clay': 'clay', 'c-sky': 'sky', 'c-sunset': 'sunset', 'c-arctic': 'arctic', 'c-neon': 'neon', 'c-obsidian': 'obsid', 'c-aurora': 'aurora'};
+// auras: drawn behind the coach, the same for all three (they only come out of the crate)
+const AURAS = {
+  'a-glow': () => '<g class="aura au-glow"><circle cx="32" cy="33" r="30"/><circle cx="32" cy="33" r="23"/></g>',
+  'a-ember': () => `<g class="aura au-ember">${[[8, 50, 3], [14, 58, 2.2], [52, 56, 2.6], [58, 46, 2], [5, 36, 1.8], [60, 32, 2.2], [22, 61, 1.6], [44, 61, 1.8]].map(([x, y, r], i) => `<circle cx="${x}" cy="${y}" r="${r}" style="animation-delay:${(i * .23).toFixed(2)}s"/>`).join('')}</g>`,
+  'a-frost': () => `<g class="aura au-frost">${[[7, 14], [57, 12], [4, 40], [60, 38], [12, 58], [53, 58]].map(([x, y], i) => `<path d="M${x - 3} ${y}h6M${x} ${y - 3}v6M${x - 2} ${y - 2}l4 4M${x + 2} ${y - 2}l-4 4" style="animation-delay:${(i * .4).toFixed(1)}s"/>`).join('')}</g>`,
+  'a-stars': () => `<g class="aura au-stars"><circle cx="32" cy="33" r="30"/>${[[8, 12, 3.4], [56, 9, 2.8], [4, 34, 2.4], [60, 36, 3], [10, 56, 2.8], [54, 57, 2.4], [32, 4, 2.4]].map(([x, y, r], i) => `<path d="M${x} ${y - r}l${(r * .28).toFixed(2)} ${(r * .72).toFixed(2)} ${(r * .72).toFixed(2)} ${(r * .28).toFixed(2)}-${(r * .72).toFixed(2)} ${(r * .28).toFixed(2)}-${(r * .28).toFixed(2)} ${(r * .72).toFixed(2)}-${(r * .28).toFixed(2)}-${(r * .72).toFixed(2)}-${(r * .72).toFixed(2)}-${(r * .28).toFixed(2)} ${(r * .72).toFixed(2)}-${(r * .28).toFixed(2)}z" style="animation-delay:${(i * .31).toFixed(2)}s"/>`).join('')}</g>`,
+  'a-nova': () => `<g class="aura au-nova"><circle cx="32" cy="33" r="29"/><g class="aurays">${Array.from({length: 12}, (_, i) => { const a = i * Math.PI / 6, q = (d, r) => `${(32 + r * Math.cos(a + d)).toFixed(1)} ${(33 + r * Math.sin(a + d)).toFixed(1)}`; return `<path d="M${q(-.5, 9)}L${q(-.08, 36)}L${q(.08, 36)}L${q(.5, 9)}z"/>`; }).join('')}</g></g>`
+};
 // where each kind of piece sits on each character. head: x, y, tilt, size (a hat is drawn around the middle of its own
 // rim, so y is the line it is pulled down to)
 const SPOT = {
@@ -144,7 +153,7 @@ function gearSVG(who, L){
 }
 function knightSVG(mood, who, look){
   const w = who || coachWho().id, L = look || (typeof Shop !== 'undefined' ? Shop.worn() : {}), sk = SKINS[L.skin];
-  return `<svg viewBox="${hatBox(w, L.head)}" aria-hidden="true"${sk ? ` class="sk-${sk}"` : ''}>${(FACES[w] || FACES.knight)(mood, L)}${gearSVG(w, L)}</svg>`;
+  return `<svg viewBox="${hatBox(w, L.head)}" aria-hidden="true"${sk ? ` class="sk-${sk}"` : ''}>${L.aura && AURAS[L.aura] ? AURAS[L.aura]() : ''}${(FACES[w] || FACES.knight)(mood, L)}${gearSVG(w, L)}</svg>`;
 }
 // the three faces to choose from (Settings, and the first screen after an account is made)
 function coachPickHTML(){ return `<div class="coachpick" role="group" aria-label="Your coach">${COACHES.map(c => `<button type="button" data-coachwho="${c.id}" aria-pressed="${coachWho().id === c.id}"><span class="cface">${knightSVG('', c.id)}</span><b>${c.name}</b><span>${c.what}</span></button>`).join('')}</div>`; }
@@ -761,11 +770,28 @@ const SHOP = [
   {id: 'n-lei', slot: 'neck', name: 'Flower lei', price: 2},
   {id: 'h-cowboy', slot: 'head', name: 'Cowboy hat', price: 3},
   {id: 'f-hearts', slot: 'face', name: 'Heart shades', price: 2},
-  {id: 'c-sand', slot: 'skin', name: 'Sand', price: 3}
+  {id: 'c-sand', slot: 'skin', name: 'Sand', price: 3},
+  // the collector's crate: pieces the shelf never has, by rarity (RAR). No price: a crate costs CRATE_PRICE.
+  {id: 'c-moss', slot: 'skin', name: 'Moss', crate: 1, rar: 'common'},
+  {id: 'c-clay', slot: 'skin', name: 'Clay', crate: 1, rar: 'common'},
+  {id: 'c-sky', slot: 'skin', name: 'Sky', crate: 1, rar: 'common'},
+  {id: 'a-glow', slot: 'aura', name: 'Soft glow', crate: 1, rar: 'common'},
+  {id: 'c-sunset', slot: 'skin', name: 'Sunset', crate: 1, rar: 'rare'},
+  {id: 'c-arctic', slot: 'skin', name: 'Arctic', crate: 1, rar: 'rare'},
+  {id: 'a-ember', slot: 'aura', name: 'Embers', crate: 1, rar: 'rare'},
+  {id: 'a-frost', slot: 'aura', name: 'Frost', crate: 1, rar: 'rare'},
+  {id: 'c-neon', slot: 'skin', name: 'Neon', crate: 1, rar: 'epic'},
+  {id: 'c-obsidian', slot: 'skin', name: 'Obsidian', crate: 1, rar: 'epic'},
+  {id: 'a-stars', slot: 'aura', name: 'Starfield', crate: 1, rar: 'epic'},
+  {id: 'c-aurora', slot: 'skin', name: 'Aurora', crate: 1, rar: 'legendary'},
+  {id: 'a-nova', slot: 'aura', name: 'Supernova', crate: 1, rar: 'legendary'}
 ];
+// a crate: what it costs, and how often each rarity comes out of it (out of 100, while pieces of that rarity are left)
+const CRATE_PRICE = 2, RAR = {common: {w: 60, name: 'Common', lv: 0}, rare: {w: 27, name: 'Rare', lv: 1}, epic: {w: 10, name: 'Epic', lv: 2}, legendary: {w: 3, name: 'Legendary', lv: 3}};
+const CRATE_ART = '<svg viewBox="0 0 120 96" aria-hidden="true"><path class="cr-wood" d="M12 44h96v40a6 6 0 01-6 6H18a6 6 0 01-6-6z"/><path class="cr-lid" d="M12 44c0-17 13-30 30-30h36c17 0 30 13 30 30z"/><path class="cr-band" d="M30 15.800v74h8v-75.300zM82 14.500v75.300h8v-74zM12 41h96v7H12z"/><rect class="cr-lock" x="52" y="36" width="16" height="19" rx="3"/><circle class="cr-key" cx="60" cy="44" r="2.6"/><path class="cr-key" d="M59 45h2v5h-2z"/></svg>';
 // the daily shop holds this many of each kind
 const SHELF = {head: 2, skin: 2, face: 1, neck: 1};
-const SLOTS = [['skin', 'Colours'], ['head', 'Hats'], ['face', 'Glasses'], ['neck', 'Round the neck']];
+const SLOTS = [['skin', 'Colours'], ['head', 'Hats'], ['face', 'Glasses'], ['neck', 'Round the neck'], ['aura', 'Auras']];
 const COIN = '<svg class="coin" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9"/><circle class="c2" cx="10" cy="10" r="6.4"/><path class="c3" d="M10 5.6l1.3 2.7 3 .4-2.2 2.1.5 2.9L10 12.3l-2.6 1.4.5-2.9-2.2-2.1 3-.4z"/></svg>';
 const Shop = {
   st(){ const s = Prog.d.shop || (Prog.d.shop = {own: {}, wear: {}}); s.own = s.own || {}; s.wear = s.wear || {}; return s; },
@@ -774,7 +800,8 @@ const Shop = {
     for (const k of ks){ if (prev && dkey(dayDate(1, prev)) === k) out[out.length - 1]++; else out.push(1); prev = k; } return out; },
   earned(){ const have = Prog.d.badges || {}, r = this.runs();
     return {badges: BADGES.filter(B => have[B.id]).length, streak: r.reduce((a, n) => a + Math.floor(n / 3), 0), level: Math.max(0, Level.n() - SHOP_AT + 1)}; },
-  spent(){ return Object.keys(this.st().own).reduce((a, id) => a + ((SHOP.find(i => i.id === id) || {}).price || 0), 0); },
+  // a piece out of a crate cost one crate (there are no doubles, so the pieces owned count the crates opened)
+  spent(){ return Object.keys(this.st().own).reduce((a, id) => { const I = SHOP.find(i => i.id === id) || {}; return a + (I.crate ? CRATE_PRICE : I.price || 0); }, 0); },
   total(){ const e = this.earned(); return e.badges + e.streak + e.level; },
   // The daily shop: six pieces set by the date from what the player doesn't have yet, so every device shows the same
   // shelf. Each kind takes its turn through what is left of it; a piece that needs a badge joins once the badge is
@@ -795,8 +822,15 @@ const Shop = {
   balance(){ return Owner.on ? Infinity : Math.max(0, this.total() - this.spent()); },
   isOpen(){ return Owner.on || Level.n() >= SHOP_AT; },
   owns(id){ return id === 'c-classic' || !!this.st().own[id]; },
-  worn(){ const w = (Prog.d.shop || {}).wear || {}, g = s => (w[s] || [])[0] || null; return {skin: g('skin') || 'c-classic', head: g('head'), face: g('face'), neck: g('neck')}; },
-  lockOf(I){ if (!I.price || Owner.on) return ''; if (!this.isOpen()) return 'level'; if (I.needs && !(Prog.d.badges || {})[I.needs]) return 'badge';
+  worn(){ const w = (Prog.d.shop || {}).wear || {}, g = s => (w[s] || [])[0] || null; return {skin: g('skin') || 'c-classic', head: g('head'), face: g('face'), neck: g('neck'), aura: g('aura')}; },
+  // the crate: the pieces still in it, one of them by the rarity odds, and the opening itself
+  crateLeft(){ return SHOP.filter(I => I.crate && !this.owns(I.id)); },
+  crateRoll(){ const left = this.crateLeft(); if (!left.length) return null;
+    const rs = Object.keys(RAR).filter(r => left.some(I => I.rar === r)); let x = Math.random() * rs.reduce((a, r) => a + RAR[r].w, 0), r = rs[rs.length - 1];
+    for (const k of rs){ x -= RAR[k].w; if (x <= 0){ r = k; break; } }
+    const pool = left.filter(I => I.rar === r); return pool[Math.floor(Math.random() * pool.length)]; },
+  openCrate(){ if (!this.isOpen() || this.balance() < CRATE_PRICE) return null; const I = this.crateRoll(); if (!I) return null; this.st().own[I.id] = Date.now(); Prog.save(); return I; },
+  lockOf(I){ if (I.crate) return this.owns(I.id) ? '' : 'crate'; if (!I.price || Owner.on) return ''; if (!this.isOpen()) return 'level'; if (I.needs && !(Prog.d.badges || {})[I.needs]) return 'badge';
     if (!this.owns(I.id) && !this.today().includes(I)) return 'gone'; return ''; },
   put(id){ const I = SHOP.find(x => x.id === id); if (!I || !this.owns(id)) return; this.st().wear[I.slot] = [id, Date.now()]; Prog.save(); },
   off(slot){ this.st().wear[slot] = [slot === 'skin' ? 'c-classic' : null, Date.now()]; Prog.save(); },
@@ -809,19 +843,28 @@ const Shop = {
 // time left on it) and the locker (everything bought, to wear or take off, and the pieces a badge still has to earn).
 function renderShop(){
   const view = document.getElementById('view'), bal = Shop.balance(), e = Shop.earned(), open = Shop.isOpen(), L = Shop.worn(), who = coachWho().id;
-  const st = Daily.streak(), toNext = 3 - (st % 3), tab = S.shopTab === 'locker' ? 'locker' : 'shop', have = Prog.d.badges || {};
+  const st = Daily.streak(), toNext = 3 - (st % 3), tab = ['locker', 'crate'].includes(S.shopTab) ? S.shopTab : 'shop', have = Prog.d.badges || {};
   const card = I => {
     const lk = Shop.lockOf(I), own = Shop.owns(I.id), on = L[I.slot] === I.id, B = I.needs && BADGES.find(x => x.id === I.needs), needB = B && !have[B.id] && !Owner.on;
     // a card shows the piece itself, on the coach in the colour worn; the whole outfit is on the mannequin beside the shelf
     const look = I.slot === 'skin' ? {skin: I.id} : {skin: L.skin, [I.slot]: I.id}, x = needB ? badgeStats() : null;
     const act = needB ? `<span class="need">Badge: ${esc(B.name)}<i>${Math.min(B.n(x), badgeNeed(B, x))} of ${badgeNeed(B, x)}</i></span>`
+      : own && tab === 'shop' ? `<button class="btn small ownedbtn" type="button" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Owned</button>`
+      : I.crate && !own ? '<span class="price">In the crate</span>'
       : on ? (I.slot === 'skin' && I.id === 'c-classic' ? '<span class="wearing">Wearing</span>' : `<button class="btn small" data-off="${I.slot}">Take off</button>`)
       : own ? `<button class="btn small" data-wear="${I.id}">Wear</button>`
       : lk === 'level' ? `<span class="price">${COIN}${I.price}</span>`
       : `<button class="btn small primary" data-buy="${I.id}" ${bal < I.price || lk ? 'disabled' : ''} aria-label="Buy ${esc(I.name)} for ${I.price} ${I.price === 1 ? 'token' : 'tokens'}">${COIN}${I.price}</button>`;
-    return `<li class="item ${needB || (lk === 'level' && !own) ? 'lock' : ''} ${on ? 'on' : ''}"><span class="ipv z-${I.slot} zk-${who}">${knightSVG('', who, look)}</span><b>${esc(I.name)}</b>${act}</li>`;
+    return `<li class="item ${needB || (lk === 'level' && !own) ? 'lock' : ''} ${on ? 'on' : ''} ${own && tab === 'shop' ? 'owned' : ''} ${I.rar ? 'r-' + I.rar : ''}" data-item="${I.id}"><span class="ipv z-${I.slot} zk-${who}">${knightSVG('', who, look)}</span><b>${esc(I.name)}</b>${I.rar ? `<i class="rar r-${I.rar}">${RAR[I.rar].name}</i>` : ''}${act}</li>`;
   };
-  const shelf = (Owner.on ? SHOP.filter(I => I.price) : Shop.today()).filter(I => !Shop.owns(I.id));
+  // a piece bought today stays on the shelf, marked as owned, until the shelf changes
+  const shelf = Owner.on ? SHOP.filter(I => I.price) : Shop.today();
+  const inCrate = SHOP.filter(I => I.crate), crateLeft = Shop.crateLeft();
+  const crateHTML = () => `<section class="cratebox"><div class="crateart">${CRATE_ART}</div>
+      <div class="crateinfo"><h3>Collector's crate</h3><p>One piece the shop never sells, picked at random and never one you have.</p>
+        ${crateLeft.length ? `<button class="btn primary" type="button" data-crate ${open && bal >= CRATE_PRICE ? '' : 'disabled'} aria-label="Open a crate for ${CRATE_PRICE} tokens">Open a crate ${COIN}${CRATE_PRICE}</button>` : '<span class="wearing">You have every piece in it</span>'}
+        <p class="codds">${Object.entries(RAR).map(([k, r]) => `<span class="rar r-${k}">${r.name} ${r.w}%</span>`).join('')}</p></div></section>
+    <ul class="items cratein">${inCrate.map(card).join('')}</ul>`;
   const locker = SHOP.filter(I => Shop.owns(I.id)), earn = Owner.on ? [] : SHOP.filter(I => I.needs && !have[I.needs] && !Shop.owns(I.id));
   const groups = SLOTS.map(([slot, name]) => [name, locker.filter(I => I.slot === slot)]).filter(([, l]) => l.length).concat(earn.length ? [['Earned with a badge', earn]] : []);
   const lv = Level.of(), toGo = Array.from({length: Math.max(0, SHOP_AT - lv.n)}, (_, k) => Level.step(lv.n + k)).reduce((a, v) => a + v, 0) - lv.into;
@@ -836,16 +879,67 @@ function renderShop(){
       <div class="shopmain">
         ${open ? '' : `<section class="wlock"><div><h3>Opens at level ${SHOP_AT}</h3><p>${toGo} more ${toGo === 1 ? 'point' : 'points'} to go.</p></div>
           <div class="wlv" aria-label="Level ${lv.n} of ${SHOP_AT}">${Array.from({length: SHOP_AT}, (_, k) => `<i class="${k < lv.n ? 'on' : ''}">${k + 1}</i>`).join('')}</div></section>`}
-        <div class="shophd">${segHTML([['shop', 'Daily shop'], ['locker', 'Locker', locker.length]], tab, 'shoptab')}${tab === 'shop' ? `<span class="sdt tnum" id="dropT">${Shop.endsIn()} left</span>` : ''}</div>
+        <div class="shophd">${segHTML([['shop', 'Daily shop'], ['crate', 'Crates'], ['locker', 'Locker', locker.length]], tab, 'shoptab')}${tab === 'shop' ? `<span class="sdt tnum" id="dropT">${Shop.endsIn()} left</span>` : ''}</div>
         ${tab === 'shop' ? (shelf.length ? `<ul class="items daily">${shelf.map(card).join('')}</ul>` : '<p class="snone">Nothing new today.</p>')
+          : tab === 'crate' ? crateHTML()
           : groups.map(([name, l]) => `<section class="slot"><h3>${name}</h3><ul class="items">${l.map(card).join('')}</ul></section>`).join('')}
       </div>
     </div>`;
   Shop.day = dayKey();
   view.querySelectorAll('[data-shoptab]').forEach(b => b.onclick = () => { S.shopTab = b.dataset.shoptab; renderShop(); });
-  view.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => { const I = SHOP.find(x => x.id === b.dataset.buy); if (Shop.buy(I.id)){ renderShop(); Coach.refresh(); } });
+  view.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => { const I = SHOP.find(x => x.id === b.dataset.buy); if (Shop.buy(I.id)){ Sound.play('buy'); renderShop(); Coach.refresh(); shopFx(I.id); } });
+  const cr = view.querySelector('[data-crate]'); if (cr) cr.onclick = crateOpen;
   view.querySelectorAll('[data-wear]').forEach(b => b.onclick = () => { Shop.put(b.dataset.wear); renderShop(); Coach.refresh(); });
   view.querySelectorAll('[data-off]').forEach(b => b.onclick = () => { Shop.off(b.dataset.off); renderShop(); Coach.refresh(); });
+}
+// A purchase is a moment: the card pops with a ring and a burst of confetti, the coach hops in the new piece, the
+// tokens tick. `burst` throws n bits of confetti from the middle of `host` (not with reduced motion).
+function burst(host, n, cls){
+  if (reduced || !host) return; const b = document.createElement('span'); b.className = 'burst ' + (cls || ''); b.setAttribute('aria-hidden', 'true');
+  b.innerHTML = Array.from({length: n}, (_, i) => `<i style="--a:${Math.round(i / n * 360 + Math.random() * 24)}deg;--d:${Math.round(52 + Math.random() * 58)}px;animation-delay:${(Math.random() * .08).toFixed(2)}s"></i>`).join('');
+  host.appendChild(b); setTimeout(() => b.remove(), 1400);
+}
+function shopFx(id){
+  const li = document.querySelector(`#view .item[data-item="${id}"]`), m = document.querySelector('#view .mannequin'), bal = document.querySelector('#view .bal b');
+  if (li){ li.classList.add('bought'); burst(li, 16); }
+  if (m){ m.classList.remove('hop'); void m.offsetWidth; m.classList.add('hop'); }
+  if (bal) bal.classList.add('baltick');
+}
+// Opening a crate: the piece is drawn first (Shop.openCrate), then shown. A reel of pieces runs past a marker and slows
+// down onto it, ticking as each one passes; then the piece itself, in its rarity's colour. Skip jumps to the piece.
+function crateOpen(){
+  const I = Shop.openCrate(); if (!I) return;
+  const who = coachWho().id, L = Shop.worn(), pool = SHOP.filter(x => x.crate), look = x => x.slot === 'skin' ? {skin: x.id} : {skin: L.skin, [x.slot]: x.id};
+  const filler = () => { let x = Math.random() * 100, r = 'common'; for (const [k, v] of Object.entries(RAR)){ x -= v.w; if (x <= 0){ r = k; break; } } const ps = pool.filter(q => q.rar === r); return ps[Math.floor(Math.random() * ps.length)] || pool[0]; };
+  const N = 46, WIN = 40, tiles = Array.from({length: N}, (_, i) => i === WIN ? I : filler());
+  const sheet = document.createElement('div'); sheet.className = 'scrim cratescrim'; sheet.id = 'crateSheet';
+  sheet.innerHTML = `<div class="sheet cratesheet" role="dialog" aria-modal="true" aria-label="Opening a crate"><p class="kicker">Collector's crate</p>
+      <div class="reel"><ul class="strip">${tiles.map(x => `<li class="rt r-${x.rar}"><span class="ipv z-${x.slot} zk-${who}">${knightSVG('', who, look(x))}</span><b>${esc(x.name)}</b></li>`).join('')}</ul><i class="reelmark" aria-hidden="true"></i></div>
+      <div class="prize" hidden></div><div class="lesson-actions cratebtns"><button class="btn ghost" type="button" data-crateskip>Skip</button></div></div>`;
+  document.body.appendChild(sheet);
+  const strip = sheet.querySelector('.strip'), reel = sheet.querySelector('.reel'), btns = sheet.querySelector('.cratebtns');
+  const close = () => { sheet.remove(); renderShop(); Coach.refresh(); };
+  let over = false, raf = 0, an = null;
+  const show = () => {
+    if (over) return; over = true; cancelAnimationFrame(raf); if (an){ try { an.finish(); } catch(e){} }
+    reel.classList.add('done'); strip.children[WIN].classList.add('won');
+    const prize = sheet.querySelector('.prize'); prize.hidden = false; prize.className = 'prize r-' + I.rar;
+    prize.innerHTML = `<i class="prays" aria-hidden="true"></i><span class="ipv z-${I.slot} zk-${who}">${knightSVG('cheer', who, look(I))}</span><p class="rar r-${I.rar}">${RAR[I.rar].name}</p><h3>${esc(I.name)}</h3>`;
+    Sound.play('win', {level: RAR[I.rar].lv}); burst(prize, 14 + RAR[I.rar].lv * 10, 'r-' + I.rar);
+    btns.innerHTML = `<button class="btn primary" type="button" data-cratewear>Wear it</button>${Shop.crateLeft().length && Shop.balance() >= CRATE_PRICE ? `<button class="btn" type="button" data-crateagain>Open another ${COIN}${CRATE_PRICE}</button>` : ''}<button class="btn ghost" type="button" data-cratedone>Done</button>`;
+    btns.querySelector('[data-cratewear]').onclick = () => { Shop.put(I.id); close(); };
+    btns.querySelector('[data-cratedone]').onclick = close;
+    const ag = btns.querySelector('[data-crateagain]'); if (ag) ag.onclick = () => { sheet.remove(); crateOpen(); };
+    btns.querySelector('[data-cratewear]').focus();
+  };
+  sheet.querySelector('[data-crateskip]').onclick = show;
+  if (reduced){ show(); return; }
+  const tw = strip.children[1].offsetLeft - strip.children[0].offsetLeft, mid = reel.clientWidth / 2;
+  const end = strip.children[WIN].offsetLeft + strip.children[WIN].offsetWidth * (0.18 + Math.random() * 0.64) - mid;
+  an = strip.animate([{transform: 'translateX(0px)'}, {transform: `translateX(${-end.toFixed(1)}px)`}], {duration: 5600, easing: 'cubic-bezier(.08,.62,.1,1)', fill: 'forwards'});
+  let last = -1; const tick = () => { if (over) return; const k = Math.floor((-new DOMMatrixReadOnly(getComputedStyle(strip).transform).m41 + mid) / tw); if (k !== last){ last = k; Sound.play('tick'); } raf = requestAnimationFrame(tick); };
+  raf = requestAnimationFrame(tick);
+  an.finished.then(() => setTimeout(show, 420)).catch(() => {});
 }
 // the time left on today's shelf, and a fresh one after midnight
 setInterval(() => {
@@ -2016,7 +2110,7 @@ const Tour = {
       {h: 'Levels', at: '#lvBtn', skip: () => document.getElementById('lvBtn').hidden, say: ['Every line you play earns points', 'The ring fills toward your next level. Tap it for your badges']},
       {h: 'Your streak', at: '#meBtn', skip: () => document.getElementById('meBtn').hidden, say: ['The flame counts the days in a row you finish today\'s five', 'It takes a new colour at 5, 10, 20, 30, 50 and 100 days', 'Every third day in a row earns a shop token']},
       {h: 'The daily shop', at: () => document.querySelector('#app .shopmain') || document.querySelector('#app .shop'), go: () => go('shop'),
-        say: () => ['Six new pieces every day', 'Tokens from badges, levels and days in a row buy them', 'Wear what you buy from your locker'].concat(Level.of().n < SHOP_AT ? [`It opens at level ${SHOP_AT}`] : [])},
+        say: () => ['Six new pieces every day', 'Tokens from badges, levels and days in a row buy them', 'Crates hold pieces the shop never sells, in four rarities: legendary ones come only from there', 'Wear what you buy from your locker'].concat(Level.of().n < SHOP_AT ? [`It opens at level ${SHOP_AT}`] : [])},
       {h: 'Settings', at: '#setBtn', go: () => go('course'), say: ['Light or dark, text size, board colours and your coach', 'How pieces slide, with six animations to pick from, and sounds in three themes', 'Advanced settings: switch a system or reset your account, each confirmed with your username', 'You can take this tour again from there']},
       {h: 'Your account', at: '#acctBtn', skip: () => document.getElementById('acctBtn').hidden, say: ['Sign in and your progress follows you to every device']},
       {h: 'That\'s me', at: '#coach .cav', skip: () => !SET.coach, say: ['Tap me any time for a tip', 'I speak up when a line ends, and when something new happens', 'When a game of yours leaves your book, I\'ll say so and bring the line to drill']},

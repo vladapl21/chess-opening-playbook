@@ -33,7 +33,7 @@ with sync_playwright() as p:
     assert 'level 5' in pg.inner_text('.wlock') and pg.locator('.wlock .wlv i').count() == 5
     assert pg.locator('.items.daily .item.lock').count() == pg.evaluate('Shop.today().length') == 6, 'today\'s shelf is there to look at, with nothing to tap'
     head = ' '.join(pg.inner_text('.shophd').split()); print('the header:', head)
-    assert head.startswith('Daily shop Locker') and head.endswith(' left') and pg.locator('#dropT').count() == 1
+    assert head.startswith('Daily shop Crates Locker') and head.endswith(' left') and pg.locator('#dropT').count() == 1
     page = pg.inner_text('#view').lower()
     for gone in ('two drops', 'today only', 'gone at midnight', 'tomorrow', 'wardrobe', 'days only', 'fridays', 'saturdays'): assert gone not in page, gone
     pg.screenshot(path=out + 's_locked.png', full_page=True)
@@ -78,13 +78,21 @@ with sync_playwright() as p:
     hat = min((x for x in shelf if x[1] == 'head'), key=lambda x: x[2]); assert hat[2] <= bal, (hat, bal)
     poor = [x[0] for x in shelf if x[2] > bal]
     for i in poor: assert pg.is_disabled(f'[data-buy="{i}"]'), i
+    n_snd = pg.evaluate('Sound.n')
     pg.click(f'[data-buy="{hat[0]}"]'); pg.wait_for_timeout(300)
     assert pg.evaluate('Shop.balance()') == bal - hat[2] and pg.evaluate('Shop.worn().head') == hat[0]
+    # buying is a moment: the card pops with confetti, the coach hops, and a sound plays
+    fx = pg.evaluate(f"[document.querySelector('.item[data-item=\"{hat[0]}\"]').classList.contains('bought'), document.querySelectorAll('.item[data-item=\"{hat[0]}\"] .burst i').length, document.querySelector('.mannequin').classList.contains('hop'), Sound.n, Sound.last]")
+    print('a purchase:', fx); assert fx[0] and fx[1] >= 12 and fx[2] and fx[3] == n_snd + 1 and fx[4] == 'buy', fx
     assert pg.locator('#coach .cbub').count() == 0, 'no speech for a purchase'
     vb = pg.get_attribute('#coach .cav svg', 'viewBox'); print('room for the hat:', vb)
     assert vb == pg.evaluate(f"hatBox('knight', '{hat[0]}')") and pg.locator(f'#coach .cav svg [data-g="{hat[0]}"]').count() == 1, 'the corner coach wears the hat'
     assert pg.evaluate('Shop.today().map(I => I.id)') == [x[0] for x in shelf], 'the shelf stays as it was for the day'
-    assert pg.locator(f'.items.daily [data-buy="{hat[0]}"]').count() == 0 and pg.locator('.items.daily .item').count() == 5, 'what is bought leaves the shelf for the locker'
+    # what is bought stays on the shelf for the day, marked as owned, with the button greyed out
+    own = pg.locator(f'.items.daily .item[data-item="{hat[0]}"] .ownedbtn')
+    assert pg.locator(f'.items.daily [data-buy="{hat[0]}"]').count() == 0 and pg.locator('.items.daily .item').count() == 6 and own.count() == 1 and own.is_disabled() and own.inner_text().strip() == 'Owned'
+    pg.wait_for_timeout(1500); assert pg.locator('.burst').count() == 0, 'the confetti clears itself away'
+    pg.screenshot(path=out + 's_owned.png')
     # ---- the fit. Every hat on every coach is inside its picture with a shadow under its rim, the picture makes room
     #      for the hat and little more, and what goes round the knight's neck is cut to the neck (each picture its own cut)
     fit = pg.evaluate("""(() => { const host = document.createElement('div'); host.style.cssText = 'position:absolute;left:0;top:0;width:200px;visibility:hidden'; document.body.appendChild(host); const bad = [];
@@ -106,7 +114,7 @@ with sync_playwright() as p:
     assert all(v[0] and v[1] and v[2] and v[3] >= 1 for v in neck.values()) and len(neck) == 7, neck
     # a card shows the piece by itself: the hat just put on is on the mannequin, not on the cards for glasses or scarves
     alone = [pg.locator(f'.mannequin svg [data-g="{hat[0]}"]').count() == 1, pg.locator('.items.daily .ipv.z-face svg [data-g], .items.daily .ipv.z-neck svg [data-g], .items.daily .ipv.z-skin svg [data-g]').count() > 0, pg.locator('.items.daily .ipv.z-head svg').count()]
-    assert alone == [True, False, 1], alone
+    assert alone == [True, False, 2], alone      # both hats are still on the shelf: the one bought is marked as owned
     row = pg.evaluate("[...document.querySelectorAll('.items.daily .item > :last-child')].slice(0, 3).map(e => Math.round(e.getBoundingClientRect().bottom))")
     assert len(row) == 3 and max(row) - min(row) <= 2, ('what a card does sits on one line across a row', row)
     pg.click('[data-shoptab="locker"]'); pg.wait_for_timeout(200)
@@ -146,7 +154,8 @@ with sync_playwright() as p:
     later = pg.evaluate("Array.from({length: 28}, (_, k) => Shop.on(new Date(Date.now() + (k + 1) * DAY)).map(I => I.id)).flat()")
     assert hat[0] not in pg.evaluate('Shop.today().map(I => I.id)') and hat[0] not in later
     pg.evaluate("renderShop()"); pg.wait_for_timeout(200)
-    assert pg.locator('.items.daily .item').count() == 6 - (1 if sk else 0), 'the next piece of its kind takes the empty place'
+    assert pg.locator('.items.daily .item').count() == 6 and pg.locator(f'.items.daily .item[data-item="{hat[0]}"]').count() == 0, 'the next piece of its kind takes the empty place'
+    assert not sk or pg.locator(f'.items.daily .item[data-item="{sk[0]}"] .ownedbtn').count() == 1, 'the one bought today is still there, owned'
     assert pg.evaluate("/^\\d+ (h \\d+ )?min left$/.test(document.getElementById('dropT').textContent)"), pg.inner_text('#dropT')
     pg.click('[data-shoptab="locker"]'); pg.wait_for_timeout(200)
     names = pg.locator('.shopmain .slot .item b').all_inner_texts(); print('locker:', names[:6]); assert hat[3] in names and (not sk or sk[3] in names)
@@ -156,7 +165,43 @@ with sync_playwright() as p:
     # ---- the record: bought items stay bought, the newer choice of what to wear wins, tokens are the same everywhere
     m = pg.evaluate("mergeProg({shop: {own: {'h-cap': 5}, wear: {head: ['h-cap', 10]}}}, {shop: {own: {'h-cap': 3, 'n-bowtie': 4}, wear: {head: ['h-tophat', 20], neck: ['n-bowtie', 4]}}}).shop")
     assert m == {'own': {'h-cap': 3, 'n-bowtie': 4}, 'wear': {'head': ['h-tophat', 20], 'neck': ['n-bowtie', 4]}}, m
-    assert pg.evaluate("Shop.spent()") == pg.evaluate("Object.keys(Prog.d.shop.own).reduce((a, id) => a + SHOP.find(x => x.id === id).price, 0)")
+    assert pg.evaluate("Shop.spent()") == pg.evaluate("Object.keys(Prog.d.shop.own).reduce((a, id) => a + (SHOP.find(x => x.id === id).price || 0), 0)")
+
+    # ---- crates. Pieces the shelf never has, in four rarities; a crate costs tokens, gives one of them by the odds and
+    #      never a double; the reel runs past the marker and stops on the piece, which can be worn from there.
+    crate = pg.evaluate("[SHOP.filter(I => I.crate).map(I => [I.id, I.rar, I.slot]), CRATE_PRICE, Object.entries(RAR).map(([k, r]) => [k, r.w])]")
+    rars = [x[1] for x in crate[0]]; print('in the crate:', len(crate[0]), {r: rars.count(r) for r in ('common', 'rare', 'epic', 'legendary')}, '| a crate costs', crate[1])
+    assert set(rars) == {'common', 'rare', 'epic', 'legendary'} and sum(w for _, w in crate[2]) == 100 and rars.count('legendary') >= 2
+    month = set(pg.evaluate("Array.from({length: 60}, (_, k) => Shop.on(new Date(Date.now() + k * DAY)).map(I => I.id)).flat()"))
+    assert not month & {x[0] for x in crate[0]} and not pg.evaluate("SHOP.some(I => I.price && I.rar === 'legendary')"), 'crate pieces are never on the shelf: legendary comes only from a crate'
+    fits = pg.evaluate("COACHES.every(c => SHOP.filter(I => I.crate).every(I => { const t = knightSVG('', c.id, I.slot === 'skin' ? {skin: I.id} : {skin: 'c-classic', [I.slot]: I.id}); return I.slot === 'skin' ? t.includes('class=\"sk-') : t.includes('class=\"aura'); }))")
+    assert fits, 'every crate piece draws on every coach'
+    odds = pg.evaluate("(() => { const n = {}; for (let i = 0; i < 4000; i++){ const I = Shop.crateRoll(); n[I.rar] = (n[I.rar] || 0) + 1; } return n; })()"); print('  4,000 draws:', odds)
+    assert odds['common'] > odds['rare'] > odds['epic'] > odds['legendary'] > 40
+    pg.evaluate("Prog.d.badges = Object.assign({}, Prog.d.badges, {s3: 1, s7: 1, u1: 1, m10: 1}); Prog.save(); renderShop()"); bal = pg.evaluate('Shop.balance()'); assert bal >= crate[1] * 2, bal
+    pg.click('[data-shoptab="crate"]'); pg.wait_for_timeout(300)
+    assert pg.locator('.cratein .item').count() == len(crate[0]) and pg.locator('.codds .rar').count() == 4 and not pg.is_disabled('[data-crate]')
+    pg.screenshot(path=out + 's_crate.png', full_page=True)
+    pg.click('[data-crate]'); pg.wait_for_timeout(700)
+    spin = pg.evaluate("[document.querySelectorAll('#crateSheet .strip .rt').length, document.querySelector('#crateSheet .prize').hidden, new DOMMatrixReadOnly(getComputedStyle(document.querySelector('#crateSheet .strip')).transform).m41 < -200, Sound.last]")
+    print('  the reel, under way:', spin); assert spin[0] >= 40 and spin[1] is True and spin[2] and spin[3] == 'tick', spin
+    pg.screenshot(path=out + 's_crate_spin.png')
+    pg.wait_for_function("!document.querySelector('#crateSheet .prize').hidden", timeout=12000); pg.wait_for_timeout(500)
+    won = pg.evaluate("(() => { const id = Object.keys(Prog.d.shop.own).find(k => SHOP.find(I => I.id === k).crate), I = SHOP.find(x => x.id === id), strip = document.querySelector('#crateSheet .strip'), w = strip.querySelector('.rt.won').getBoundingClientRect(), m = document.querySelector('#crateSheet .reelmark').getBoundingClientRect(); return [id, I.rar, document.querySelector('#crateSheet .prize h3').textContent, I.name, w.left <= m.left && m.right <= w.right, document.querySelector('#crateSheet .prize .rar').textContent, Sound.last]; })()")
+    print('  out of the crate:', won); assert won[2] == won[3] and won[4] and won[5].lower() == won[1] and won[6] == 'win', won
+    assert pg.evaluate('Shop.balance()') == bal - crate[1]
+    pg.screenshot(path=out + 's_crate_prize.png')
+    pg.click('[data-cratewear]'); pg.wait_for_timeout(400)
+    slot = pg.evaluate(f"SHOP.find(I => I.id === '{won[0]}').slot")
+    assert pg.locator('#crateSheet').count() == 0 and pg.evaluate(f"Shop.worn()['{slot}']") == won[0] and pg.locator(f'.cratein .item[data-item="{won[0]}"] [data-off]').count() == 1
+    # no doubles: with every piece but one in hand, the crate gives that one; then it is empty
+    rest = pg.evaluate("(() => { const left = Shop.crateLeft(); for (const I of left.slice(1)) Prog.d.shop.own[I.id] = Date.now(); return [left[0].id, Shop.crateRoll().id, Shop.crateLeft().length]; })()")
+    assert rest[0] == rest[1] and rest[2] == 1, rest
+    pg.evaluate(f"Prog.d.shop.own['{rest[0]}'] = Date.now(); renderShop()"); pg.wait_for_timeout(200)
+    assert pg.evaluate('Shop.crateRoll()') is None and pg.locator('[data-crate]').count() == 0 and 'every piece' in pg.inner_text('.crateinfo')
+    assert pg.evaluate("mergeProg({shop: {own: {'a-nova': 9}, wear: {aura: ['a-nova', 9]}}}, {shop: {own: {'h-cap': 3}, wear: {}}}).shop") == {'own': {'a-nova': 9, 'h-cap': 3}, 'wear': {'aura': ['a-nova', 9]}}, 'crate pieces follow the player like the rest'
+    pg.evaluate("for (const I of SHOP.filter(x => x.crate)) delete Prog.d.shop.own[I.id]; delete Prog.d.shop.wear.aura; Shop.off('skin'); renderShop()")
+    pg.click('[data-shoptab="shop"]'); pg.wait_for_timeout(200)
 
     # ---- dark and phone
     ph = b.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True, color_scheme='dark'); q = ph.new_page(); hook(q)
