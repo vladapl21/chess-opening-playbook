@@ -124,7 +124,7 @@ with sync_playwright() as p:
                 'the explore board': 'explore board', 'the engine in lessons': 'the engine in lessons',
                 'the plan at the end of every line': 'plan', 'opening names': "opening's real name",
                 'practice from a position': 'set up a position', 'the last three games': 'last 3 games',
-                'levels': 'level', 'the streak': 'streak', 'the daily shop': 'new pieces every day', 'the locker': 'from your locker', 'the account': 'sign in',
+                'levels': 'level', 'the streak': 'streak', 'the flame\'s colours': 'takes a new colour', 'the daily shop': 'new pieces every day', 'the locker': 'from your locker', 'the account': 'sign in',
                 'the coach': 'tap me', 'marks on the moves': 'key move', 'marks on the board': 'on the board beside the piece', 'move numbers on the pieces': 'number of the move', 'a lesson board that takes moves': 'move any piece', 'where the added moves begin': 'how it usually goes on',
                 'a game that left the book': 'leaves your book',
                 'a move played too early': 'wrong moment'}

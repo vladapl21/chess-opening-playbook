@@ -78,6 +78,14 @@ with sync_playwright() as p:
     assert m == [5, 7], m
     y = pg.evaluate("(() => { const keep = Prog.d.days; Prog.d.days = {[dayKey(-1)]: ['a','b','c','d','e'], [dayKey(-2)]: ['a','b','c','d','e']}; const r = [Daily.streak(), Daily.done(0)]; Prog.d.days = keep; return r; })()")
     assert y == [2, False], 'an open today keeps yesterday\'s streak alive'
+    # the flame takes a new colour as the streak grows: at 5, 10, 20, 30, 50 and 100 days
+    fl = pg.evaluate("""(() => { const keep = Prog.d.days, got = [];
+        for (const n of [1, 4, 5, 9, 10, 20, 30, 50, 100]){ Prog.d.days = {}; for (let i = 0; i < n; i++) Prog.d.days[dayKey(-i)] = ['a','b','c','d','e']; render();
+          got.push([Daily.streak(), +document.documentElement.dataset.flame, getComputedStyle(document.querySelector('#meBtn .flame')).fill]); }
+        Prog.d.days = keep; render(); return got; })()""")
+    print('flame by streak:', [(x[0], x[1]) for x in fl])
+    assert [x[0] for x in fl] == [1, 4, 5, 9, 10, 20, 30, 50, 100] and [x[1] for x in fl] == [0, 0, 1, 1, 2, 3, 4, 5, 6], fl
+    assert len({x[2] for x in fl}) == 7, 'a colour of its own for every step'
 
     # ---- badges: earned quietly the first time, then the coach brings a medal; the profile shows them all
     got = pg.evaluate('Object.keys(Prog.d.badges || {})'); print('badges so far:', got); assert 'l1' in got and 's3' in got

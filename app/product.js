@@ -676,7 +676,7 @@ function profileHTML(){
   return `<div class="prof"><div class="plevel"><span class="lvc big tnum" style="--p:${Math.round(L.into / L.need * 100)}">${L.n}</span><div><b>Level ${L.n}</b><span class="tnum">${L.into} of ${L.need} points to level ${L.n + 1}</span><span class="lvbar wide" aria-hidden="true"><i style="width:${Math.round(L.into / L.need * 100)}%"></i></span>
       ${L.n < SHOP_AT ? `<span class="lvnote">The shop opens at level ${SHOP_AT}.</span>` : ''}</div></div>
     <details class="pxp"><summary>How points add up</summary><ul>${pts.map(([t, n]) => `<li><span>${t}</span><b class="tnum">+${n}</b></li>`).join('')}</ul></details>
-    <div class="pstreak ${st ? '' : 'zero'}">${FLAME}<div><b class="tnum">${st}</b><span>${st === 1 ? 'day' : 'days'} in a row</span></div><p>Best: ${best} · today: ${k} of ${DAILY} lines</p></div>
+    <div class="pstreak ${st ? '' : 'zero'}">${FLAME}<div><b class="tnum">${st}</b><span>${st === 1 ? 'day' : 'days'} in a row</span></div><p>Best: ${best} · today: ${k} of ${DAILY} lines${(f => f.next ? ` · ${f.name.toLowerCase()} flame, a new colour at ${f.next} days` : ` · ${f.name.toLowerCase()} flame`)(flameTier(st))}</p></div>
     <ol class="week" aria-label="The last seven days">${week}</ol>
     <div class="bdgs"><p class="kicker">Badges · ${got} of ${BADGES.length}</p>${groups.map(g => `<div><p class="bgh">${esc(g)}</p><ul class="bgrid">${BADGES.filter(B => B.group === g).map(one).join('')}</ul></div>`).join('')}</div></div>`;
 }
@@ -1977,7 +1977,7 @@ const Tour = {
       {h: 'The Sandbox', at: '#sbpanel', go: () => { S.drill = S.drillState = null; go('sandbox'); },
         say: ['Practice games against an opponent who plays your book\'s lines', 'Everything plays White and Black in turn', 'Pick openings from either colour to narrow it', 'Set up a position to practise only the lines that go on from it', 'Every game ends with the plan from there']},
       {h: 'Levels', at: '#lvBtn', skip: () => document.getElementById('lvBtn').hidden, say: ['Every line you play earns points', 'The ring fills toward your next level. Tap it for your badges']},
-      {h: 'Your streak', at: '#meBtn', skip: () => document.getElementById('meBtn').hidden, say: ['The flame counts the days in a row you finish today\'s five', 'Every third day in a row earns a shop token']},
+      {h: 'Your streak', at: '#meBtn', skip: () => document.getElementById('meBtn').hidden, say: ['The flame counts the days in a row you finish today\'s five', 'It takes a new colour at 5, 10, 20, 30, 50 and 100 days', 'Every third day in a row earns a shop token']},
       {h: 'The daily shop', at: () => document.querySelector('#app .shopmain') || document.querySelector('#app .shop'), go: () => go('shop'),
         say: () => ['Six new pieces every day', 'Tokens from badges, levels and days in a row buy them', 'Wear what you buy from your locker'].concat(Level.of().n < SHOP_AT ? [`It opens at level ${SHOP_AT}`] : [])},
       {h: 'Settings', at: '#setBtn', go: () => go('course'), say: ['Light or dark, text size, board colours, your coach and your systems', 'You can take this tour again from there']},
