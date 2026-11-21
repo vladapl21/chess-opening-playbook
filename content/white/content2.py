@@ -379,6 +379,8 @@ CHAPTERS = [
   dict(id='e5x', name='Philidor & Petrov', move='Philidor, Petrov, Stafford, Latvian, Elephant', parts=['e5x-phil', 'e5x-pet', 'e5x-misc']),
   dict(id='caro', name='Caro-Kann', move='Classical, Karpov, Tartakower, Bronstein-Larsen', parts=['caro-main', 'caro-other4', 'caro-third']),
   dict(id='sic', name='Sicilian', move='The Alapin against every second move', parts=['sic-knight', 'sic-pawn', 'sic-rare']),
+  # the Advance: a second variation against the Caro-Kann (slot whiteCaro in content2_meta.py), lessons and notes in caroadv.py
+  dict(id='caroadv', name='Caro-Kann: the Advance', move='Advance Variation, Short\'s setup, Botvinnik-Carls', parts=['ca-push', 'ca-other']),
   # the Open Sicilian: a second variation against the Sicilian (slot whiteSic in content2_meta.py), lessons and notes in sicopen.py
   dict(id='sico', name='Open Sicilian', move='Najdorf, Dragon, Classical, Accelerated Dragon, Kan, Taimanov', parts=['so-d6', 'so-nc6', 'so-e6', 'so-rare']),
   dict(id='scandi', name='Scandinavian', move='Main Line, Valencian, Modern, the gambits', parts=['scandi-queen', 'scandi-other']),
@@ -402,5 +404,6 @@ import content2_notes  # noqa
 import london  # noqa: E402,F401  the London System for White (its own pack)
 import english  # noqa: E402,F401  the English Opening for White (its own pack)
 import sicopen  # noqa: E402,F401  the Open Sicilian: the Sicilian's second variation for White (its own pack, beside the Alapin)
+import caroadv  # noqa: E402,F401  the Advance against the Caro-Kann (its own pack, beside the main line)
 import odd  # noqa: E402,F401  odd first, second and third moves, in the house chapters
 import wfill  # noqa: E402,F401  replies that came up often and had no line, and named gambits (side lines of the lessons above)

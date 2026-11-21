@@ -171,6 +171,9 @@ const CATALOG = [
     {id: 'd4', keys: ['d4'], ready: false, name: 'Open with the d-pawn (London)', line: 'd4 d5 Bf4 Nf6 e3 e6 Nf3 c5 c3', pitch: 'One setup in one order against almost anything, with a trick ready for each of Black\'s usual tries.'},
     {id: 'flank', keys: ['c4', 'nf3'], ready: false, name: 'Start from the side (English)', line: 'c4 e5 Nc3 Nf6 g3', pitch: 'C-pawn, knight, fianchetto: one setup against nearly everything, and Black never gets the game they prepared for.'}]},
   // second steps inside the e-pawn repertoire: each is asked only when the games show five or more of that kind
+  {slot: 'whiteCaro', within: ['white', 'e4'], label: 'Against the Caro-Kann', ask: 'Against the Caro-Kann, would you rather…', flip: false, opts: [
+    {id: 'classical', keys: ['classical'], ready: false, name: 'Bring the knight out (main line)', line: 'e4 c6 d4 d5 Nc3 dxe4 Nxe4', pitch: 'Develop and let Black trade in the middle. Two lines cover most games.'},
+    {id: 'advance', keys: ['advance'], ready: false, name: 'Push past (Advance)', line: 'e4 c6 d4 d5 e5 Bf5 Nf3 e6 Be2', pitch: 'Take space and keep it. A quiet setup behind the pawns, the same against everything.'}]},
   {slot: 'whiteSic', within: ['white', 'e4'], label: 'Against the Sicilian', ask: 'Against the Sicilian, would you rather…', flip: false, opts: [
     {id: 'alapin', keys: ['alapin'], ready: false, name: 'Build a center first (Alapin)', line: 'e4 c5 c3 Nf6 e5 Nd5 d4', pitch: 'The small c-pawn move, then the d-pawn two squares. Little to learn, and Black\'s main lines never happen.'},
     {id: 'open', keys: ['open'], ready: false, name: 'Open the middle (Open Sicilian)', line: 'e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 f3 e6 Be3', pitch: 'One setup against every Sicilian, then castle long and send the pawns at Black\'s king. Sharper, with more to know.'}]},

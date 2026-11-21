@@ -19,7 +19,8 @@ WE4 = ['italian', 'e5x', 'caro', 'sic', 'scandi', 'pirc', 'french', 'rare']
 WE4_UNITS = {'w-italian', 'w-sicilian', 'w-caro', 'w-2knights', 'w-philidor', 'w-defences', 'w-rare'}
 LONDON_UNITS = {'w-london', 'w-lindian', 'w-lrare'}
 # second steps inside the e-pawn repertoire: slot, variation, the house chapter it replaces, its chapter, its unit, the unit it replaces, a main line
-WVARS = [('whiteSic', 'open', 'sic', 'sico', 'w-sicopen', 'w-sicilian', 'so-najdorf', 'Against the Sicilian')]
+WVARS = [('whiteSic', 'open', 'sic', 'sico', 'w-sicopen', 'w-sicilian', 'so-najdorf', 'Against the Sicilian'),
+         ('whiteCaro', 'advance', 'caro', 'caroadv', 'w-caroadv', 'w-caro', 'ca-main', 'Against the Caro-Kann')]
 
 
 def hook(pg):
