@@ -157,16 +157,17 @@ with sync_playwright() as p:
     lid, k = pg.evaluate(f"(i => {{ const id = (linesByNode.get(i) || []).find(x => LESSONS[LINES[x].lesson] && LINES[x].main) || linesByNode.get(i)[0]; return [id, LINES[id].n.indexOf(i)]; }})((useSide('w'), {AT}('e2e4 e7e5 g1f3 f7f6')))")
     pg.evaluate(f"openLine('{lid}', {k})"); pg.wait_for_timeout(500)
     pg.evaluate("Coach.hush(); document.getElementById('coach').style.visibility = 'hidden'; window.scrollTo(0, 0)"); settle(pg, 400)
-    bottom = pg.evaluate("Math.max(document.querySelector('.ostrip').getBoundingClientRect().bottom, document.querySelector('.mklegend').getBoundingClientRect().bottom) + scrollY + 24")
+    bottom = pg.evaluate("Math.max(document.querySelector('.engrow').getBoundingClientRect().bottom, document.querySelector('.mklegend').getBoundingClientRect().bottom) + scrollY + 24")
     full = pg.screenshot(full_page=True); w, h = Image.open(io.BytesIO(full)).size
     save(full, 'marks.png', crop=(0, 0, w, min(h, round(bottom * 2))))
-    # Your moves, in order: a line of the Slav setup that brings the queen's knight out one move later than the main line
+    # The order on the board: a line of the Slav setup that brings the queen's knight out one move later than the main
+    # line. Every piece carries the number of the move that put it there, and that one is purple.
     swap = pg.evaluate("(useSide('b'), DATA.lines.find(l => LESSONS[l.lesson] && chapterOf(LESSONS[l.lesson]).id === 'slav' && orderOf(l).diff.length === 1 && orderOf(l).diff[0].odd === 'swap').id)")
-    pg.evaluate(f"S.onums = true; openLine('{swap}', LINES['{swap}'].n.length - 1)"); pg.wait_for_timeout(500); pg.evaluate("Coach.hush()"); settle(pg, 300)
-    pg.evaluate("document.querySelector('.ostrip').scrollIntoView({block: 'center'})"); pg.wait_for_timeout(200)
-    box = pg.evaluate("(() => { const r = document.querySelector('.ostrip').getBoundingClientRect(); return [r.left - 10, r.top - 10, r.right + 10, r.bottom + 10]; })()")
+    pg.evaluate(f"openLine('{swap}', LINES['{swap}'].n.length - 1)"); pg.wait_for_timeout(500); pg.evaluate("Coach.hush()"); settle(pg, 300)
+    pg.evaluate("document.querySelector('.board-wrap').scrollIntoView({block: 'start'}); window.scrollBy(0, -12)"); pg.wait_for_timeout(200)
+    box = pg.evaluate("(() => { const a = document.querySelector('.board-wrap').getBoundingClientRect(), b = (document.querySelector('.onote') || document.querySelector('.engrow')).getBoundingClientRect(); return [a.left - 10, a.top - 10, a.right + 10, b.bottom + 10]; })()")
     save(pg.screenshot(), 'order.png', width=1100, crop=tuple(round(v * 2) for v in box))
-    pg.evaluate("S.onums = false; document.getElementById('coach').style.visibility = ''")
+    pg.evaluate("document.getElementById('coach').style.visibility = ''")
 
     # Drill: three moves into the Berlin, next piece picked up
     pg.evaluate("startDrillLine('br-oo')"); pg.wait_for_timeout(1800)

@@ -53,5 +53,19 @@ const A = ctx.Analyze, assert = (c, m) => { if (!c){ console.error('FAILED:', m)
   assert(A.again(JSON.parse(JSON.stringify(K)), books, {blackD4: 'slav'}).home.blackD4 === 'kid', 'a stored profile has no games to read again and stays as it is');
   const V = await A.run(fs.readFileSync(path.join(root, 'data/games/vladapl_1.pgn'), 'utf8'), 'vladapl', books, null, {blackD4: 'kid'});
   assert(V.home.blackD4 === 'kid' && V.leaks.some(l => l.ch === 'kid') && !V.leaks.some(l => l.ch === 'slav'), 'given picks win over the habit');
+  // the quick reader of a game's moves (sanMove) makes the very moves the chess library reads, on every stored game,
+  // and Analyze.newest plays through only the games it is asked for
+  let moves = 0, bad = 0, all = [];
+  for (const f of fs.readdirSync(path.join(root, 'data/games'))) for (const g of A.parsePGN(fs.readFileSync(path.join(root, 'data/games', f), 'utf8'))){
+    all.push(g); const a = new ctx.Chess(), b = new ctx.Chess();
+    for (const san of g.moves){ const y = b.move(san, {sloppy: true}); if (!y) break; const x = A.sanMove(a, san); moves++;
+      if (!x || x.from !== y.from || x.to !== y.to || x.promotion !== y.promotion || x.san !== y.san){ bad++; if (!x) a.move(san, {sloppy: true}); } }
+  }
+  console.log('\n== quick replay:', moves, 'moves,', bad, 'read differently');
+  assert(moves > 9000 && bad === 0, 'the quick reader and the library agree on every move');
+  const C = new ctx.Chess('r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1');
+  assert(A.sanMove(C, 'O-O-O').to === 'c1' && A.sanMove(C, 'O-O').to === 'g8' && A.sanMove(new ctx.Chess('8/P6k/8/8/8/8/7K/8 w - - 0 1'), 'a8=N').promotion === 'n' && A.sanMove(new ctx.Chess(), 'Ke2') === null, 'castling both ways, a promotion, and an illegal move refused');
+  const mine = all.filter(g => /aqua_alpaca/i.test((g.h.White || '') + (g.h.Black || ''))), N3 = A.newest(mine, 'aqua_alpaca', 3);
+  assert(N3.length === 3 && N3[0].t >= N3[1].t && N3[1].t >= N3[2].t && N3[0].h && N3[0].t === Math.max(...mine.map(g => Date.parse((g.h.UTCDate || g.h.Date).replace(/\./g, '-') + 'T' + (g.h.UTCTime || '00:00:00') + 'Z') || 0)), 'the newest three games, newest first');
   console.log(process.exitCode ? '\nanalysis checks FAILED' : '\nanalysis checks passed');
 })();

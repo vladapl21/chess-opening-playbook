@@ -74,15 +74,15 @@ with sync_playwright() as p:
     assert a.evaluate('PERSONA') == 'house' and a.evaluate('!!Prog.ref'), 'the claude.ai copy talks to its database'
 
     # ---- device A: a coach, a board colour, one line played to its end
-    a.evaluate("setSetting('who', 'rook'); setSetting('board', 'wood')")
+    a.evaluate("setSetting('who', 'rook'); setSetting('board', 'wood'); setSetting('nums', false)")
     finish_line(a, 'setup'); a.wait_for_timeout(600)
     d = stored(); print('stored after A:', {k: d.get(k) for k in ('prefs',)}, '| days', d.get('days'))
     assert d['prefs']['who'][0] == 'rook' and d['prefs']['board'][0] == 'wood' and d['lines']['setup']['seen'] == 1 and list(d['days'].values()) == [['setup']]
 
     # ---- device B opens: everything is there
     bp = device(b, 'B'); bp.wait_for_timeout(500)
-    got = bp.evaluate("[SET.who, SET.board, document.documentElement.dataset.board, coachName(), Daily.count(), (Prog.rec('setup') || {}).seen]")
-    print('device B on opening:', got); assert got == ['rook', 'wood', 'wood', 'Rocco', 1, 1], got
+    got = bp.evaluate("[SET.who, SET.board, document.documentElement.dataset.board, coachName(), Daily.count(), (Prog.rec('setup') || {}).seen, SET.nums]")
+    print('device B on opening:', got); assert got == ['rook', 'wood', 'wood', 'Rocco', 1, 1, False], got
 
     # ---- B, already open, keeps hearing A; a change on each side never undoes the other
     bp.evaluate("setSetting('theme', 'dark')"); bp.wait_for_timeout(900)

@@ -69,6 +69,14 @@ Facts that shape the design:
 - Settings and the account button moved out of the header into the corner of the screen; the header fits one row on an ordinary monitor and centres its rows when it has to wrap.
 - A lesson opened from a course unit has "Next lesson" at the top. The Sandbox has "Free play: pick openings" to leave a course practice game.
 
+## Phase 1.21: a lesson board you can move on, and no more waiting on games (done, November 20)
+
+- **Move any piece in a lesson.** The line's own move steps on. A move the book answers opens that line. Anything else opens the explore board with the move made and the engine on.
+- **The order of your moves, on the board.** Each piece carries the number of the move that put it there, on from the start and kept with the settings; a purple number is played at another turn than in the main line. The strip of small diagrams from Phase 1.19 is gone: it was more to decode than the board.
+- **The lag.** Reading a month of games replayed every game through the chess library's own move reader on the page's main thread: on a slow phone, 23 seconds for the last three games and two minutes for the first monthly recap, with the page frozen. A reader written for the job is nine times quicker, only the newest three games are replayed for the reviews, and the recap yields every four games. The same month now takes a quarter of a second and about nine seconds in the background.
+- **Said once.** The engine's verdict and depth are under the board, so the card beside it lists the moves only. The explore board's way back is a centred button. The coach's bubble closes with a bigger cross on a phone.
+- **The welcome page** shows a lesson's board with its opening's name in place of the tilted board, the speech bubble and the four locked cards.
+
 ## Phase 1.20: one book, a daily shop, marks on the board (done, November 20)
 
 Notes from play, the same day: the shop said everything twice, the marks were only in lessons, and switching between White and Black by hand was a chore in the Sandbox.

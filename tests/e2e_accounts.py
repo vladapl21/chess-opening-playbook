@@ -158,14 +158,14 @@ with sync_playwright() as p:
     bp.click('#acctPanel [data-act="close"]')
 
     # ---- the coach, the look and the reminder choice follow the account to the other device
-    a.evaluate("setSetting('who', 'rook'); setSetting('board', 'wood')"); a.click('#acctBtn'); a.wait_for_timeout(200)
+    a.evaluate("setSetting('who', 'rook'); setSetting('board', 'wood'); setSetting('nums', false)"); a.click('#acctBtn'); a.wait_for_timeout(200)
     assert a.get_attribute('#acctPanel [data-mail]', 'aria-checked') == 'false'
     a.click('#acctPanel [data-mail]'); a.wait_for_timeout(200); assert a.get_attribute('#acctPanel [data-mail]', 'aria-checked') == 'true'
     a.click('#acctPanel [data-act="close"]'); a.wait_for_timeout(1800)
     row = S.rows[uid]['data']; assert row['set']['who'] == 'rook' and row['set']['board'] == 'wood' and row['mail']['on'] is True, (row.get('set'), row.get('mail'))
     bp.evaluate("document.dispatchEvent(new Event('visibilitychange'))"); bp.wait_for_timeout(900)
-    got = bp.evaluate("[SET.who, SET.board, document.documentElement.dataset.board, coachName(), !!(Prog.d.mail && Prog.d.mail.on)]"); print('device B after a pull:', got)
-    assert got == ['rook', 'wood', 'wood', 'Rocco', True], got
+    got = bp.evaluate("[SET.who, SET.board, document.documentElement.dataset.board, coachName(), !!(Prog.d.mail && Prog.d.mail.on), SET.nums]"); print('device B after a pull:', got)
+    assert got == ['rook', 'wood', 'wood', 'Rocco', True, False], (got, 'the move numbers on the board are a setting like the others')
     bp.evaluate("setSetting('who', 'pawn')"); bp.wait_for_timeout(1800)
     a.evaluate("document.dispatchEvent(new Event('visibilitychange'))"); a.wait_for_timeout(900)
     assert a.evaluate("[SET.who, SET.board]") == ['pawn', 'wood'], 'the newer change wins, the rest stays'

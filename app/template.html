@@ -286,13 +286,7 @@ p{margin:0}
 .mkc{display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-size:12.5px;font-weight:700;color:var(--ink);white-space:nowrap} .mkw{margin:6px 0 0;font-size:13.5px;color:var(--muted)}
 .mklegend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:10px 0 0;font-size:12.5px;color:var(--muted)} .mklegend span{display:inline-flex;align-items:center;gap:5px}
 .onum circle{fill:var(--ink);opacity:.86} .onum text{fill:var(--surface);font:700 17px var(--f-mono)}
-.ostrip{margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)} .ohead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.otoks{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px} .otok{position:relative;width:50px;display:grid;justify-items:center;gap:2px;padding:3px 0 5px;border:1.5px solid var(--line);border-radius:6px;background:var(--surface-2);opacity:.5;font:inherit;color:inherit}
-button.otok{cursor:pointer} .otok .pico{width:26px;height:26px;margin-top:5px} .otok .on{position:absolute;top:2px;left:4px;font:700 11px var(--f-mono);color:var(--muted)} .otok.done{opacity:1} .otok.cur{opacity:1;border-color:var(--accent);background:var(--accent-soft)}
-.otok.odd{border-style:dashed;border-color:var(--ord)} .otok.odd .on{color:var(--ord)} .ocap{margin:9px 0 0;font-size:13px;color:var(--muted)} .ocap b{color:var(--ink);font-weight:650}
-.omap{width:38px;height:38px} .omb{fill:var(--surface);stroke:var(--line);stroke-width:1} .omg{stroke:var(--line);stroke-width:.6} .oml{stroke:var(--accent);stroke-width:1.6;stroke-linecap:round;opacity:.55} .omf{fill:var(--surface);stroke:var(--accent);stroke-width:1.1} .omt{fill:var(--accent)}
-.otok.odd .oml,.otok.odd .omf{stroke:var(--ord)} .otok.odd .omt{fill:var(--ord)} .olab{margin:10px 0 -4px;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)} .otoks.ref .otok{background:transparent}
-@media (max-width:460px){ .otoks{gap:5px} .otok{width:42px} .omap{width:32px;height:32px} }
+.onum.odd circle{fill:var(--ord);opacity:1} .onote{display:flex;align-items:center;justify-content:center;gap:7px;margin:8px 0 0;font-size:13px;color:var(--muted)} .onote i{flex:none;width:11px;height:11px;border-radius:50%;background:var(--ord)}
 .trow.cur{background:var(--accent-soft)}
 .trow .n{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
 .trow .pico{width:22px;height:22px}
@@ -640,6 +634,7 @@ button.ucard:hover{border-color:var(--accent);transform:translateY(-1px)}
 /* engine + explore */
 .engrow{display:flex;align-items:center;justify-content:center;gap:8px 12px;flex-wrap:wrap;margin-top:10px}
 .engrow .evaltext{margin:0}
+.xcame{display:flex;justify-content:center;margin-top:10px} .xcame .btn{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding-inline:14px} .xcame svg{width:15px;height:15px}
 .eswitch{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:4px 12px 4px 5px;font-weight:650;font-size:13px;cursor:pointer;color:var(--ink)}
 .eswitch i{width:30px;height:18px;border-radius:3px;background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line);position:relative;flex:none;transition:background .15s}
 .eswitch i::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--muted);transition:transform .15s,background .15s}
@@ -931,7 +926,7 @@ function boardSVGInner(fen, o){
   for (const d of (o.dots || [])){ const [x, y] = sqxy(sqi(d)); s += a[sqi(d)] ? `<circle cx="${x+50}" cy="${y+50}" r="44" class="capring"/>` : `<circle cx="${x+50}" cy="${y+50}" r="15" class="dot"/>`; }
   for (const ar of (o.arrows || [])){ s += arrowSVG(ar.slice(0, 2), ar.slice(2, 4), ar[4], o.mini ? 22 : 17, ''); }
   if (o.hint){ s += arrowSVG(o.hint.slice(0, 2), o.hint.slice(2, 4), 'g', o.mini ? 22 : 17, 'hint'); }
-  for (const [sq, n] of (o.nums || [])){ const [x, y] = sqxy(sqi(sq)); s += `<g class="onum" transform="translate(${x + 17} ${y + 83})"><circle r="14"/><text y="6" text-anchor="middle">${n}</text></g>`; }
+  for (const [sq, n, odd] of (o.nums || [])){ const [x, y] = sqxy(sqi(sq)); s += `<g class="onum ${odd ? 'odd' : ''}" transform="translate(${x + 17} ${y + 83})"><circle r="14"/><text y="6" text-anchor="middle">${n}</text></g>`; }
   if (!o.mini) for (const m of (o.marks || (o.mark ? [o.mark] : []))){ const [x, y] = sqxy(sqi(m.sq)), bx = x + 82, by = y + 18;
     // the word beside the sign, for a moment after the move: to the right, or to the left when the board ends there
     if (m.word){ const w = m.word.length * 9.9 + 28, left = bx + w > 796;
@@ -998,25 +993,16 @@ function orderOf(line){
   if (n >= 3) mine.forEach((m, i) => { m.was = at[i]; if (at[i] >= 0 && !keep.has(i)) m.odd = 'swap'; else if (at[i] < 0 && i < lastShared) m.odd = 'new'; if (m.odd) diff.push(m); });
   return {mine, ref, diff, shared: n};
 }
-// a move as a picture: the board from your side, the square the piece left and the one it lands on. No names needed.
-function moveMap(u){
-  const sq = q => { let f = q.charCodeAt(0) - 97, r = +q[1] - 1; if (FLIP){ f = 7 - f; r = 7 - r; } return [f * 4 + 2, (7 - r) * 4 + 2]; };
-  const [x1, y1] = sq(u.slice(0, 2)), [x2, y2] = sq(u.slice(2, 4));
-  return `<svg class="omap" viewBox="0 0 32 32" aria-hidden="true"><rect class="omb" width="32" height="32" rx="2.5"/><path class="omg" d="M0 16H32M16 0V32"/><line class="oml" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/><circle class="omf" cx="${x1}" cy="${y1}" r="1.7"/><circle class="omt" cx="${x2}" cy="${y2}" r="2.7"/></svg>`;
-}
-function orderStripHTML(line, i){
-  const O = orderOf(line); if (O.mine.length < 2) return '';
-  const tok = (m, j, cls, tag) => `<${tag} class="otok ${cls} ${m.odd ? 'odd' : ''}" ${tag === 'button' ? `type="button" data-step="${m.k}" aria-label="Your move ${j + 1}: ${esc(m.nd.l)}"` : ''} title="${esc(m.nd.l)}"><span class="on">${j + 1}</span>${pieceIcon(m.nd.pc, m.nd.w === 1)}${moveMap(m.u)}</${tag}>`;
-  const toks = O.mine.map((m, j) => tok(m, j, m.k === i ? 'cur' : m.k < i ? 'done' : '', 'button')).join('');
-  const two = O.ref && O.shared >= 3 && O.diff.length > 0, moved = new Set(O.diff.filter(m => m.odd === 'swap').map(m => m.u));
-  const ref = two ? myMoves(O.ref).slice(0, Math.max(O.mine.length, 6)).map((m, j) => tok(Object.assign(m, {odd: moved.has(m.u) ? 'swap' : null}), j, 'done', 'span')).join('') : '';
-  const cap = !O.ref ? 'This is the order to know for this opening' : O.shared < 3 ? 'This line goes its own way early' : !O.diff.length ? 'The same order as the main line'
-    : O.diff.slice(0, 2).map(m => `<b>${esc(m.nd.l)}</b> ${m.odd === 'new' ? 'is not in the main line' : O.mine.indexOf(m) < m.was ? 'comes earlier than in the main line' : 'comes later than in the main line'}`).join(' · ');
-  return `<div class="ostrip"><div class="ohead"><p class="kicker">Your moves in order</p><button class="eswitch" id="cNums" type="button" aria-pressed="${!!S.onums}"><i aria-hidden="true"></i>Numbers on the board</button></div>
-    ${two ? `<p class="olab">The main line</p><div class="otoks ref">${ref}</div><p class="olab">This line</p>` : ''}<div class="otoks">${toks}</div><p class="ocap">${cap}</p></div>`;
-}
 // where each of your pieces stands, with the number of the move that put it there
-function orderNums(line, i){ const at = {}; let j = 0; for (let k = 1; k <= i; k++){ const nd = N[line.n[k]], f = nd.u.slice(0, 2), t = nd.u.slice(2, 4); if (isMine(nd)){ delete at[f]; at[t] = ++j; } else delete at[t]; } return Object.entries(at); }
+// (a number is purple when that move comes at another turn than in the opening's main line)
+function orderNums(line, i){
+  const odd = new Set(orderOf(line).diff.map(m => m.k)), at = {}; let j = 0;
+  for (let k = 1; k <= i; k++){ const nd = N[line.n[k]], f = nd.u.slice(0, 2), t = nd.u.slice(2, 4);
+    if (isMine(nd)){ delete at[f]; at[t] = [++j, odd.has(k)];
+      if (nd.pc === 'K' && Math.abs(f.charCodeAt(0) - t.charCodeAt(0)) === 2){ const r = f[1]; delete at[(t[0] === 'g' ? 'h' : 'a') + r]; }   // castling: the rook goes along, without a number
+    } else delete at[t]; }
+  return Object.entries(at).map(([sq, v]) => [sq, v[0], v[1]]);
+}
 function nodeBoardOpts(idx, extra = {}){
   const nd = N[idx], o = {coords: true}, mk = markOf(idx);
   if (mk && nd.u) o.mark = {sq: nd.u.slice(2, 4), k: mk};
@@ -1545,7 +1531,7 @@ function useSide(side){
 }
 /* ------------------------------------------------------------------ settings (kept on this device and with the progress) */
 const SET_KEY = 'playbook-settings', HOST_THEME = document.documentElement.dataset.theme || '';
-const SET_DEF = {theme: 'system', size: 'm', board: 'green', coords: true, coach: true, who: 'knight'};
+const SET_DEF = {theme: 'system', size: 'm', board: 'green', coords: true, coach: true, who: 'knight', nums: true};
 const SET = Object.assign({}, SET_DEF);
 try { Object.assign(SET, JSON.parse(localStorage.getItem(SET_KEY) || '{}')); } catch(e){}
 const SIZES = {s: .92, m: 1, l: 1.08, xl: 1.16};
@@ -1561,7 +1547,7 @@ function applySettings(){
 // the phone never undoes a coach picked on the laptop. A choice made before times were kept counts as very old (time 1)
 // but still beats a device that never chose (time 0). d.set keeps the older one-time-for-all form for pages still open
 // on an earlier version.
-const SET_KEYS = ['theme', 'size', 'board', 'coords', 'coach', 'who'];
+const SET_KEYS = ['theme', 'size', 'board', 'coords', 'coach', 'who', 'nums'];
 SET.ts = SET.ts || {};
 for (const k of SET_KEYS) if (SET.ts[k] === undefined) SET.ts[k] = SET.t || (SET[k] !== SET_DEF[k] ? 1 : 0);
 const setLocal = () => { try { localStorage.setItem(SET_KEY, JSON.stringify(SET)); } catch(e){} };
@@ -1876,6 +1862,7 @@ function renderStudy(){
   const plan = les && lineEnd ? planOf(S.line) : null;
   const exTitle = `${les ? les.title : 'Game vs ' + game.opp} · ${line.main ? (les ? 'main line' : 'the game') : line.title}${S.i ? `, move ${moveNo(p)}` : ''}`;
   const exOpts = extra => Object.assign({title: exTitle, plan: plan ? {side: SIDE, line: S.line} : null}, extra);
+  S.studyEx = exOpts;
   const drillBtn = (les && DRILLABLE.includes(S.line)) ? `<button class="btn ${CU && atEnd ? '' : 'primary'}" id="drillThis">Drill this line</button><button class="btn" id="playAlong">Play along</button>` : '';
   const fromBtn = les && sbCanFrom(idx) ? '<button class="btn ghost" id="sbHere">Practise from here</button>' : '';
   const lessonBtn = (!les && game.lesson) ? `<button class="btn" data-lesson="${game.lesson}">Open the related lesson</button>` : '';
@@ -1890,7 +1877,7 @@ function renderStudy(){
   <div class="sgrid study">
     <header class="lhead"><div class="chips">${chips}</div><h2>${esc(title)}</h2>${les ? `<p class="sub">${esc(sub)}</p>` : bullets(sub, 'sub')}${why ? bullets(why, 'why') : ''}</header>
     <div class="bcol">
-      <div class="board-wrap">${evalBarHTML(idx, 'sbar')}<div class="board" id="sb">${boardSVG(nd.f, nodeBoardOpts(idx, {aria: nd.l, nums: les && S.onums ? orderNums(line, S.i) : null}))}</div></div>
+      <div class="board-wrap">${evalBarHTML(idx, 'sbar')}<div class="board input" id="sb">${boardSVG(nd.f, studyBoardOpts())}</div></div>
       <div class="controls">
         <button class="ctl" id="cFirst" aria-label="To the start" ${S.i === 0 ? 'disabled' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5v14M18 6l-8 6 8 6V6z"/></svg></button>
         <button class="ctl" id="cPrev" aria-label="Back one move" ${S.i === 0 ? 'disabled' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -1898,8 +1885,8 @@ function renderStudy(){
         <button class="ctl" id="cNext" aria-label="Forward one move" ${S.i >= line.n.length - 1 ? 'disabled' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
         <button class="ctl" id="cLast" aria-label="To the end" ${S.i >= line.n.length - 1 ? 'disabled' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 5v14M6 6l8 6-8 6V6z"/></svg></button>
       </div>
-      <div class="engrow"><button class="eswitch" id="cEng" type="button" aria-pressed="${engOn}"><i aria-hidden="true"></i>Engine</button><p class="evaltext" id="stext">${curEval ? `Engine: <b>${esc(curEval.txt)}</b>${curEval.num ? ` <span class="tnum" title="${NUMHINT}">(${curEval.num})</span>` : ''}` : ''}</p></div>
-      ${les ? orderStripHTML(line, S.i) : ''}
+      <div class="engrow"><button class="eswitch" id="cEng" type="button" aria-pressed="${engOn}"><i aria-hidden="true"></i>Engine</button>${les ? `<button class="eswitch" id="cNums" type="button" aria-pressed="${!!SET.nums}"><i aria-hidden="true"></i>Move numbers</button>` : ''}<p class="evaltext" id="stext">${curEval ? `Engine: <b>${esc(curEval.txt)}</b>${curEval.num ? ` <span class="tnum" title="${NUMHINT}">(${curEval.num})</span>` : ''}` : ''}</p></div>
+      ${les && SET.nums && orderNums(line, S.i).some(x => x[2]) ? '<p class="onote"><i aria-hidden="true"></i>Played at another turn than in the main line</p>' : ''}
     </div>
     <div class="ccol">
       ${opnHTML(Openings.ofNode(idx), !!nameStart(idx))}${mcard}${engOn ? '<div id="engcard"></div>' : ''}${optHTML}${linesHTML}
@@ -1909,7 +1896,8 @@ function renderStudy(){
     </div></div>`;
   const svg = document.querySelector('#sb svg');
   if (S.anim){ const a = S.anim; S.anim = null; animateMove(svg, a.u, a.meta, a.back); }
-  const cn = document.getElementById('cNums'); if (cn) cn.onclick = () => { S.onums = !S.onums; render(); };
+  const cn = document.getElementById('cNums'); if (cn) cn.onclick = () => { setSetting('nums', !SET.nums); render(); };
+  S.ssel = null; wireStudyInput();
   document.getElementById('cFirst').onclick = () => step(-999);
   document.getElementById('cPrev').onclick = () => step(-1);
   document.getElementById('cNext').onclick = () => step(1);
@@ -1933,6 +1921,64 @@ function renderStudy(){
       if (top < tl.scrollTop || top + h > tl.scrollTop + tl.clientHeight) tl.scrollTop = Math.max(0, top - tl.clientHeight / 2 + h / 2); }
   }
   S.scrollTimeline = false;
+}
+// the lesson's board as it stands: the marks, your move numbers, and a piece picked up with the squares it can go to
+function studyBoardOpts(){
+  const line = LINES[S.line], idx = line.n[S.i], nd = N[idx], o = {aria: nd.l, nums: lessonOf(S.line) && SET.nums ? orderNums(line, S.i) : null};
+  if (S.ssel){ o.sel = S.ssel; o.dots = new Chess(nodeFen(idx)).moves({square: S.ssel, verbose: true}).map(m => m.to); }
+  return nodeBoardOpts(idx, o);
+}
+function studyBoard(){ const el = document.getElementById('sb'); if (!el || !LINES[S.line]) return; el.innerHTML = boardSVG(N[LINES[S.line].n[S.i]].f, studyBoardOpts()); if (EngineUI.host && EngineUI.host.board === 'sb') EngineUI.arrows(); }
+/* A lesson's board takes moves, for whichever side is to move. The line's own next move steps on. Another move the book
+   has an answer to opens the line that goes that way. Anything else opens the explore board with the move made and the
+   engine on, so a "what if" never needs a second tap. */
+function studyTry(from, to){
+  const line = LINES[S.line], idx = line.n[S.i], ch = new Chess(nodeFen(idx)), ms = ch.moves({verbose: true});
+  let m = ms.find(x => x.from === from && x.to === to);
+  if (!m){ const p = ch.get(from), q = ch.get(to);     // king onto its own rook = castle
+    if (p && p.type === 'k' && q && q.type === 'r' && q.color === p.color) m = ms.find(x => x.from === from && x.flags.includes(to[0] > from[0] ? 'k' : 'q')); }
+  S.ssel = null;
+  if (!m){ studyBoard(); return; }
+  const u = from + m.to + (m.promotion ? 'q' : ''), same = c => N[c].u.slice(0, 4) === u.slice(0, 4);
+  stopPlay();
+  const nx = line.n[S.i + 1];
+  if (nx !== undefined && same(nx)){ if (S.i + 1 === line.n.length - 1) S.stepped = S.line; S.i++; S.scrollTimeline = true; renderStudy(); return; }   // your hand made the move: it lands at once
+  const kid = (N[idx].k || []).find(c => same(c) && (linesByNode.get(c) || []).length);
+  if (kid !== undefined){
+    const ls = linesByNode.get(kid), les = lessonOf(S.line), pick = ls.find(id => les && LINES[id].lesson === les.id) || ls.find(id => LINES[id].main && LESSONS[LINES[id].lesson]) || ls.find(id => LESSONS[LINES[id].lesson]) || ls[0];
+    S.line = pick; S.i = LINES[pick].n.indexOf(kid); S.showPre = false; renderStudy(); setHash(); return;
+  }
+  EngineUI.set(true); exploreNode(idx, (S.studyEx || (x => x))({moves: [u], land: true}));
+}
+function wireStudyInput(){
+  const el = document.getElementById('sb'); if (!el) return;
+  let drag = null;
+  const turn = () => nodeFen(LINES[S.line].n[S.i]).split(' ')[1];
+  const mineAt = sq => { const p = fenArr(N[LINES[S.line].n[S.i]].f)[sqi(sq)]; return !!p && (turn() === 'w') === (p === p.toUpperCase()); };
+  el.addEventListener('pointerdown', e => {
+    if (!LINES[S.line] || S.view !== 'study') return;
+    const svg = el.querySelector('svg'); if (!svg) return;
+    const sq = squareAt(svg, e); if (!sq) return;
+    if (S.ssel && S.ssel !== sq && !mineAt(sq)){ e.preventDefault(); studyTry(S.ssel, sq); return; }
+    if (mineAt(sq)){
+      e.preventDefault(); stopPlay(); S.ssel = sq; studyBoard();
+      const svg2 = el.querySelector('svg'), use = svg2.querySelector(`use[data-sq="${sq}"]`);
+      if (use){ const ghost = use.cloneNode(); ghost.classList.add('ghost'); ghost.removeAttribute('data-sq'); svg2.appendChild(ghost); use.style.opacity = '.35';
+        drag = {sq, ghost, use, svg: svg2, moved: false, x0: e.clientX, y0: e.clientY}; try { el.setPointerCapture(e.pointerId); } catch(_){} }
+    } else if (S.ssel){ S.ssel = null; studyBoard(); }
+  });
+  el.addEventListener('pointermove', e => {
+    if (!drag) return; const r = drag.svg.getBoundingClientRect(); if (!drag.svg.isConnected || !r.width) return;
+    if (Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) > 4) drag.moved = true;
+    drag.ghost.setAttribute('x', ((e.clientX - r.left) / r.width * 800 - 50).toFixed(1)); drag.ghost.setAttribute('y', ((e.clientY - r.top) / r.height * 800 - 50).toFixed(1));
+  });
+  const end = e => {
+    if (!drag) return; const d = drag; drag = null;
+    const svg = d.svg.isConnected ? d.svg : el.querySelector('svg'), to = svg ? squareAt(svg, e) : null;
+    if (d.moved && to && to !== d.sq) studyTry(d.sq, to); else { d.ghost.remove(); d.use.style.opacity = ''; }
+  };
+  el.addEventListener('pointerup', end);
+  el.addEventListener('pointercancel', () => { if (drag){ drag.ghost.remove(); drag.use.style.opacity = ''; drag = null; } });
 }
 function step(d){
   const line = LINES[S.line], ni = Math.max(0, Math.min(line.n.length - 1, S.i + d));
@@ -3599,8 +3645,9 @@ function engineCardHTML(r, h){
   if (r && r.over) return `<div class="eng">${head('')}<p class="eeval"><b>${r.over === 'mate' ? `Checkmate: ${other} wins` : r.over === 'stalemate' ? 'Stalemate: a draw' : 'A draw'}</b></p></div>`;
   const L = r ? r.lines.filter(l => l && l.pv && l.pv[0]) : [], top = L[0], ei = top ? evalInfo(top.s) : null;
   const spin = !r || !r.done ? '<i class="spin" aria-hidden="true"></i>' : '';
-  const depth = `${spin}${r && r.d ? `depth ${r.d}` : 'starting…'}`;
-  let h2 = ei ? `<p class="eeval"><b>${esc(ei.txt)}</b>${ei.num ? ` <span class="tnum" title="${NUMHINT}">${ei.num}</span>` : ''}</p>` : `<p class="eeval wait">Thinking…</p>`;
+  const said = !!(h.text && document.getElementById(h.text));        // the verdict and the depth are under the board already
+  const depth = said ? spin : `${spin}${r && r.d ? `depth ${r.d}` : 'starting…'}`;
+  let h2 = !ei ? `<p class="eeval wait">Thinking…</p>` : said ? '' : `<p class="eeval"><b>${esc(ei.txt)}</b>${ei.num ? ` <span class="tnum" title="${NUMHINT}">${ei.num}</span>` : ''}</p>`;
   if (L.length){
     const ws = L.map(l => lineWords(h.fen, l.pv, 1)[0]), extra = ws.map(() => '');
     ws.forEach((w, k) => { if (!w || extra[k]) return;
@@ -3663,7 +3710,7 @@ function exploreFrom(fen, o = {}){
   stopPlay(); exStopAuto();
   const pre = (o.pre || []).slice(), own = (o.moves || []).slice(), ms = pre.concat(own);
   S.ex = {start: pre.length ? START_FEN : fen, base: pre.length, moves: ms, i: pre.length + (o.i !== undefined ? o.i : own.length), flip: o.flip !== undefined ? o.flip : FLIP, side: o.side || viewSide(), back: o.back || backHere(),
-    title: o.title || '', plan: o.plan || null, answer: false, sel: null, busy: false, auto: null, anim: o.i === undefined && own.length ? ms[ms.length - 1] : null};
+    title: o.title || '', plan: o.plan || null, answer: false, sel: null, busy: false, auto: null, anim: o.i === undefined && own.length && !o.land ? ms[ms.length - 1] : null};
   exSave(); S.view = 'explore'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
   if (o.auto) exAutoPlay();
 }
@@ -3762,8 +3809,8 @@ function renderExplore(){
         <button class="ctl" id="xLast" aria-label="To the last move" ${X.i >= n ? 'disabled' : ''}>${ICO.last}</button>
         <button class="ctl" id="xFlip" aria-label="Turn the board around">${ICO.flip}</button>
       </div>
+      ${B && X.i !== B && X.moves.length >= B ? `<div class="xcame"><button class="btn small" id="xCame"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>Back to where you started</button></div>` : ''}
       <p class="evaltext" id="xeval">&nbsp;</p>
-      ${B && X.i !== B && X.moves.length >= B ? `<button class="btn small" id="xCame">Back to where you came in</button>` : ''}
     </div>
     <div class="ccol">
       <div class="dpanel"><p class="kicker">Explore · moves for both sides</p><h3>Play on from here</h3>${opnHTML(Openings.ofMoves(X.moves.slice(0, X.i), X.start))}
