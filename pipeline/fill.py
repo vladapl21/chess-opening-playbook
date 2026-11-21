@@ -33,7 +33,19 @@ EXTRA = {'white': ['e4 e5 Nf3 f5 Nxe5 Qe7', 'e4 e5 Nf3 f5 Nxe5 Nc6',            
                    'e4 d5 exd5 Nf6 d4 Bg4', 'e4 d5 exd5 c6 dxc6 e5',                      # the Portuguese; Kloosterboer
                    'e4 c5 c3 d5 exd5 Nf6',                                                # the Anti-Alapin Gambit
                    'e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nd4', 'e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 b5',   # the Fritz, the Ulvestad
-                   'e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nb4', 'e4 e5 Nf3 Nc6 Bc4 Nd4', 'e4 e5 Nf3 Nc6 Bc4 f5'],   # Kloss; Blackburne Shilling; Rousseau
+                   'e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nb4', 'e4 e5 Nf3 Nc6 Bc4 Nd4', 'e4 e5 Nf3 Nc6 Bc4 f5']   # Kloss; Blackburne Shilling; Rousseau
+                  # the Two Knights, asked for by name: every reply with real odds at each turn of its lines, the ones
+                  # that leave a line drafted here included (the net above doesn't read its own lines)
+                  + ['e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 ' + x for x in (
+                      'Be7', 'd6', 'Qe7 Bxf7+ Qxf7', 'Qe7 Bxf7+ Kd8 Bb3 Nd4', 'Qe7 Bxf7+ Kd8 Bb3 d6', 'Qe7 Bxf7+ Kd8 Bb3 d5', 'h6 Nxf7 d5',
+                      'Na5 Bxf7+ Ke7 Bd5 Nxd5', 'Na5 Bxf7+ Ke7 Bd5 Qe8', 'Na5 Bxf7+ Ke7 Bd5 h6',
+                      'Bc5 Bxf7+ Ke7 Bc4 d5', 'Bc5 Bxf7+ Ke7 Bc4 h6', 'Bc5 Bxf7+ Ke7 Bc4 Rf8', 'Bc5 Bxf7+ Ke7 Bc4 d6', 'Bc5 Bxf7+ Kf8 Bb3 h6', 'Bc5 Bxf7+ Kf8 Bb3 d6',
+                      'd5 exd5 Nxd5 Nxf7 Qf6', 'd5 exd5 Nxd5 Nxf7 Kxf7 Qf3+ Ke7', 'd5 exd5 Nxd5 Nxf7 Kxf7 Qf3+ Qf6 Bxd5+ Ke7',
+                      'd5 exd5 Nxd5 Nxf7 Kxf7 Qf3+ Ke6 Nc3 Ne7 d4 e4', 'd5 exd5 Nxd5 Nxf7 Kxf7 Qf3+ Ke6 Nc3 Nd4 Bxd5+ Qxd5',
+                      'd5 exd5 Nxd5 Nxf7 Kxf7 Qf3+ Ke6 Nc3 Nd4 Bxd5+ Ke7', 'd5 exd5 Nxd5 Nxf7 Kxf7 Qf3+ Ke6 Nc3 Nd4 Bxd5+ Kd6 Qd3 c6',
+                      'd5 exd5 Nd4 c3 b5', 'd5 exd5 Nd4 c3 Nxd5', 'd5 exd5 Nd4 c3 Bg4', 'd5 exd5 b5 Bf1 Qxd5', 'd5 exd5 b5 Bf1 Nd4', 'd5 exd5 Nb4 O-O Nbxd5',
+                      'd5 exd5 Na5 Bb5+ c6 dxc6 bxc6 Qf3 Rb8', 'd5 exd5 Na5 Bb5+ c6 dxc6 bxc6 Qf3 e4', 'd5 exd5 Na5 Bb5+ c6 dxc6 bxc6 Qf3 h6 Ne4 cxb5',
+                      'd5 exd5 Na5 Bb5+ c6 dxc6 bxc6 Qf3 h6 Ne4 Bg4', 'd5 exd5 Na5 Bb5+ Bd7 Qe2 a6', 'd5 exd5 Na5 Bb5+ Bd7 Qe2 Nxd5', 'd5 exd5 Na5 Bb5+ Bd7 Qe2 c6')],
          'black': ['d4 d5 e4 dxe4 Nc3 Nf6 Be3', 'd4 d5 e4 dxe4 Be3', 'd4 d5 e4 dxe4 Bc4', # Blackmar-Diemer: Rasa-Studier, Diemer-Rosenberg, Fritz
                    'd4 d5 c4 c6 e4',                                                      # the Slav: Diemer Gambit
                    'e4 e5 d4 exd4 f4', 'e4 e5 Nc3 Nc6 d4', 'e4 e5 Nf3 Nc6 b4',            # Halasz; Fyfe; Pachman Wing
@@ -87,23 +99,25 @@ for l, t in sorted(lines, key=lambda x: (not x[0]['main'], x[0]['id'])):
         if b.turn != ME: reach *= max(dict(X.human(path)).get(s, 0.003), 0.003)               # how often a game of yours gets here
         b.push_san(s)
 
-n_odds = len(found)
+n_odds = len(found); later = []
 for root in EXTRA:
     root = ' '.join(root.split()); par = root.rsplit(' ', 1)[0]
     if root in have or root in found: continue
-    if par not in have: print('  !! not reachable in the book as built:', root); continue
+    if par not in have: later.append(root); continue                     # it may leave a line drafted below
     l = next((l for l, t in sorted(lines, key=lambda x: (not x[0]['main'], x[0]['id'])) if (' '.join(t) + ' ').startswith(par + ' ')), None)
     found[root] = dict(lesson=l['lesson'], ch=part_ch[LES[l['lesson']]['part']], p=dict(X.human(par)).get(root.rsplit(' ', 1)[1], 0), reach=0, ply=len(root.split()) - 1, named=True, off=l.get('title') or LES[l['lesson']]['title'])
 print(n_odds, 'replies without a line by the odds,', len(found) - n_odds, 'named ones on top', flush=True)
 rows, used = [], {}
-for path, m in sorted(found.items(), key=lambda kv: (kv[1]['lesson'], -kv[1]['reach'])):
+
+
+def draft_row(path, m):
     t = path.split(); b = chess.Board(); prev = None
     for s in t[:-1]: prev = b.parse_san(s); b.push(prev)
     mv = b.parse_san(t[-1]); title = draft.short(b, mv, prev)
     b.push(mv)
-    if b.is_game_over(): continue
+    if b.is_game_over(): return
     legal = {b.san(x) for x in b.legal_moves}
-    mine = deepen.F.FIXED.get(path) or seen.get(b.epd(), ctx_of[m['lesson']])
+    mine = deepen.F.FIXED.get(path) or deepen._fixed_at().get(b.epd()) or seen.get(b.epd(), ctx_of[m['lesson']])
     if mine not in legal: mine = deepen.choose(b)
     seen.add(b.epd(), ctx_of[m['lesson']], mine)
     v = draft.value(b, mine, deepen.DEPTH)
@@ -115,6 +129,20 @@ for path, m in sorted(found.items(), key=lambda kv: (kv[1]['lesson'], -kv[1]['re
     n[sid] = ttl
     rows.append((m['lesson'], f"{m['lesson']}-f-{sid}", ttl, path + ' ' + mine, m, v))
     print(f"  {m['ch']:9s} {m['lesson']:18s} {m['p'] * 100:4.0f}% reach {m['reach'] * 100:5.2f}%  {v / 100:+.2f}  {path} | {mine}   [{ttl}]", flush=True)
+
+
+for path, m in sorted(found.items(), key=lambda kv: (kv[1]['lesson'], -kv[1]['reach'])): draft_row(path, m)
+# the replies listed by hand that leave one of the lines just drafted (a second move in a gambit that had no line at all)
+while later:
+    for root in later:
+        par = root.rsplit(' ', 1)[0]
+        src = next((r for r in rows if (r[3] + ' ').startswith(par + ' ')), None)
+        if src: break
+    else: break
+    later.remove(root)
+    if any((r[3] + ' ').startswith(root + ' ') for r in rows): continue
+    draft_row(root, dict(lesson=src[0], ch=src[4]['ch'], p=dict(X.human(par)).get(root.rsplit(' ', 1)[1], 0), reach=0, ply=len(root.split()) - 1, named=True, off=src[2]))
+for root in later: print('  !! not reachable in the book as built:', root)
 
 q = lambda s: "'" + s.replace('\\', '\\\\').replace("'", "\\'") + "'"
 imp = 'from content import LESSONS' if SIDE == 'white' else 'from bcontent import LESSONS'

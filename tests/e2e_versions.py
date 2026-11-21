@@ -65,12 +65,18 @@ else:
 
 # ---- 2. line versions
 vers = json.load(open(paths.DATA / 'line_versions.json'))
-CHANGED, SAME = 'bsl-slow2', 'bsl-slow'
-assert vers[CHANGED][0] == 2 and vers[SAME][0] == 1, (vers[CHANGED], vers[SAME])
+# a Black unit of the house course that drills a line whose moves have changed since it was first released and one
+# whose moves never have (most lines changed when the build began to play them on); the units before it count as passed
+units = json.load(open(paths.BUILD / 'data_course.json'))['units']
+UNIT, CHANGED, SAME = 'b-italian', 'bi-qxd2', 'bi-main'
+U = next(u for u in units if u['id'] == UNIT); assert {CHANGED, SAME} <= set(U['lines']), U['lines']
+V = vers[CHANGED][0]
+assert V >= 2 and vers[SAME][0] == 1, (vers[CHANGED], vers[SAME])
+PASSED = json.dumps({u['id']: {'idea': 1, 'cp': 6, 'pass': 1} for u in units[:units.index(U)]})
 SEED = """(() => { const K = 'italian-playbook-progress-v1'; if (sessionStorage.getItem('seeded')) return; sessionStorage.setItem('seeded', '1');
   const now = Date.now(), day = 864e5, old = {box: 4, seen: 5, clean: 4, last: now - 3 * day, due: now + 20 * day};
   localStorage.setItem(K, JSON.stringify({lines: {'%s': old, '%s': old}, puz: {}, updated: now - 3 * day,
-    course: {u: {'w-italian': {idea: 1, cp: 6, pass: 1}}, seen: {}}})); })()""" % (CHANGED, SAME)
+    course: {u: %s, seen: {}}})); })()""" % (CHANGED, SAME, PASSED)
 
 with sync_playwright() as p:
     b = launch(p)
@@ -80,13 +86,13 @@ with sync_playwright() as p:
     st = pg.evaluate(f"({{ver: VER['{CHANGED}'], stale: Prog.stale('{CHANGED}'), same: Prog.stale('{SAME}'), rec: Prog.rec('{CHANGED}'), keep: Prog.rec('{SAME}').box,"
                      f" due: Prog.dueCount('b'), n: Prog.staleCount(), clean: lineClean('{CHANGED}')}})")
     print('old record on a changed line:', st)
-    assert st['ver'] == 2 and st['stale'] and not st['same'] and st['rec']['changed'] and st['rec']['box'] == 0 and st['keep'] == 4
+    assert st['ver'] == V and st['stale'] and not st['same'] and st['rec']['changed'] and st['rec']['box'] == 0 and st['keep'] == 4
     assert st['due'] == 1 and st['n'] == 1 and not st['clean']
     note = pg.inner_text('#changed'); print('course note:', note.replace('\n', ' | '))
     assert note.startswith('1 line you drilled has changed.')
     pg.screenshot(path=out + 'v_course_note.png')
 
-    pg.click('[data-unit="b-slav"]'); pg.wait_for_timeout(500)
+    pg.click(f'[data-unit="{UNIT}"]'); pg.wait_for_timeout(500)
     row = pg.inner_text(f'[data-udrill="{CHANGED}"]').replace('\n', ' | '); print('unit row:', row)
     assert 'Changed' in row and 'Changed' not in pg.inner_text(f'[data-udrill="{SAME}"]')
     pg.screenshot(path=out + 'v_unit.png', full_page=True)
@@ -99,14 +105,14 @@ with sync_playwright() as p:
     pg.screenshot(path=out + 'v_drill.png')
     assert drill_clean(pg) == 'done'
     rec = pg.evaluate(f"Prog.d.lines['{CHANGED}']"); print('new record:', {k: rec[k] for k in ('v', 'box', 'seen', 'clean')})
-    assert rec['v'] == 2 and rec['box'] == 1 and rec['seen'] == 1 and rec['clean'] == 1
+    assert rec['v'] == V and rec['box'] == 1 and rec['seen'] == 1 and rec['clean'] == 1
     assert pg.evaluate(f"!Prog.stale('{CHANGED}') && Prog.staleCount() === 0 && lineClean('{CHANGED}')")
     pg.evaluate("go('course')"); pg.wait_for_timeout(400)
     assert pg.query_selector('#changed') is None
 
     # two devices: the copy made on the current moves wins, even when the old copy was touched later
     m = pg.evaluate(f"""(() => {{ const t = Date.now(), a = {{lines: {{'{CHANGED}': {{box: 5, clean: 9, last: t}}}}, puz: {{}}}},
-        b = {{lines: {{'{CHANGED}': {{v: 2, box: 1, clean: 1, last: t - 1e6}}}}, puz: {{}}}};
+        b = {{lines: {{'{CHANGED}': {{v: {V}, box: 1, clean: 1, last: t - 1e6}}}}, puz: {{}}}};
         return [mergeProg(a, b).lines['{CHANGED}'].box, mergeProg(b, a).lines['{CHANGED}'].box]; }})()""")
     print('merge old + new copy:', m); assert m == [1, 1]
 

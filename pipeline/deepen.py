@@ -81,6 +81,8 @@ class Seen:
     takes its move from another pack of the same slot."""
     def __init__(self): self.d = {}
     def add(self, epd, ctx, san): self.d.setdefault(epd, []).append((ctx, san))
+    def drop(self, epd, ctx, san):
+        if (ctx, san) in self.d.get(epd, []): self.d[epd].remove((ctx, san))
     def get(self, epd, ctx):
         for c, san in self.d.get(epd, []):
             if c is None or ctx is None or c == ctx or c[0] != ctx[0]: return san
@@ -91,11 +93,18 @@ def extension(path, me, ctx, seen):
     """The moves to add to a line that ends at `path` (your move was the last one)."""
     toks = path.split(); b = board_of(path); out = []
     if b.turn == me or b.is_game_over(): return out          # ends on the other side's move, or the game is over
-    been = set(); w = chess.Board(); been.add(w.epd())       # every position this line has had: it never walks in a circle
-    for s in toks: w.push_san(s); been.add(w.epd())
+
+    def stand():
+        """The board after the line so far, every position it has had, and whether its last move was forcing."""
+        w = chess.Board(); had = {w.epd()}
+        for s in toks + out: w.push_san(s); had.add(w.epd())
+        last = w.pop(); f = w.is_capture(last) or w.gives_check(last); w.push(last)
+        return w, had, f
+    b, been, forcing = stand()
     def circles(san):
         b.push_san(san); r = b.epd() in been; b.pop(); return r
-    last = b.peek(); b.pop(); forcing = b.is_capture(last) or b.gives_check(last); b.push(last)
+    made = []                 # your moves added here: (position, move), one for every pair in `out`
+    barred = {}               # position -> moves that led back to it: not played there again
     while True:
         n = len(toks) + len(out); cur = ' '.join(toks + out)
         if n >= MAX or b.is_game_over(): break
@@ -109,18 +118,29 @@ def extension(path, me, ctx, seen):
         b.push(mo)
         if b.is_game_over(): b.pop(); break
         nxt = cur + ' ' + opp; epd = b.epd(); legal = {b.san(m) for m in b.legal_moves}
+        if epd in been:
+            # the line has come back to a position it has had. If you chose a move there among the moves added here, that
+            # move led nowhere: the line goes back to that turn and another move is tried. One position, one move.
+            k = next((i for i, (e, _) in enumerate(made) if e == epd), None)
+            if k is None: b.pop(); break                      # a position of the line as written: it ends before that
+            barred.setdefault(epd, set()).add(made[k][1])
+            for e, s in made[k:]: seen.drop(e, ctx, s)
+            del made[k:]; del out[2 * k:]
+            b, been, forcing = stand()
+            continue
+        bar = barred.get(epd, ())
         known = F.FIXED.get(nxt) or _fixed_at().get(epd) or seen.get(epd, ctx)
-        if known in legal and circles(known): known = None                  # the book's move here leads back: play on instead
-        if n >= MIN and not forcing and not cap and known is None:
+        if known in legal and (known in bar or circles(known)): known = None      # the book's move here leads back: play on instead
+        if n >= MIN and not forcing and not cap and known is None and not bar:
             top = _best(b)
             if len(top) < 2 or top[0][1] - top[1][1] < ONLY: b.pop(); break    # nothing forced comes next: the line can end here
         san = known if known in legal else choose(b)
-        if circles(san):                                      # a check that only repeats: the best move that goes somewhere new
-            top = _best(b); fresh = [s for s, v in top if not circles(s) and top[0][1] - v <= 150]
+        if san in bar or circles(san):                        # a check that only repeats: the best move that goes somewhere new
+            top = _best(b); fresh = [s for s, v in top if s not in bar and not circles(s) and top[0][1] - v <= 150]
             if not fresh: b.pop(); break                      # repeating is all there is: the line ends before it
             san = fresh[0]
         m = b.parse_san(san); forcing = b.is_capture(m) or b.gives_check(m)
-        been.add(epd); seen.add(epd, ctx, san); b.push(m); been.add(b.epd()); out += [opp, san]
+        been.add(epd); seen.add(epd, ctx, san); made.append((epd, san)); b.push(m); been.add(b.epd()); out += [opp, san]
     return out
 
 

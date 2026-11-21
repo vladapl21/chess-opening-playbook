@@ -15045,6 +15045,56 @@
 "d6",
 "Be2"
 ],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Bc5 Bxf7+ Ke7 Bc4 Rf8 O-O":[
+"h6",
+"Nf3",
+"Nxe4",
+"Nc3",
+"Nxc3",
+"dxc3",
+"d6",
+"a4",
+"Bg4",
+"b4",
+"Bxf3",
+"gxf3",
+"Bb6",
+"a5"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Bc5 Bxf7+ Ke7 Bc4 d5 exd5":[
+"Nxd5",
+"O-O",
+"h6",
+"Ne4",
+"Bb6",
+"Nbc3",
+"Nxc3",
+"bxc3",
+"Bf5",
+"Ba3+",
+"Ke8",
+"Qf3"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Bc5 Bxf7+ Ke7 Bc4 d6 Nc3":[
+"h6",
+"Nf7",
+"Qf8",
+"Nxh8",
+"Qxh8",
+"Nd5+",
+"Nxd5",
+"Bxd5",
+"Qf8",
+"O-O"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Bc5 Bxf7+ Ke7 Bc4 h6 Nf7":[
+"Qe8",
+"Nxh8",
+"Qxh8",
+"O-O",
+"Nxe4",
+"Nc3"
+],
 "w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Bc5 Bxf7+ Kf8 Bb3":[
 "d5",
 "Nc3",
@@ -15057,11 +15107,50 @@
 "Ke8",
 "Qf7#"
 ],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Bc5 Bxf7+ Kf8 Bb3 d6 Nc3":[
+"Ng4",
+"Ne6+",
+"Bxe6",
+"Bxe6",
+"Nxf2",
+"Qf3+",
+"Qf6",
+"Qxf6+",
+"gxf6",
+"Rf1"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Bc5 Bxf7+ Kf8 Bb3 h6 Nf7":[
+"Qe7",
+"Nxh8",
+"Nxe4",
+"Ng6+",
+"Ke8",
+"Nxe7",
+"Kxe7",
+"Nc3"
+],
 "w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Bc5 Nxf7 Bxf2+ Kxf2 Nxe4+":[],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Be7 Nxf7":[
+"O-O",
+"Nxd8+",
+"Kh8",
+"Nxc6",
+"dxc6",
+"O-O"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Na5 Bxf7+ Ke7 Bd5 Nxd5 exd5":[
+"d6",
+"d3"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Na5 Bxf7+ Ke7 Bd5 Qe8 O-O":[
+"c6",
+"d4"
+],
 "w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Na5 Bxf7+ Ke7 Bd5 c6 Nf7 Qb6 Nxh8 cxd5 exd5":[
 "Nxd5",
 "O-O"
 ],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Na5 Bxf7+ Ke7 Bd5 h6 Nf7":[],
 "w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Nxe4 Bxf7+ Ke7 d4":[
 "Nxg5",
 "Bxg5+",
@@ -15092,6 +15181,42 @@
 "Kd8",
 "Nxe4"
 ],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Qe7 Bxf7+ Kd8 Bb3 Nd4 Nf7+":[
+"Ke8",
+"Nxh8",
+"Nxe4",
+"Qh5+",
+"g6",
+"Nxg6",
+"hxg6",
+"Qxg6+",
+"Kd8",
+"d3"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Qe7 Bxf7+ Kd8 Bb3 d5 exd5":[
+"Nd4",
+"O-O",
+"Nxb3",
+"axb3",
+"Nxd5",
+"d4"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Qe7 Bxf7+ Kd8 Bb3 d6 Nf7+":[
+"Ke8",
+"Nxh8",
+"Nxe4",
+"Qh5+",
+"g6",
+"Nxg6",
+"hxg6",
+"Qxg6+",
+"Kd8",
+"d3"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Qe7 Bxf7+ Qxf7 Nxf7":[
+"Kxf7",
+"O-O"
+],
 "w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Na5 Bb5+ Bd7 Qe2":[
 "Bxb5",
 "Qxb5+",
@@ -15107,6 +15232,36 @@
 "Bxd7",
 "Qxd7",
 "Nc3"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Na5 Bb5+ Bd7 Qe2 Nxd5 Qxe5+":[
+"Ne7",
+"Bxd7+",
+"Qxd7",
+"Qxa5",
+"Nc6",
+"Qa4"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Na5 Bb5+ Bd7 Qe2 a6 Bxd7+":[
+"Qxd7",
+"O-O",
+"Qxd5",
+"Nc3",
+"Qc6",
+"Qxe5+",
+"Be7",
+"Qxa5",
+"O-O",
+"Qf5"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Na5 Bb5+ Bd7 Qe2 c6 Qxe5+":[
+"Be7",
+"d6",
+"cxb5",
+"dxe7",
+"Qxe7",
+"Qxe7+",
+"Kxe7",
+"d3"
 ],
 "w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Na5 Bb5+ c6 dxc6 Nxc6 O-O":[
 "h6",
@@ -15152,7 +15307,37 @@
 "Rc8",
 "Qxf7#"
 ],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Na5 Bb5+ c6 dxc6 bxc6 Qf3 Rb8 Bd3":[
+"Bg4",
+"Qg3",
+"Bd6",
+"Ne4",
+"Nxe4",
+"Bxe4",
+"f5",
+"h3",
+"fxe4",
+"Qxg4"
+],
 "w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Na5 Bb5+ c6 dxc6 bxc6 Qf3 cxb5 Qxa8 Qc7 Qf3":[],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Na5 Bb5+ c6 dxc6 bxc6 Qf3 e4 Nxe4":[
+"cxb5",
+"Nxf6+",
+"Qxf6",
+"Qxa8",
+"Qe6+",
+"Kd1"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Na5 Bb5+ c6 dxc6 bxc6 Qf3 h6 Ne4 Bg4 Nxf6+":[
+"Qxf6",
+"Qxf6",
+"gxf6",
+"Be2",
+"Bxe2",
+"Kxe2",
+"Bc5",
+"d3"
+],
 "w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Na5 Bb5+ c6 dxc6 bxc6 Qf3 h6 Ne4 Nxe4 Qxe4 Bb7 Ba4":[
 "Bd6",
 "b4",
@@ -15160,6 +15345,16 @@
 "bxa5",
 "Qxa5",
 "O-O"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Na5 Bb5+ c6 dxc6 bxc6 Qf3 h6 Ne4 cxb5 Nxf6+":[
+"Qxf6",
+"Qxa8",
+"Bc5",
+"Qxc8+",
+"Ke7",
+"Qxc5+",
+"Ke6",
+"Nc3"
 ],
 "w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nb4 O-O":[
 "Nfxd5",
@@ -15179,6 +15374,16 @@
 "O-O",
 "Rxd7+"
 ],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nb4 O-O Nbxd5 Nc3":[
+"Nxc3",
+"Bxf7+",
+"Ke7",
+"bxc3",
+"h6",
+"Ba3+",
+"Kd7",
+"Ne6"
+],
 "w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nd4 c3":[
 "Nf5",
 "d3",
@@ -15188,6 +15393,40 @@
 "O-O",
 "O-O",
 "Re1"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nd4 c3 Bg4 f3":[
+"Nxf3+",
+"gxf3",
+"Bh5",
+"O-O",
+"Bc5+",
+"d4",
+"exd4",
+"cxd4",
+"Bb6",
+"Re1+",
+"Kf8",
+"Nc3"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nd4 c3 Nxd5 cxd4":[
+"Qxg5",
+"Bxd5",
+"exd4",
+"Qf3"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nd4 c3 b5 Bf1":[
+"Nf5",
+"Bxb5+",
+"Bd7",
+"Qa4",
+"Bxb5",
+"Qxb5+",
+"Qd7",
+"Qxd7+",
+"Nxd7",
+"O-O",
+"h6",
+"Nf3"
 ],
 "w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nxd5 Nxf7 Kxf7 Qf3+ Ke6 Nc3 Nb4 O-O Nxc2 Bxd5+":[
 "Kd6",
@@ -15203,9 +15442,48 @@
 "Ke6",
 "O-O"
 ],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nxd5 Nxf7 Kxf7 Qf3+ Ke6 Nc3 Nd4 Bxd5+ Kd6 Qd3 c6 Be4":[],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nxd5 Nxf7 Kxf7 Qf3+ Ke6 Nc3 Nd4 Bxd5+ Ke7 Qf7+":[
+"Kd6",
+"Ne4#"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nxd5 Nxf7 Kxf7 Qf3+ Ke6 Nc3 Nd4 Bxd5+ Qxd5 Qxd5+":[
+"Kf5",
+"Qf7+",
+"Kg5",
+"Ne4+",
+"Kh6",
+"d3+",
+"g5",
+"Bxg5#"
+],
 "w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nxd5 Nxf7 Kxf7 Qf3+ Ke6 Nc3 Ne7 d4 c6 dxe5 Qe8 O-O":[],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nxd5 Nxf7 Kxf7 Qf3+ Ke6 Nc3 Ne7 d4 e4 Qxe4+":[
+"Kd6",
+"Nxd5",
+"Nxd5",
+"Qxd5+",
+"Ke7",
+"Bg5+",
+"Ke8",
+"Qxd8#"
+],
 "w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nxd5 Nxf7 Kxf7 Qf3+ Ke6 Nc3 Ne7 d4 exd4 Bf4 dxc3 O-O-O cxb2+ Kb1 c6 Rhe1+ Kd7 Rxd5+ cxd5 Bb5+ Nc6 Qg4#":[],
 "w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nxd5 Nxf7 Kxf7 Qf3+ Ke6 Nc3 Ne7 d4 exd4 Bf4 dxc3 O-O-O cxb2+ Kb1 c6 Rhe1+ Kf7 Bc7+":[],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nxd5 Nxf7 Kxf7 Qf3+ Ke7 Bxd5":[
+"Nd4",
+"Qf7+",
+"Kd6",
+"Na3",
+"Be6",
+"Bxe6",
+"Nxe6",
+"Nc4+",
+"Kd5",
+"Ne3+",
+"Kd6",
+"Nf5+"
+],
 "w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nxd5 Nxf7 Kxf7 Qf3+ Ke8 Bxd5":[
 "Nd4",
 "Qf7#"
@@ -15236,6 +15514,14 @@
 "Bd6",
 "Nc3"
 ],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nxd5 Nxf7 Kxf7 Qf3+ Qf6 Bxd5+ Ke7 Bxc6":[
+"bxc6",
+"Qe3"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nxd5 Nxf7 Qf6 Bxd5":[
+"Bc5",
+"O-O"
+],
 "w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 b5 Bf1":[
 "Nxd5",
 "Bxb5",
@@ -15245,6 +15531,38 @@
 "Bxd5",
 "c6",
 "d3"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 b5 Bf1 Nd4 c3":[
+"Nf5",
+"Bxb5+",
+"Bd7",
+"Qa4",
+"Bxb5",
+"Qxb5+",
+"Qd7",
+"Qxd7+",
+"Nxd7",
+"O-O",
+"h6",
+"Nf3"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 b5 Bf1 Qxd5 Nc3":[
+"Qd8",
+"Bxb5",
+"Bd7",
+"Bc4",
+"Be6",
+"Nxe6",
+"fxe6",
+"Bb5"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d6 Nxf7":[
+"Qe7",
+"Nxh8",
+"Be6",
+"Bxe6",
+"Qxe6",
+"Nc3"
 ],
 "w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 h6 Nxf7 Qe7 Nxh8":[
 "Nxe4",
@@ -15261,6 +15579,12 @@
 "Nxe4",
 "Nd4",
 "d3"
+],
+"w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 h6 Nxf7 d5 Nxd8":[
+"dxc4",
+"Nxc6",
+"bxc6",
+"d4"
 ],
 "w|18.26.30.350.70|e4 e5 Nf3 Nc6 Bc4 Qe7 c3 Nf6 d4 Nxe4 O-O exd4 Re1":[
 "f5",

@@ -20719,6 +20719,160 @@
 "gen": 1,
 "h": "A piece up: finish your setup and trade pieces"
 },
+"fried-liver-f-b5v2": {
+"b": [
+[
+"target",
+"Black's c-pawn has no pawn beside it: only pieces can guard it."
+],
+[
+"pieces",
+"Your queen's knight and dark bishop are still at home. Bring them out soon."
+],
+[
+"pawns",
+"Trade pieces, not pawns: your extra pawns counts for more with every trade."
+],
+[
+"them",
+"Black wants to push the f-pawn one square."
+]
+],
+"gen": 1,
+"h": "Two pawns up: push the d-pawn and push the c-pawn"
+},
+"fried-liver-f-be7": {
+"b": [
+[
+"target",
+"Black's e-pawn has no pawn beside it: only pieces can guard it."
+],
+[
+"pieces",
+"Your queen's knight and dark bishop are still at home. Bring them out soon."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to take your d-pawn."
+]
+],
+"gen": 1,
+"h": "Ahead in material: push the d-pawn"
+},
+"fried-liver-f-bg4": {
+"b": [
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Your dark bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to push the c-pawn to hit your d-pawn and push the h-pawn at your knight."
+]
+],
+"gen": 1,
+"h": "A piece up: go after the king and take Black's c-pawn"
+},
+"fried-liver-f-c6": {
+"b": [
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Your dark bishop is still at home. Bring it out next."
+],
+[
+"pawns",
+"Trade pieces, not pawns: your extra pawn counts for more with every trade."
+],
+[
+"them",
+"Black wants to bring the dark bishop out."
+]
+],
+"gen": 1,
+"h": "A pawn up: go after the king and finish your setup"
+},
+"fried-liver-f-d6": {
+"b": [
+[
+"king",
+"Castle short next."
+],
+[
+"pieces",
+"Your dark bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to castle long and push the d-pawn to hit your e-pawn."
+]
+],
+"gen": 1,
+"h": "A rook up: castle and take Black's d-pawn"
+},
+"fried-liver-f-ke7": {
+"b": [
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Your dark bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Trade pieces, not pawns: your extra pawn counts for more with every trade."
+],
+[
+"them",
+"Black wants to bring the dark bishop out."
+]
+],
+"gen": 1,
+"h": "A pawn up: go after the king"
+},
+"fried-liver-f-ke7v3": {
+"b": [
+[
+"king",
+"Castle short next."
+],
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Your queen's knight and dark bishop are still at home. Bring them out soon."
+],
+[
+"them",
+"Black wants to take your c-pawn with the queen."
+]
+],
+"gen": 1,
+"h": "A pawn up: go after the king and castle"
+},
 "fried-liver-f-nb4": {
 "b": [
 [
@@ -20737,6 +20891,28 @@
 "gen": 1,
 "h": "A pawn up: take Black's queen with the rook"
 },
+"fried-liver-f-nbxd5": {
+"b": [
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Take Black's queen with the knight next."
+],
+[
+"pawns",
+"Trade pieces, not pawns: your extra pawn counts for more with every trade."
+],
+[
+"them",
+"Black wants to take your dark bishop with the bishop."
+]
+],
+"gen": 1,
+"h": "A pawn up: go after the king"
+},
 "fried-liver-f-nd4": {
 "b": [
 [
@@ -20754,6 +20930,50 @@
 ],
 "gen": 1,
 "h": "A pawn up: take Black's e-pawn with the knight"
+},
+"fried-liver-f-nd4v2": {
+"b": [
+[
+"target",
+"Black's c-pawn has no pawn beside it: only pieces can guard it."
+],
+[
+"pieces",
+"Your queen's knight and dark bishop are still at home. Bring them out soon."
+],
+[
+"pawns",
+"Trade pieces, not pawns: your extra pawns counts for more with every trade."
+],
+[
+"them",
+"Black wants to push the f-pawn one square."
+]
+],
+"gen": 1,
+"h": "Two pawns up: push the d-pawn and push the c-pawn"
+},
+"fried-liver-f-nxd5": {
+"b": [
+[
+"king",
+"Castle short next."
+],
+[
+"target",
+"f7: only the king guards it, and two of your pieces aim at it."
+],
+[
+"pieces",
+"Your queen's knight and dark bishop are still at home. Bring them out soon."
+],
+[
+"them",
+"Black wants to bring the dark bishop out and castle short."
+]
+],
+"gen": 1,
+"h": "A piece for a pawn: castle and push the d-pawn"
 },
 "fried-liver-f-qe7": {
 "b": [
@@ -20820,6 +21040,50 @@
 ],
 "gen": 1,
 "h": "A pawn up: go after the king and push the d-pawn"
+},
+"fried-liver-f-qf6v3": {
+"b": [
+[
+"target",
+"Black's e-pawn has no pawn beside it: only pieces can guard it."
+],
+[
+"pieces",
+"Your queen's knight and dark bishop are still at home. Bring them out next."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to put a rook on the half-open f-file and bring the light bishop out."
+]
+],
+"gen": 1,
+"h": "A piece up: finish your setup and push the d-pawn"
+},
+"fried-liver-f-qxd5v2": {
+"b": [
+[
+"king",
+"Castle short soon."
+],
+[
+"target",
+"Black's c-pawn has no pawn beside it: only pieces can guard it."
+],
+[
+"pieces",
+"Your dark bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to bring the queen out and jump the knight to the center."
+]
+],
+"gen": 1,
+"h": "A pawn up: castle and push the d-pawn"
 },
 "fried-liver-nb4-f-nxc2": {
 "b": [
@@ -27742,6 +28006,182 @@
 "gen": 1,
 "h": "The exchange up: go after the king and push the d-pawn"
 },
+"tk-sidelines-f-d5": {
+"b": [
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Your queen's knight and dark bishop are still at home. Bring them out soon."
+],
+[
+"pawns",
+"Trade pieces, not pawns: your extra pawn counts for more with every trade."
+],
+[
+"them",
+"Black wants to push the h-pawn at your knight and take your knight."
+]
+],
+"gen": 1,
+"h": "A pawn up: go after the king and take Black's e-pawn"
+},
+"tk-sidelines-f-d5v2": {
+"b": [
+[
+"target",
+"Black's c-pawn has no pawn beside it: only pieces can guard it."
+],
+[
+"pieces",
+"Your queen's knight and dark bishop are still at home. Bring them out next."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to bring the dark bishop out and castle short."
+]
+],
+"gen": 1,
+"h": "Ahead in material: finish your setup and push the f-pawn"
+},
+"tk-sidelines-f-d6": {
+"b": [
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Your queen's knight and dark bishop are still at home. Bring them out soon."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to offer a trade of queens and bring the light bishop out at your queen."
+]
+],
+"gen": 1,
+"h": "The exchange up: go after the king"
+},
+"tk-sidelines-f-h6": {
+"b": [
+[
+"king",
+"Castle short soon."
+],
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Your queen's knight and dark bishop are still at home. Bring them out soon."
+],
+[
+"them",
+"Black wants to bring the queen out and take your light bishop with the knight."
+]
+],
+"gen": 1,
+"h": "A pawn up: go after the king"
+},
+"tk-sidelines-f-nd4": {
+"b": [
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Your queen's knight and dark bishop are still at home. Bring them out soon."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to offer a trade of queens and push the c-pawn one square."
+]
+],
+"gen": 1,
+"h": "The exchange up: go after the king"
+},
+"tk-sidelines-f-nxd5": {
+"b": [
+[
+"king",
+"Castle short soon."
+],
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Your queen's knight and dark bishop are still at home. Bring them out next."
+],
+[
+"them",
+"Black wants to bring the queen out."
+]
+],
+"gen": 1,
+"h": "A pawn up: go after the king"
+},
+"tk-sidelines-f-qe8": {
+"b": [
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Your queen's knight and dark bishop are still at home. Bring them out next."
+],
+[
+"pawns",
+"Trade pieces, not pawns: your extra pawn counts for more with every trade."
+],
+[
+"them",
+"Black wants to push the h-pawn at your knight and bring a rook to the g-file."
+]
+],
+"gen": 1,
+"h": "A pawn up: go after the king"
+},
+"tk-sidelines-f-qxf7": {
+"b": [
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Your queen's knight and dark bishop are still at home. Bring them out soon."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to bring the light bishop out at your rook."
+]
+],
+"gen": 1,
+"h": "Ahead in material: go after the king and push the d-pawn"
+},
 "trap-d6-bd7": {
 "b": [
 [
@@ -27818,6 +28258,138 @@
 "gen": 1,
 "h": "A pawn up: go after the king"
 },
+"traxler-f-d5": {
+"b": [
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Put a rook on the half-open e-file next."
+],
+[
+"pawns",
+"Trade pieces, not pawns: your extra pawn counts for more with every trade."
+],
+[
+"them",
+"Black wants to bring the queen out."
+]
+],
+"gen": 1,
+"h": "A pawn up: go after the king and bring a rook in"
+},
+"traxler-f-d6": {
+"b": [
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Your dark bishop is still at home. Bring it out next."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to bring the queen out and jump the knight to the center."
+]
+],
+"gen": 1,
+"h": "The exchange up: go after the king and push the c-pawn"
+},
+"traxler-f-d6v2": {
+"b": [
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Your dark bishop is still at home. Bring it out next."
+],
+[
+"pawns",
+"Then push the h-pawn at Black's knight."
+],
+[
+"them",
+"Black wants to hit your light bishop with the knight and pull the knight back."
+]
+],
+"gen": 1,
+"h": "Better for you: go after the king, then push the h-pawn"
+},
+"traxler-f-h6": {
+"b": [
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Your dark bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to pull the knight back."
+]
+],
+"gen": 1,
+"h": "The exchange up: go after the king and push the d-pawn"
+},
+"traxler-f-h6v2": {
+"b": [
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Your dark bishop is still at home. Bring it out next."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to take your f-pawn with the bishop."
+]
+],
+"gen": 1,
+"h": "Ahead in material: go after the king"
+},
+"traxler-f-rf8": {
+"b": [
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Your dark bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Push the f-pawn one square next."
+],
+[
+"them",
+"Black wants to push the e-pawn to hit your f-pawn and bring the queen out."
+]
+],
+"gen": 1,
+"h": "Better for you: go after the king, then push the f-pawn"
+},
 "traxler-warn": {
 "b": [
 [
@@ -27861,6 +28433,24 @@
 ],
 "gen": 1,
 "h": "A piece up: hit Black's dark bishop with the queen"
+},
+"two-knights-na5-f-a6": {
+"b": [
+[
+"pieces",
+"Your dark bishop is still at home. Bring it out next."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to put a rook on the open e-file."
+]
+],
+"gen": 1,
+"h": "A piece up: push the d-pawn and finish your setup"
 },
 "two-knights-na5-f-bb7": {
 "b": [
@@ -27920,6 +28510,90 @@
 "gen": 1,
 "h": "Two pawns up: take Black's queen with the queen"
 },
+"two-knights-na5-f-bg4v2": {
+"b": [
+[
+"king",
+"Your king can't castle any more. With the queens off, it is safe enough in the middle."
+],
+[
+"target",
+"Black's c-pawn has no pawn beside it: only pieces can guard it."
+],
+[
+"pieces",
+"Your queen's knight and dark bishop are still at home. Bring them out next."
+],
+[
+"them",
+"Black wants to push the f-pawn one square."
+]
+],
+"gen": 1,
+"h": "A pawn up: bring a rook in and push the f-pawn"
+},
+"two-knights-na5-f-c6": {
+"b": [
+[
+"target",
+"Black's king can't castle any more. The e-file in front of it is open. Bring your pieces at it."
+],
+[
+"pieces",
+"Your queen's knight and dark bishop are still at home. Bring them out next."
+],
+[
+"pawns",
+"Trade pieces, not pawns: your extra pawn counts for more with every trade."
+],
+[
+"them",
+"Black wants to put a rook on the half-open c-file."
+]
+],
+"gen": 1,
+"h": "A pawn up: go after the king and check with the rook"
+},
+"two-knights-na5-f-cxb5": {
+"b": [
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Your dark bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+]
+],
+"gen": 1,
+"h": "Ahead in material: go after the king"
+},
+"two-knights-na5-f-e4": {
+"b": [
+[
+"king",
+"Your king can't castle any more. Keep it covered and keep the middle closed."
+],
+[
+"target",
+"Black's king is still in the middle, on the open e-file. Get a rook there before it castles."
+],
+[
+"pieces",
+"Your queen's knight and dark bishop are still at home. Bring them out next."
+],
+[
+"them",
+"Black wants to check with the queen."
+]
+],
+"gen": 1,
+"h": "The exchange up: hit Black's queen with the rook"
+},
 "two-knights-na5-f-nxc6": {
 "b": [
 [
@@ -27937,6 +28611,50 @@
 ],
 "gen": 1,
 "h": "A pawn up: take Black's knight with the bishop"
+},
+"two-knights-na5-f-nxd5": {
+"b": [
+[
+"target",
+"Black's king is still in the middle, on the open e-file. Get a rook there before it castles."
+],
+[
+"pieces",
+"Your queen's knight and dark bishop are still at home. Bring them out next."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to push the h-pawn at your knight and check with the queen."
+]
+],
+"gen": 1,
+"h": "A piece up: hit Black's queen with the rook"
+},
+"two-knights-na5-f-rb8": {
+"b": [
+[
+"target",
+"Black's c-pawn has no pawn beside it: only pieces can guard it."
+],
+[
+"pieces",
+"Your queen's knight and dark bishop are still at home. Bring them out next."
+],
+[
+"pawns",
+"Trade pieces, not pawns: your extra pawn counts for more with every trade."
+],
+[
+"them",
+"Black wants to castle short and pull the knight back."
+]
+],
+"gen": 1,
+"h": "A pawn up: finish your setup"
 },
 "x-bc5": {
 "b": [

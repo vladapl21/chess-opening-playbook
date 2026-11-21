@@ -245,6 +245,21 @@ with sync_playwright() as p:
     print('one engine readout:', said); assert 'depth' in said[0] and said[1] == 0 and 'depth' not in said[2] and said[3] >= 1, said
     pg.evaluate("exBack()"); pg.wait_for_timeout(400); pg.evaluate("EngineUI.set(false)")
 
+    # ---- a line the build played on: the list of moves says where the added moves begin, the plan written for the lesson
+    #      shows at the position it was written for, and the line's end has the plan read off the board there
+    pg.evaluate("useSide('w')"); pg.wait_for_timeout(300)
+    deep = pg.evaluate("(() => { const l = LINES['two-knights-na5'], L = LESSONS[l.lesson]; return [l.n.length, l.dp || 0, L.plan0 && L.plan0.h, l.plan && l.plan.h]; })()")
+    print('a line played on [plies, added, the written plan, the plan at its end]:', deep); assert deep[1] >= 2 and deep[2] and deep[3] and deep[2] != deep[3], deep
+    look = "(() => [(document.querySelector('.ccol .plan h4') || {}).textContent || '', document.querySelectorAll('.timeline .tsep ~ li .trow').length, (document.querySelector('.timeline .tsep') || {}).textContent || '', document.querySelectorAll('.timeline .tsep').length])()"
+    pg.evaluate(f"openLine('two-knights-na5', {deep[0] - 1 - deep[1]})"); pg.wait_for_timeout(500); mid = pg.evaluate(look)
+    pg.evaluate(f"openLine('two-knights-na5', {deep[0] - 2 - deep[1]})"); pg.wait_for_timeout(400); before = pg.evaluate(look)
+    pg.evaluate(f"openLine('two-knights-na5', {deep[0] - 1})"); pg.wait_for_timeout(500); end = pg.evaluate(look)
+    print('  where it was written to:', mid, '| a move earlier:', before[0] or 'no plan', '| at its end:', end[0])
+    assert mid[0] == deep[2] and before[0] == '' and end[0] == deep[3], (mid, before, end)
+    assert mid[2] == 'How it usually goes on' and mid[1] == deep[1] and mid[3] == 1, mid      # one divider, right before the moves that were added
+    vis = pg.evaluate("(() => { const tl = document.querySelector('.timeline'), li = document.querySelector('.trow.cur').parentElement; return li.offsetTop >= tl.scrollTop && li.offsetTop + li.offsetHeight <= tl.scrollTop + tl.clientHeight + 1; })()")
+    print('  the last move is in view in the list:', vis); assert vis
+
     # ---- a drill: a move of the line played before its turn is named as that (the order slipped, not the move), without
     #      saying which move is due; the second miss shows the arrow as always, and the coach's note says it again
     pg.evaluate(f"useSide('b'); startDrillLine('{main}', '', null, {{from0: true}})"); pg.wait_for_timeout(1500)

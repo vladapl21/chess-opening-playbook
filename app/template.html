@@ -276,6 +276,7 @@ p{margin:0}
 .timeline{position:relative;list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .timeline li{border-top:1px solid var(--line)}
 .timeline li:first-child{border-top:0}
+.timeline .tsep{padding:7px 12px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--muted);background:var(--surface-2)}
 .trow{display:grid;grid-template-columns:44px 24px minmax(0,1fr) auto;gap:8px;align-items:center;width:100%;text-align:left;background:none;border:0;padding:8px 12px;cursor:pointer;font-size:14px}
 .trow:hover{background:var(--surface-2)}
 /* move marks (!, ?!, ?, ??) and the strip of your moves in order */
@@ -818,7 +819,9 @@ function applyPacks(D){
 }
 for (const s of ['w', 'b']){ BOOKS[s].side = s; applyPacks(BOOKS[s]); BOOKS[s].drillable = drillableOf(BOOKS[s]); }
 // A line's version goes up when its moves change (pipeline/assemble.py). Lines still on their first version carry none.
-const VER = {}; for (const s of ['w', 'b']) for (const l of BOOKS[s].lines) if (l.v) VER[l.id] = l.v;
+// Every system in the library, not only the ones in play: a record kept for a system the player has switched away
+// from is not out of date, and two copies of it still merge to the one made on the current moves.
+const VER = {}; for (const s of ['w', 'b']) for (const l of (BOOKS[s].full || BOOKS[s]).lines) if (l.v) VER[l.id] = l.v;
 function loadBook(side){
   SIDE = BOOKS[side] ? side : 'w'; DATA = BOOKS[SIDE];
   N = DATA.nodes; LINES = {}; LESSONS = {}; PARTS = {}; GAMES = {}; CHAPTERS = {};
@@ -1851,15 +1854,19 @@ function renderStudy(){
   }
   for (let k = 1; k < line.n.length; k++){
     if (k <= preEnd && !S.showPre) continue;
+    // the moves the build added (line.dp): the reply club players pick most, and your book's or the engine's answer
+    if (les && line.dp && k === line.n.length - line.dp) rows.push('<li class="tsep">How it usually goes on</li>');
     const m = N[line.n[k]], pk = k;
     rows.push(`<li><button class="trow ${isMine(m) ? 'you' : 'blk'} ${k === S.i ? 'cur' : ''}" data-step="${k}"><span class="n">${moveNo(pk)}${m.w === 1 ? '' : '…'}</span>${pieceIcon(m.pc, m.w === 1)}${namedLabel(line.n[k], 'lbl')}<span class="tg">${(q => (q ? markIcon(q) : '') + (m.g || []).filter(t => t !== 'game' && !QUIET_TAGS.has(t) && !(q && ['mistake', 'blunder', 'warn'].includes(t))).slice(0, 2).map(t => `<i class="${t}" title="${esc(TAGNAMES[t])}"></i>`).join(''))(markOf(line.n[k]))}</span></button></li>`);
   }
   const endIdx = line.n[line.n.length - 1], ei = evalInfo(N[endIdx].e);
-  const outcome = les ? `<div class="outcome"><span class="kicker">Where it ends</span><b>${esc(LINES[S.line].main ? (les.outcome || (ei && ei.txt)) : (ei ? ei.txt : ''))}</b></div>` : '';
+  const outcome = les ? `<div class="outcome"><span class="kicker">Where it ends</span><b>${esc(line.main && !line.dp ? (les.outcome || (ei && ei.txt)) : (ei ? ei.txt : ''))}</b></div>` : '';
   const curEval = evalInfo(nd.e);
   // the engine: a switch under the board; at the end of a line, the plan for what comes next
   const engOn = EngineUI.on(), lineEnd = S.i === line.n.length - 1;
   const plan = les && lineEnd ? planOf(S.line) : null;
+  // a main line the build played on: the plan written for the lesson shows at the position it was written for
+  const plan0 = les && line.main && line.dp && les.plan0 && S.i === line.n.length - 1 - line.dp ? les.plan0 : null;
   const exTitle = `${les ? les.title : 'Game vs ' + game.opp} · ${line.main ? (les ? 'main line' : 'the game') : line.title}${S.i ? `, move ${moveNo(p)}` : ''}`;
   const exOpts = extra => Object.assign({title: exTitle, plan: plan ? {side: SIDE, line: S.line} : null}, extra);
   S.studyEx = exOpts;
@@ -1891,7 +1898,7 @@ function renderStudy(){
     <div class="ccol">
       ${opnHTML(Openings.ofNode(idx), !!nameStart(idx))}${mcard}${engOn ? '<div id="engcard"></div>' : ''}${optHTML}${linesHTML}
       <ol class="timeline" aria-label="Moves in this line">${rows.join('')}</ol>${line.n.some((x, k) => k && markOf(x)) ? markLegend() : ''}
-      ${outcome}${plan ? planCardHTML(plan, planKick(S.line)) : ''}
+      ${outcome}${plan ? planCardHTML(plan, planKick(S.line)) : plan0 ? planCardHTML(plan0) : ''}
       <div class="lesson-actions">${unitBtns}${drillBtn}${fromBtn}${lessonBtn}<button class="btn ${lineEnd && !unitBtns && !drillBtn ? 'primary' : 'ghost'}" id="exHere">${lineEnd ? 'Play on from here' : 'Explore from here'}</button></div>
     </div></div>`;
   const svg = document.querySelector('#sb svg');
@@ -2235,7 +2242,7 @@ function guidedPanelHTML(D){
   const face = m => typeof knightSVG === 'function' && SET.coach ? `<span class="cnface">${knightSVG(m)}</span>` : '';
   const who = typeof coachName === 'function' && SET.coach ? `<b class="gwho">${esc(coachName())}</b>` : '';
   if (D.state === 'done'){
-    const ei = evalInfo(N[n[n.length - 1]].e), ends = line.main ? (L && L.outcome) || (ei && ei.txt) : ei && ei.txt;
+    const ei = evalInfo(N[n[n.length - 1]].e), ends = line.main && !line.dp ? (L && L.outcome) || (ei && ei.txt) : ei && ei.txt;   // a line played on ends somewhere else than its lesson's words say
     return `<div class="dpanel">${head}<h3>You played the whole line</h3><div class="progressbar" aria-hidden="true"><i style="width:100%"></i></div>
       <div class="donebox"><h4>Now from memory</h4>${bullets([ends ? 'Ends: ' + ends : '', 'No arrows this time: two tries, then the arrow shows the move', CU ? `Clean once and it counts for this ${uword(CU)}` : 'Clean once and it comes back for review'])}
       <div class="lesson-actions"><button class="btn primary" id="gMem">Play it from memory</button><button class="btn" id="gAgain">Play along again</button><button class="btn ghost" data-line="${D.id}">Read the notes</button></div></div></div>`;

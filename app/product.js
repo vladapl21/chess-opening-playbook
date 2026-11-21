@@ -1971,7 +1971,7 @@ const Tour = {
         say: ['Each piece carries the number of the move that put it there', 'A purple number is played at another turn than in the main line', 'Move any piece to try something else: your book answers if it knows the move, and the engine if not']},
       {h: 'The engine in lessons', at: '.engrow', say: ['Switch it on for the best moves, their arrows and the score', 'It stays off in drills, practice games and checkpoints, and comes back when they end']},
       {h: 'The plan from here', at: '.ccol .plan', skip: () => !planOf(lid), go: () => { S.drill = S.drillState = null; openLine(lid, LINES[lid].n.length - 1, 'games'); },
-        say: ['Every line ends with a plan: what to aim for once the moves you know run out', 'You get it at the end of lessons, clean drills and practice games']},
+        say: ['Every line ends with a plan: what to aim for once the moves you know run out', 'You get it at the end of lessons, clean drills and practice games', 'In the list of moves, a divider marks where the opening is done: the moves after it are how it usually goes on']},
       {h: 'Your games', at: '.gseg', go: () => go('games'),
         say: () => PERSONA === 'ready' ? ['Your openings with both colours and your record in each', 'Last 3 games: your newest games reviewed, with the spot to drill in each', 'Where you leave the book most, and the monthly recap'] : ['Your openings and your record in each', 'Last 3 games: your newest games reviewed, with the spot to drill in each', 'Missed shots, game reviews and the monthly recap']},
       {h: 'The Sandbox', at: '#sbpanel', go: () => { S.drill = S.drillState = null; go('sandbox'); },
