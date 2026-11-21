@@ -190,9 +190,10 @@ const CATALOG = [
     {id: 'd4', keys: ['d4'], ready: false, name: 'Open with the d-pawn (London)', line: 'd4 d5 Bf4 Nf6 e3 e6 Nf3 c5 c3', pitch: 'One setup in one order against almost anything, with a trick ready for each of Black\'s usual tries.'},
     {id: 'flank', keys: ['c4', 'nf3'], ready: false, name: 'Start from the side (English)', line: 'c4 e5 Nc3 Nf6 g3', pitch: 'C-pawn, knight, fianchetto: one setup against nearly everything, and Black never gets the game they prepared for.'}]},
   // second steps inside the e-pawn repertoire, the house line first: each is asked only when the player's games go the other way
-  {slot: 'whiteItalian', within: ['white', 'e4'], label: 'Your Italian', ask: 'In the Italian, would you rather…', flip: false, opts: [
-    {id: 'center', keys: ['center'], ready: false, name: 'Strike in the middle at once', line: 'e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4', pitch: 'A big center on move five and the knight jump at f7. Sharp, with traps to know on both sides.'},
-    {id: 'slow', keys: ['slow'], ready: false, name: 'Build first (slow Italian)', line: 'e4 e5 Nf3 Nc6 Bc4 Bc5 d3 Nf6 c3 d6 O-O', pitch: 'Two small pawn moves and one setup in one order. Little to memorise, and the fight comes later.'}]},
+  {slot: 'whiteItalian', within: ['white', 'e4'], label: 'Your bishop on move three', ask: 'On move three, would you rather…', flip: false, opts: [
+    {id: 'center', keys: ['center'], ready: false, name: 'Strike in the middle at once (Italian)', line: 'e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4', pitch: 'A big center on move five and the knight jump at f7. Sharp, with traps to know on both sides.'},
+    {id: 'slow', keys: ['slow'], ready: false, name: 'Build first (slow Italian)', line: 'e4 e5 Nf3 Nc6 Bc4 Bc5 d3 Nf6 c3 d6 O-O', pitch: 'Two small pawn moves and one setup in one order. Little to memorise, and the fight comes later.'},
+    {id: 'ruy', keys: ['ruy'], ready: false, name: 'Lean on the knight (Ruy Lopez)', line: 'e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1', pitch: 'The bishop comes at the knight that guards the e-pawn. Castle, rook, c-pawn, then the d-pawn: the most played opening there is.'}]},
   {slot: 'whiteCaro', within: ['white', 'e4'], label: 'Against the Caro-Kann', ask: 'Against the Caro-Kann, would you rather…', flip: false, opts: [
     {id: 'classical', keys: ['classical'], ready: false, name: 'Bring the knight out (main line)', line: 'e4 c6 d4 d5 Nc3 dxe4 Nxe4', pitch: 'Develop and let Black trade in the middle. Two lines cover most games.'},
     {id: 'advance', keys: ['advance'], ready: false, name: 'Push past (Advance)', line: 'e4 c6 d4 d5 e5 Bf5 Nf3 e6 Be2', pitch: 'Take space and keep it. A quiet setup behind the pawns, the same against everything.'}]},
@@ -204,7 +205,7 @@ const CATALOG = [
     {id: 'sicilian', keys: ['sicilian'], ready: false, name: 'Fight from the side (Sicilian)', line: 'e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6', pitch: 'Unbalanced from move one. More to learn and more winning chances.'},
     {id: 'caro', keys: ['caro'], ready: false, name: 'Build a wall (Caro-Kann)', line: 'e4 c6 d4 d5 Nc3 dxe4 Nxe4', pitch: 'A sound pawn structure, few early tactics and a good bishop.'},
     {id: 'scandi', keys: ['scandi'], ready: false, name: 'Hit the e-pawn at once (Scandinavian)', line: 'e4 d5 exd5 Qxd5 Nc3 Qa5', pitch: 'One setup after the queen comes out: knight, c-pawn, bishop, e-pawn. Little theory and the same moves every game.'},
-    {id: 'french', keys: ['french'], ready: false, name: 'Lock the centre (French)', line: 'e4 e6 d4 d5 e5 c5', pitch: 'A closed centre and a clear plan against White\'s pawn chain.'}]},
+    {id: 'french', keys: ['french'], ready: false, name: 'Lock the middle (French)', line: 'e4 e6 d4 d5 e5 c5 c3 Nc6', pitch: 'The middle is shut and the plan is clear: c-pawn, knight and queen go at the pawn that holds White\'s chain up.'}]},
   // a second step: `within` is the pick that opens it (the slot's `within` in PACKS). `always`: asked whenever that pick is made
   {slot: 'blackSic', within: ['blackE4', 'sicilian'], always: true, label: 'Your Sicilian', ask: 'Which Sicilian? Would you rather…', flip: true, opts: [
     {id: 'kan', keys: ['kan'], ready: false, name: 'Small pawn moves (Kan)', line: 'e4 c5 Nf3 e6 d4 cxd4 Nxd4 a6 Nc3 Qc7', pitch: 'E-pawn and a-pawn one square, the queen beside the bishop. Flexible and hard to attack.'},
@@ -212,7 +213,7 @@ const CATALOG = [
   {slot: 'blackD4', ask: 'Against the d-pawn, would you rather…', flip: true, chapters: ['slav', 'london', 'd4x'], opts: [
     {id: 'slav', keys: ['slav'], ready: true, name: 'One solid setup (Slav)', line: 'd4 d5 c4 c6 Nf3 Nf6 e3 Bf5', pitch: 'D-pawn, c-pawn, bishop out, e-pawn: the same order against every d-pawn system.'},
     {id: 'kid', keys: ['kid'], ready: false, name: 'Let them build, then strike (King\'s Indian)', line: 'd4 Nf6 c4 g6 Nc3 Bg7 e4 d6', pitch: 'Five moves in the same order against every d-pawn system, then your e-pawn hits the middle.'},
-    {id: 'qgd', keys: ['qgd', 'nimzo'], ready: false, name: 'The classical defence', line: 'd4 d5 c4 e6 Nc3 Nf6', pitch: 'D-pawn and e-pawn side by side: hard to break down, with a quieter bishop.'}]}
+    {id: 'qgd', keys: ['qgd', 'nimzo'], ready: false, name: 'Hold the middle (Queen\'s Gambit Declined)', line: 'd4 d5 c4 e6 Nc3 Nf6 Bg5 Be7', pitch: 'D-pawn and e-pawn side by side, knight, bishop, castle. Then a knight jump trades pieces and frees your game.'}]}
 ];
 const STYLE = [
   {id: 'order', ask: 'Where should your course start? Would you rather…', opts: [
@@ -326,7 +327,7 @@ function makeChoices(P){
     const s = P.slots[C.slot] || (C.always ? {n: 0, opts: {}} : null); if (!s || (s.n < 5 && !C.always)) continue;
     const share = o => o.keys.reduce((a, k) => a + ((s.opts[k] || {}).n || 0), 0), tal = o => o.keys.reduce((a, k) => { const t = s.opts[k]; if (t){ a.n += t.n; a.w += t.w; a.l += t.l; a.d += t.d; } return a; }, {n: 0, w: 0, l: 0, d: 0});
     const top = C.opts.slice().sort((a, b) => share(b) - share(a))[0], own = s.n && share(top) / s.n >= 0.3 ? top : null, ready = C.opts.filter(o => o.ready);
-    const opts = (own ? [own] : []).concat(ready.filter(o => o !== own)).slice(0, 4);
+    const opts = (own ? [own] : []).concat(ready.filter(o => o !== own)).slice(0, 6);
     if (opts.length < 2 || (C.within && !C.always && !(own && own !== C.opts[0]))) continue;
     out.push({id: C.slot, ask: C.ask, kind: 'system', flip: C.flip, within: C.within, opts: opts.map(o => Object.assign({}, o, {t: tal(o), of: s.n}))});
   }
@@ -619,7 +620,7 @@ const Product = {
     };
     return `<section class="wyr"><p class="kicker">Step 3 of 3 · would you rather · ${this.ci + 1} of ${cards.length}</p><div class="pdots" aria-hidden="true">${dots}</div>
       <div class="say"><div class="cface">${knightSVG()}</div><p>${esc(Q.ask)}</p></div>
-      <div class="duo${Q.opts.length > 3 ? ' quad' : Q.opts.length > 2 ? ' trio' : ''}">${Q.opts.map(opt).join('<span class="or">or</span>')}</div>
+      <div class="duo${Q.opts.length > 4 ? ' many' : Q.opts.length > 3 ? ' quad' : Q.opts.length > 2 ? ' trio' : ''}">${Q.opts.map(opt).join('<span class="or">or</span>')}</div>
       ${this.ci ? `<button class="btn ghost" data-cback>Back</button>` : ''}</section>`;
   },
   // the cards to go through: a second step (which Sicilian?) is one of them only while the pick that opens it stands

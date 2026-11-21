@@ -21,7 +21,8 @@ LONDON_UNITS = {'w-london', 'w-lindian', 'w-lrare'}
 # second steps inside the e-pawn repertoire: slot, variation, the house chapter it replaces, its chapter, its unit, the unit it replaces, a main line
 WVARS = [('whiteSic', 'open', 'sic', 'sico', 'w-sicopen', ('w-sicilian',), 'so-najdorf', 'Against the Sicilian'),
          ('whiteCaro', 'advance', 'caro', 'caroadv', 'w-caroadv', ('w-caro',), 'ca-main', 'Against the Caro-Kann'),
-         ('whiteItalian', 'slow', 'italian', 'italians', 'w-italslow', ('w-italian', 'w-2knights'), 'sl-main', 'Your Italian')]
+         ('whiteItalian', 'slow', 'italian', 'italians', 'w-italslow', ('w-italian', 'w-2knights'), 'sl-main', 'Your bishop on move three'),
+         ('whiteItalian', 'ruy', 'italian', 'ruy', 'w-ruy', ('w-italian', 'w-2knights'), 'rl-main', 'Your bishop on move three')]
 
 
 def hook(pg):
@@ -66,7 +67,7 @@ with sync_playwright() as p:
     ctx = b.new_context(viewport={'width': 1280, 'height': 900}); pg = ctx.new_page(); hook(pg)
     pg.goto(URL); pg.wait_for_timeout(1000)
     a = shape(pg); print('default:', {k: (v if k != 'units' else len(v)) for k, v in a.items()})
-    assert 'caro' not in a['chapters'] and a['chapters'][:5] == E5 and a['all'] == len(a['chapters']) + 6
+    assert 'caro' not in a['chapters'] and a['chapters'][:5] == E5 and a['all'] == len(a['chapters']) + 9
     assert 'b-caro' not in a['units'] and len(a['units']) == 17 and a['first'] == ['e7e5']
     assert pg.evaluate("Object.keys(LIDX.b).some(l => l.startsWith('bck-'))") is False
 
@@ -75,7 +76,7 @@ with sync_playwright() as p:
     pg.click('#setBtn'); pg.wait_for_timeout(300)
     assert not pg.locator('#setPanel [data-packask="blackE4:caro"]').is_visible(), 'the repertoire is folded away'
     pg.click('#setPanel .repdet > summary'); pg.wait_for_timeout(200)
-    rows = pg.locator('#setPanel [data-packask]').all_inner_texts(); print('settings:', rows); assert len(rows) == 9 + 2 * len(WVARS)
+    rows = pg.locator('#setPanel [data-packask]').all_inner_texts(); print('settings:', rows); assert len(rows) == 11 + 2 * len(set(w[0] for w in WVARS)) + 1   # White 3, the e-pawn 5, the d-pawn 3, the steps two each, and a third for the bishop on move three
     pg.click('#setPanel [data-packask="blackE4:caro"]'); pg.wait_for_timeout(200)
     assert pg.evaluate("PICKS.blackE4 || null") is None and pg.locator('#repName').count() == 1, 'a tap alone switches nothing'
     pg.fill('#repName', 'somebody'); assert pg.is_disabled('.repask [type=submit]')
@@ -138,15 +139,15 @@ with sync_playwright() as p:
     # a new player who already plays the Caro-Kann is offered it first, as ready
     cards = pg.evaluate("""makeChoices({slots: {blackE4: {n: 20, opts: {caro: {n: 15, w: 8, l: 6, d: 1}, e5: {n: 5, w: 2, l: 3, d: 0}}},
         blackD4: {n: 12, opts: {slav: {n: 12, w: 6, l: 5, d: 1}}}}}).map(c => [c.id, (c.opts || []).map(o => [o.id, !!o.ready])])""")
-    print('cards for a Caro-Kann player:', cards[:2]); assert cards[0] == ['blackE4', [['caro', True], ['e5', True], ['sicilian', True], ['scandi', True]]], cards[0]
+    print('cards for a Caro-Kann player:', cards[:2]); assert cards[0] == ['blackE4', [['caro', True], ['e5', True], ['sicilian', True], ['scandi', True], ['french', True]]], cards[0]
     # the Sicilian has two variations, so "which Sicilian?" is a card of its own: a second step, shown once the Sicilian is picked
     assert cards[1] == ['blackSic', [['kan', True], ['dragon', True]]], cards[1]
     assert pg.evaluate("makeChoices({slots: {blackE4: {n: 20, opts: {e5: {n: 20, w: 9, l: 9, d: 2}}}}}).find(c => c.id === 'blackSic').within") == ['blackE4', 'sicilian']
     own = pg.evaluate("""makeChoices({slots: {blackE4: {n: 20, opts: {sicilian: {n: 20, w: 9, l: 9, d: 2}}}, blackSic: {n: 20, opts: {dragon: {n: 14, w: 7, l: 6, d: 1}, kan: {n: 6, w: 2, l: 3, d: 1}}}}})
         .find(c => c.id === 'blackSic').opts.map(o => o.id)"""); assert own == ['dragon', 'kan'], own       # a Dragon player sees the Dragon first
-    assert cards[2] == ['blackD4', [['slav', True], ['kid', True]]] and cards[3][0] == 'order', 'the d-pawn has a second system now, so it gets a card'
+    assert cards[2] == ['blackD4', [['slav', True], ['kid', True], ['qgd', True]]] and cards[3][0] == 'order', 'the d-pawn has a second system now, so it gets a card'
     three = pg.evaluate("""makeChoices({slots: {blackE4: {n: 20, opts: {sicilian: {n: 16, w: 8, l: 7, d: 1}, e5: {n: 4, w: 2, l: 2, d: 0}}}}})[0].opts.map(o => o.id)""")
-    assert three == ['sicilian', 'e5', 'caro', 'scandi'], three
+    assert three == ['sicilian', 'e5', 'caro', 'scandi', 'french'], three
 
     # the Sicilian is a pack too
     pg.evaluate("Prog.d.packs = {blackE4: 'sicilian', updated: Date.now()}; Prog.save(); window.__before = 1; syncPacks()")

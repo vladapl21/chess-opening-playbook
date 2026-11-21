@@ -67,8 +67,9 @@ const Analyze = (() => {
   /* second steps: the variation of a system a game shows, for the slots that sit within a pack of another slot. Each has
      the games it reads (colour and first moves) and its names, keyed by the packs' ids. */
   const SUBS = {
-    whiteItalian: {me: 'w', first: ['e4', 'e5', 'Nf3', 'Nc6', 'Bc4'], names: [
-      ['center', 'Strike in the middle at once', g => has(g, 'w', 'd4', 14) || has(g, 'w', 'Ng5', 10)], ['slow', 'Build first (slow Italian)', g => has(g, 'w', 'd3', 12)],
+    whiteItalian: {me: 'w', first: ['e4', 'e5', 'Nf3', 'Nc6'], names: [
+      ['ruy', 'The bishop at the knight (Ruy Lopez)', g => g[4] === 'Bb5'],
+      ['center', 'Strike in the middle at once', g => g[4] === 'Bc4' && (has(g, 'w', 'd4', 14) || has(g, 'w', 'Ng5', 10))], ['slow', 'Build first (slow Italian)', g => g[4] === 'Bc4' && has(g, 'w', 'd3', 12)],
       ['other', 'Something else', () => true]]},
     whiteCaro: {me: 'w', first: ['e4', 'c6'], names: [
       ['advance', 'Push past (Advance)', g => g[2] === 'd4' && g[4] === 'e5'], ['classical', 'Knight out (main line)', g => g[2] === 'd4' && (g[4] === 'Nc3' || g[4] === 'Nd2')],
@@ -84,17 +85,20 @@ const Analyze = (() => {
     .map(k => { const f = SUBS[k].names.find(([, , test]) => test(g.sans)); return [k, f[0], f[1]]; });
 
   /* ---- the books: which chapter a position belongs to */
-  function indexBook(D){
-    if (D._chOf) return D._chOf;
+  // The chapter of every position, over the chapters in play (`off`: the ones that aren't). Counting the whole library
+  // here would leave a position without a chapter as soon as two systems for the same slot both start from it.
+  function indexBook(D, off){
+    const key = off ? [...off].sort().join(',') : '';
+    if (!D._idx) Object.defineProperty(D, '_idx', {value: {}, enumerable: false});
+    if (D._idx[key]) return D._idx[key];
     const partCh = {}; for (const p of D.parts) partCh[p.id] = p.ch;
     const lesCh = {}; for (const l of D.lessons) lesCh[l.id] = partCh[l.part];
-    const chOf = {}, lesOf = {};
-    for (const ln of D.lines){ const ch = lesCh[ln.lesson]; if (!ch) continue; for (const i of ln.n){ if (!(i in chOf)){ chOf[i] = ch; lesOf[i] = ln.id; } } }
-    // a position shared by several chapters (the first moves) belongs to none of them yet
-    const cnt = {}; for (const ln of D.lines){ const ch = lesCh[ln.lesson]; if (!ch) continue; for (const i of ln.n){ (cnt[i] = cnt[i] || new Set()).add(ch); } }
+    const chOf = {}, cnt = {};
+    for (const ln of D.lines){ const ch = lesCh[ln.lesson]; if (!ch || (off && off.has(ch))) continue;
+      for (const i of ln.n){ if (!(i in chOf)) chOf[i] = ch; (cnt[i] = cnt[i] || new Set()).add(ch); } }
+    // a position shared by several of those chapters (the first moves) belongs to none of them yet
     for (const i in cnt) if (cnt[i].size > 1) delete chOf[i];
-    Object.defineProperty(D, '_chOf', {value: chOf, enumerable: false}); Object.defineProperty(D, '_lineOf', {value: lesOf, enumerable: false});
-    return chOf;
+    return D._idx[key] = chOf;
   }
   /* ---- systems: a game is read against one pack per slot, never the whole library. Given picks win; without them it is
      the pack the player's own games fit (when the library has it and it is at least three games in ten), else the first. */
@@ -120,13 +124,14 @@ const Analyze = (() => {
     const partCh = {}; for (const p of D.parts) partCh[p.id] = p.ch;
     const lesCh = {}; for (const l of D.lessons) lesCh[l.id] = partCh[l.part];
     const ok = new Set([0]); for (const ln of D.lines){ const ch = lesCh[ln.lesson]; if (ch && !off.has(ch)) for (const i of ln.n) ok.add(i); }
+    ok.off = off;   // the chapters that sit out, for the chapter index
     return ok;
   }
   // Follow a game through a book: how far it stays in, who left first and with what.
   // After the player leaves, the walk goes on as a shadow (the book's move for them, the opponent's real moves) for as long
   // as the opponent stays in the book, because the chapter is decided by what the opponent set up, not by the player's slip.
   function walk(D, ucis, me, ok){
-    const N = D.nodes, chOf = indexBook(D), isMine = ply => (ply % 2 === 0) === (me === 'w');
+    const N = D.nodes, chOf = indexBook(D, ok && ok.off), isMine = ply => (ply % 2 === 0) === (me === 'w');
     const kids = n => ok ? (N[n].k || []).filter(c => ok.has(c)) : (N[n].k || []);
     const bookKid = n => kids(n).find(c => !!N[c].w === (me === 'w') && !(N[c].g || []).includes('warn'));
     let node = 0, ply = 0, ch = null, out = null;

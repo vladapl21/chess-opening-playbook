@@ -105,18 +105,20 @@ with sync_playwright() as p:
             assert 'Which Sicilian' in txt and 'Dragon' in txt and 'Kan' in txt and f'of {n + 1}' in txt.lower(), txt[:200]
             pg.screenshot(path=out + 'o_choice_second.png', full_page=True)
             pg.click('[data-cback]'); pg.wait_for_timeout(500); assert pg.evaluate('Product.shown()[Product.ci].id') == 'blackE4'
-        if q['id'] == 'blackE4':   # four systems on one card: side by side on a wide screen, none cut off, and stacked on a phone
-            assert [o['id'] for o in q['opts']] == ['e5', 'sicilian', 'caro', 'scandi'] and all(o['ready'] for o in q['opts']), q['opts']
+        if q['id'] == 'blackE4':   # five systems on one card: a grid on a wide screen, none cut off or over another, and stacked on a phone
+            assert [o['id'] for o in q['opts']] == ['e5', 'sicilian', 'caro', 'scandi', 'french'] and all(o['ready'] for o in q['opts']), q['opts']
             pg.wait_for_timeout(900)   # the cards pop in
             bx = [b_.bounding_box() for b_ in pg.locator('.duo .wopt').all()]; pg.screenshot(path=out + 'o_choice_four.png', full_page=True)
-            assert len(bx) == 4 and max(b_['y'] for b_ in bx) - min(b_['y'] for b_ in bx) < 4 and all(bx[i]['x'] + bx[i]['width'] <= bx[i + 1]['x'] for i in range(3)) and bx[3]['x'] + bx[3]['width'] <= 1280, bx
+            assert len(bx) == 5 and max(b_['y'] for b_ in bx) - min(b_['y'] for b_ in bx) < 4 and all(bx[i]['x'] + bx[i]['width'] <= bx[i + 1]['x'] for i in range(4)) and bx[4]['x'] + bx[4]['width'] <= 1280, bx
+            assert pg.locator('.duo.many .or').count() and not pg.locator('.duo.many .or').first.is_visible(), 'no "or" between five'
             pg.set_viewport_size({'width': 390, 'height': 844}); pg.wait_for_timeout(400)
             xs = [b_.bounding_box()['x'] for b_ in pg.locator('.duo .wopt').all()]
             assert pg.evaluate('document.documentElement.scrollWidth') <= 390 and max(xs) - min(xs) < 4, xs
             pg.screenshot(path=out + 'o_choice_four_phone.png', full_page=True); pg.set_viewport_size({'width': 1280, 'height': 900}); pg.wait_for_timeout(300)
         if q['id'] == 'blackD4':
             pg.screenshot(path=out + 'o_choice_system.png', full_page=True)
-            txt = pg.inner_text('.wyr'); assert 'Being written' in txt and 'Ready now' in txt and 'What you play now' in txt
+            txt = pg.inner_text('.wyr'); assert 'Being written' not in txt and 'Ready now' in txt and 'What you play now' in txt   # every system on the cards is written
+            assert [o['id'] for o in q['opts']][0] == 'qgd' and len(q['opts']) == 3 and all(o['ready'] for o in q['opts']), q['opts']
         # take the system the books were first written for; first option for the style cards
         pick = next(i for i, o in enumerate(q['opts']) if o['id'] in ('e4', 'e5', 'slav')) if q['kind'] == 'system' else 0
         pg.click(f'.duo .wopt >> nth={pick}'); pg.wait_for_timeout(350)

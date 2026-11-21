@@ -208,7 +208,8 @@ with sync_playwright() as p:
     # a crate opened on its legendary aura: the piece in its rarity's colour, ready to wear
     pg.evaluate("""(() => { const D = Prog.d.days; for (let k = 1; k <= 40; k++) D[dayKey(-k)] = ['a','b','c','d','e']; Prog.save(); Badges.queue = []; Coach.hush();
       Shop.crateRoll = () => SHOP.find(x => x.id === 'a-nova'); S.shopTab = 'crate'; render(); crateOpen(); })()"""); pg.wait_for_timeout(500)
-    if pg.query_selector('[data-crateskip]'): pg.click('[data-crateskip]')
+    pg.click('[data-cratetap]', force=True); pg.wait_for_selector('[data-crateskip]', timeout=4000)   # the crate waits for a tap; then the reel
+    pg.click('[data-crateskip]')
     pg.wait_for_timeout(1500); pg.evaluate("Coach.hush()"); settle(pg, 300)
     box = pg.evaluate("(() => { const r = document.querySelector('#crateSheet .sheet, #crateSheet > div').getBoundingClientRect(); return [r.left - 16, r.top - 16, r.right + 16, Math.min(r.bottom + 16, innerHeight)]; })()")
     save(pg.screenshot(), 'crate.png', width=1100, crop=tuple(round(v * 2) for v in box))
