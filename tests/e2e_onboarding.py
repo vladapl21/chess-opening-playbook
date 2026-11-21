@@ -91,12 +91,20 @@ with sync_playwright() as p:
 
     # would you rather
     pg.click('[data-pgo="choices"]'); pg.wait_for_timeout(500)
-    n = pg.evaluate('Product.cards.length'); kinds = pg.evaluate('Product.cards.map(c => c.id)'); print('cards:', kinds)
+    n = pg.evaluate('Product.shown().length'); kinds = pg.evaluate('Product.shown().map(c => c.id)'); print('cards:', kinds)
+    assert 'blackSic' not in kinds and 'blackSic' in pg.evaluate('Product.cards.map(c => c.id)'), 'which Sicilian? is asked only once the Sicilian is picked'
     assert 'blackD4' in kinds and kinds[-2:] == ['order', 'depth'], kinds   # this player met the d-pawn with something the library lacks
     assert kinds[:2] == ['white', 'blackE4'], kinds                          # the library has two first moves for White and two answers to the e-pawn, so both are asked too
     txt = pg.inner_text('.wyr'); assert 'Ready now' in txt and 'What you play now' in txt and 'Being written' not in txt
     for k in range(n):
-        q = pg.evaluate('Product.cards[Product.ci]')
+        q = pg.evaluate('Product.shown()[Product.ci]')
+        if q['id'] == 'blackE4':   # the second step: pick the Sicilian and the next card asks which one; Back, and another pick, take it away again
+            sic = next(i for i, o in enumerate(q['opts']) if o['id'] == 'sicilian'); pg.click(f'.duo .wopt >> nth={sic}'); pg.wait_for_timeout(900)
+            q2 = pg.evaluate('Product.shown()[Product.ci]'); txt = pg.inner_text('.wyr')
+            assert q2['id'] == 'blackSic' and [o['id'] for o in q2['opts']] == ['kan', 'dragon'] and all(o['ready'] for o in q2['opts']), q2
+            assert 'Which Sicilian' in txt and 'Dragon' in txt and 'Kan' in txt and f'of {n + 1}' in txt.lower(), txt[:200]
+            pg.screenshot(path=out + 'o_choice_second.png', full_page=True)
+            pg.click('[data-cback]'); pg.wait_for_timeout(500); assert pg.evaluate('Product.shown()[Product.ci].id') == 'blackE4'
         if q['id'] == 'blackE4':   # four systems on one card: side by side on a wide screen, none cut off, and stacked on a phone
             assert [o['id'] for o in q['opts']] == ['e5', 'sicilian', 'caro', 'scandi'] and all(o['ready'] for o in q['opts']), q['opts']
             pg.wait_for_timeout(900)   # the cards pop in

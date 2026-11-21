@@ -176,6 +176,10 @@ const CATALOG = [
     {id: 'caro', keys: ['caro'], ready: false, name: 'Build a wall (Caro-Kann)', line: 'e4 c6 d4 d5 Nc3 dxe4 Nxe4', pitch: 'A sound pawn structure, few early tactics and a good bishop.'},
     {id: 'scandi', keys: ['scandi'], ready: false, name: 'Hit the e-pawn at once (Scandinavian)', line: 'e4 d5 exd5 Qxd5 Nc3 Qa5', pitch: 'One setup after the queen comes out: knight, c-pawn, bishop, e-pawn. Little theory and the same moves every game.'},
     {id: 'french', keys: ['french'], ready: false, name: 'Lock the centre (French)', line: 'e4 e6 d4 d5 e5 c5', pitch: 'A closed centre and a clear plan against White\'s pawn chain.'}]},
+  // a second step: `within` is the pick that opens it (the slot's `within` in PACKS). `always`: asked whenever that pick is made
+  {slot: 'blackSic', within: ['blackE4', 'sicilian'], always: true, label: 'Your Sicilian', ask: 'Which Sicilian? Would you rather…', flip: true, opts: [
+    {id: 'kan', keys: ['kan'], ready: false, name: 'Small pawn moves (Kan)', line: 'e4 c5 Nf3 e6 d4 cxd4 Nxd4 a6 Nc3 Qc7', pitch: 'E-pawn and a-pawn one square, the queen beside the bishop. Flexible and hard to attack.'},
+    {id: 'dragon', keys: ['dragon'], ready: false, name: 'Bishop on the long diagonal (Dragon)', line: 'e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7', pitch: 'One setup against everything: d-pawn, knight, g-pawn, bishop, castle. Sharper when White castles long.'}]},
   {slot: 'blackD4', ask: 'Against the d-pawn, would you rather…', flip: true, chapters: ['slav', 'london', 'd4x'], opts: [
     {id: 'slav', keys: ['slav'], ready: true, name: 'One solid setup (Slav)', line: 'd4 d5 c4 c6 Nf3 Nf6 e3 Bf5', pitch: 'D-pawn, c-pawn, bishop out, e-pawn: the same order against every d-pawn system.'},
     {id: 'kid', keys: ['kid'], ready: false, name: 'Let them build, then strike (King\'s Indian)', line: 'd4 Nf6 c4 g6 Nc3 Bg7 e4 d6', pitch: 'Five moves in the same order against every d-pawn system, then your e-pawn hits the middle.'},
@@ -209,7 +213,7 @@ function syncPacks(){
 // Settings, folded away at the bottom: the system for each slot the library has more than one of. A switch swaps whole
 // units, so it is never one tap: the player types their username first.
 const Rep = {ask: null, open: false, reset: false};
-const slotName = slot => slot === 'white' ? 'With White' : slot === 'blackE4' ? 'Against the e-pawn' : 'Against the d-pawn';
+const slotName = slot => (CATALOG.find(C => C.slot === slot) || {}).label || (slot === 'white' ? 'With White' : slot === 'blackE4' ? 'Against the e-pawn' : 'Against the d-pawn');
 function repNames(){
   const me = meOf(Prog.d) || {}, out = [(me.P || {}).user, (me.src || {}).user];
   if (PERSONA === 'house') out.push(HOUSE_ACCT.user);   // the house playbook's own account
@@ -219,7 +223,7 @@ function packRowsHTML(){
   if (PERSONA === 'new') return '';
   const slots = packSlots(); if (!slots.length) return '';
   const names = repNames(), word = names[0] || 'switch', A = Rep.ask;
-  const rows = slots.map(({slot, D, v}) => {
+  const rows = slots.filter(({slot, D}) => slotOn(D, slot)).map(({slot, D, v}) => {
     const C = CATALOG.find(x => x.slot === slot), cur = packOf(D, slot), nm = id => ((C && C.opts.find(o => o.id === id)) || {name: id}).name;
     const ask = A && A.slot === slot ? `<form class="repask" data-repform><label for="repName">${names.length > 1 ? 'Type one of your usernames' : `Type <b>${esc(word)}</b>`} to switch to <b>${esc(nm(A.id))}</b>.</label>
         <div class="reprow"><input id="repName" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Your username"><button class="btn primary small" type="submit" disabled>Switch</button><button class="btn small ghost" type="button" data-repcancel>Cancel</button></div></form>` : '';
@@ -288,17 +292,18 @@ document.addEventListener('submit', e => {
 function makeChoices(P){
   const out = [];
   for (const C of CATALOG){
-    const s = P.slots[C.slot]; if (!s || s.n < 5) continue;
+    // a second step is asked whenever its system is picked (`always`), or when the games show a habit there
+    const s = P.slots[C.slot] || (C.always ? {n: 0, opts: {}} : null); if (!s || (s.n < 5 && !C.always)) continue;
     const share = o => o.keys.reduce((a, k) => a + ((s.opts[k] || {}).n || 0), 0), tal = o => o.keys.reduce((a, k) => { const t = s.opts[k]; if (t){ a.n += t.n; a.w += t.w; a.l += t.l; a.d += t.d; } return a; }, {n: 0, w: 0, l: 0, d: 0});
-    const top = C.opts.slice().sort((a, b) => share(b) - share(a))[0], own = share(top) / s.n >= 0.3 ? top : null, ready = C.opts.filter(o => o.ready);
+    const top = C.opts.slice().sort((a, b) => share(b) - share(a))[0], own = s.n && share(top) / s.n >= 0.3 ? top : null, ready = C.opts.filter(o => o.ready);
     const opts = (own ? [own] : []).concat(ready.filter(o => o !== own)).slice(0, 4);
     if (opts.length < 2) continue;
-    out.push({id: C.slot, ask: C.ask, kind: 'system', flip: C.flip, opts: opts.map(o => Object.assign({}, o, {t: tal(o), of: s.n}))});
+    out.push({id: C.slot, ask: C.ask, kind: 'system', flip: C.flip, within: C.within, opts: opts.map(o => Object.assign({}, o, {t: tal(o), of: s.n}))});
   }
   for (const Q of STYLE) out.push(Object.assign({kind: 'style'}, Q));
   return out;
 }
-const defaultPicks = () => ({white: 'e4', blackE4: 'e5', blackD4: 'slav', order: 'leaks', depth: 'core'});
+const defaultPicks = () => { const o = {white: 'e4', blackE4: 'e5', blackD4: 'slav', order: 'leaks', depth: 'core'}; for (const D of [BOOKS.w, BOOKS.b]) for (const [slot, v] of Object.entries((D.full || D).packs || {})) if (!(slot in o)) o[slot] = v.default; return o; };
 
 /* ---- text that speaks about the house player's own games is taken out for everyone else */
 const PERS = /\b(your games?|in your game|you (lost|won|played|pushed|took|missed|resigned|blundered|had|met|faced)\b|against \S+ (in|on) (jul|aug|sep|oct|nov)|both of your|you have (won|lost)|your last|this exact shot against|your study|(on|in) (jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.? \d|against [a-z][\w-]*\d[\w-]*)/i;
@@ -574,7 +579,7 @@ const Product = {
   choiceHTML(){
     const P = this.me().P; if (!P) return this.startHTML();
     if (!this.cards){ this.cards = makeChoices(P); this.ci = 0; this.picks = defaultPicks(); }
-    const Q = this.cards[this.ci], dots = this.cards.map((_, k) => `<i class="${k <= this.ci ? 'on' : ''}"></i>`).join('');
+    const cards = this.shown(), Q = cards[this.ci], dots = cards.map((_, k) => `<i class="${k <= this.ci ? 'on' : ''}"></i>`).join('');
     const opt = (o, k) => {
       if (Q.kind === 'style') return `<button class="wopt plain pop" data-pick="${o.id}" style="animation-delay:${k * 90}ms"><svg class="pbig" viewBox="0 0 45 45" aria-hidden="true"><use href="#${o.big}"/></svg><b>${esc(o.name)}</b><p>${esc(o.pitch)}</p></button>`;
       const f = fenOf(o.line), mine = o.t.n / o.of >= 0.3;
@@ -582,14 +587,16 @@ const Product = {
         <span><span class="chip ${o.ready ? 'good' : 'new'}">${o.ready ? 'Ready now' : 'Being written'}</span></span><b>${esc(o.name)}</b><p>${esc(o.pitch)}</p>
         <span class="you">${mine ? `What you play now: ${pc(o.t.n, o.of)}% of these games, ${rec(o.t)}.` : o.t.n ? `You have tried it ${plural(o.t.n, 'time')}: ${rec(o.t)}.` : 'New to you.'}${o.ready ? '' : ' Its lessons are not written yet, so this part of your course would wait.'}</span></button>`;
     };
-    return `<section class="wyr"><p class="kicker">Step 3 of 3 · would you rather · ${this.ci + 1} of ${this.cards.length}</p><div class="pdots" aria-hidden="true">${dots}</div>
+    return `<section class="wyr"><p class="kicker">Step 3 of 3 · would you rather · ${this.ci + 1} of ${cards.length}</p><div class="pdots" aria-hidden="true">${dots}</div>
       <div class="say"><div class="cface">${knightSVG()}</div><p>${esc(Q.ask)}</p></div>
       <div class="duo${Q.opts.length > 3 ? ' quad' : Q.opts.length > 2 ? ' trio' : ''}">${Q.opts.map(opt).join('<span class="or">or</span>')}</div>
       ${this.ci ? `<button class="btn ghost" data-cback>Back</button>` : ''}</section>`;
   },
+  // the cards to go through: a second step (which Sicilian?) is one of them only while the pick that opens it stands
+  shown(){ return this.cards.filter(Q => !Q.within || this.picks[Q.within[0]] === Q.within[1]); },
   pick(id){
-    this.picks[this.cards[this.ci].id] = id;
-    if (++this.ci < this.cards.length) return render();
+    this.picks[this.shown()[this.ci].id] = id;
+    if (++this.ci < this.shown().length) return render();
     // the games were read against the systems they fit; with another one picked, read them again against the book being built
     const F = this.fresh, P0 = this.me().P, moved = F && F._games && P0 && P0.home && Object.keys(P0.home).some(s => this.picks[s] && this.picks[s] !== P0.home[s]);
     const P = moved ? Analyze.again(F, {w: BOOKS.w.full, b: BOOKS.b.full}, this.picks) : null;

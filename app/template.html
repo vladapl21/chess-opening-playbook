@@ -828,9 +828,12 @@ function drillableOf(D){ const les = new Set(D.lessons.map(l => l.id)), me = D.s
 const PACKS_KEY = 'playbook-packs'; let PICKS = {};
 try { PICKS = JSON.parse(localStorage.getItem(PACKS_KEY) || '{}') || {}; } catch(e){}
 function packOf(D, slot){ const P = (D.packs || {})[slot]; return P ? (P.packs[PICKS[slot]] ? PICKS[slot] : P.default) : null; }
+// a slot can sit within a pack of another slot ("which Sicilian?" once the Sicilian answers the e-pawn): it is in play
+// only while that pack is, and its chapters are held only then (pipeline/packs.py has the same rule for the builds)
+function slotOn(D, slot){ const P = (D.packs || {})[slot], w = P && P.within; return !!P && (!w || (slotOn(D, w[0]) && packOf(D, w[0]) === w[1])); }
 function applyPacks(D){
   D.full = Object.assign({}, D);
-  const off = new Set(D.chapters.filter(c => c.slot && c.pack !== packOf(D, c.slot)).map(c => c.id)); if (!off.size) return;
+  const off = new Set(D.chapters.filter(c => c.slot && (!slotOn(D, c.slot) || c.pack !== packOf(D, c.slot))).map(c => c.id)); if (!off.size) return;
   const parts = new Set(D.chapters.filter(c => off.has(c.id)).flatMap(c => c.parts)), les = new Set(D.lessons.filter(l => parts.has(l.part)).map(l => l.id));
   D.chapters = D.chapters.filter(c => !off.has(c.id)); D.parts = D.parts.filter(q => !parts.has(q.id)); D.lessons = D.lessons.filter(l => !les.has(l.id));
   D.lines = D.lines.filter(l => !les.has(l.lesson)); D.cheat = D.cheat.filter(r => !les.has(r.lesson));

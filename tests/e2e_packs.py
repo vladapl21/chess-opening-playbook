@@ -62,7 +62,7 @@ with sync_playwright() as p:
     ctx = b.new_context(viewport={'width': 1280, 'height': 900}); pg = ctx.new_page(); hook(pg)
     pg.goto(URL); pg.wait_for_timeout(1000)
     a = shape(pg); print('default:', {k: (v if k != 'units' else len(v)) for k, v in a.items()})
-    assert 'caro' not in a['chapters'] and a['chapters'][:5] == E5 and a['all'] == len(a['chapters']) + 5
+    assert 'caro' not in a['chapters'] and a['chapters'][:5] == E5 and a['all'] == len(a['chapters']) + 6
     assert 'b-caro' not in a['units'] and len(a['units']) == 17 and a['first'] == ['e7e5']
     assert pg.evaluate("Object.keys(LIDX.b).some(l => l.startsWith('bck-'))") is False
 
@@ -135,7 +135,12 @@ with sync_playwright() as p:
     cards = pg.evaluate("""makeChoices({slots: {blackE4: {n: 20, opts: {caro: {n: 15, w: 8, l: 6, d: 1}, e5: {n: 5, w: 2, l: 3, d: 0}}},
         blackD4: {n: 12, opts: {slav: {n: 12, w: 6, l: 5, d: 1}}}}}).map(c => [c.id, (c.opts || []).map(o => [o.id, !!o.ready])])""")
     print('cards for a Caro-Kann player:', cards[:2]); assert cards[0] == ['blackE4', [['caro', True], ['e5', True], ['sicilian', True], ['scandi', True]]], cards[0]
-    assert cards[1] == ['blackD4', [['slav', True], ['kid', True]]] and cards[2][0] == 'order', 'the d-pawn has a second system now, so it gets a card'
+    # the Sicilian has two variations, so "which Sicilian?" is a card of its own: a second step, shown once the Sicilian is picked
+    assert cards[1] == ['blackSic', [['kan', True], ['dragon', True]]], cards[1]
+    assert pg.evaluate("makeChoices({slots: {blackE4: {n: 20, opts: {e5: {n: 20, w: 9, l: 9, d: 2}}}}}).find(c => c.id === 'blackSic').within") == ['blackE4', 'sicilian']
+    own = pg.evaluate("""makeChoices({slots: {blackE4: {n: 20, opts: {sicilian: {n: 20, w: 9, l: 9, d: 2}}}, blackSic: {n: 20, opts: {dragon: {n: 14, w: 7, l: 6, d: 1}, kan: {n: 6, w: 2, l: 3, d: 1}}}}})
+        .find(c => c.id === 'blackSic').opts.map(o => o.id)"""); assert own == ['dragon', 'kan'], own       # a Dragon player sees the Dragon first
+    assert cards[2] == ['blackD4', [['slav', True], ['kid', True]]] and cards[3][0] == 'order', 'the d-pawn has a second system now, so it gets a card'
     three = pg.evaluate("""makeChoices({slots: {blackE4: {n: 20, opts: {sicilian: {n: 16, w: 8, l: 7, d: 1}, e5: {n: 4, w: 2, l: 2, d: 0}}}}})[0].opts.map(o => o.id)""")
     assert three == ['sicilian', 'e5', 'caro', 'scandi'], three
 
@@ -146,9 +151,29 @@ with sync_playwright() as p:
     assert 'sicilian' in s3['chapters'] and 'caro' not in s3['chapters'] and not set(E5) & set(s3['chapters']) and s3['first'] == ['c7c5'] and 'b-sicilian' in s3['units']
     pg.evaluate("useSide('b'); startDrillLine('bsi-open')"); pg.wait_for_timeout(600); assert drill_clean(pg) == 'done'
     pg.evaluate("openLine('bsi-open')"); pg.wait_for_timeout(400); pg.keyboard.press('End'); pg.wait_for_timeout(400); pg.screenshot(path=out + 'p_sicilian.png')
-    pg.evaluate("Prog.d.packs = {blackE4: 'e5', updated: Date.now()}; Prog.save(); window.__before = 1; syncPacks()")
+    # the Sicilian's second step: the Kan until the Dragon is picked. The row is in Advanced settings only while the Sicilian is in play
+    assert 'dragon' not in s3['chapters'] and 'b-dragon' not in s3['units'] and pg.evaluate("slotOn(BOOKS.b, 'blackSic') && packOf(BOOKS.b, 'blackSic')") == 'kan'
+    pg.evaluate("go('course')"); switch(pg, 'blackSic:dragon')
+    dr = shape(pg); print('dragon:', dr['chapters'], dr['first'])
+    assert 'dragon' in dr['chapters'] and 'sicilian' not in dr['chapters'] and not set(E5) & set(dr['chapters']) and dr['first'] == ['c7c5'] and 'b-dragon' in dr['units'] and 'b-sicilian' not in dr['units']
+    assert pg.evaluate("(() => { useSide('b'); let i = 0; for (const u of ['e2e4', 'c7c5', 'g1f3']) i = N[i].k.find(k => N[k].u === u); return sbMyKids(i).map(c => N[c].u); })()") == ['d7d6'], 'one position, one move: the Dragon\'s second move, not the Kan\'s'
+    for lid in ('bdr-yugo', 'bdr-classical'):
+        pg.evaluate(f"useSide('b'); startDrillLine('{lid}')"); pg.wait_for_timeout(600); assert drill_clean(pg) == 'done', lid
+    assert pg.evaluate("!!planOf('bdr-classical')")
+    pg.evaluate("useSide('b'); S.chapter = 'dragon'; go('learn')"); pg.wait_for_timeout(500)
+    txt = pg.inner_text('#view'); assert 'the long diagonal' in txt and 'The Yugoslav Attack' in txt and 'The Classical Dragon' in txt; pg.screenshot(path=out + 'p_dragon.png')
+    pg.click('#setBtn'); pg.wait_for_timeout(300); pg.click('#setPanel .repdet > summary'); pg.wait_for_timeout(200)
+    rows = pg.evaluate("[...document.querySelectorAll('#setPanel .repbody .setrow > b')].map(b => b.textContent)"); print('rows with the Sicilian on:', rows)
+    assert 'Your Sicilian' in rows and pg.get_attribute('#setPanel [data-packask="blackSic:dragon"]', 'aria-pressed') == 'true'
+    pg.evaluate("Settings.close()")
+    pg.evaluate("Prog.d.packs = Object.assign({}, Prog.d.packs, {blackE4: 'e5', updated: Date.now()}); Prog.save(); window.__before = 1; syncPacks()")
     pg.wait_for_function("typeof __before === 'undefined' && typeof COURSE !== 'undefined' && typeof PERSONA !== 'undefined'"); pg.wait_for_timeout(900)
-    assert shape(pg)['chapters'] == a['chapters']
+    # back on the e-pawn: no Sicilian chapter of either kind, and no row for its second step, though the Dragon stays picked for next time
+    assert shape(pg)['chapters'] == a['chapters'] and pg.evaluate("slotOn(BOOKS.b, 'blackSic')") is False and pg.evaluate("Prog.d.packs.blackSic") == 'dragon'
+    pg.click('#setBtn'); pg.wait_for_timeout(300); pg.click('#setPanel .repdet > summary'); pg.wait_for_timeout(200)
+    assert 'Your Sicilian' not in pg.evaluate("[...document.querySelectorAll('#setPanel .repbody .setrow > b')].map(b => b.textContent)"); pg.evaluate("Settings.close()")
+    assert pg.evaluate("Prog.rec('bdr-yugo').clean") == 1, 'the Dragon\'s record is kept'
+    pg.evaluate("Prog.d.packs = {blackE4: 'e5', updated: Date.now()}; Prog.save(); window.__before = 1; syncPacks()"); pg.wait_for_timeout(1200)
 
     # the London is a pack for White, beside the e-pawn
     w0 = wshape(pg); print('white default:', {k: (v if k != 'units' else len(v)) for k, v in w0.items()})

@@ -107,7 +107,7 @@ A **coach**, one of three characters to pick from (Pip the knight, Rocco the roo
 
 The course on top of both books has **17 units**. Fourteen are opening units: 55 core lessons, 92 optional ones and 84 checkpoint positions. Three are skill units made of positions from my own games: 26 threats I walked into, 18 winning positions I let slip and 16 endings. Finishing the course opens a library of **11 deep dives**: the optional lessons in 27 parts, with 162 more checkpoint positions.
 
-Those are the numbers for my own playbook. The library behind it also holds the systems other players can pick ([Systems](#systems)): with the London and the English for White and the Caro-Kann, the Sicilian, the Scandinavian and the King's Indian for Black, the books have 14 chapters, 115 lessons and 763 lines for White, 14 chapters, 99 lessons and 958 lines for Black, and the course has 28 units and 20 deep dives.
+Those are the numbers for my own playbook. The library behind it also holds the systems other players can pick ([Systems](#systems)): with the London and the English for White and the Caro-Kann, the Sicilian, the Scandinavian and the King's Indian for Black, the books have 14 chapters, 115 lessons and 763 lines for White, 15 chapters, 112 lessons and 1090 lines for Black, and the course has 29 units and 21 deep dives.
 
 ## Using it: where everything is
 
@@ -422,7 +422,7 @@ The named oddities are in both books too, each in the chapter where it belongs. 
 
 ### Systems
 
-The library can hold more than one answer to the same question. A **slot** is one decision in a repertoire ("what do I play against the e-pawn?") and a **pack** is one answer to it. A player has one pack per slot, chosen in the would-you-rather cards or later in Settings, and the page cuts both books down to the packs in play before anything else is built: chapters, course units, drills, the cheat sheet and the Sandbox all follow. Progress in the other pack is kept.
+The library can hold more than one answer to the same question. A **slot** is one decision in a repertoire ("what do I play against the e-pawn?") and a **pack** is one answer to it. A player has one pack per slot, chosen in the would-you-rather cards or later in Settings. Some answers are a family with variations of their own: the Sicilian is one pick against the e-pawn, and **which Sicilian** (the Kan or the Dragon) is a second step, asked on its own card once the Sicilian is picked and shown as its own row in Advanced settings while the Sicilian is in play. Each variation is a pack like any other, and the page cuts both books down to the packs in play before anything else is built: chapters, course units, drills, the cheat sheet and the Sandbox all follow. Progress in the other pack is kept.
 
 | Slot | Packs | |
 | --- | --- | --- |
@@ -431,7 +431,8 @@ The library can hold more than one answer to the same question. A **slot** is on
 | | **The English** (1.c4): the King's English with the Reversed Dragon, the Smyslov and the Keres; the Symmetrical and the Anglo-Indian; Black's d-pawn at once (the Anglo-Scandinavian, the Agincourt, the Caro-Kann setup) and rare first moves | 3 chapters, 15 lessons, 194 lines |
 | Against the e-pawn | **Meet it head-on** (1…e5): Italian, Ruy Lopez, Scotch, Four Knights and Vienna, early attacks | the first system; 5 chapters |
 | | **Caro-Kann** (1…c6): the push past, the pawn trade and the c-pawn attack, the main line, both knights, sidelines | 7 lessons, 73 lines |
-| | **Sicilian** (1…c5, the Kan setup): the open game, the early bishop, the small c-pawn and the pawn offer, sidelines | 5 lessons, 50 lines |
+| | **Sicilian: the Kan** (1…c5 with the small e-pawn and a-pawn moves): the open game, the early bishop, the small c-pawn and the pawn offer, sidelines | the first system; 1 chapters |
+| | **Sicilian: the Dragon** (1…c5 with the bishop on the long diagonal): the Yugoslav Attack, the Classical, other sixth moves, the queen that takes back; the Moscow check, the Italian bishop, the small c-pawn; the early bishop, the Closed Sicilian, the Alapin, the d-pawn on move two, the f-pawn | 13 lessons, 132 lines |
 | | **Scandinavian** (1…d5): the queen takes back and steps to the side, then one setup; the push past, the Tennison and Blackmar-Diemer gambits, quiet second moves | 10 lessons, 126 lines |
 | Against the d-pawn | **The Slav setup** | the first system; 3 chapters |
 | | **King's Indian** (1…Nf6 and 2…g6): the Classical, the Four Pawns Attack, the early bishop, the quiet setups; and the same five moves against the London, the Torre, the Colle, the Jobava and the Trompowsky | 2 chapters, 12 lessons, 136 lines |
@@ -440,11 +441,12 @@ The Caro-Kann is written as the Slav setup's twin: c-pawn one square, d-pawn two
 
 The London is a whole White repertoire on its own, since a player who picks it has no e-pawn lines left: one chapter for each of Black's three answers (the d-pawn, about half of club players; the king's knight, one in six; everything else). It is one setup in one order (below), with a trick ready for the usual tries: the knight that punishes the queen raid on the b-pawn while your c-pawn is at home, the queen check that wins the knight when Black jumps it at your queen, the queen that hits the b-pawn once Black's light bishop has gone to your knight, the c-pawn capture that wins Black's queen when it stands behind its bishop on your bishop's diagonal, and the one move that avoids the mate trap in the e-pawn gambit (a line that shows the trap is marked as a mistake and never drilled). Black's moves come from the Maia odds at club level; the house player has no games with it, so its chapters show no record. Opening the White book with the London in play, the Sandbox plays the d-pawn for you, and the course puts the three London units where the e-pawn units were.
 
-The three newest packs are each one setup in one order, like the London, and were drafted the same way ([`pipeline/draft.py`](pipeline/draft.py)): the other side's moves come from the Maia odds, yours from the setup's order wherever Stockfish accepts it, and the engine's move where it doesn't. Every place where the order changes has a note that says why.
+The newest packs are each one setup in one order, like the London, and were drafted the same way ([`pipeline/draft.py`](pipeline/draft.py)): the other side's moves come from the Maia odds, yours from the setup's order wherever Stockfish accepts it, and the engine's move where it doesn't. Every place where the order changes has a note that says why.
 
 | Pack | The order | Where it changes |
 | --- | --- | --- |
 | **Scandinavian** | Take back with the queen, step to the side when the knight hits her, then king's knight, c-pawn one square, light bishop out, e-pawn one square | The queen goes home early when a knight or a bishop is about to trap her on the edge. Against the push past, the bishop comes out first and the c-pawn goes two squares. |
+| **Sicilian: the Dragon** | C-pawn two squares, take the d-pawn when it comes, then d-pawn one square, king's knight, g-pawn one square, bishop to the long diagonal, castle, queen's knight | When White leaves the f-pawn at home, the knight jumps at the bishop. Against the small c-pawn, and the gambit that offers it, the knight hits the e-pawn first. A queen that takes back in the middle is hit by the queen's knight, and a bishop check is blocked by the bishop. |
 | **King's Indian** | Knight, g-pawn one square, bishop to the long diagonal, d-pawn one square, castle, then the e-pawn two squares | When White's queen's knight comes out in front of its own c-pawn, your d-pawn goes two squares to stop the e-pawn. With White's bishop at your knight, the queen's knight backs up the e-pawn first. |
 | **English** | C-pawn two squares, queen's knight, g-pawn one square, bishop to the long diagonal, e-pawn two squares, king's knight tucked in behind it, castle, d-pawn one square | When Black's d-pawn comes two squares, take it; once the c-pawn is gone, the king's knight comes out in front of the f-pawn instead. Against the e-pawn one square the knight comes out first. When knight and bishop (or queen and bishop) aim at f2, the e-pawn goes one square. |
 

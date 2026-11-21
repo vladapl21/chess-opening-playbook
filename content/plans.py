@@ -701,6 +701,17 @@ B = {
     ('pawns', 'Trade the c-pawns: the file opens for the rook that already stands on it.'),
     ('pieces', 'The king\'s knight comes out behind the e-pawn and heads for the square where it hits the d-pawn too.'),
     ('them', 'White wants to keep the chain and use the extra space on the kingside.')]),
+  # ---------------------------------------------------------------- the Dragon
+  'bdr-yugo': dict(h='Your attack runs down the half-open file', b=[
+    ('pieces', 'The knight in the middle can jump in beside White\'s king; if a bishop takes it, your rook takes back and stays on the file.'),
+    ('target', 'The knight in front of White\'s king. Rook, bishop and queen all bear on it, and giving the rook for it often breaks the king\'s cover.'),
+    ('watch', 'Keep the edge pawn where it is. White wants to trade your bishop on the long diagonal: it is your best piece, so step it back when the other bishop offers.'),
+    ('them', 'White wants to push the g-pawn, open a file at your king and trade off your bishop.')]),
+  'bdr-classical': dict(h='Queen\'s knight out, then the d-pawn break', b=[
+    ('pieces', 'The queen\'s knight comes out, then the bishop behind it.'),
+    ('pawns', 'The d-pawn two squares, once it is safe: it frees your whole game.'),
+    ('king', 'Both kings are on the same side, so there is no race. Play in the middle and on the half-open file.'),
+    ('them', 'White wants to push the f-pawn at your king or hold the middle and squeeze.')]),
   # ---------------------------------------------------------------- the King's Indian
   'bki-main': dict(h='Hold the knight, then the f-pawn', b=[
     ('pieces', 'Your knight sits in front of White\'s c-pawn and hits the e-pawn. Push the a-pawn two squares so the b-pawn can\'t kick it.'),

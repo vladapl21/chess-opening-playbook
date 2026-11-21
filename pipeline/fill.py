@@ -18,6 +18,7 @@ import chess
 import paths
 import expand as X
 import deepen, draft
+import packs as PK
 
 SIDE = sys.argv[1] if len(sys.argv) > 1 else 'white'
 ME = chess.WHITE if SIDE == 'white' else chess.BLACK
@@ -57,7 +58,7 @@ OUT = paths.ROOT / ('content/white/wfill.py' if SIDE == 'white' else 'content/bl
 
 D = json.load(open(paths.BUILD / f'data_{SIDE}.json')); N = D['nodes']
 packs = D.get('packs') or {}
-house = {c['id'] for c in D['chapters'] if not c.get('slot') or c.get('pack') == packs[c['slot']]['default']}
+house = {c['id'] for c in D['chapters']} - PK.off(packs)
 part_ch = {p['id']: p['ch'] for p in D['parts']}; LES = {l['id']: l for l in D['lessons']}
 ctx_of = deepen.contexts(D['lessons'], D['parts'], packs)
 

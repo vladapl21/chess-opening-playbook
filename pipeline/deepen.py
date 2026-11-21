@@ -26,6 +26,7 @@ engine and cache do the work). `KEEP` in content/deepen_fixes.py lists lines tha
 import json
 import chess
 import paths
+import packs as PK
 import expand as X
 
 CACHE = paths.CACHE / 'deepen_cache.json'
@@ -85,7 +86,7 @@ class Seen:
         if (ctx, san) in self.d.get(epd, []): self.d[epd].remove((ctx, san))
     def get(self, epd, ctx):
         for c, san in self.d.get(epd, []):
-            if c is None or ctx is None or c == ctx or c[0] != ctx[0]: return san
+            if PK.together(c, ctx): return san
         return None
 
 
@@ -163,9 +164,10 @@ def stale(path, ext):
 
 
 def contexts(lessons, parts, packs):
-    """lesson id -> (slot, pack), or None for a lesson outside the slots (it goes with every pack)."""
+    """lesson id -> what has to be picked for its pack to be in play ({slot: pack}, see packs.need), or None for a
+    lesson outside the slots (it goes with every pack)."""
     part_ch = {p['id']: p['ch'] for p in parts}
-    ch_ctx = {ch: (slot, pk) for slot, P in (packs or {}).items() for pk, chs in P['packs'].items() for ch in chs}
+    ch_ctx = {ch: PK.need(packs, slot, pk) for slot, P in (packs or {}).items() for pk, chs in P['packs'].items() for ch in chs}
     return {l['id']: ch_ctx.get(part_ch.get(l['part'])) for l in lessons}
 
 
