@@ -30154,6 +30154,1420 @@
 "gen": 1,
 "h": "Two pawns up: go after the king and push the d-pawn"
 },
+"so-accel": {
+"b": [
+[
+"pieces",
+"Hit Black's dark bishop with the rook next."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to take your knight with the knight and take your b-pawn with the bishop."
+]
+],
+"gen": 1,
+"h": "A piece up: hit Black's dark bishop with the rook"
+},
+"so-accel-d6": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to push the b-pawn at your knight and take your knight."
+]
+],
+"gen": 1,
+"h": "A piece up: take Black's knight and finish your setup"
+},
+"so-accel-e5": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"them",
+"Black wants to jump the knight to the center."
+]
+],
+"gen": 1,
+"h": "Better for you: check with the knight"
+},
+"so-accel-e6": {
+"b": [
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Hit Black's rook with the knight next."
+],
+[
+"them",
+"Black wants to bring a rook to the b-file."
+]
+],
+"gen": 1,
+"h": "Better for you: go after the king"
+},
+"so-classical": {
+"b": [
+[
+"pieces",
+"Take Black's knight soon."
+],
+[
+"pawns",
+"Push the a-pawn at Black's knight next."
+],
+[
+"them",
+"Black wants to bring the queen out."
+]
+],
+"gen": 1,
+"h": "Push the a-pawn, then take Black's knight"
+},
+"so-d6x": {
+"b": [
+[
+"king",
+"Castle long soon."
+],
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Bring a rook to the d-file soon."
+],
+[
+"them",
+"Black wants to put a rook on the half-open c-file and bring a rook to the c-file."
+]
+],
+"gen": 1,
+"h": "A pawn up: go after the king and push the f-pawn"
+},
+"so-d6x-a6": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to push the b-pawn at your knight and push the e-pawn at your knight."
+]
+],
+"gen": 1,
+"h": "Finish your setup"
+},
+"so-d6x-a6nc6": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"them",
+"Black wants to push the h-pawn to hit your g-pawn."
+]
+],
+"gen": 1,
+"h": "Take Black's h-pawn"
+},
+"so-d6x-g6": {
+"b": [
+[
+"pieces",
+"Jump the knight to the center next."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to take your knight with the knight."
+]
+],
+"gen": 1,
+"h": "The exchange up: jump the knight to the center"
+},
+"so-d6x-g6nc6": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to push the b-pawn at your knight and take your knight."
+]
+],
+"gen": 1,
+"h": "A piece up: take Black's knight and finish your setup"
+},
+"so-d6x-nc6": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to push the b-pawn at your knight and take your knight."
+]
+],
+"gen": 1,
+"h": "A piece up: take Black's knight and finish your setup"
+},
+"so-d6x-nf6": {
+"b": [
+[
+"pieces",
+"Take Black's b-pawn with the queen soon."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to pull the knight back."
+]
+],
+"gen": 1,
+"h": "Ahead in material: push the b-pawn"
+},
+"so-d6x-nf6qxd7": {
+"b": [
+[
+"pieces",
+"Take Black's knight with the knight soon."
+],
+[
+"them",
+"Black wants to pull the dark bishop back and pull the knight back."
+]
+],
+"gen": 1,
+"h": "Take Black's knight with the knight"
+},
+"so-d6x-qxd7": {
+"b": [
+[
+"pieces",
+"Take Black's knight with the bishop next."
+],
+[
+"them",
+"Black wants to bring the queen's knight out and hit your queen with the knight."
+]
+],
+"gen": 1,
+"h": "Take Black's knight with the bishop"
+},
+"so-d6x-qxd7nc6": {
+"b": [
+[
+"king",
+"Castle long soon."
+],
+[
+"pieces",
+"Bring the queen out next."
+],
+[
+"them",
+"Black wants to castle short and pull the knight back."
+]
+],
+"gen": 1,
+"h": "Castle"
+},
+"so-dragon-a6": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to push the b-pawn at your knight and take your knight with the knight."
+]
+],
+"gen": 1,
+"h": "Better for you: jump the knight to the center"
+},
+"so-dragon-a6v2": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to push the b-pawn at your knight and take your knight with the knight."
+]
+],
+"gen": 1,
+"h": "Better for you: jump the knight to the center"
+},
+"so-dragon-d5": {
+"b": [
+[
+"target",
+"Black's c-pawn has no pawn beside it: only pieces can guard it."
+],
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to bring the queen out and push the c-pawn at your rook."
+]
+],
+"gen": 1,
+"h": "Better for you: bring a rook in, then finish your setup"
+},
+"so-dragon-nc6": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to push the b-pawn at your knight and take your knight."
+]
+],
+"gen": 1,
+"h": "A piece up: take Black's knight and finish your setup"
+},
+"so-e5": {
+"b": [
+[
+"king",
+"Castle short soon."
+],
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"them",
+"Black wants to take your knight with the knight."
+]
+],
+"gen": 1,
+"h": "Better for you: take Black's queen with the bishop"
+},
+"so-e5-d6": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to bring the light bishop and the queen out."
+]
+],
+"gen": 1,
+"h": "Finish your setup"
+},
+"so-e5-d6nf6": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to bring the light bishop and the queen out."
+]
+],
+"gen": 1,
+"h": "Finish your setup"
+},
+"so-e5-nf6": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Push the f-pawn one square next."
+],
+[
+"them",
+"Black wants to push the b-pawn two squares and push the h-pawn at your dark bishop."
+]
+],
+"gen": 1,
+"h": "Push the f-pawn, then finish your setup"
+},
+"so-e5-nf6a6": {
+"b": [
+[
+"king",
+"Castle long once the queen's knight is out."
+],
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Your queen's knight and light bishop are still at home. Bring them out next."
+],
+[
+"them",
+"Black wants to bring the light bishop out at your knight."
+]
+],
+"gen": 1,
+"h": "A rook up: go after the king and finish your setup"
+},
+"so-e5-nf6be7": {
+"b": [
+[
+"target",
+"Black's king can't castle any more. Bring your pieces at it."
+],
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Push the c-pawn one square soon."
+]
+],
+"gen": 1,
+"h": "Better for you: go after the king"
+},
+"so-e5-nge7": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to push the b-pawn two squares and bring the knight forward."
+]
+],
+"gen": 1,
+"h": "Better for you: take Black's knight with the bishop"
+},
+"so-e5-qa5": {
+"b": [
+[
+"pieces",
+"Your queen's knight and both bishops are still at home. Bring them out next."
+],
+[
+"them",
+"Black wants to push the f-pawn at your queen and take your b-pawn with the knight."
+]
+],
+"gen": 1,
+"h": "Better for you: finish your setup"
+},
+"so-e6x": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to bring a rook to the e-file."
+]
+],
+"gen": 1,
+"h": "Better for you: finish your setup"
+},
+"so-e6x-a6": {
+"b": [
+[
+"target",
+"Black's king is still in the middle, on the open d-file. Get a rook there before it castles."
+],
+[
+"pieces",
+"Your queen's knight is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Trade pieces, not pawns: your extra pawn counts for more with every trade."
+],
+[
+"them",
+"Black wants to take your dark bishop."
+]
+],
+"gen": 1,
+"h": "A pawn up: take Black's rook with the queen"
+},
+"so-e6x-d5": {
+"b": [
+[
+"target",
+"Black's king is still in the middle, on the open d-file. Get a rook there before it castles."
+],
+[
+"pieces",
+"Hit Black's light bishop with the knight soon."
+],
+[
+"them",
+"Black wants to push the f-pawn at your knight and put a rook on the open d-file."
+]
+],
+"gen": 1,
+"h": "Better for you: hit Black's light bishop with the knight"
+},
+"so-e6x-d5dxe4": {
+"b": [
+[
+"target",
+"Black's king can't castle any more. The d-file in front of it is open. Bring your pieces at it."
+],
+[
+"pieces",
+"Both your bishops are still at home. Bring them out next."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to pull the dark bishop back."
+]
+],
+"gen": 1,
+"h": "A rook up: go after the king and finish your setup"
+},
+"so-e6x-d5nf6": {
+"b": [
+[
+"target",
+"Black's d-pawn has no pawn beside it: only pieces can guard it."
+],
+[
+"pieces",
+"Take Black's knight with the bishop next."
+],
+[
+"pawns",
+"Then push the c-pawn one square."
+],
+[
+"them",
+"Black wants to castle short."
+]
+],
+"gen": 1,
+"h": "Better for you: take Black's knight with the bishop"
+},
+"so-e6x-nc6": {
+"b": [
+[
+"target",
+"Black's king is still in the middle, on the open e-file. Get a rook there before it castles."
+],
+[
+"pieces",
+"Your queen's knight and both bishops are still at home. Bring them out soon."
+],
+[
+"them",
+"Black wants to bring the king's knight out."
+]
+],
+"gen": 1,
+"h": "Better for you: check with the queen, then finish your setup"
+},
+"so-e6x-nf6": {
+"b": [
+[
+"pieces",
+"Bring the queen out next."
+],
+[
+"them",
+"Black wants to castle short."
+]
+],
+"gen": 1,
+"h": "Hit Black's rook with the dark bishop"
+},
+"so-four": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Keep the pieces on: your active pieces make up for the material while they are on the board."
+],
+[
+"them",
+"Black wants to bring a rook to the e-file."
+]
+],
+"gen": 1,
+"h": "A pawn for a piece: take Black's knight with the queen"
+},
+"so-four-a6": {
+"b": [
+[
+"pieces",
+"Take Black's queen with the bishop next."
+],
+[
+"them",
+"Black wants to hit your dark bishop with the queen."
+]
+],
+"gen": 1,
+"h": "Better for you: take Black's queen with the bishop"
+},
+"so-four-a6v2": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Push the f-pawn one square next."
+],
+[
+"them",
+"Black wants to push the b-pawn two squares and push the h-pawn at your dark bishop."
+]
+],
+"gen": 1,
+"h": "Push the f-pawn, then finish your setup"
+},
+"so-four-d6": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to push the b-pawn at your knight and take your knight."
+]
+],
+"gen": 1,
+"h": "A piece up: take Black's knight and finish your setup"
+},
+"so-four-e6": {
+"b": [
+[
+"king",
+"Castle long soon."
+],
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to bring the light bishop out and bring a rook to the e-file."
+]
+],
+"gen": 1,
+"h": "Better for you: castle, then finish your setup"
+},
+"so-four-g6": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to push the b-pawn at your knight and take your knight."
+]
+],
+"gen": 1,
+"h": "A piece up: take Black's knight and finish your setup"
+},
+"so-g6": {
+"b": [
+[
+"pieces",
+"Hit Black's dark bishop with the rook next."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to take your knight with the knight and take your b-pawn with the bishop."
+]
+],
+"gen": 1,
+"h": "A piece up: hit Black's dark bishop with the rook"
+},
+"so-g6-bg7": {
+"b": [
+[
+"pieces",
+"Hit Black's dark bishop with the rook next."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to take your knight with the knight and take your b-pawn with the bishop."
+]
+],
+"gen": 1,
+"h": "A piece up: hit Black's dark bishop with the rook"
+},
+"so-g6-nc6": {
+"b": [
+[
+"pieces",
+"Hit Black's dark bishop with the rook next."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to take your knight with the knight and take your b-pawn with the bishop."
+]
+],
+"gen": 1,
+"h": "A piece up: hit Black's dark bishop with the rook"
+},
+"so-kan": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Push the a-pawn at Black's dark bishop next."
+],
+[
+"them",
+"Black wants to push the d-pawn to hit your e-pawn and pull the dark bishop back."
+]
+],
+"gen": 1,
+"h": "Push the a-pawn, then take Black's knight with the knight"
+},
+"so-kan-b5": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to push the b-pawn at your knight and push the d-pawn to hit your e-pawn."
+]
+],
+"gen": 1,
+"h": "Take Black's dark bishop with the knight"
+},
+"so-najdorf": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to bring the light bishop out."
+]
+],
+"gen": 1,
+"h": "Jump the knight to the center, then finish your setup"
+},
+"so-najdorf-b5": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to push the b-pawn at your knight and take your knight with the knight."
+]
+],
+"gen": 1,
+"h": "Jump the knight to the center"
+},
+"so-najdorf-be6": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"pawns",
+"Then push the c-pawn two squares."
+],
+[
+"them",
+"Black wants to bring the queen's knight out."
+]
+],
+"gen": 1,
+"h": "Jump the knight to the center, then push the c-pawn"
+},
+"so-najdorf-be6v2": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"pawns",
+"Then push the g-pawn at Black's knight."
+]
+],
+"gen": 1,
+"h": "Push the g-pawn, then finish your setup"
+},
+"so-najdorf-e6": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to push the b-pawn at your knight and push the e-pawn at your knight."
+]
+],
+"gen": 1,
+"h": "Finish your setup"
+},
+"so-najdorf-e6b5": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to push the h-pawn one square and push the b-pawn at your knight."
+]
+],
+"gen": 1,
+"h": "Bring a rook in, then finish your setup"
+},
+"so-najdorf-g6": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to push the b-pawn at your knight and take your knight with the knight."
+]
+],
+"gen": 1,
+"h": "Better for you: jump the knight to the center"
+},
+"so-najdorf-nc6": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to bring the light bishop out."
+]
+],
+"gen": 1,
+"h": "Jump the knight to the center, then finish your setup"
+},
+"so-najdorf-nc6v2": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to bring the light bishop out."
+]
+],
+"gen": 1,
+"h": "Jump the knight to the center, then finish your setup"
+},
+"so-nc6x": {
+"b": [
+[
+"pieces",
+"Take Black's dark bishop with the bishop soon."
+],
+[
+"pawns",
+"Trade pieces, not pawns: your extra pawn counts for more with every trade."
+],
+[
+"them",
+"Black wants to offer a trade of queens."
+]
+],
+"gen": 1,
+"h": "A pawn up: take Black's dark bishop with the bishop"
+},
+"so-nc6x-d6": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to push the b-pawn at your knight and take your knight."
+]
+],
+"gen": 1,
+"h": "A piece up: take Black's knight and finish your setup"
+},
+"so-nc6x-d6a6": {
+"b": [
+[
+"pieces",
+"Offer a trade of queens next."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to take your knight with the knight and bring the light bishop out."
+]
+],
+"gen": 1,
+"h": "A piece up: offer a trade of queens and trade pieces"
+},
+"so-nc6x-d6e5": {
+"b": [
+[
+"pieces",
+"Bring the queen out next."
+],
+[
+"them",
+"Black wants to jump the knight to the center and push the b-pawn at your light bishop."
+]
+],
+"gen": 1,
+"h": "Hit Black's rook with the light bishop"
+},
+"so-nc6x-d6g6": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to push the b-pawn at your knight and take your knight."
+]
+],
+"gen": 1,
+"h": "A piece up: take Black's knight and finish your setup"
+},
+"so-nc6x-e6": {
+"b": [
+[
+"king",
+"Castle short soon."
+],
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Push the c-pawn one square next."
+],
+[
+"them",
+"Black wants to check with the queen."
+]
+],
+"gen": 1,
+"h": "Better for you: push the c-pawn, then finish your setup"
+},
+"so-nc6x-e6exd5": {
+"b": [
+[
+"target",
+"Black's king is still in the middle, on the open e-file. Get a rook there before it castles."
+],
+[
+"pieces",
+"Your queen's knight and both bishops are still at home. Bring them out soon."
+],
+[
+"them",
+"Black wants to bring the king's knight out."
+]
+],
+"gen": 1,
+"h": "Better for you: check with the queen, then finish your setup"
+},
+"so-nc6x-e6exd5nb4": {
+"b": [
+[
+"king",
+"Castle short soon."
+],
+[
+"target",
+"Black's king is still in the middle, on the open e-file. Get a rook there before it castles."
+],
+[
+"pieces",
+"Your queen's knight and both bishops are still at home. Bring them out next."
+],
+[
+"them",
+"Black wants to take your d-pawn with the knight and bring the king's knight out at your queen."
+]
+],
+"gen": 1,
+"h": "Better for you: finish your setup, then castle"
+},
+"so-nc6x-e6exd5nd4": {
+"b": [
+[
+"target",
+"Black's king is still in the middle, on the open e-file. Get a rook there before it castles."
+],
+[
+"pieces",
+"Both your bishops are still at home. Bring them out soon."
+],
+[
+"pawns",
+"Trade pieces, not pawns: your extra pawn counts for more with every trade."
+],
+[
+"them",
+"Black wants to bring the light bishop and the dark bishop out."
+]
+],
+"gen": 1,
+"h": "A pawn up: check with the queen and take Black's dark bishop"
+},
+"so-nc6x-e6exd5qe7": {
+"b": [
+[
+"target",
+"Black's king is still in the middle, on the open e-file. Get a rook there before it castles."
+],
+[
+"pieces",
+"Your dark bishop is still at home. Bring it out next."
+],
+[
+"pawns",
+"Then push the d-pawn at Black's dark bishop."
+],
+[
+"them",
+"Black wants to bring the dark bishop out."
+]
+],
+"gen": 1,
+"h": "Better for you: hit Black's queen with the knight"
+},
+"so-nc6x-e6nce7": {
+"b": [
+[
+"pieces",
+"Both your bishops are still at home. Bring them out next."
+],
+[
+"them",
+"Black wants to check with the queen."
+]
+],
+"gen": 1,
+"h": "Better for you: finish your setup"
+},
+"so-nc6x-e6v2": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to take your f-pawn with the knight and bring a rook to the b-file."
+]
+],
+"gen": 1,
+"h": "Better for you: take Black's light bishop with the knight"
+},
+"so-nc6x-nf6": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Push the a-pawn at Black's dark bishop next."
+],
+[
+"them",
+"Black wants to bring the dark bishop out and take your knight with the bishop."
+]
+],
+"gen": 1,
+"h": "Better for you: push the a-pawn, then finish your setup"
+},
+"so-nc6x-nf6e5": {
+"b": [
+[
+"king",
+"Castle long next."
+],
+[
+"pieces",
+"Then take Black's knight with the bishop."
+],
+[
+"pawns",
+"Then push the f-pawn one square."
+],
+[
+"them",
+"Black wants to bring the dark bishop out and castle long."
+]
+],
+"gen": 1,
+"h": "Better for you: castle, then push the f-pawn"
+},
+"so-nc6x-nf6g6": {
+"b": [
+[
+"pieces",
+"Take Black's light bishop with the bishop next."
+],
+[
+"them",
+"Black wants to castle short and push the e-pawn one square."
+]
+],
+"gen": 1,
+"h": "Better for you: take Black's light bishop with the bishop"
+},
+"so-nc6x-nf6nh5": {
+"b": [
+[
+"pieces",
+"Your queen's knight and both bishops are still at home. Bring them out soon."
+],
+[
+"pawns",
+"Push the h-pawn at Black's dark bishop soon."
+],
+[
+"them",
+"Black wants to bring the dark bishop out."
+]
+],
+"gen": 1,
+"h": "Better for you: take Black's knight, then push the h-pawn"
+},
+"so-nc6x-nf6qa5": {
+"b": [
+[
+"pieces",
+"Both your bishops are still at home. Bring them out next."
+],
+[
+"them",
+"Black wants to pull the knight back."
+]
+],
+"gen": 1,
+"h": "Better for you: finish your setup"
+},
+"so-rare": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"pawns",
+"Then push the b-pawn to hit Black's a-pawn."
+],
+[
+"them",
+"Black wants to put a rook on the half-open b-file."
+]
+],
+"gen": 1,
+"h": "Better for you: push the b-pawn, then push the a-pawn"
+},
+"so-rare-e5": {
+"b": [
+[
+"king",
+"Castle long next."
+],
+[
+"target",
+"Black's d-pawn has no pawn beside it: only pieces can guard it."
+],
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"them",
+"Black wants to put a rook on the half-open e-file and take your e-pawn with the rook."
+]
+],
+"gen": 1,
+"h": "A pawn up: castle and finish your setup"
+},
+"so-rare-e6": {
+"b": [
+[
+"pieces",
+"Your dark bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to take your knight with the bishop and bring the queen's knight out."
+]
+],
+"gen": 1,
+"h": "Finish your setup"
+},
+"so-rare-nf6": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Push the f-pawn one square next."
+],
+[
+"them",
+"Black wants to push the b-pawn two squares and push the h-pawn at your dark bishop."
+]
+],
+"gen": 1,
+"h": "Push the f-pawn, then finish your setup"
+},
+"so-rare-nf6d6": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to bring the light bishop out."
+]
+],
+"gen": 1,
+"h": "Jump the knight to the center, then finish your setup"
+},
+"so-schev": {
+"b": [
+[
+"king",
+"Castle long soon."
+],
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to bring the queen's knight out and push the d-pawn to hit your e-pawn."
+]
+],
+"gen": 1,
+"h": "Castle, then finish your setup"
+},
+"so-schev-oo": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Trade pieces when you can: every trade makes your extra material count for more."
+],
+[
+"them",
+"Black wants to push the d-pawn to hit your e-pawn and pull the knight back."
+]
+],
+"gen": 1,
+"h": "A piece up: push the g-pawn and take Black's d-pawn"
+},
+"so-taim": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Push the a-pawn at Black's dark bishop next."
+],
+[
+"them",
+"Black wants to push the d-pawn to hit your e-pawn and pull the dark bishop back."
+]
+],
+"gen": 1,
+"h": "Push the a-pawn, then take Black's knight with the knight"
+},
+"so-taim-bb4": {
+"b": [
+[
+"king",
+"Castle short soon."
+],
+[
+"pieces",
+"Your light bishop is still at home. Bring it out soon."
+],
+[
+"pawns",
+"Push the c-pawn one square next."
+],
+[
+"them",
+"Black wants to check with the queen."
+]
+],
+"gen": 1,
+"h": "Better for you: push the c-pawn, then finish your setup"
+},
+"so-taim-bc5": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to bring a rook to the e-file."
+]
+],
+"gen": 1,
+"h": "Better for you: finish your setup"
+},
+"so-taim-nf6": {
+"b": [
+[
+"king",
+"Castle long soon."
+],
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to bring the light bishop out and bring a rook to the e-file."
+]
+],
+"gen": 1,
+"h": "Better for you: castle, then finish your setup"
+},
+"so-taim-nxd4": {
+"b": [
+[
+"pieces",
+"Your light bishop is still at home. Bring it out next."
+],
+[
+"them",
+"Black wants to take your f-pawn with the knight and bring a rook to the b-file."
+]
+],
+"gen": 1,
+"h": "Better for you: take Black's light bishop with the knight"
+},
 "tk-h6": {
 "b": [
 [

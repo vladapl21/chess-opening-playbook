@@ -5,9 +5,11 @@ from content import J
 # Systems. A slot is one decision in a repertoire ("what do I open with?") and a pack is one answer to it (see PACKS in
 # content/black/bmeta.py for the Black book). The White book's first system is the e-pawn; the London is the second and the English the third.
 PACKS = dict(
-  white=dict(default='e4', packs=dict(e4=['italian', 'e5x', 'caro', 'sic', 'scandi', 'pirc', 'french', 'rare'],
+  white=dict(default='e4', packs=dict(e4=['italian', 'e5x', 'caro', 'scandi', 'pirc', 'french', 'rare'],
                                       d4=['london', 'lindian', 'lrare'],
                                       flank=['english', 'engsym', 'engrare'])),
+  # second steps (see pipeline/packs.py): a variation inside the e-pawn repertoire, in play only while the e-pawn is
+  whiteSic=dict(default='alapin', within=['white', 'e4'], packs=dict(alapin=['sic'], open=['sico'])),
 )
 
 CH_META = {
@@ -111,6 +113,15 @@ CH_META = {
            dict(big='1', text='trap in the e-pawn gambit, and one move that avoids it', alert=True),
            dict(big='9', text='first moves covered here, most of them by the same setup')],
     notes=[]),
+  'sico': dict(tile='e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3', first='so-najdorf', roots=['e4 c5'],
+    hero='e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 f3 e6 Be3 b5 Qd2 Bb7 O-O-O Nbd7 g4', arrows=['g4g5g', 'h2h4g'], circles=['c1g'], cap='Your king is on the other wing, so the pawns in front of Black\'s king are free to run.',
+    kicker='Sicilian Defense: the Open Sicilian',
+    headline='Castle long and <em>send the pawns</em>.',
+    lede='Knight out, d-pawn two squares, and the knight takes back in the middle. Then one setup against every Sicilian: queen\'s knight, f-pawn one square, bishop, queen, castle long. With your king on the other wing, the g-pawn and the edge pawn run at Black\'s king. When Black\'s e-pawn hits the knight in the middle it steps back, or jumps forward when the square in front is free.',
+    facts=[dict(big='5', text='moves make the setup once the knight has taken back: knight, f-pawn, bishop, queen, castle long'),
+           dict(big='1 in 2', text='who start with the d-pawn go for the Najdorf, the small a-pawn move. The setup is the same.'),
+           dict(big='1 in 4', text='who bring the knight out first hit your knight with the e-pawn at once. It jumps forward.', alert=True)],
+    notes=[]),
   'english': dict(tile='c4 e5 Nc3 Nf6 g3', first='en-main', roots=['c4 e5'],
     hero='c4 e5 Nc3 Nf6 g3 Nc6 Bg2 Bc5 e4 O-O Nge2 d6 O-O Bg4 d3', arrows=['g2d5g', 'c3d5g', 'e4d5g', 'c4d5g'], circles=['d5g'], cap='The setup, complete: three pawns in a wedge, and four of your men on one square.',
     kicker='English Opening: the King\'s English',
@@ -160,6 +171,14 @@ CHEAT2 = [
   (J(CKX, 'Bf5 Ng3 Bg6'), 'h4', 'Push the h-pawn at the bishop', 'ck-march'),
   (J(CKX, 'Nf6'), 'Nxf6+', 'Knight trade offered? Take it', 'ck-nf6'),
   (J(CK, 'Nf6'), 'e5', 'Push past the knight', 'ck-nf6-3'),
+  ('e4 c5', 'Nf3', 'Knight out, then the d-pawn two squares', 'so-najdorf'),
+  ('e4 c5 Nf3 d6 d4 cxd4', 'Nxd4', 'Take back with the knight', 'so-najdorf'),
+  ('e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6', 'f3', 'F-pawn one square, then bishop and queen', 'so-najdorf'),
+  ('e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 f3 e6 Be3 Be7 Qd2 O-O', 'O-O-O', 'Castle long, then the g-pawn', 'so-najdorf'),
+  ('e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 f3 Bg7 Be3 O-O Qd2 Nc6', 'O-O-O', 'The Dragon: the same setup', 'so-dragon'),
+  ('e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Nf6 Nc3 e5', 'Ndb5', 'E-pawn hits the knight: jump forward', 'so-four'),
+  ('e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 g6 Nc3 Bg7 Be3 Nf6', 'Bc4', 'Accelerated Dragon: bishop out before the f-pawn', 'so-accel'),
+  ('e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Nxd4', 'Qxd4', 'Knights traded: the queen takes back', 'so-nc6x'),
   ('e4 c5', 'c3', 'Small pawn move, like the Italian', 'sc-push'),
   (J(SN, 'Nf6'), 'd5', 'Knight in front of your pawn? Push it', 'sc-push'),
   (J(SN, 'd5 exd5 Qxd5 Nf3 Bg4 Be2 Bxf3'), 'Bxf3', 'Take back; the pawn grab loses the queen', 'sc-d5'),

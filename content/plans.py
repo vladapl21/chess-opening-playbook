@@ -409,6 +409,17 @@ W = {
     ('target', 'Black\'s h-pawn. Once the knight is driven off, only the king guards it.'),
     ('pieces', 'If the knight goes to the middle, the bishop takes the h-pawn with check and the attack crashes through.'),
     ('watch', 'If the knight jumps forward instead, the small h-pawn move sends it to the edge, and your bishop takes it there.')]),
+  # ---------------------------------------------------------------- the Open Sicilian
+  'so-najdorf': dict(h='Queen, castle long, then the g-pawn', b=[
+    ('pieces', 'The queen goes beside the bishop and the king castles long.'),
+    ('pawns', 'Then the g-pawn two squares. It is aimed at the knight in front of Black\'s king.'),
+    ('target', 'The square in front of Black\'s d-pawn. A knight that lands there can\'t be chased by a pawn.'),
+    ('them', 'Black wants to push the b-pawn at your knight and bring a rook to the half-open file.')]),
+  'so-dragon': dict(h='Trade the bishop, open the edge file', b=[
+    ('pieces', 'Your bishop goes to the square beside Black\'s king, to trade off the bishop on the long diagonal.'),
+    ('pawns', 'The edge pawn goes two squares and on, to open the file in front of Black\'s king.'),
+    ('king', 'Step the king into the corner first if Black\'s rook lines up on your knight.'),
+    ('them', 'Black wants the half-open file and a knight jump in beside your king.')]),
 }
 
 B = {

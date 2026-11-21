@@ -170,6 +170,10 @@ const CATALOG = [
     {id: 'e4', keys: ['e4'], ready: true, name: 'Open with the e-pawn', line: 'e4 e5 Nf3 Nc6 Bc4', pitch: 'Fast development and open lines. Your bishop aims at f7 from move three, and every reply has a ready answer.'},
     {id: 'd4', keys: ['d4'], ready: false, name: 'Open with the d-pawn (London)', line: 'd4 d5 Bf4 Nf6 e3 e6 Nf3 c5 c3', pitch: 'One setup in one order against almost anything, with a trick ready for each of Black\'s usual tries.'},
     {id: 'flank', keys: ['c4', 'nf3'], ready: false, name: 'Start from the side (English)', line: 'c4 e5 Nc3 Nf6 g3', pitch: 'C-pawn, knight, fianchetto: one setup against nearly everything, and Black never gets the game they prepared for.'}]},
+  // second steps inside the e-pawn repertoire: each is asked only when the games show five or more of that kind
+  {slot: 'whiteSic', within: ['white', 'e4'], label: 'Against the Sicilian', ask: 'Against the Sicilian, would you rather…', flip: false, opts: [
+    {id: 'alapin', keys: ['alapin'], ready: false, name: 'Build a center first (Alapin)', line: 'e4 c5 c3 Nf6 e5 Nd5 d4', pitch: 'The small c-pawn move, then the d-pawn two squares. Little to learn, and Black\'s main lines never happen.'},
+    {id: 'open', keys: ['open'], ready: false, name: 'Open the middle (Open Sicilian)', line: 'e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 f3 e6 Be3', pitch: 'One setup against every Sicilian, then castle long and send the pawns at Black\'s king. Sharper, with more to know.'}]},
   {slot: 'blackE4', ask: 'Against the e-pawn, would you rather…', flip: true, chapters: ['italian', 'ruy', 'scotch', 'vienna', 'attacks'], opts: [
     {id: 'e5', keys: ['e5'], ready: true, name: 'Meet it head-on', line: 'e4 e5 Nf3 Nc6 Bc4 Bc5', pitch: 'Your own e-pawn, your bishop on the same diagonal as theirs, and an early castle. Classical and direct.'},
     {id: 'sicilian', keys: ['sicilian'], ready: false, name: 'Fight from the side (Sicilian)', line: 'e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6', pitch: 'Unbalanced from move one. More to learn and more winning chances.'},

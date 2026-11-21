@@ -73,7 +73,10 @@ def numbers():
     for side in ('white', 'black'):
         d = BOOK[side]
         for slot, P in d['packs'].items():
-            for pk, chs in P['packs'].items():
+            for pk, own in P['packs'].items():
+                # a pack is counted with the second steps inside it at their first variation (the e-pawn with the Alapin)
+                def nested(sl, k): return list(d['packs'][sl]['packs'][k]) + [c for s2, v in d['packs'].items() if v.get('within') == [sl, k] for c in nested(s2, v['default'])]
+                chs = nested(slot, pk)
                 ls = {l['id'] for l in pack_lessons(d, chs)}
                 systems[(slot, pk)] = dict(chapters=len(chs), lessons=len(ls), lines=sum(1 for l in d['lines'] if l['lesson'] in ls), first=pk == P['default'])
     return dict(H=H, units=len(mine), opening=len(opening), core=sum(len(u['lessons']) for u in opening),
@@ -96,7 +99,7 @@ ROWS = [('Chapters (openings)', 'chapters'), ('Lessons', 'lessons'), ('Lines you
 # rows that used to carry these numbers under another label
 OLD = {'Positions in the tree': 'Positions on those lines', 'Lessons that end with a plan': 'Lessons with a written plan'}
 # the system rows of the Systems table: (slot, pack) and a word that is only in that row
-SYSTEMS = [(('white', 'd4'), 'The London'), (('white', 'flank'), 'The English'), (('blackE4', 'caro'), 'Caro-Kann'), (('blackSic', 'kan'), 'Sicilian: the Kan'), (('blackSic', 'dragon'), 'Sicilian: the Dragon'),
+SYSTEMS = [(('white', 'd4'), 'The London'), (('white', 'flank'), 'The English'), (('whiteSic', 'open'), 'The Open Sicilian'), (('blackE4', 'caro'), 'Caro-Kann'), (('blackSic', 'kan'), 'Sicilian: the Kan'), (('blackSic', 'dragon'), 'Sicilian: the Dragon'),
            (('blackE4', 'scandi'), 'Scandinavian'), (('blackD4', 'kid'), "King's Indian"),
            (('white', 'e4'), 'Open with the e-pawn'), (('blackE4', 'e5'), 'Meet it head-on'), (('blackD4', 'slav'), 'The Slav setup')]
 

@@ -67,6 +67,9 @@ const Analyze = (() => {
   /* second steps: the variation of a system a game shows, for the slots that sit within a pack of another slot. Each has
      the games it reads (colour and first moves) and its names, keyed by the packs' ids. */
   const SUBS = {
+    whiteSic: {me: 'w', first: ['e4', 'c5'], names: [
+      ['alapin', 'The small c-pawn (Alapin)', g => g[2] === 'c3' || g[4] === 'c3'], ['open', 'Open the middle (Open Sicilian)', g => g[2] === 'Nf3' && g[4] === 'd4'],
+      ['other', 'Something else', () => true]]},
     blackSic: {me: 'b', first: ['e4', 'c5'], names: [
       ['dragon', 'Bishop on the long diagonal (Dragon)', g => has(g, 'b', 'g6', 14)], ['kan', 'Small pawn moves (Kan)', g => has(g, 'b', 'e6', 10) && has(g, 'b', 'a6', 14)],
       ['other', 'Something else', () => true]]}
