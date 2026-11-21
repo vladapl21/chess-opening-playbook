@@ -199,7 +199,7 @@ function syncPacks(){
 }
 // Settings, folded away at the bottom: the system for each slot the library has more than one of. A switch swaps whole
 // units, so it is never one tap: the player types their username first.
-const Rep = {ask: null, open: false};
+const Rep = {ask: null, open: false, reset: false};
 const slotName = slot => slot === 'white' ? 'With White' : slot === 'blackE4' ? 'Against the e-pawn' : 'Against the d-pawn';
 function repNames(){
   const me = meOf(Prog.d) || {}, out = [(me.P || {}).user, (me.src || {}).user];
@@ -215,8 +215,38 @@ function packRowsHTML(){
     const ask = A && A.slot === slot ? `<form class="repask" data-repform><label for="repName">${names.length > 1 ? 'Type one of your usernames' : `Type <b>${esc(word)}</b>`} to switch to <b>${esc(nm(A.id))}</b>.</label>
         <div class="reprow"><input id="repName" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Your username"><button class="btn primary small" type="submit" disabled>Switch</button><button class="btn small ghost" type="button" data-repcancel>Cancel</button></div></form>` : '';
     return `<div class="setrow"><b>${slotName(slot)}</b><div class="setseg" role="group">${Object.keys(v.packs).map(id => `<button type="button" data-packask="${slot}:${id}" aria-pressed="${cur === id}">${esc(nm(id))}</button>`).join('')}</div>${ask}</div>`; }).join('');
-  return `<details class="repdet" ${Rep.open || A ? 'open' : ''}><summary><span><b>Your repertoire</b><span>Which system you play in each part of your book</span></span></summary>
-    <div class="repbody"><p>Switching swaps the lessons, drills and course units for that part. Your progress in the other system is kept, and you can switch back.</p>${rows}</div></details>`;
+  // Reset account: confirmed with the username like everything here (not offered while the page works on a copy)
+  const rword = names[0] || 'reset';
+  const reset = Owner.on ? '' : `<div class="resetbox"><div><b>Reset account</b><span>Wipes your progress, streak, badges, levels and shop on every device${SITE ? ', and starts again from the welcome page' : ''}. It can't be undone.</span></div>
+      ${Rep.reset ? `<form class="repask resetask" data-resetform><label for="resetName">${names.length > 1 ? 'Type one of your usernames' : `Type <b>${esc(rword)}</b>`} to reset.</label>
+        <div class="reprow"><input id="resetName" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Your username"><button class="btn danger small" type="submit" disabled>Reset account</button><button class="btn small ghost" type="button" data-resetcancel>Cancel</button></div></form>`
+        : '<button type="button" class="btn danger" data-resetask>Reset account</button>'}</div>`;
+  return `<details class="repdet" ${Rep.open || A || Rep.reset ? 'open' : ''}><summary><span><b>Advanced settings</b><span>Your systems, and a reset. Each change asks for your username</span></span></summary>
+    <div class="repbody"><p>Switching a system swaps the lessons, drills and course units for that part. Your progress in the other system is kept, and you can switch back.</p>${rows}${reset}</div></details>`;
+}
+const resetOk = v => { const t = String(v || '').trim().toLowerCase(), names = repNames(); return !!t && (names.length ? names.includes(t) : t === 'reset'); };
+/* Reset account: everything a player has earned or set up goes, on every device, and the page opens again on the welcome
+   screen (the copy without accounts opens its book from nothing). `reset` is the time of it: mergeProg lets the copy
+   with the later reset win whole, so an older copy on another device can't bring the progress back. The look, the
+   sounds and the other settings stay. `me.was` is the chess account that was linked: the welcome screen offers it again. */
+async function resetAccount(){
+  const old = Prog.d, me = meOf(old) || {}, now = Date.now();
+  const was = PERSONA === 'house' ? {site: HOUSE_ACCT.site, user: HOUSE_ACCT.user, house: true}
+    : me.src && me.src.user ? {site: me.src.site || 'chess.com', user: me.src.user} : me.P && me.P.user ? {site: me.P.site || 'chess.com', user: me.P.user} : null;
+  const d = {lines: {}, puz: {}, updated: now, reset: now};
+  for (const k of ['set', 'prefs', 'tz', 'mail', 'owner']) if (old[k] !== undefined) d[k] = old[k];
+  d.me = SITE ? Object.assign({state: 'new', since: now}, was ? {was} : {}) : {state: 'house', since: now};
+  Prog.d = d; Prog.saveLocal();
+  try { localStorage.removeItem('playbook-tour'); for (const sd of ['w', 'b']) localStorage.removeItem(SBK(sd)); sessionStorage.clear(); } catch(e){}
+  try { if (Cloud.user) await Cloud.write(); if (Prog.ref) await Prog.push(); } catch(e){}
+  try { history.replaceState(null, '', location.pathname + location.search); } catch(e){}
+  location.reload();
+}
+// the welcome screen after a reset: the same chess account again. The hand-built playbook comes back as it was made.
+async function resetAgain(){
+  const was = (meOf(Prog.d) || {}).was; if (!was) return;
+  if (was.house){ Prog.d.me = {state: 'house', since: Date.now(), updated: Date.now()}; Prog.d.updated = Date.now(); Prog.saveLocal(); try { if (Cloud.user) await Cloud.write(); } catch(e){} location.reload(); return; }
+  Product.site = was.site === 'lichess' ? 'lichess' : 'chess.com'; Product.user = was.user; Product.msg = null; go('setup'); if (!Product.busy) Product.fetchUser();
 }
 function setPack(slot, id){
   if (PERSONA === 'ready'){ const me = meOf(Prog.d); me.picks = Object.assign({}, me.picks, {[slot]: id}); me.updated = Date.now(); }
@@ -229,10 +259,16 @@ document.addEventListener('click', e => {
   if (b){ const [slot, id] = b.dataset.packask.split(':'), D = packSlots().find(x => x.slot === slot);
     Rep.ask = D && packOf(D.D, slot) !== id ? {slot, id} : null; Settings.render(); const i = document.getElementById('repName'); if (i) i.focus(); return; }
   if (e.target.closest('[data-repcancel]')){ Rep.ask = null; Settings.render(); }
+  if (e.target.closest('[data-resetask]')){ Rep.reset = true; Rep.ask = null; Settings.render(); const i = document.getElementById('resetName'); if (i) i.focus(); return; }
+  if (e.target.closest('[data-resetcancel]')){ Rep.reset = false; Settings.render(); return; }
+  if (e.target.closest('[data-again]')){ resetAgain(); return; }
 });
 document.addEventListener('toggle', e => { if (e.target.classList && e.target.classList.contains('repdet')) Rep.open = e.target.open; }, true);
-document.addEventListener('input', e => { if (e.target.id === 'repName'){ const f = e.target.closest('form'), sb = f && f.querySelector('[type=submit]'); if (sb) sb.disabled = !repOk(e.target.value); } });
+document.addEventListener('input', e => { if (e.target.id === 'repName' || e.target.id === 'resetName'){ const f = e.target.closest('form'), sb = f && f.querySelector('[type=submit]'); if (sb) sb.disabled = !(e.target.id === 'repName' ? repOk : resetOk)(e.target.value); } });
 document.addEventListener('submit', e => {
+  const rf = e.target.closest('[data-resetform]');
+  if (rf){ e.preventDefault(); const i = rf.querySelector('#resetName'); if (!i || !resetOk(i.value)){ if (i){ i.setAttribute('aria-invalid', 'true'); i.focus(); } return; }
+    rf.querySelector('[type=submit]').disabled = true; Rep.reset = false; resetAccount(); return; }
   const f = e.target.closest('[data-repform]'); if (!f) return; e.preventDefault();
   const i = f.querySelector('#repName'); if (!Rep.ask || !i || !repOk(i.value)){ if (i){ i.setAttribute('aria-invalid', 'true'); i.focus(); } return; }
   setPack(Rep.ask.slot, Rep.ask.id);
@@ -371,7 +407,8 @@ const Product = {
   startHTML(){
     const out = this.signedOut(), has = !!this.me().P, short = !has && this.me().short, step = out ? 1 : has ? 3 : 2;
     const cta = out ? `<button class="btn primary" data-acct="signup">Create your account</button><button class="btn" data-acct="signin">I already have an account</button>`
-      : has ? `<button class="btn primary" data-pgo="findings">Continue: see what I found</button>` : short ? `<button class="btn primary" data-pgo="setup">Check my games again</button>` : `<button class="btn primary" data-pgo="setup">Connect your account</button>`;
+      : has ? `<button class="btn primary" data-pgo="findings">Continue: see what I found</button>` : short ? `<button class="btn primary" data-pgo="setup">Check my games again</button>`
+      : this.me().was ? `<button class="btn primary" data-again>Use ${esc(this.me().was.user)} again</button><button class="btn" data-pgo="setup">Link another account</button>` : `<button class="btn primary" data-pgo="setup">Connect your account</button>`;
     const li = (k, h, p) => `<li class="${k < step ? 'done' : k === step ? 'now' : ''}"><b>${h}</b><span>${p}</span></li>`;
     // a look at the product itself: a position from a lesson with its name above it and the book's move as the arrow
     const us = ['e2e4', 'e7e5', 'g1f3', 'b8c6', 'f1c4', 'f8c5', 'c2c3', 'g8f6'], pv = fenOf('e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6');
@@ -1980,7 +2017,7 @@ const Tour = {
       {h: 'Your streak', at: '#meBtn', skip: () => document.getElementById('meBtn').hidden, say: ['The flame counts the days in a row you finish today\'s five', 'It takes a new colour at 5, 10, 20, 30, 50 and 100 days', 'Every third day in a row earns a shop token']},
       {h: 'The daily shop', at: () => document.querySelector('#app .shopmain') || document.querySelector('#app .shop'), go: () => go('shop'),
         say: () => ['Six new pieces every day', 'Tokens from badges, levels and days in a row buy them', 'Wear what you buy from your locker'].concat(Level.of().n < SHOP_AT ? [`It opens at level ${SHOP_AT}`] : [])},
-      {h: 'Settings', at: '#setBtn', go: () => go('course'), say: ['Light or dark, text size, board colours, your coach and your systems', 'How pieces slide, with six animations to pick from, and sounds in three themes', 'You can take this tour again from there']},
+      {h: 'Settings', at: '#setBtn', go: () => go('course'), say: ['Light or dark, text size, board colours and your coach', 'How pieces slide, with six animations to pick from, and sounds in three themes', 'Advanced settings: switch a system or reset your account, each confirmed with your username', 'You can take this tour again from there']},
       {h: 'Your account', at: '#acctBtn', skip: () => document.getElementById('acctBtn').hidden, say: ['Sign in and your progress follows you to every device']},
       {h: 'That\'s me', at: '#coach .cav', skip: () => !SET.coach, say: ['Tap me any time for a tip', 'I speak up when a line ends, and when something new happens', 'When a game of yours leaves your book, I\'ll say so and bring the line to drill']},
       {h: 'You\'re all set', say: () => this.replay ? ['That\'s everything', 'Back to where you were'] : ['Start with the course: your first unit is waiting', 'Five lines a day and the openings stick']}

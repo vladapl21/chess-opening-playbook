@@ -1324,8 +1324,11 @@ const SITE = /*__SITE__*/null;
 const canon = o => JSON.stringify(o, (k, v) => v && typeof v === 'object' && !Array.isArray(v) ? Object.keys(v).sort().reduce((a, x) => (a[x] = v[x], a), {}) : v);
 const newer = (x, y) => !x ? y : !y ? x : (y.v || 1) !== (x.v || 1) ? ((y.v || 1) > (x.v || 1) ? y : x) : (y.last || 0) > (x.last || 0) ? y : x;
 // two copies of the progress object -> one: newest record per line and puzzle, best of everything else
-const KNOWN = new Set(['lines', 'puz', 'sb', 'course', 'days', 'updated', 'packs', 'set', 'prefs', 'mail', 'badges', 'tz', 'me', 'owner', 'shop', 'lvl', 'recap', 'tour', 'rg']);
+const KNOWN = new Set(['lines', 'puz', 'sb', 'course', 'days', 'updated', 'packs', 'set', 'prefs', 'mail', 'badges', 'tz', 'me', 'owner', 'shop', 'lvl', 'recap', 'tour', 'rg', 'reset']);
 function mergeProg(a, b){
+  // an account that was reset (Settings, Advanced settings): the copy with the later reset stands whole, and what an
+  // older copy still holds from before it is gone
+  const ra = (a && a.reset) || 0, rb = (b && b.reset) || 0; if (ra !== rb) return JSON.parse(JSON.stringify(ra > rb ? a : b));
   const o = JSON.parse(JSON.stringify(a || {})), r = JSON.parse(JSON.stringify(b || {}));
   a = a || {};
   o.lines = o.lines || {}; o.puz = o.puz || {};

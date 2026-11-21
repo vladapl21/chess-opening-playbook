@@ -149,6 +149,8 @@ body:has(.coach:not([hidden])) .foot{padding-right:100px}
 .repdet > summary > span{display:grid;gap:2px} .repdet > summary b{font-size:14px} .repdet > summary span span{font-size:13px;color:var(--muted)}
 .repbody{display:grid;gap:14px;margin-top:12px} .repbody > p{font-size:13px;color:var(--muted);margin:0}
 .repask{display:grid;gap:8px;background:var(--surface-2);border-radius:4px;padding:10px 12px;font-size:13.5px}
+.resetbox{display:grid;gap:10px;border:1px solid var(--rosso);border-radius:4px;padding:12px;background:var(--rosso-soft)} .resetbox > div{display:grid;gap:3px} .resetbox b{font-size:14px} .resetbox > div span{font-size:13px;color:var(--ink)}
+.btn.danger{background:var(--rosso);border-color:var(--rosso);color:var(--surface);justify-self:start} .btn.danger:disabled{opacity:.45} .resetbox .repask{background:var(--surface)}
 .repask.repask{display:grid;gap:8px} .reprow{display:flex;gap:6px;flex-wrap:wrap;align-items:center} .reprow .btn.primary{width:auto;min-height:38px;font-size:14px} .reprow input{flex:1 1 140px;min-width:0;font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:3px;background:var(--surface);color:var(--ink)}
 .reprow input[aria-invalid="true"]{border-color:var(--rosso)}
 

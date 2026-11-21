@@ -107,7 +107,7 @@ def synced(pg):
         try:
             if pg.evaluate("!!Cloud.user && Cloud.state === 'ok' && !Cloud.writing && !Cloud.pulling"): return True
         except Exception as e:                      # the page is loading again (a new account opens on its own playbook)
-            if 'navigation' not in str(e) and 'context' not in str(e): raise
+            if 'navigation' not in str(e) and 'context' not in str(e) and 'is not defined' not in str(e): raise
         pg.wait_for_timeout(150)
     return False
 
@@ -371,6 +371,32 @@ with sync_playwright() as p:
     m = n2.evaluate("""[mergeProg({lines: {}, me: {state: 'new'}}, {lines: {x: {box: 1}}}).me.state, mergeProg({lines: {}, me: {state: 'new', updated: 9}}, {lines: {}, me: {state: 'ready', updated: 1}}).me.state,
         mergeProg({lines: {}}, {lines: {}}).me === undefined]""")
     assert m == ['house', 'ready', True], m
+    # ---- Reset account, in Advanced settings. The username confirms it; everything earned goes, on this device and in
+    #      the account; the page opens on the welcome screen with the same chess account or another to choose from.
+    vid = S.users['vlad@example.com']['id']
+    n2.evaluate("Prog.record('setup', true); setSetting('board', 'blue'); Prog.save()"); n2.wait_for_timeout(1900)
+    assert S.rows[vid]['data']['lines'].get('setup'), 'progress in the account before the reset'
+    n2.click('#setBtn'); n2.wait_for_timeout(300); assert 'Advanced settings' in n2.inner_text('#setPanel .repdet > summary')
+    n2.click('#setPanel .repdet > summary'); n2.wait_for_timeout(200); n2.click('#setPanel [data-resetask]'); n2.wait_for_timeout(200)
+    sub = n2.locator('#setPanel .resetask [type=submit]'); assert sub.is_disabled()
+    n2.fill('#resetName', 'somebody'); assert sub.is_disabled(), 'another name does not confirm it'
+    n2.screenshot(path=out + 'acct_reset_ask.png')
+    n2.fill('#resetName', 'Aqua_Alpaca'); assert not sub.is_disabled(); sub.click()
+    n2.wait_for_function("typeof PERSONA !== 'undefined' && PERSONA === 'new' && S.view === 'start' && !!document.querySelector('.whero [data-again]')", timeout=20000); n2.wait_for_timeout(600)
+    row = S.rows[vid]['data']; print('after the reset:', {k: row.get(k) for k in ('me', 'lines')}, '| board kept:', row['set']['board'])
+    assert row['me']['state'] == 'new' and row['me']['was'] == {'site': 'chess.com', 'user': 'aqua_alpaca', 'house': True} and row['lines'] == {} and row['reset'] and row['set']['board'] == 'blue'
+    left = n2.evaluate("[Object.keys(Prog.d.lines).length, !!Prog.d.badges, !!Prog.d.days, !!Prog.d.tour, SET.board]"); print('on this device:', left)
+    assert left == [0, False, False, False, 'blue'], left
+    btns = n2.locator('.whero .cta button').all_inner_texts(); print('the welcome screen after it:', btns); assert btns[:2] == ['Use aqua_alpaca again', 'Link another account'], btns
+    n2.screenshot(path=out + 'acct_reset_welcome.png')
+    # an older copy on another device can't bring the progress back, whichever way the two meet
+    mr = n2.evaluate("""(() => { const oldc = {lines: {x: {box: 3, seen: 4}}, days: {a: [1]}, badges: {s3: 1}, updated: 5}, fresh = {lines: {}, puz: {}, reset: 9, me: {state: 'new'}};
+        return [mergeProg(oldc, fresh), mergeProg(fresh, oldc)].map(m => [Object.keys(m.lines).length, !!m.days, !!m.badges, m.me.state, m.reset]); })()""")
+    assert mr == [[0, False, False, 'new', 9]] * 2, mr
+    # the same account again: the hand-built playbook, from nothing
+    n2.click('.whero [data-again]'); n2.wait_for_function("typeof PERSONA !== 'undefined' && PERSONA === 'house' && S.view !== 'start'", timeout=20000); n2.wait_for_timeout(1500)
+    back = n2.evaluate("[PERSONA, Object.keys(Prog.d.lines).length, document.querySelectorAll('.tabs button.lock').length]"); print('the same account again:', back, S.rows[vid]['data']['me']['state'])
+    assert back == ['house', 0, 0] and S.rows[vid]['data']['me']['state'] == 'house'
     nb.close()
     print('ERRORS:', errors[:8])
     assert not errors
