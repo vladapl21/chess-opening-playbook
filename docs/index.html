@@ -3629,7 +3629,9 @@ function setPerspective(side){
 const isMine = nd => nd.w === ME;
 const isMyPiece = p => !!p && (ME === 1 ? p === p.toUpperCase() : p === p.toLowerCase());
 // the pieces a tap or a drag can pick up: your own, or on the Sandbox's set-up board those of the side to move
-function pickable(p){ const D = S.drill; if (D && D.kind === 'sbset'){ const w = ply(D.node) % 2 === 0; return !!p && (w ? p === p.toUpperCase() : p === p.toLowerCase()); } return isMyPiece(p); }
+function pickable(p){ const D = S.drill; if (D && (D.kind === 'sbset' || sbOver(D))){ const w = ply(dNode()) % 2 === 0; return !!p && (w ? p === p.toUpperCase() : p === p.toLowerCase()); } return isMyPiece(p); }
+// a Sandbox game that has ended: its board stays live (the engine, the steps through the game, a move to play on)
+const sbOver = D => !!D && D.kind === 'sb' && D.state === 'done' && !D.tour;
 const chapterOf = L => CHAPTERS[PARTS[L.part].ch];
 const pctTxt = q => q >= 0.995 ? '100%' : q >= 0.095 ? Math.round(q * 100) + '%' : q >= 0.01 ? (q * 100).toFixed(q >= 0.05 ? 0 : 1).replace(/\.0$/, '') + '%' : '<1%';
 function lessonOf(lineId){ const l = LINES[lineId]; return LESSONS[l.lesson] || null; }
@@ -4434,6 +4436,8 @@ function refresh(){ adoptSettings(); render(); }
 // new data from another device: show it, but never pull the board out from under a line being played
 function refreshSoon(){ if (S.drill && S.drill.state === 'play'){ adoptSettings(); renderChrome(); return; } refresh(); }
 function render(){
+  // the engine on a finished Sandbox game lets go as soon as anything else is on the page
+  if (EngineUI.host && EngineUI.host.board === 'db' && !(S.view === 'sandbox' && sbOver(S.sbState))) EngineUI.detach();
   const U = (S.view === 'unit' || S.view === 'quiz') && UNIT[S.unit];
   if (U && U.side && !U.soon && U.kind !== 'skill' && U.side !== SIDE) useSide(U.side);
   // a line or a game under way brings its own book with it, whichever one was open last
@@ -4826,6 +4830,10 @@ document.addEventListener('keydown', e => {
     const k = {ArrowRight: 1, ArrowLeft: -1, Home: -999, End: 999}[e.key];
     if (k){ e.preventDefault(); sbSetStep(k); }
   }
+  else if (S.view === 'sandbox' && sbOver(S.drill)){
+    const k = {ArrowRight: 1, ArrowLeft: -1, Home: -999, End: 999}[e.key];
+    if (k){ e.preventDefault(); sbView(k); }
+  }
   else if (S.view === 'explore' && S.ex){
     const k = {ArrowRight: 1, ArrowLeft: -1, Home: -999, End: 999}[e.key];
     if (k){ e.preventDefault(); exStopAuto(); exStep(k); }
@@ -4882,7 +4890,7 @@ function startPuzzle(k, wrapped){
   S.drill = S.drillState = {kind: 'puz', side: SIDE, wrapped: !!wrapped, k, i: 0, mistakes: 0, tries: 0, sel: null, busy: false, state: 'play', hint: null, flash: null, msg: ''};
   S.view = 'drill'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
 }
-function dNode(){ const D = S.drill; return D.kind === 'sb' || D.kind === 'sbset' ? D.node : D.kind === 'line' ? LINES[D.id].n[D.i] : D.kind === 'q' ? D.items[D.k].node : DATA.puzzles[D.k].node; }
+function dNode(){ const D = S.drill; return sbOver(D) && D.vi !== undefined ? D.hist[D.vi] : D.kind === 'sb' || D.kind === 'sbset' ? D.node : D.kind === 'line' ? LINES[D.id].n[D.i] : D.kind === 'q' ? D.items[D.k].node : DATA.puzzles[D.k].node; }
 // the position on the drill board: course quizzes can show a position that isn't in the book (a threat puzzle, or a move played out)
 function dFen(){
   const D = S.drill;
@@ -4907,14 +4915,15 @@ function drillAdvance(){
   } else { D.busy = false; D.tries = 0; if (D.guided){ D.hint = nx.u; renderDrillBoard(); } renderDrillPanel(); }
 }
 function expectedMove(){ const D = S.drill; if (D.kind === 'rv') return [D.moves[D.i]]; if (D.kind === 'puz') return DATA.puzzles[D.k].ok; if (D.kind === 'q'){ const it = D.items[D.k]; return it.ok || it.safe; } if (D.kind === 'sb') return sbMyKids(D.node).map(c => N[c].u); return [N[LINES[D.id].n[D.i + 1]].u]; }
-function legalFor(){ const D = S.drill; if (D.kind === 'rv') return Review.legal(D); if (D.kind === 'sbset') return sbLegal(D.node); if (D.kind === 'puz') return DATA.puzzles[D.k].legal; if (D.kind === 'q'){ const it = D.items[D.k]; return it.legal || DATA.legal[String(it.node)] || []; } return DATA.legal[String(dNode())] || []; }
+function legalFor(){ const D = S.drill; if (sbOver(D)) return new Chess(nodeFen(dNode())).moves({verbose: true}).map(m => m.from + m.to + (m.promotion || '')); if (D.kind === 'rv') return Review.legal(D); if (D.kind === 'sbset') return sbLegal(D.node); if (D.kind === 'puz') return DATA.puzzles[D.k].legal; if (D.kind === 'q'){ const it = D.items[D.k]; return it.legal || DATA.legal[String(it.node)] || []; } return DATA.legal[String(dNode())] || []; }
 // how many of your moves later the line plays this move (0: it doesn't)
 function laterInLine(D, u){ const n = LINES[D.id].n; let c = 0; for (let k = D.i + 2; k < n.length; k++){ if (!isMine(N[n[k]])) continue; c++; if (N[n[k]].u === u) return c; } return 0; }
 const HOWMANY = ['', 'one move', 'two moves', 'three moves', 'four moves', 'five moves', 'six moves'];
 const movesLater = c => HOWMANY[c] || `${c} moves`;
 const earlyHTML = c => `<b>The right move at the wrong moment.</b> In this line it comes ${movesLater(c)} later: something else has to happen first.`;
 function tryMove(from, to){
-  const D = S.drill; if (!D || D.busy || D.state !== 'play') return;
+  const D = S.drill; if (sbOver(D)) return sbEndTry(from, to);
+  if (!D || D.busy || D.state !== 'play') return;
   let u = from + to;
   const legal = legalFor();
   if (!legal.includes(u)){ // king onto own rook = castle
@@ -4998,6 +5007,7 @@ function renderDrillBoard(anim){
   if (D.hint) o.hint = D.hint;
   o.aria = 'Drill board';
   el.innerHTML = boardSVG(fen, o); matUpdate(el, fen, FLIP);
+  if (EngineUI.host && EngineUI.host.board === 'db'){ if (sbOver(D)) EngineUI.arrows(); else EngineUI.detach(); }
   if (anim) animateMove(el.querySelector('svg'), anim.u, anim.meta, false);
 }
 function drillPanelHTML(){
@@ -5168,7 +5178,7 @@ function wireBoardInput(){
   const el = document.getElementById('db'); if (!el || el.dataset.wired) return; el.dataset.wired = '1';
   let drag = null;
   el.addEventListener('pointerdown', e => {
-    const D = S.drill; if (!D || D.busy || D.state !== 'play') return;
+    const D = S.drill; if (!D || D.busy || (D.state !== 'play' && !sbOver(D))) return;
     const svg = el.querySelector('svg'); if (!svg) return;
     const sq = squareAt(svg, e); if (!sq) return;
     const a = fenArr(dFen()), p = a[sqi(sq)];
@@ -5386,8 +5396,46 @@ function sbSetJump(k){
 function sbSetStep(d){ sbSetJump(d <= -999 ? 0 : d >= 999 ? 1e9 : S.drill.hist.length - 1 + d); }
 function sbSetBack(){ sbSetStep(-1); }
 // the arrows under the set-up board (the legend under a game's board otherwise)
+// A finished game stays on the board: the engine's verdict and arrows, steps back and forward through the game, and a
+// move for either side plays on from there on the explore board. Next game is the way on.
+function sbEndTitle(D){ const L = D.line ? lessonOf(D.line) : null; return `Practice game · ${L ? L.title : 'end of your book'}`; }
+function sbEngine(){
+  const D = S.drill; if (!sbOver(D) || !document.getElementById('db')) return;
+  const idx = dNode(), fen = nodeFen(idx);
+  if (EngineUI.host && EngineUI.host.board === 'db' && EngineUI.host.fen === fen){ EngineUI.paint(); return; }
+  EngineUI.attach({fen, card: 'sbeng', board: 'db', text: 'sbeval', flip: FLIP,
+    acts: [{id: 'eLine', t: 'Play the line it expects', go: pv => exploreNode(idx, {title: sbEndTitle(D), plan: sbEndPlan(D), moves: pv.slice(0, 10), i: 0, auto: true})}]});
+}
+function sbEndPlan(D){ return D.line && planOf(D.line) ? {side: SIDE, line: D.line} : null; }
+function sbView(d){
+  const D = S.drill; if (!sbOver(D)) return;
+  const n = D.hist.length - 1, to = Math.max(0, Math.min(n, d <= -999 ? 0 : d >= 999 ? n : D.vi + d)); if (to === D.vi) return;
+  const fwd = to === D.vi + 1; D.vi = to; D.sel = null;
+  renderDrillBoard(fwd ? {u: N[D.hist[to]].u, meta: N[D.hist[to]]} : null);
+  const ctl = document.getElementById('sbctl'); if (ctl){ ctl.innerHTML = sbCtlHTML(); wireSbCtl(ctl); }
+  sbEngine();
+}
+function sbEndTry(from, to){
+  const D = S.drill, idx = dNode(), legal = legalFor(), k = ply(idx) % 2 === 0 ? '1' : '8'; let u = from + to; D.sel = null;
+  if (!legal.includes(u)){
+    if (from === 'e' + k && to === 'h' + k && legal.includes('e' + k + 'g' + k)) u = 'e' + k + 'g' + k;
+    else if (from === 'e' + k && to === 'a' + k && legal.includes('e' + k + 'c' + k)) u = 'e' + k + 'c' + k;
+    else if (legal.includes(u + 'q')) u += 'q';
+    else { renderDrillBoard(); return; }
+  }
+  EngineUI.detach(); exploreNode(idx, {title: sbEndTitle(D), plan: sbEndPlan(D), moves: [u], land: true});
+}
+function wireSbCtl(ctl){ ctl.querySelectorAll('[data-sbstep]').forEach(b => b.onclick = () => sbSetStep(+b.dataset.sbstep)); ctl.querySelectorAll('[data-sbv]').forEach(b => b.onclick = () => sbView(+b.dataset.sbv)); }
 function sbCtlHTML(){
   const D = S.drill;
+  if (sbOver(D)){
+    const i = D.vi, n = D.hist.length - 1, ic = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
+    return `<div class="controls"><button class="ctl" data-sbv="-999" aria-label="To the start" ${i > 0 ? '' : 'disabled'}>${ic('M6 5v14M18 6l-8 6 8 6V6z')}</button>
+      <button class="ctl" data-sbv="-1" aria-label="Back one move" ${i > 0 ? '' : 'disabled'}>${ic('M15 6l-6 6 6 6')}</button>
+      <button class="ctl" data-sbv="1" aria-label="Forward one move" ${i < n ? '' : 'disabled'}>${ic('M9 6l6 6-6 6')}</button>
+      <button class="ctl" data-sbv="999" aria-label="To the last move" ${i < n ? '' : 'disabled'}>${ic('M18 5v14M6 6l8 6-8 6V6z')}</button></div>
+    <p class="evaltext" id="sbeval">${(ei => ei ? `Engine: <b>${esc(ei.txt)}</b>${ei.num ? ` <span class="tnum" title="${NUMHINT}">(${ei.num})</span>` : ''}` : 'Engine: thinking…')(evalInfo(N[D.hist[i]].e))}</p>`;
+  }
   if (!D || D.kind !== 'sbset') return `<div class="legend" style="margin-top:10px"><span><i style="background:var(--arr-g)"></i>the move in your book</span><span><i style="background:var(--arr-r)"></i>what you tried</span></div>`;
   const back = D.hist.length > 1, fwd = D.fwd.length > 0, ic = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
   return `<div class="controls"><button class="ctl" data-sbstep="-999" aria-label="To the start" ${back ? '' : 'disabled'}>${ic('M6 5v14M18 6l-8 6 8 6V6z')}</button>
@@ -5416,6 +5464,7 @@ function sbLineFor(idx){
 function sbFinish(){
   const D = S.drill; D.state = 'done'; D.busy = false; D.hint = null;
   D.line = sbLineFor(D.node); if (D.line && !D.tour) SB_PREVL[D.side] = D.line;
+  D.vi = D.hist.length - 1;
   const clean = D.slips.length === 0;
   if (D.line) Prog.record(D.line, clean);
   const sb = Prog.d.sb || (Prog.d.sb = {games: 0, clean: 0, slips: 0, seen: {}});
@@ -5456,7 +5505,7 @@ function sbReport(){
       <div class="bigstat"><b class="tnum">${n}</b><span>${n === 1 ? 'slip' : 'slips'} in this game · ${n ? 'this line is back in today\'s review' : `clean; it comes back in ${days} ${days === 1 ? 'day' : 'days'}`}</span></div>
       ${n ? `<div class="slips">${slipCards}</div>` : ''}
       ${D.choices.length ? `<div><p class="kicker" style="margin-bottom:6px">${OPP}'s choices</p><div class="chain">${chain}</div>${prob < .67 ? `<p class="evaltext" style="text-align:left">${D.from ? 'From your position, this' : 'This'} exact line: ${oneIn(prob)}.</p>` : ''}</div>` : ''}
-      <div class="lesson-actions"><button class="btn ${CU && cs >= SPAR ? '' : 'primary'}" id="sbAgain">Next game</button>${CU ? `<button class="btn ${cs >= SPAR ? 'primary' : ''}" data-unit="${CU.id}">Back to the ${uword(CU)}</button>` : ''}${lid ? `<button class="btn" data-line="${lid}">Study this line</button><button class="btn ghost" id="sbDrill">Drill it</button>` : ''}<button class="btn ghost" id="sbExplore">Play on with the engine</button></div></div>
+      <div class="lesson-actions"><button class="btn ${CU && cs >= SPAR ? '' : 'primary'}" id="sbAgain">Next game</button>${CU ? `<button class="btn ${cs >= SPAR ? 'primary' : ''}" data-unit="${CU.id}">Back to the ${uword(CU)}</button>` : ''}${lid ? `<button class="btn" data-line="${lid}">Study this line</button><button class="btn ghost" id="sbDrill">Drill it</button>` : ''}</div>${D.tour ? '' : '<div id="sbeng"></div>'}</div>
       ${lid && planOf(lid) ? planCardHTML(planOf(lid), planKick(lid)) : ''}`;
 }
 function sbPanelHTML(){
@@ -5500,10 +5549,9 @@ function wireSbPanel(){
   view.querySelectorAll('[data-sbset]').forEach(b => b.onclick = () => { if (b.dataset.sbset !== SIDE){ useSide(b.dataset.sbset); S.view = 'sandbox'; sbSetupStart(); } });
   const fg = document.getElementById('sbFromGo'); if (fg) fg.onclick = () => { sbSetFrom(SIDE, S.drill.node); S.drill = S.sbState = null; sbStart(); };
   view.querySelectorAll('[data-sbj]').forEach(b => b.onclick = () => sbSetJump(+b.dataset.sbj));
-  const ctl = document.getElementById('sbctl'); if (ctl){ ctl.innerHTML = sbCtlHTML(); ctl.querySelectorAll('[data-sbstep]').forEach(b => b.onclick = () => sbSetStep(+b.dataset.sbstep)); }
+  const ctl = document.getElementById('sbctl'); if (ctl){ ctl.innerHTML = sbCtlHTML(); wireSbCtl(ctl); }
+  sbEngine();
   const sc = document.getElementById('sbSetCancel'); if (sc) sc.onclick = () => { S.drill = S.sbState = null; render(); };
-  const ex = document.getElementById('sbExplore'); if (ex && S.drill) ex.onclick = () => { const D = S.drill, lid = D.line, L = lid ? lessonOf(lid) : null;
-    exploreNode(D.node, {title: `Practice game · ${L ? L.title : 'end of your book'}`, plan: lid && planOf(lid) ? {side: SIDE, line: lid} : null}); };
 }
 // where games start, kept under the board so it is always in the same place
 function sbFromHTML(){
@@ -8680,7 +8728,7 @@ const Tour = {
       {h: 'Your games', at: '.gseg', go: () => go('games'),
         say: () => PERSONA === 'ready' ? ['Your openings with both colours and your record in each', 'Last 3 games: your newest games reviewed, with the spot to drill in each', 'Where you leave the book most, and the monthly recap'] : ['Your openings and your record in each', 'Last 3 games: your newest games reviewed, with the spot to drill in each', 'Missed shots, game reviews and the monthly recap']},
       {h: 'The Sandbox', at: '#sbpanel', go: () => { S.drill = S.drillState = null; go('sandbox'); },
-        say: ['Practice games against an opponent who plays your book\'s lines', 'Everything plays White and Black in turn', 'Pick openings from either colour to narrow it', 'Set up a position to practise only the lines that go on from it', 'Every game ends with the plan from there']},
+        say: ['Practice games against an opponent who plays your book\'s lines', 'Everything plays White and Black in turn', 'Pick openings from either colour to narrow it', 'Set up a position to practise only the lines that go on from it', 'No line comes twice in a row', 'When a game ends the engine is on its board: step back through the game, or move a piece to play on']},
       {h: 'Levels', at: '#lvBtn', skip: () => document.getElementById('lvBtn').hidden, say: ['Every line you play earns points', 'The ring fills toward your next level. Tap it for your badges']},
       {h: 'Your streak', at: '#meBtn', skip: () => document.getElementById('meBtn').hidden, say: ['The flame counts the days in a row you finish today\'s five', 'It takes a new colour at 5, 10, 20, 30, 50 and 100 days', 'Every third day in a row earns a shop token']},
       {h: 'The daily shop', at: () => document.querySelector('#app .shopmain') || document.querySelector('#app .shop'), go: () => go('shop'),

@@ -185,6 +185,32 @@ try:
         assert q.evaluate('document.documentElement.scrollWidth') <= 390
         q.screenshot(path=out + 'engine_phone_explore_dark.png', full_page=True)
 
+        # ---- a Sandbox game that has ended keeps its board live: the verdict and the arrows under and on the board, steps
+        #      back and forward through the game, and a move for either side plays on from there. No button to press.
+        g = b.new_context(viewport={'width': 1280, 'height': 900}).new_page(); hook(g, 'sandbox'); g.goto(APP + '#sandbox'); g.wait_for_timeout(900)
+        g.evaluate("""async () => { sbStart(); for (let t = 0; t < 600; t++){ await new Promise(r => setTimeout(r, 50)); const D = S.drill; if (D.state === 'done') break;
+            if (!D.busy && myTurnAt(D.node)){ const ks = sbMyKids(D.node); if (ks.length) sbGo(ks[0], false); } } }""")
+        assert g.evaluate("S.drill.state") == 'done' and g.locator('#sbExplore').count() == 0 and g.locator('#sbAgain').count() == 1
+        for _ in range(60):
+            if 'depth' in g.inner_text('#sbeval') and g.locator('#db svg g.eng path, #db svg g.eng line').count(): break
+            g.wait_for_timeout(250)
+        end = g.evaluate("[document.getElementById('sbeval').innerText, document.querySelectorAll('#db svg g.eng > *').length, !!document.querySelector('#sbeng .ebest'), S.drill.vi, S.drill.hist.length - 1]")
+        print('a finished Sandbox game:', end); assert 'depth' in end[0] and end[1] >= 1 and end[2] and end[3] == end[4], end
+        fen0 = g.evaluate("dFen()"); g.click('[data-sbv="-1"]'); g.wait_for_timeout(600)
+        back = g.evaluate("[S.drill.vi, dFen(), document.querySelector('[data-sbv=\"1\"]').disabled]"); print('  a step back:', back[0], back[2])
+        assert back[0] == end[4] - 1 and back[1] != fen0 and back[2] is False
+        g.keyboard.press('ArrowRight'); g.wait_for_timeout(500); assert g.evaluate("S.drill.vi") == end[4]
+        ov = g.evaluate("(() => { const b = document.getElementById('db').getBoundingClientRect(), c = document.getElementById('sbctl').getBoundingClientRect(); return c.top - b.bottom; })()")
+        assert ov >= 0, 'the controls sit under the board, not on it'
+        mv = g.evaluate("legalFor()[0]"); g.evaluate(f"tryMove('{mv[:2]}', '{mv[2:4]}')"); g.wait_for_timeout(700)
+        on = g.evaluate("[S.view, S.ex.moves[S.ex.moves.length - 1], S.ex.i === S.ex.moves.length]"); print('  a move on that board:', mv, '->', on)
+        assert on[0] == 'explore' and on[1][:4] == mv[:4] and on[2], on
+        g.evaluate("exBack()"); g.wait_for_timeout(600)
+        assert g.evaluate("[S.view, S.drill && S.drill.state]") == ['sandbox', 'done'] and g.locator('#sbeval').count() == 1
+        g.click('#sbAgain'); g.wait_for_timeout(700)
+        assert g.evaluate("[S.drill.state, !!EngineUI.host, document.querySelectorAll('#db svg g.eng').length]") == ['play', False, 0], 'no engine once the next game is on'
+        g.screenshot(path=out + 'engine_sandbox_next.png')
+
         # ---- opened as a file, the engine can't start: the card says so, nothing breaks
         f = b.new_context(viewport={'width': 1280, 'height': 900}).new_page(); hook(f, 'file')
         f.goto(FILE_URL + '#line.fried-liver'); f.wait_for_timeout(900)
