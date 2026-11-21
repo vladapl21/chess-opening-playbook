@@ -1003,6 +1003,15 @@ body:has(.coach:not([hidden])) .foot{padding-right:100px}
 .item .price,.item .owned,.item .wearing{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;color:var(--muted);font-weight:600} .item .wearing{color:var(--accent)}
 .item .need{font-size:12px;color:var(--muted)} .item .btn.small{min-height:32px;gap:5px} .item .btn .coin{width:15px;height:15px}
 @media (max-width:860px){ .shop{grid-template-columns:minmax(0,1fr)} .shopside{position:static} .wlock{grid-template-columns:minmax(0,1fr)} }
+/* one column: the coach sits small beside the tokens, so the shelf is on the first screen of a phone */
+@media (max-width:860px){
+  .shopside{grid-template-columns:112px minmax(0,1fr);grid-template-areas:"man bal" "man earn" "pick pick";gap:8px 14px;padding:14px;align-items:start}
+  .shopside .mannequin{grid-area:man;align-self:stretch;padding:8px 0 2px} .shopside .mannequin svg{width:88%}
+  .shopside .bal{grid-area:bal} .shopside .bal b{font-size:30px} .shopside .earn{grid-area:earn;font-size:13px;gap:3px}
+  .shopside .coachpick{grid-area:pick;margin-top:4px}
+  .coachpick.mini button{display:flex;align-items:center;justify-content:center;gap:7px;padding:5px 6px;min-height:44px} .coachpick.mini .cface{width:30px;height:30px;margin:0;padding:3px 2px 0} .coachpick.mini b{font-size:14px}
+  .shop{gap:16px} .shopmain{gap:16px}
+}
 /* after the first course: the big moment */
 .gradv{position:relative;display:grid;gap:22px;justify-items:center;text-align:center;overflow:hidden;background:radial-gradient(ellipse at 50% 0%,var(--oro-soft),transparent 64%),var(--surface);border:1px solid var(--line);border-radius:8px;padding:34px 22px 28px;box-shadow:var(--shadow);margin:4px 0 24px}
 .grhero{display:grid;justify-items:center;gap:6px;max-width:660px;position:relative;z-index:1}
@@ -1072,7 +1081,7 @@ body:has(.coach:not([hidden])) .foot{padding-right:100px}
 .lvring i:nth-child(odd){background:var(--accent)}
 @keyframes lvray{0%{opacity:1;transform:rotate(var(--a)) translateY(-26px)}100%{opacity:0;transform:rotate(var(--a)) translateY(-50px)}}
 .lvsay{display:grid;gap:3px;min-width:0} .lvsay .kicker{margin:0} .lvsay b{font:700 22px/1.1 var(--f-display)} .lvsay span{font-size:13.5px;color:var(--muted);line-height:1.4} .lvsay .btn{justify-self:start;margin-top:6px}
-.lvup .x{position:absolute;top:6px;right:6px}
+.lvup .x{position:absolute;top:4px;right:4px;width:34px;height:34px;display:grid;place-items:center;border:0;background:none;color:var(--muted);font-size:20px;line-height:1;cursor:pointer;border-radius:50%} .lvup .x:hover{background:var(--surface-2);color:var(--ink)}
 /* the level at the top of the profile */
 .plevel{display:flex;align-items:center;gap:14px;padding:4px 0 2px} .plevel > div{display:grid;gap:4px;flex:1;min-width:0}
 .plevel b{font:700 20px/1.1 var(--f-display)} .plevel span{font-size:13px;color:var(--muted)}
@@ -1241,9 +1250,11 @@ button.rcrow{cursor:pointer} button.rcrow:hover{border-color:var(--accent)}
 /* the crate bought and waiting: it floats and glows until it is tapped, then shakes open into the reel */
 .cratewait{position:relative;display:grid;justify-items:center;gap:12px;padding:30px 10px 10px;overflow:hidden;border-radius:6px} .cratewait[hidden]{display:none}
 .cratetap{position:relative;z-index:1;width:min(230px,60vw);padding:0;border:0;background:none;cursor:pointer;animation:crfloat 2.6s ease-in-out infinite;filter:drop-shadow(0 0 14px var(--oro))}
-.cratetap svg{display:block;width:100%;height:auto} .cratetap:focus-visible{outline:3px solid var(--accent);outline-offset:8px;border-radius:10px}
+.cratetap svg{display:block;width:100%;height:auto}
 .crays{position:absolute;left:50%;top:46%;width:470px;height:470px;margin:-235px 0 0 -235px;border-radius:50%;opacity:.3;animation:rays 18s linear infinite;
   background:repeating-conic-gradient(from 0deg,var(--oro) 0 8deg,transparent 8deg 24deg);-webkit-mask-image:radial-gradient(circle,#000 0 30%,transparent 66%);mask-image:radial-gradient(circle,#000 0 30%,transparent 66%)}
+/* no box round the crate when it has the focus: it glows brighter instead */
+.cratetap:focus-visible{outline:none} .cratetap:focus-visible svg{filter:drop-shadow(0 0 5px var(--accent))}
 .cratehint{margin:0;position:relative;z-index:1;font-weight:700;color:var(--ink);background:var(--surface);border:1px solid var(--line);padding:6px 16px;border-radius:999px;animation:crpulse 1.6s ease-in-out infinite}
 @keyframes crfloat{0%,100%{transform:translateY(0) rotate(-1.5deg)}50%{transform:translateY(-10px) rotate(1.5deg)}} @keyframes crpulse{50%{opacity:.62}}
 .cratewait.opening .cratetap{animation:crshake .64s cubic-bezier(.3,0,.3,1) forwards} .cratewait.opening .cratehint{visibility:hidden}
@@ -1280,6 +1291,13 @@ button.rcrow{cursor:pointer} button.rcrow:hover{border-color:var(--accent)}
 .au-nova circle{fill:var(--rar-legendary-soft)} .au-nova .aurays{transform-origin:32px 33px;animation:rays 18s linear infinite} .au-nova .aurays path{fill:var(--rar-legendary);opacity:.6}
 @keyframes autwink{0%,100%{opacity:1}50%{opacity:.25}}
 @media (prefers-reduced-motion: reduce){ .sk-aurora .kn-body,.aura *,.prays{animation:none} }
+
+/* a phone: things to tap are at least a fingertip high, and a long choice in Advanced settings gets a row of its own */
+@media (max-width:640px){
+  .chnav .chip{min-height:32px;padding:6px 11px} .crumbs .btn.small, .lesson-head .btn.small{min-width:36px}
+  .repdet .setseg:has(> :nth-child(3)){grid-auto-flow:row;grid-auto-columns:auto;grid-template-columns:minmax(0,1fr)} .repdet .setseg button{min-height:40px}
+}
+@media (pointer:coarse), (max-width:640px){ button.linkish{padding-block:7px;margin-block:-7px} }
 
 </style>
 
