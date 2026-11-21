@@ -5266,6 +5266,13 @@ function sbGo(next, anim = true){
   renderDrillBoard(anim ? {u: N[next].u, meta: N[next]} : null);
   sbContinue();
 }
+// Never the same line twice in a row. SB_PREVL keeps the line each colour's last game ended on, and the other side only
+// picks among the moves a game can still end somewhere else from. With one line to play, it is that line again.
+const SB_PREVL = {};
+function sbEndsElse(c, last){
+  const ks = myTurnAt(c) ? sbMyKids(c) : sbOppKids(c);
+  return ks.length ? ks.some(k => sbEndsElse(k, last)) : sbLineFor(c) !== last;
+}
 function sbContinue(){
   const D = S.drill, idx = D.node;
   if (myTurnAt(idx)){
@@ -5278,7 +5285,9 @@ function sbContinue(){
     const t = ++D.tick; // a newer timer (after leaving and coming back) cancels this one
     setTimeout(() => {
       if (S.drill !== D || D.tick !== t) return;
-      const ws = sbWeights(bk), c = pickWeighted(bk, ws), tot = ws.reduce((a, b) => a + b, 0);
+      const ws = sbWeights(bk), tot = ws.reduce((a, b) => a + b, 0), last = SB_PREVL[D.side];
+      const ok = last ? bk.map(k => sbEndsElse(k, last)) : null, some = ok && ok.includes(true);
+      const c = some ? pickWeighted(bk.filter((k, i) => ok[i]), ws.filter((w, i) => ok[i])) : pickWeighted(bk, ws);
       D.choices.push({at: idx, pick: c, kids: bk, share: ws.map(w => w / tot)});
       D.flash = null; D.msg = '';
       sbGo(c);
@@ -5366,7 +5375,7 @@ function sbLineFor(idx){
 }
 function sbFinish(){
   const D = S.drill; D.state = 'done'; D.busy = false; D.hint = null;
-  D.line = sbLineFor(D.node);
+  D.line = sbLineFor(D.node); if (D.line && !D.tour) SB_PREVL[D.side] = D.line;
   const clean = D.slips.length === 0;
   if (D.line) Prog.record(D.line, clean);
   const sb = Prog.d.sb || (Prog.d.sb = {games: 0, clean: 0, slips: 0, seen: {}});
