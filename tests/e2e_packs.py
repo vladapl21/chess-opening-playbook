@@ -18,6 +18,10 @@ E5 = ['italian', 'ruy', 'scotch', 'vienna', 'attacks']
 WE4 = ['italian', 'e5x', 'caro', 'sic', 'scandi', 'pirc', 'french', 'rare']
 WE4_UNITS = {'w-italian', 'w-sicilian', 'w-caro', 'w-2knights', 'w-philidor', 'w-defences', 'w-rare'}
 LONDON_UNITS = {'w-london', 'w-lindian', 'w-lrare'}
+# second steps inside the e-pawn repertoire: slot, variation, the house chapter it replaces, its chapter, its unit, the unit it replaces, a main line
+WVARS = [('whiteSic', 'open', 'sic', 'sico', 'w-sicopen', ('w-sicilian',), 'so-najdorf', 'Against the Sicilian'),
+         ('whiteCaro', 'advance', 'caro', 'caroadv', 'w-caroadv', ('w-caro',), 'ca-main', 'Against the Caro-Kann'),
+         ('whiteItalian', 'slow', 'italian', 'italians', 'w-italslow', ('w-italian', 'w-2knights'), 'sl-main', 'Your Italian')]
 
 
 def hook(pg):
@@ -62,7 +66,7 @@ with sync_playwright() as p:
     ctx = b.new_context(viewport={'width': 1280, 'height': 900}); pg = ctx.new_page(); hook(pg)
     pg.goto(URL); pg.wait_for_timeout(1000)
     a = shape(pg); print('default:', {k: (v if k != 'units' else len(v)) for k, v in a.items()})
-    assert 'caro' not in a['chapters'] and a['chapters'][:5] == E5 and a['all'] == len(a['chapters']) + 5
+    assert 'caro' not in a['chapters'] and a['chapters'][:5] == E5 and a['all'] == len(a['chapters']) + 6
     assert 'b-caro' not in a['units'] and len(a['units']) == 17 and a['first'] == ['e7e5']
     assert pg.evaluate("Object.keys(LIDX.b).some(l => l.startsWith('bck-'))") is False
 
@@ -71,7 +75,7 @@ with sync_playwright() as p:
     pg.click('#setBtn'); pg.wait_for_timeout(300)
     assert not pg.locator('#setPanel [data-packask="blackE4:caro"]').is_visible(), 'the repertoire is folded away'
     pg.click('#setPanel .repdet > summary'); pg.wait_for_timeout(200)
-    rows = pg.locator('#setPanel [data-packask]').all_inner_texts(); print('settings:', rows); assert len(rows) == 9
+    rows = pg.locator('#setPanel [data-packask]').all_inner_texts(); print('settings:', rows); assert len(rows) == 9 + 2 * len(WVARS)
     pg.click('#setPanel [data-packask="blackE4:caro"]'); pg.wait_for_timeout(200)
     assert pg.evaluate("PICKS.blackE4 || null") is None and pg.locator('#repName').count() == 1, 'a tap alone switches nothing'
     pg.fill('#repName', 'somebody'); assert pg.is_disabled('.repask [type=submit]')
@@ -135,7 +139,12 @@ with sync_playwright() as p:
     cards = pg.evaluate("""makeChoices({slots: {blackE4: {n: 20, opts: {caro: {n: 15, w: 8, l: 6, d: 1}, e5: {n: 5, w: 2, l: 3, d: 0}}},
         blackD4: {n: 12, opts: {slav: {n: 12, w: 6, l: 5, d: 1}}}}}).map(c => [c.id, (c.opts || []).map(o => [o.id, !!o.ready])])""")
     print('cards for a Caro-Kann player:', cards[:2]); assert cards[0] == ['blackE4', [['caro', True], ['e5', True], ['sicilian', True], ['scandi', True]]], cards[0]
-    assert cards[1] == ['blackD4', [['slav', True], ['kid', True]]] and cards[2][0] == 'order', 'the d-pawn has a second system now, so it gets a card'
+    # the Sicilian has two variations, so "which Sicilian?" is a card of its own: a second step, shown once the Sicilian is picked
+    assert cards[1] == ['blackSic', [['kan', True], ['dragon', True]]], cards[1]
+    assert pg.evaluate("makeChoices({slots: {blackE4: {n: 20, opts: {e5: {n: 20, w: 9, l: 9, d: 2}}}}}).find(c => c.id === 'blackSic').within") == ['blackE4', 'sicilian']
+    own = pg.evaluate("""makeChoices({slots: {blackE4: {n: 20, opts: {sicilian: {n: 20, w: 9, l: 9, d: 2}}}, blackSic: {n: 20, opts: {dragon: {n: 14, w: 7, l: 6, d: 1}, kan: {n: 6, w: 2, l: 3, d: 1}}}}})
+        .find(c => c.id === 'blackSic').opts.map(o => o.id)"""); assert own == ['dragon', 'kan'], own       # a Dragon player sees the Dragon first
+    assert cards[2] == ['blackD4', [['slav', True], ['kid', True]]] and cards[3][0] == 'order', 'the d-pawn has a second system now, so it gets a card'
     three = pg.evaluate("""makeChoices({slots: {blackE4: {n: 20, opts: {sicilian: {n: 16, w: 8, l: 7, d: 1}, e5: {n: 4, w: 2, l: 2, d: 0}}}}})[0].opts.map(o => o.id)""")
     assert three == ['sicilian', 'e5', 'caro', 'scandi'], three
 
@@ -146,13 +155,33 @@ with sync_playwright() as p:
     assert 'sicilian' in s3['chapters'] and 'caro' not in s3['chapters'] and not set(E5) & set(s3['chapters']) and s3['first'] == ['c7c5'] and 'b-sicilian' in s3['units']
     pg.evaluate("useSide('b'); startDrillLine('bsi-open')"); pg.wait_for_timeout(600); assert drill_clean(pg) == 'done'
     pg.evaluate("openLine('bsi-open')"); pg.wait_for_timeout(400); pg.keyboard.press('End'); pg.wait_for_timeout(400); pg.screenshot(path=out + 'p_sicilian.png')
-    pg.evaluate("Prog.d.packs = {blackE4: 'e5', updated: Date.now()}; Prog.save(); window.__before = 1; syncPacks()")
+    # the Sicilian's second step: the Kan until the Dragon is picked. The row is in Advanced settings only while the Sicilian is in play
+    assert 'dragon' not in s3['chapters'] and 'b-dragon' not in s3['units'] and pg.evaluate("slotOn(BOOKS.b, 'blackSic') && packOf(BOOKS.b, 'blackSic')") == 'kan'
+    pg.evaluate("go('course')"); switch(pg, 'blackSic:dragon')
+    dr = shape(pg); print('dragon:', dr['chapters'], dr['first'])
+    assert 'dragon' in dr['chapters'] and 'sicilian' not in dr['chapters'] and not set(E5) & set(dr['chapters']) and dr['first'] == ['c7c5'] and 'b-dragon' in dr['units'] and 'b-sicilian' not in dr['units']
+    assert pg.evaluate("(() => { useSide('b'); let i = 0; for (const u of ['e2e4', 'c7c5', 'g1f3']) i = N[i].k.find(k => N[k].u === u); return sbMyKids(i).map(c => N[c].u); })()") == ['d7d6'], 'one position, one move: the Dragon\'s second move, not the Kan\'s'
+    for lid in ('bdr-yugo', 'bdr-classical'):
+        pg.evaluate(f"useSide('b'); startDrillLine('{lid}')"); pg.wait_for_timeout(600); assert drill_clean(pg) == 'done', lid
+    assert pg.evaluate("!!planOf('bdr-classical')")
+    pg.evaluate("useSide('b'); S.chapter = 'dragon'; go('learn')"); pg.wait_for_timeout(500)
+    txt = pg.inner_text('#view'); assert 'the long diagonal' in txt and 'The Yugoslav Attack' in txt and 'The Classical Dragon' in txt; pg.screenshot(path=out + 'p_dragon.png')
+    pg.click('#setBtn'); pg.wait_for_timeout(300); pg.click('#setPanel .repdet > summary'); pg.wait_for_timeout(200)
+    rows = pg.evaluate("[...document.querySelectorAll('#setPanel .repbody .setrow > b')].map(b => b.textContent)"); print('rows with the Sicilian on:', rows)
+    assert 'Your Sicilian' in rows and pg.get_attribute('#setPanel [data-packask="blackSic:dragon"]', 'aria-pressed') == 'true'
+    pg.evaluate("Rep.open = false; Settings.close()")
+    pg.evaluate("Prog.d.packs = Object.assign({}, Prog.d.packs, {blackE4: 'e5', updated: Date.now()}); Prog.save(); window.__before = 1; syncPacks()")
     pg.wait_for_function("typeof __before === 'undefined' && typeof COURSE !== 'undefined' && typeof PERSONA !== 'undefined'"); pg.wait_for_timeout(900)
-    assert shape(pg)['chapters'] == a['chapters']
+    # back on the e-pawn: no Sicilian chapter of either kind, and no row for its second step, though the Dragon stays picked for next time
+    assert shape(pg)['chapters'] == a['chapters'] and pg.evaluate("slotOn(BOOKS.b, 'blackSic')") is False and pg.evaluate("Prog.d.packs.blackSic") == 'dragon'
+    pg.click('#setBtn'); pg.wait_for_timeout(300); pg.click('#setPanel .repdet > summary'); pg.wait_for_timeout(200)
+    assert 'Your Sicilian' not in pg.evaluate("[...document.querySelectorAll('#setPanel .repbody .setrow > b')].map(b => b.textContent)"); pg.evaluate("Rep.open = false; Settings.close()")
+    assert pg.evaluate("Prog.rec('bdr-yugo').clean") == 1, 'the Dragon\'s record is kept'
+    pg.evaluate("Prog.d.packs = {blackE4: 'e5', updated: Date.now()}; Prog.save(); window.__before = 1; syncPacks()"); pg.wait_for_timeout(1200)
 
     # the London is a pack for White, beside the e-pawn
     w0 = wshape(pg); print('white default:', {k: (v if k != 'units' else len(v)) for k, v in w0.items()})
-    assert w0['chapters'] == WE4 and w0['all'] == len(WE4) + 6 and w0['first'] == 'e2e4' and w0['roots'] == ['e2e4']
+    assert w0['chapters'] == WE4 and w0['all'] == len(WE4) + 6 + len(WVARS) and w0['first'] == 'e2e4' and w0['roots'] == ['e2e4']
     assert not LONDON_UNITS & set(w0['units']) and WE4_UNITS <= set(w0['units'])
     assert pg.evaluate("Object.keys(LIDX.w).some(l => l.startsWith('ld-'))") is False
     pg.evaluate("useSide('w'); startDrillLine('setup')"); pg.wait_for_timeout(600); assert drill_clean(pg) == 'done'
@@ -230,6 +259,35 @@ with sync_playwright() as p:
     assert e_b['chapters'] == base_b['chapters'] and e_b['units'] == base_b['units'] and e_b['lines'] == base_b['lines'] and e_w['chapters'] == base_w['chapters'] and e_w['lines'] == base_w['lines']
     assert pg.evaluate("['bsc-main', 'bki-main', 'bkx-london', 'en-main'].map(l => Prog.rec(l).clean)") == [1, 1, 1, 1], 'records in the other systems are kept'
     print('the Scandinavian, the King\'s Indian and the English switch in and out')
+
+    # variations inside the e-pawn repertoire: each swaps one chapter and one unit and nothing else, drills clean, and has its
+    # row in Advanced settings only while the e-pawn is White's first move
+    for slot, var, old_ch, new_ch, unit, old_unit, main, label in WVARS:
+        pg.evaluate("go('course')"); switch(pg, f'{slot}:{var}')
+        v = wshape(pg); print(f'{slot}:{var}:', v['chapters'])
+        assert v['chapters'] == [new_ch if c == old_ch else c for c in WE4] or set(v['chapters']) == (set(WE4) - {old_ch}) | {new_ch}, v['chapters']
+        assert unit in v['units'] and not set(old_unit) & set(v['units']) and v['first'] == 'e2e4' and (WE4_UNITS - set(old_unit)) <= set(v['units'])
+        pg.evaluate(f"useSide('w'); startDrillLine('{main}')"); pg.wait_for_timeout(600); assert drill_clean(pg) == 'done', main
+        assert pg.evaluate(f"!!planOf('{main}')")
+        pg.evaluate(f"useSide('w'); S.chapter = '{new_ch}'; go('learn')"); pg.wait_for_timeout(500); pg.screenshot(path=out + f'p_{new_ch}.png')
+        assert pg.evaluate('document.documentElement.scrollWidth') <= 1280
+        pg.evaluate("go('course')"); switch(pg, 'white:d4')
+        assert pg.evaluate(f"slotOn(BOOKS.w, '{slot}')") is False and new_ch not in wshape(pg)['chapters']
+        pg.click('#setBtn'); pg.wait_for_timeout(300); pg.click('#setPanel .repdet > summary'); pg.wait_for_timeout(200)
+        assert label not in pg.evaluate("[...document.querySelectorAll('#setPanel .repbody .setrow > b')].map(b => b.textContent)"); pg.evaluate("Rep.open = false; Settings.close()")
+        pg.evaluate("go('course')"); switch(pg, 'white:e4')
+        assert new_ch in wshape(pg)['chapters'], 'the variation is still picked when the e-pawn comes back'
+        pg.click('#setBtn'); pg.wait_for_timeout(300); pg.click('#setPanel .repdet > summary'); pg.wait_for_timeout(200)
+        assert label in pg.evaluate("[...document.querySelectorAll('#setPanel .repbody .setrow > b')].map(b => b.textContent)"); pg.evaluate("Rep.open = false; Settings.close()")
+        pg.evaluate("go('course')"); switch(pg, f"{slot}:{pg.evaluate(f'BOOKS.w.packs.{slot}.default')}")
+        e = wshape(pg); assert e['chapters'] == base_w['chapters'] and e['lines'] == base_w['lines'] and e['units'] == base_w['units'], (slot, 'back to the house book')
+        assert pg.evaluate(f"Prog.rec('{main}').clean") == 1
+    # a card for a second step inside the e-pawn repertoire comes only when the player's own games go the other way
+    cs = pg.evaluate("""[makeChoices({slots: {white: {n: 40, opts: {e4: {n: 40, w: 20, l: 18, d: 2}}}, whiteSic: {n: 3, opts: {open: {n: 3, w: 1, l: 2, d: 0}}}}}).map(c => c.id),
+        makeChoices({slots: {white: {n: 40, opts: {e4: {n: 40, w: 20, l: 18, d: 2}}}, whiteSic: {n: 8, opts: {open: {n: 6, w: 3, l: 3, d: 0}, alapin: {n: 2, w: 1, l: 1, d: 0}}}}}).filter(c => c.id === 'whiteSic').map(c => [c.within, c.opts.map(o => o.id)])]""")
+    assert 'whiteSic' not in cs[0] and cs[1] == [[['white', 'e4'], ['open', 'alapin']]], cs
+    assert 'whiteSic' not in pg.evaluate("makeChoices({slots: {white: {n: 40, opts: {e4: {n: 40, w: 20, l: 18, d: 2}}}, whiteSic: {n: 12, opts: {alapin: {n: 10, w: 5, l: 5, d: 0}, open: {n: 2, w: 1, l: 1, d: 0}}}}}).map(c => c.id)"), 'a player who already plays the first variation is not asked'
+    print('variations inside the e-pawn repertoire switch in and out:', [w[1] for w in WVARS])
 
     # phone width with the Caro-Kann on
     ph = b.new_context(viewport={'width': 390, 'height': 844}); ph.add_init_script("localStorage.setItem('playbook-packs', JSON.stringify({blackE4: 'caro'}))")

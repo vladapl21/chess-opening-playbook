@@ -16,4 +16,6 @@ FIXED = {
     'e4 d5 exd5 Qxd5 Nc3 Qa5 Nf3 Nf6 Bc4 c6 O-O Bf5 Ng5 e6 d3 Be7 Bd2': 'Qc7',
 }
 REPLY = {}
-KEEP = set()
+# rr-nimzo runs into the Italian by another move order and is held with either Italian (the center attack or the slow
+# one), so it stops where they part: its last move is the bishop's, and the Italian lessons take it from there
+KEEP = {'rr-nimzo'}

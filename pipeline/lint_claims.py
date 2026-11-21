@@ -9,6 +9,7 @@
 Exit code 1 if anything is found, so the build can stop on it."""
 import sys, json, re, collections, itertools
 import paths
+import packs as PK
 from common import *
 
 VAL = {chess.PAWN: 1, chess.KNIGHT: 3, chess.BISHOP: 3, chess.ROOK: 5, chess.QUEEN: 9, chess.KING: 100}
@@ -105,12 +106,8 @@ def lint_labels(side):
 
 def combos(D):
     """Every repertoire a player can hold: one pack per slot (see PACKS in the content). Returns sets of chapter ids left out."""
-    slots = list((D.get('packs') or {}).values())
-    if not slots: return [frozenset()]
-    out = []
-    for pick in itertools.product(*[list(s['packs']) for s in slots]):
-        out.append(frozenset(c for s, p in zip(slots, pick) for q, chs in s['packs'].items() if q != p for c in chs))
-    return out
+    P = D.get('packs') or {}
+    return [frozenset(PK.off(P, picks)) for picks in PK.combos(P)]
 
 
 def lint_repeats(side):

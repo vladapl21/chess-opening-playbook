@@ -64,6 +64,24 @@ const Analyze = (() => {
       ['dutch', 'Dutch (f-pawn)', g => S(g, 'd4', 'f5')], ['d5', 'D-pawn against d-pawn', g => S(g, 'd4', 'd5')], ['other', 'Something else', g => S(g, 'd4')]]
   };
   const nameIn = (slot, sans) => { for (const [key, name, test] of NAMES[slot]) if (test(sans)) return {key, name}; return null; };
+  /* second steps: the variation of a system a game shows, for the slots that sit within a pack of another slot. Each has
+     the games it reads (colour and first moves) and its names, keyed by the packs' ids. */
+  const SUBS = {
+    whiteItalian: {me: 'w', first: ['e4', 'e5', 'Nf3', 'Nc6', 'Bc4'], names: [
+      ['center', 'Strike in the middle at once', g => has(g, 'w', 'd4', 14) || has(g, 'w', 'Ng5', 10)], ['slow', 'Build first (slow Italian)', g => has(g, 'w', 'd3', 12)],
+      ['other', 'Something else', () => true]]},
+    whiteCaro: {me: 'w', first: ['e4', 'c6'], names: [
+      ['advance', 'Push past (Advance)', g => g[2] === 'd4' && g[4] === 'e5'], ['classical', 'Knight out (main line)', g => g[2] === 'd4' && (g[4] === 'Nc3' || g[4] === 'Nd2')],
+      ['other', 'Something else', () => true]]},
+    whiteSic: {me: 'w', first: ['e4', 'c5'], names: [
+      ['alapin', 'The small c-pawn (Alapin)', g => g[2] === 'c3' || g[4] === 'c3'], ['open', 'Open the middle (Open Sicilian)', g => g[2] === 'Nf3' && g[4] === 'd4'],
+      ['other', 'Something else', () => true]]},
+    blackSic: {me: 'b', first: ['e4', 'c5'], names: [
+      ['dragon', 'Bishop on the long diagonal (Dragon)', g => has(g, 'b', 'g6', 14)], ['kan', 'Small pawn moves (Kan)', g => has(g, 'b', 'e6', 10) && has(g, 'b', 'a6', 14)],
+      ['other', 'Something else', () => true]]}
+  };
+  const subsOf = g => Object.keys(SUBS).filter(k => SUBS[k].me === g.me && SUBS[k].first.every((s, i) => g.sans[i] === s))
+    .map(k => { const f = SUBS[k].names.find(([, , test]) => test(g.sans)); return [k, f[0], f[1]]; });
 
   /* ---- the books: which chapter a position belongs to */
   function indexBook(D){
@@ -95,7 +113,9 @@ const Analyze = (() => {
   }
   // the nodes on the lines of the chapters in play (null: the book has one pack per slot, so all of it is in play)
   function inPlay(D, home){
-    const off = new Set(); for (const [slot, v] of Object.entries(D.packs || {})) for (const id in v.packs) if (id !== home[slot]) v.packs[id].forEach(c => off.add(c));
+    // a slot within a pack of another slot is in play only while that pack is home (slotOn in the template)
+    const on = slot => { const v = (D.packs || {})[slot], w = v && v.within; return !!v && (!w || (on(w[0]) && home[w[0]] === w[1])); };
+    const off = new Set(); for (const [slot, v] of Object.entries(D.packs || {})) for (const id in v.packs) if (!on(slot) || id !== home[slot]) v.packs[id].forEach(c => off.add(c));
     if (!off.size) return null;
     const partCh = {}; for (const p of D.parts) partCh[p.id] = p.ch;
     const lesCh = {}; for (const l of D.lessons) lesCh[l.id] = partCh[l.part];
@@ -210,6 +230,7 @@ const Analyze = (() => {
     for (const g of games){
       const sl = g.me === 'w' ? 'white' : g.sans[0] === 'e4' ? 'blackE4' : g.sans[0] === 'd4' ? 'blackD4' : null, f = sl && nameIn(sl, g.sans);
       if (f){ const h = habit[sl] = habit[sl] || {n: 0, opts: {}}; h.n++; h.opts[f.key] = (h.opts[f.key] || 0) + 1; }
+      for (const [k, key] of subsOf(g)){ const h = habit[k] = habit[k] || {n: 0, opts: {}}; h.n++; h.opts[key] = (h.opts[key] || 0) + 1; }
     }
     const home = P.home = homePacks(books, habit, picks), okOf = {w: inPlay(books.w, home), b: inPlay(books.b, home)};
     games.forEach((g, gi) => {
@@ -225,6 +246,7 @@ const Analyze = (() => {
         if (first === 'e4'){ const o = nameIn('blackE4', g.sans); slot('blackE4', o.key, o.name, r); }
         else if (first === 'd4'){ const o = nameIn('blackD4', g.sans); slot('blackD4', o.key, o.name, r); }
       }
+      for (const [k, key, name] of subsOf(g)) slot(k, key, name, r);
       // where it sits in the books
       const w = walk(D, g.ucis, g.me, okOf[g.me]), inBook = !!w.ch;
       // systems: how often each chapter's setup was faced. off: games where the player's own first move was not the playbook's

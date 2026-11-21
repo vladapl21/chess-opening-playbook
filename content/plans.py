@@ -310,7 +310,7 @@ W = {
     ('pawns', 'Push the e-pawn past the knight when it gains space.'),
     ('pieces', 'Castle, rook behind the center pawns.')]),
   'rr-nimzo': dict(h='Back in your Italian', b=[
-    ('pawns', 'Small c-pawn move, then the d-pawn two squares.'),
+    ('pieces', 'The position is the one your Italian lessons start from. Every move from here is theirs.'),
     ('king', 'Castle short.'),
     ('target', 'f7.')]),
   'rr-alekhine': dict(h='Two bishops and space', b=[
@@ -409,6 +409,23 @@ W = {
     ('target', 'Black\'s h-pawn. Once the knight is driven off, only the king guards it.'),
     ('pieces', 'If the knight goes to the middle, the bishop takes the h-pawn with check and the attack crashes through.'),
     ('watch', 'If the knight jumps forward instead, the small h-pawn move sends it to the edge, and your bishop takes it there.')]),
+  # ---------------------------------------------------------------- the slow Italian
+  'sl-main': dict(h='Knight round, then the d-pawn forward', b=[
+    ('pieces', 'The knight goes behind the rook and out to the kingside. The bishop steps back out of reach when a pawn or a knight comes at it.'),
+    ('pawns', 'When every piece is ready, the d-pawn goes one more square.'),
+    ('king', 'Already safe. The small edge-pawn move keeps Black\'s bishop off your knight.'),
+    ('them', 'Black wants the same setup on the other side, and to push the d-pawn first.')]),
+  # ---------------------------------------------------------------- the Open Sicilian
+  'so-najdorf': dict(h='Queen, castle long, then the g-pawn', b=[
+    ('pieces', 'The queen goes beside the bishop and the king castles long.'),
+    ('pawns', 'Then the g-pawn two squares. It is aimed at the knight in front of Black\'s king.'),
+    ('target', 'The square in front of Black\'s d-pawn. A knight that lands there can\'t be chased by a pawn.'),
+    ('them', 'Black wants to push the b-pawn at your knight and bring a rook to the half-open file.')]),
+  'so-dragon': dict(h='Trade the bishop, open the edge file', b=[
+    ('pieces', 'Your bishop goes to the square beside Black\'s king, to trade off the bishop on the long diagonal.'),
+    ('pawns', 'The edge pawn goes two squares and on, to open the file in front of Black\'s king.'),
+    ('king', 'Step the king into the corner first if Black\'s rook lines up on your knight.'),
+    ('them', 'Black wants the half-open file and a knight jump in beside your king.')]),
 }
 
 B = {
@@ -701,6 +718,17 @@ B = {
     ('pawns', 'Trade the c-pawns: the file opens for the rook that already stands on it.'),
     ('pieces', 'The king\'s knight comes out behind the e-pawn and heads for the square where it hits the d-pawn too.'),
     ('them', 'White wants to keep the chain and use the extra space on the kingside.')]),
+  # ---------------------------------------------------------------- the Dragon
+  'bdr-yugo': dict(h='Your attack runs down the half-open file', b=[
+    ('pieces', 'The knight in the middle can jump in beside White\'s king; if a bishop takes it, your rook takes back and stays on the file.'),
+    ('target', 'The knight in front of White\'s king. Rook, bishop and queen all bear on it, and giving the rook for it often breaks the king\'s cover.'),
+    ('watch', 'Keep the edge pawn where it is. White wants to trade your bishop on the long diagonal: it is your best piece, so step it back when the other bishop offers.'),
+    ('them', 'White wants to push the g-pawn, open a file at your king and trade off your bishop.')]),
+  'bdr-classical': dict(h='Queen\'s knight out, then the d-pawn break', b=[
+    ('pieces', 'The queen\'s knight comes out, then the bishop behind it.'),
+    ('pawns', 'The d-pawn two squares, once it is safe: it frees your whole game.'),
+    ('king', 'Both kings are on the same side, so there is no race. Play in the middle and on the half-open file.'),
+    ('them', 'White wants to push the f-pawn at your king or hold the middle and squeeze.')]),
   # ---------------------------------------------------------------- the King's Indian
   'bki-main': dict(h='Hold the knight, then the f-pawn', b=[
     ('pieces', 'Your knight sits in front of White\'s c-pawn and hits the e-pawn. Push the a-pawn two squares so the b-pawn can\'t kick it.'),

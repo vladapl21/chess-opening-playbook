@@ -11,6 +11,7 @@ CHAPTERS = [
   dict(id='attacks', name='Early attacks', move="Wayward Queen, King's Gambit, Bishop's Opening", parts=['ba-queen', 'ba-kg', 'ba-bishop', 'ba-odd']),
   dict(id='caro', name='Caro-Kann', move='Advance, Exchange, Panov, Classical, Two Knights', parts=['bck-adv', 'bck-exch', 'bck-main', 'bck-knights', 'bck-other']),
   dict(id='sicilian', name='Sicilian', move='Open, Alapin, Smith-Morra, Bowdler, Closed', parts=['bsi-open', 'bsi-bc4', 'bsi-c3', 'bsi-other']),
+  dict(id='dragon', name='Sicilian Dragon', move='Yugoslav Attack, Classical, Moscow, Alapin, Closed', parts=['bdr-open', 'bdr-third', 'bdr-second']),
   dict(id='scandi', name='Scandinavian', move='Main Line, Advance, Tennison Gambit, Blackmar-Diemer', parts=['bsc-queen', 'bsc-third', 'bsc-push', 'bsc-second']),
   dict(id='slav', name='Queen\'s Gambit', move='Slav Defense, Exchange Slav', parts=['bsl-quiet', 'bsl-knights', 'bsl-exch', 'bsl-bishop']),
   dict(id='london', name='London System', move='London, Jobava London', parts=['bln-main', 'bln-jobava']),
@@ -23,8 +24,11 @@ CHAPTERS = [
 # Systems. A slot is one decision in a repertoire ("what do I play against the e-pawn?") and a pack is one answer to it.
 # A player has exactly one pack per slot, so two packs of a slot may answer the same position differently; inside the
 # packs a player can hold together, one position still gets one move. Chapters in no pack are always in.
+# A slot with `within` is a second step: it exists only while that pack of the other slot is in play (pipeline/packs.py).
+# The Sicilian is a family: the pack holds no chapter of its own, and blackSic says which variation.
 PACKS = dict(
-  blackE4=dict(default='e5', packs=dict(e5=['italian', 'ruy', 'scotch', 'vienna', 'attacks'], caro=['caro'], sicilian=['sicilian'], scandi=['scandi'])),
+  blackE4=dict(default='e5', packs=dict(e5=['italian', 'ruy', 'scotch', 'vienna', 'attacks'], caro=['caro'], sicilian=[], scandi=['scandi'])),
+  blackSic=dict(default='kan', within=['blackE4', 'sicilian'], packs=dict(kan=['sicilian'], dragon=['dragon'])),
   blackD4=dict(default='slav', packs=dict(slav=['slav', 'london', 'd4x'], kid=['kid', 'kidx'])),
 )
 
@@ -140,6 +144,16 @@ CH_META = {
            dict(big='1 in 3', text='guard the knight with the bishop in the main line and lose the d-pawn to your queen', alert=True),
            dict(big='2', text='pawn moves start every game, whatever White plays on move two')],
     notes=[]),
+  'dragon': dict(tile='e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6', first='bdr-yugo',
+    roots=['e4 c5'],
+    hero='e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3 O-O Qd2 Nc6 Bc4 Bd7 O-O-O Rc8', arrows=['c8c3g', 'g7d4g'], circles=['c8g'], cap='The rook on the half-open file and the bishop on the long diagonal both point at White\'s king.',
+    kicker='Sicilian Defense: Dragon Variation',
+    headline='Your bishop owns <em>the long diagonal</em>.',
+    lede='C-pawn two squares on move one, and when White pushes the d-pawn you take it. Then the same moves every game: d-pawn one square, knight, g-pawn, bishop to the long diagonal, castle. If White castles long, your rook takes the half-open file and the race is on. If White never opens the middle, the setup comes out all the same.',
+    facts=[dict(big='1 in 2', text='club players bring the knight out on move two, and fewer than half of those open the middle'),
+           dict(big='5', text='moves make the setup, in the same order: d-pawn, knight, g-pawn, bishop, castle'),
+           dict(big='1 in 6', text='set up for the Yugoslav Attack on move six. The pin and the Italian bishop are more common.', alert=True)],
+    notes=[]),
   'scandi': dict(tile='e4 d5 exd5 Qxd5', first='bsc-main',
     roots=['e4 d5'],
     hero='e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Bd2 c6', arrows=['c8f5g', 'e7e6g'], circles=['c6g'], cap='The c-pawn gives the queen a way home. The bishop comes out next.',
@@ -201,6 +215,15 @@ CHEAT = [
   ('e4 d5 exd5 Qxd5 d4', 'e5', 'D-pawn at once: your e-pawn hits it', 'bsc-3rd'),
   ('e4 d5 Nf3', 'dxe4', 'Gambit knight: take the pawn', 'bsc-tennison'),
   ('e4 d5 d3 dxe4 dxe4', 'Qxd1+', 'Small d-pawn: take, then trade queens', 'bsc-2nd'),
+  ('e4', 'c5', 'C-pawn two squares; take the d-pawn when it comes', 'bdr-yugo'),
+  ('e4 c5 Nf3', 'd6', 'D-pawn one square: the first move of the setup', 'bdr-yugo'),
+  ('e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3', 'g6', 'G-pawn, then the bishop to the long diagonal', 'bdr-yugo'),
+  ('e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3', 'Bg7', 'Bishop first; the knight jump waits', 'bdr-yugo'),
+  ('e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3 O-O Qd2 Nc6 Bc4 Bd7 O-O-O', 'Rc8', 'White castles long: rook to the half-open file', 'bdr-yugo'),
+  ('e4 c5 Nf3 d6 d4 cxd4 Qxd4', 'Nc6', 'Queen takes back: your knight hits her', 'bdr-fourth'),
+  ('e4 c5 Nf3 d6 Bb5+', 'Bd7', 'Bishop check: block with the bishop', 'bdr-moscow'),
+  ('e4 c5 c3', 'Nf6', 'Small c-pawn: knight hits the e-pawn', 'bdr-alapin'),
+  ('e4 c5 Bc4', 'd6', 'Bishop out early: the same setup', 'bdr-bowdler'),
   ('e4', 'c5', 'C-pawn two squares, then the e-pawn one', 'bsi-open'),
   ('e4 c5 Nf3 e6 d4', 'cxd4', 'Take the d-pawn', 'bsi-open'),
   ('e4 c5 Nf3 e6 d4 cxd4 Nxd4', 'a6', 'A-pawn one square', 'bsi-open'),
