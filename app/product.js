@@ -1968,7 +1968,7 @@ const Tour = {
       {h: 'Marks on the moves', at: () => document.querySelector('.mklegend') || document.querySelector('.timeline'),
         say: ['The other side\'s inaccuracies, mistakes and blunders carry a mark', 'Key move: your answer that makes a mistake cost', 'In the Sandbox and in drills the mark shows on the board beside the piece']},
       {h: 'The order, on the board', at: '#sb', skip: () => myMoves(LINES[lid]).length < 2,
-        say: ['Each piece carries the number of the move that put it there', 'A purple number is played at another turn than in the main line', 'Move any piece to try something else: your book answers if it knows the move, and the engine if not']},
+        say: ['Each piece carries the number of the move that put it there', 'A purple number is played at another turn than in the main line', 'Move any piece to try something else: your book answers if it knows the move, and the engine if not', 'Above and below the board: the pieces each side has taken, with the lead in points on the side that is ahead']},
       {h: 'The engine in lessons', at: '.engrow', say: ['Switch it on for the best moves, their arrows and the score', 'It stays off in drills, practice games and checkpoints, and comes back when they end']},
       {h: 'The plan from here', at: '.ccol .plan', skip: () => !planOf(lid), go: () => { S.drill = S.drillState = null; openLine(lid, LINES[lid].n.length - 1, 'games'); },
         say: ['Every line ends with a plan: what to aim for once the moves you know run out', 'You get it at the end of lessons, clean drills and practice games', 'In the list of moves, a divider marks where the opening is done: the moves after it are how it usually goes on']},
