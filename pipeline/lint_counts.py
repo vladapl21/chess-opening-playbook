@@ -99,7 +99,7 @@ ROWS = [('Chapters (openings)', 'chapters'), ('Lessons', 'lessons'), ('Lines you
 # rows that used to carry these numbers under another label
 OLD = {'Positions in the tree': 'Positions on those lines', 'Lessons that end with a plan': 'Lessons with a written plan'}
 # the system rows of the Systems table: (slot, pack) and a word that is only in that row
-SYSTEMS = [(('white', 'd4'), 'The London'), (('white', 'flank'), 'The English'), (('whiteSic', 'open'), 'The Open Sicilian'), (('whiteCaro', 'advance'), 'The Advance'), (('blackE4', 'caro'), 'Caro-Kann'), (('blackSic', 'kan'), 'Sicilian: the Kan'), (('blackSic', 'dragon'), 'Sicilian: the Dragon'),
+SYSTEMS = [(('white', 'd4'), 'The London'), (('white', 'flank'), 'The English'), (('whiteItalian', 'slow'), 'The slow Italian'), (('whiteSic', 'open'), 'The Open Sicilian'), (('whiteCaro', 'advance'), 'The Advance'), (('blackE4', 'caro'), 'Caro-Kann'), (('blackSic', 'kan'), 'Sicilian: the Kan'), (('blackSic', 'dragon'), 'Sicilian: the Dragon'),
            (('blackE4', 'scandi'), 'Scandinavian'), (('blackD4', 'kid'), "King's Indian"),
            (('white', 'e4'), 'Open with the e-pawn'), (('blackE4', 'e5'), 'Meet it head-on'), (('blackD4', 'slav'), 'The Slav setup')]
 

@@ -19,8 +19,9 @@ WE4 = ['italian', 'e5x', 'caro', 'sic', 'scandi', 'pirc', 'french', 'rare']
 WE4_UNITS = {'w-italian', 'w-sicilian', 'w-caro', 'w-2knights', 'w-philidor', 'w-defences', 'w-rare'}
 LONDON_UNITS = {'w-london', 'w-lindian', 'w-lrare'}
 # second steps inside the e-pawn repertoire: slot, variation, the house chapter it replaces, its chapter, its unit, the unit it replaces, a main line
-WVARS = [('whiteSic', 'open', 'sic', 'sico', 'w-sicopen', 'w-sicilian', 'so-najdorf', 'Against the Sicilian'),
-         ('whiteCaro', 'advance', 'caro', 'caroadv', 'w-caroadv', 'w-caro', 'ca-main', 'Against the Caro-Kann')]
+WVARS = [('whiteSic', 'open', 'sic', 'sico', 'w-sicopen', ('w-sicilian',), 'so-najdorf', 'Against the Sicilian'),
+         ('whiteCaro', 'advance', 'caro', 'caroadv', 'w-caroadv', ('w-caro',), 'ca-main', 'Against the Caro-Kann'),
+         ('whiteItalian', 'slow', 'italian', 'italians', 'w-italslow', ('w-italian', 'w-2knights'), 'sl-main', 'Your Italian')]
 
 
 def hook(pg):
@@ -265,7 +266,7 @@ with sync_playwright() as p:
         pg.evaluate("go('course')"); switch(pg, f'{slot}:{var}')
         v = wshape(pg); print(f'{slot}:{var}:', v['chapters'])
         assert v['chapters'] == [new_ch if c == old_ch else c for c in WE4] or set(v['chapters']) == (set(WE4) - {old_ch}) | {new_ch}, v['chapters']
-        assert unit in v['units'] and old_unit not in v['units'] and v['first'] == 'e2e4' and (WE4_UNITS - {old_unit}) <= set(v['units'])
+        assert unit in v['units'] and not set(old_unit) & set(v['units']) and v['first'] == 'e2e4' and (WE4_UNITS - set(old_unit)) <= set(v['units'])
         pg.evaluate(f"useSide('w'); startDrillLine('{main}')"); pg.wait_for_timeout(600); assert drill_clean(pg) == 'done', main
         assert pg.evaluate(f"!!planOf('{main}')")
         pg.evaluate(f"useSide('w'); S.chapter = '{new_ch}'; go('learn')"); pg.wait_for_timeout(500); pg.screenshot(path=out + f'p_{new_ch}.png')

@@ -310,7 +310,7 @@ W = {
     ('pawns', 'Push the e-pawn past the knight when it gains space.'),
     ('pieces', 'Castle, rook behind the center pawns.')]),
   'rr-nimzo': dict(h='Back in your Italian', b=[
-    ('pawns', 'Small c-pawn move, then the d-pawn two squares.'),
+    ('pieces', 'The position is the one your Italian lessons start from. Every move from here is theirs.'),
     ('king', 'Castle short.'),
     ('target', 'f7.')]),
   'rr-alekhine': dict(h='Two bishops and space', b=[
@@ -409,6 +409,12 @@ W = {
     ('target', 'Black\'s h-pawn. Once the knight is driven off, only the king guards it.'),
     ('pieces', 'If the knight goes to the middle, the bishop takes the h-pawn with check and the attack crashes through.'),
     ('watch', 'If the knight jumps forward instead, the small h-pawn move sends it to the edge, and your bishop takes it there.')]),
+  # ---------------------------------------------------------------- the slow Italian
+  'sl-main': dict(h='Knight round, then the d-pawn forward', b=[
+    ('pieces', 'The knight goes behind the rook and out to the kingside. The bishop steps back out of reach when a pawn or a knight comes at it.'),
+    ('pawns', 'When every piece is ready, the d-pawn goes one more square.'),
+    ('king', 'Already safe. The small edge-pawn move keeps Black\'s bishop off your knight.'),
+    ('them', 'Black wants the same setup on the other side, and to push the d-pawn first.')]),
   # ---------------------------------------------------------------- the Open Sicilian
   'so-najdorf': dict(h='Queen, castle long, then the g-pawn', b=[
     ('pieces', 'The queen goes beside the bishop and the king castles long.'),

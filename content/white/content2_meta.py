@@ -5,10 +5,11 @@ from content import J
 # Systems. A slot is one decision in a repertoire ("what do I open with?") and a pack is one answer to it (see PACKS in
 # content/black/bmeta.py for the Black book). The White book's first system is the e-pawn; the London is the second and the English the third.
 PACKS = dict(
-  white=dict(default='e4', packs=dict(e4=['italian', 'e5x', 'scandi', 'pirc', 'french', 'rare'],
+  white=dict(default='e4', packs=dict(e4=['e5x', 'scandi', 'pirc', 'french', 'rare'],
                                       d4=['london', 'lindian', 'lrare'],
                                       flank=['english', 'engsym', 'engrare'])),
   # second steps (see pipeline/packs.py): a variation inside the e-pawn repertoire, in play only while the e-pawn is
+  whiteItalian=dict(default='center', within=['white', 'e4'], packs=dict(center=['italian'], slow=['italians'])),
   whiteCaro=dict(default='classical', within=['white', 'e4'], packs=dict(classical=['caro'], advance=['caroadv'])),
   whiteSic=dict(default='alapin', within=['white', 'e4'], packs=dict(alapin=['sic'], open=['sico'])),
 )
@@ -132,6 +133,15 @@ CH_META = {
            dict(big='4', text='moves after the push, in the same order: knight, bishop, castle, c-pawn'),
            dict(big='1 in 10', text='hit the chain with the c-pawn at once. That pawn has then moved twice.', alert=True)],
     notes=[]),
+  'italians': dict(tile='e4 e5 Nf3 Nc6 Bc4', first='sl-main', roots=['e4 e5 Nf3 Nc6'],
+    hero='e4 e5 Nf3 Nc6 Bc4 Bc5 d3 Nf6 c3 d6 O-O O-O Re1 a6 Nbd2', arrows=['d2f1g', 'f1g3g'], circles=['d3g', 'c3g'], cap='Two small pawn moves, the king safe, and the knight on its way round to the kingside.',
+    kicker='Italian Game: Giuoco Pianissimo',
+    headline='Every piece finds its square <em>before the fight</em>.',
+    lede='The same bishop as ever, aimed at f7. But the d-pawn goes one square, not two: nothing is traded early and there is little to memorise. C-pawn one square, castle, rook beside the king, and the queen\'s knight goes the long way round to the kingside. When every piece is ready, the d-pawn goes forward after all.',
+    facts=[dict(big='3 in 10', text='bring the knight out at your e-pawn. The small d-pawn move guards it and the setup carries on.'),
+           dict(big='1 in 5', text='play the small edge-pawn move on move three, against a knight jump you never meant to make'),
+           dict(big='1', text='knight to take: the one that jumps into the middle on move three. Never the e-pawn it offers.', alert=True)],
+    notes=[]),
   'english': dict(tile='c4 e5 Nc3 Nf6 g3', first='en-main', roots=['c4 e5'],
     hero='c4 e5 Nc3 Nf6 g3 Nc6 Bg2 Bc5 e4 O-O Nge2 d6 O-O Bg4 d3', arrows=['g2d5g', 'c3d5g', 'e4d5g', 'c4d5g'], circles=['d5g'], cap='The setup, complete: three pawns in a wedge, and four of your men on one square.',
     kicker='English Opening: the King\'s English',
@@ -181,6 +191,13 @@ CHEAT2 = [
   (J(CKX, 'Bf5 Ng3 Bg6'), 'h4', 'Push the h-pawn at the bishop', 'ck-march'),
   (J(CKX, 'Nf6'), 'Nxf6+', 'Knight trade offered? Take it', 'ck-nf6'),
   (J(CK, 'Nf6'), 'e5', 'Push past the knight', 'ck-nf6-3'),
+  ('e4 e5 Nf3 Nc6', 'Bc4', 'The Italian bishop, aimed at f7', 'sl-main'),
+  ('e4 e5 Nf3 Nc6 Bc4 Bc5', 'd3', 'Small d-pawn move, then the c-pawn', 'sl-main'),
+  ('e4 e5 Nf3 Nc6 Bc4 Bc5 d3 Nf6 c3 d6', 'O-O', 'Castle, then the rook beside the king', 'sl-main'),
+  ('e4 e5 Nf3 Nc6 Bc4 Bc5 d3 Nf6 c3 d6 O-O O-O Re1 a6', 'Nbd2', 'Knight behind the d-pawn, on its way round', 'sl-main'),
+  ('e4 e5 Nf3 Nc6 Bc4 Nf6', 'd3', 'Knight hits the e-pawn: the d-pawn guards it', 'sl-2n'),
+  ('e4 e5 Nf3 Nc6 Bc4 h6', 'd3', 'A move on the edge: carry on', 'sl-h6'),
+  ('e4 e5 Nf3 Nc6 Bc4 Nd4', 'Nxd4', 'Knight jumps into the middle: take it', 'sl-nd4'),
   ('e4 c6 d4 d5', 'e5', 'The d-pawn meets yours: push past', 'ca-main'),
   ('e4 c6 d4 d5 e5 Bf5', 'Nf3', 'Knight, then the bishop one square, then castle', 'ca-main'),
   ('e4 c6 d4 d5 e5 Bf5 Nf3 e6 Be2 c5 O-O Nc6', 'c3', 'C-pawn hits the chain: yours backs it', 'ca-main'),
