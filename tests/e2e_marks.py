@@ -245,6 +245,16 @@ with sync_playwright() as p:
     print('one engine readout:', said); assert 'depth' in said[0] and said[1] == 0 and 'depth' not in said[2] and said[3] >= 1, said
     pg.evaluate("exBack()"); pg.wait_for_timeout(400); pg.evaluate("EngineUI.set(false)")
 
+    # ---- material beside the board: what each side has taken, and the lead on the side that is ahead
+    pg.evaluate("useSide('w'); openLine('fried-liver', 11)"); pg.wait_for_timeout(500)
+    mat = pg.evaluate("""(() => { const rows = [...document.querySelectorAll('.sgrid .mat')].map(r => [r.className, r.querySelectorAll('.pico').length, (r.querySelector('b') || {}).textContent || '']);
+        const m = materialOf('r1bqkb1r/ppp2Npp/2n5/3np3/2B5/8/PPPP1PPP/RNBQK2R b KQkq - 0 6'); return [rows, m.diff, m.w.join(''), m.b.join('')]; })()""")
+    print('material at the knight sacrifice:', mat)
+    assert mat[1:] == [1, 'pp', 'p'] and mat[0] == [['mat top in', 1, ''], ['mat bot in', 2, '+1']], mat
+    pg.evaluate("startDrillLine('fried-liver')"); pg.wait_for_timeout(700)
+    assert pg.evaluate("document.querySelectorAll('.bcol .mat').length") == 2 and pg.evaluate("document.querySelector('#db').getBoundingClientRect().top - document.querySelector('.bcol .mat.top').getBoundingClientRect().bottom") >= 0
+    pg.evaluate("S.drill = S.drillState = null; go('games')"); pg.wait_for_timeout(300)
+
     # ---- a line the build played on: the list of moves says where the added moves begin, the plan written for the lesson
     #      shows at the position it was written for, and the line's end has the plan read off the board there
     pg.evaluate("useSide('w')"); pg.wait_for_timeout(300)

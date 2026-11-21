@@ -66,6 +66,31 @@ with sync_playwright() as p:
     n0 = pg.locator('#view .coord').count()
     pg.click('[data-set^="coords:"]'); pg.wait_for_timeout(300)
     n1 = pg.locator('#view .coord').count(); print('coords', n0, '->', n1); assert n0 > 0 and n1 == 0
+    # piece animations: on by default (medium), six ways to slide with a little board that shows the one picked; off hides them
+    assert pg.evaluate("[SET.anim, SET.animk, SET.snd, SET.sndk]") == [True, 'medium', True, 'wood']
+    kinds = pg.locator('#setPanel [data-set^="animk:"]').all_inner_texts(); print('animations:', kinds)
+    assert kinds == ['Slow', 'Medium', 'Fast', 'Natural', 'Arcade', 'Dynamic'] and pg.locator('#setPanel .animpv svg use').count() == 1
+    durs = pg.evaluate("ANIMS.map(([k]) => [k, animSpec(300, 0, k).opts.duration, animSpec(700, 0, k).opts.duration, animSpec(300, 0, k).frames.length])")
+    print('  how long a three-square and a seven-square move take:', durs)
+    d = {k: (a, b2, n) for k, a, b2, n in durs}
+    assert d['slow'][0] > d['medium'][0] > d['fast'][0] and d['natural'][1] > d['natural'][0] and d['medium'][0] == d['medium'][1] and d['dynamic'][2] == 3
+    pg.click('#setPanel [data-set="animk:arcade"]'); pg.wait_for_timeout(450)
+    assert pg.evaluate("[SET.animk, document.getElementById('animPc').getAttribute('x')]") == ['arcade', '0'], 'the bishop crossed the little board'
+    pg.click('#setPanel [data-set="anim:0"]'); pg.wait_for_timeout(200)
+    assert pg.evaluate("SET.anim") is False and pg.locator('#setPanel [data-set^="animk:"]').count() == 0
+    pg.click('#setPanel [data-set="anim:1"]'); pg.wait_for_timeout(300)
+    # sounds: on by default, three themes and a button to hear them; a move on a board plays one, and off means silence
+    themes = pg.locator('#setPanel [data-set^="sndk:"]').all_inner_texts(); assert themes == ['Wood', 'Soft', 'Arcade'], themes
+    n0s = pg.evaluate("Sound.n"); pg.click('#setPanel [data-sndpv]'); pg.wait_for_timeout(1000)
+    heard = pg.evaluate("[Sound.n, Sound.last]"); print('sounds: hear it ->', heard); assert heard[0] - n0s == 3 and heard[1] == 'check'
+    snd = pg.evaluate("""(() => { const got = [], say = f => { boardSound('t', f); got.push(Sound.last); };
+        boardSound('t', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'); Sound.last = '';
+        say('rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR'); say('rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR'); say('rnbqkbnr/ppp1pppp/8/3P4/8/8/PPPP1PPP/RNBQKBNR');
+        Sound.last = ''; say('r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R'); got.push('|');      // a jump to another position: silent
+        say('r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1'); say('r1bqkbnr/pppp1Bpp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQ1RK1');
+        setSetting('snd', false); Sound.last = ''; say('r1bq1bnr/pppp1kpp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQ1RK1'); setSetting('snd', true); return got; })()""")
+    print('  on the board:', snd); assert snd == ['move', 'move', 'capture', '', '|', 'castle', 'check', ''], snd
+    pg.evaluate("Settings.render()")
     pg.screenshot(path=out + 's_settings_dark.png')
     pg.keyboard.press('Escape'); pg.wait_for_timeout(200)
     assert pg.evaluate("document.getElementById('setSheet').hidden")

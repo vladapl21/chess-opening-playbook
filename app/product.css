@@ -149,6 +149,8 @@ body:has(.coach:not([hidden])) .foot{padding-right:100px}
 .repdet > summary > span{display:grid;gap:2px} .repdet > summary b{font-size:14px} .repdet > summary span span{font-size:13px;color:var(--muted)}
 .repbody{display:grid;gap:14px;margin-top:12px} .repbody > p{font-size:13px;color:var(--muted);margin:0}
 .repask{display:grid;gap:8px;background:var(--surface-2);border-radius:4px;padding:10px 12px;font-size:13.5px}
+.resetbox{display:grid;gap:10px;border:1px solid var(--rosso);border-radius:4px;padding:12px;background:var(--rosso-soft)} .resetbox > div{display:grid;gap:3px} .resetbox b{font-size:14px} .resetbox > div span{font-size:13px;color:var(--ink)}
+.btn.danger{background:var(--rosso);border-color:var(--rosso);color:var(--surface);justify-self:start} .btn.danger:disabled{opacity:.45} .resetbox .repask{background:var(--surface)}
 .repask.repask{display:grid;gap:8px} .reprow{display:flex;gap:6px;flex-wrap:wrap;align-items:center} .reprow .btn.primary{width:auto;min-height:38px;font-size:14px} .reprow input{flex:1 1 140px;min-width:0;font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:3px;background:var(--surface);color:var(--ink)}
 .reprow input[aria-invalid="true"]{border-color:var(--rosso)}
 
@@ -424,3 +426,56 @@ button.rcrow{cursor:pointer} button.rcrow:hover{border-color:var(--accent)}
 .rvcue{display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap}
 .rvcue .tline{margin:2px 0 0}
 .rvcue .rvsub{margin:3px 0 0;color:var(--muted);font-size:.92rem}
+
+/* ---- the shop: a piece bought today stays on the shelf as owned, and buying is a moment */
+.item{position:relative}
+.item .ownedbtn{background:var(--surface-2);border-color:var(--line);color:var(--muted);cursor:default;opacity:1} .item .ownedbtn svg{width:14px;height:14px;color:var(--accent)}
+.item.owned .ipv{box-shadow:inset 0 0 0 2px var(--accent)}
+.item.bought{animation:bought .75s cubic-bezier(.2,1.5,.4,1),boughtring .9s ease-out;z-index:2}
+@keyframes bought{0%{transform:scale(.9)}45%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes boughtring{0%{box-shadow:0 0 0 0 var(--oro)}100%{box-shadow:0 0 0 18px transparent}}
+.burst{position:absolute;left:50%;top:40%;width:0;height:0;pointer-events:none;z-index:3}
+.burst i{position:absolute;left:-4px;top:-4px;width:8px;height:8px;border-radius:2px;background:var(--oro);transform:rotate(var(--a)) translateX(0);animation:burst 1.05s cubic-bezier(.15,.7,.3,1) forwards}
+.burst i:nth-child(3n){background:var(--accent)} .burst i:nth-child(3n+1){background:var(--flame)} .burst i:nth-child(4n){border-radius:50%}
+.burst.r-rare i{background:var(--rar-rare)} .burst.r-epic i{background:var(--rar-epic)} .burst.r-legendary i{background:var(--rar-legendary)} .burst.r-legendary i:nth-child(2n){background:var(--flame-2)}
+@keyframes burst{0%{opacity:1}100%{transform:rotate(var(--a)) translateX(var(--d)) scale(.25);opacity:0}}
+.mannequin.hop svg{animation:hop .8s cubic-bezier(.3,1.6,.5,1)} @keyframes hop{0%{transform:translateY(0)}30%{transform:translateY(-16px) rotate(-4deg)}60%{transform:translateY(0) rotate(3deg)}100%{transform:none}}
+.bal b.baltick{animation:lvpop .5s ease-out}
+/* rarities */
+.rar{font-style:normal;font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:999px;margin:0}
+.rar.r-common{color:var(--rar-common);background:var(--rar-common-soft)} .rar.r-rare{color:var(--rar-rare);background:var(--rar-rare-soft)} .rar.r-epic{color:var(--rar-epic);background:var(--rar-epic-soft)} .rar.r-legendary{color:var(--rar-legendary);background:var(--rar-legendary-soft)}
+.item.r-common{border-bottom:3px solid var(--rar-common)} .item.r-rare{border-bottom:3px solid var(--rar-rare)} .item.r-epic{border-bottom:3px solid var(--rar-epic)} .item.r-legendary{border-bottom:3px solid var(--rar-legendary)}
+/* the crate */
+.cratebox{display:grid;grid-template-columns:150px minmax(0,1fr);gap:18px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:16px 18px;margin-bottom:12px}
+.crateart svg{display:block;width:100%;height:auto} .cr-wood{fill:var(--sk-sand)} .cr-lid{fill:var(--sk-clay)} .cr-band{fill:var(--oro)} .cr-lock{fill:var(--ink)} .cr-key{fill:var(--oro)}
+.crateinfo{display:grid;gap:9px;justify-items:start} .crateinfo h3{font-family:var(--f-display);font-size:24px;line-height:1.1;margin:0} .crateinfo p{margin:0;color:var(--muted);font-size:14px}
+.crateinfo .btn{gap:7px} .crateinfo .btn .coin{width:17px;height:17px} .codds{display:flex;flex-wrap:wrap;gap:6px}
+.cratein .item .ipv{width:84px;height:84px}
+@media (max-width:620px){ .cratebox{grid-template-columns:96px minmax(0,1fr);gap:12px;padding:14px} }
+/* opening one: the reel and the piece that comes out */
+.cratesheet{width:min(640px,100%);text-align:center;overflow:hidden}
+.reel{position:relative;overflow:hidden;border-radius:6px;background:var(--surface-2);padding:12px 0;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.strip{list-style:none;margin:0;padding:0;display:flex;gap:8px;width:max-content;will-change:transform}
+.rt{flex:none;width:104px;display:grid;justify-items:center;gap:5px;padding:9px 6px 8px;border-radius:4px;background:var(--surface);border-bottom:4px solid var(--rar-common);font-size:12px}
+.rt .ipv{width:70px;height:70px} .rt b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:92px}
+.rt.r-rare{border-color:var(--rar-rare)} .rt.r-epic{border-color:var(--rar-epic)} .rt.r-legendary{border-color:var(--rar-legendary);background:var(--rar-legendary-soft)}
+.reelmark{position:absolute;left:50%;top:0;bottom:0;width:3px;margin-left:-1.5px;background:var(--flame);border-radius:2px;box-shadow:0 0 0 1px var(--surface)}
+.reel.done .reelmark{opacity:.3} .reel.done .rt{opacity:.35;transition:opacity .3s} .reel.done .rt.won{opacity:1;transform:scale(1.06);transition:transform .3s}
+.prize{position:relative;display:grid;justify-items:center;gap:6px;padding:18px 10px 6px;overflow:hidden;border-radius:6px;animation:lvin .45s cubic-bezier(.2,1.3,.4,1)}
+.prize .ipv{width:132px;height:132px;position:relative;z-index:1;animation:medalIn .6s cubic-bezier(.2,1.4,.4,1)} .prize h3{font-family:var(--f-display);font-size:30px;line-height:1.05;margin:0;position:relative;z-index:1} .prize .rar{position:relative;z-index:1;font-size:12px}
+.prays{position:absolute;left:50%;top:84px;width:420px;height:420px;margin:-210px 0 0 -210px;border-radius:50%;opacity:.5;animation:rays 16s linear infinite;
+  background:repeating-conic-gradient(var(--pr,var(--rar-common-soft)) 0 12deg,transparent 12deg 30deg);mask-image:radial-gradient(closest-side,#000 20%,transparent 78%);-webkit-mask-image:radial-gradient(closest-side,#000 20%,transparent 78%)}
+.prize.r-rare{--pr:var(--rar-rare-soft)} .prize.r-epic{--pr:var(--rar-epic-soft)} .prize.r-legendary{--pr:var(--rar-legendary)} .prize.r-legendary .prays{opacity:.42}
+.prize.r-legendary h3{color:var(--rar-legendary)}
+.cratebtns{justify-content:center}
+/* skins and auras out of the crate */
+.sk-moss{--kb:var(--sk-moss);--km:var(--sk-moss-2)} .sk-clay{--kb:var(--sk-clay);--km:var(--sk-clay-2)} .sk-sky{--kb:var(--sk-sky);--km:var(--sk-sky-2)} .sk-sunset{--kb:var(--sk-sunset);--km:var(--sk-sunset-2)}
+.sk-arctic{--kb:var(--sk-arctic);--km:var(--sk-arctic-2)} .sk-neon{--kb:var(--sk-neon);--km:var(--sk-neon-2)} .sk-obsid{--kb:var(--sk-obsid);--km:var(--sk-obsid-2)} .sk-aurora{--kb:var(--sk-aurora);--km:var(--sk-aurora-2)}
+.sk-aurora .kn-body{animation:aurora 7s linear infinite} @keyframes aurora{to{filter:hue-rotate(360deg)}}
+.aura circle{fill:var(--oro-soft)} .au-glow circle:first-child{opacity:.55} .au-glow circle:last-child{fill:var(--flame-2);opacity:.35}
+.au-ember circle{fill:var(--flame);animation:autwink 1.6s ease-in-out infinite} .au-ember circle:nth-child(2n){fill:var(--flame-2)}
+.au-frost path{fill:none;stroke:var(--blu);stroke-width:1.3;stroke-linecap:round;animation:autwink 2.4s ease-in-out infinite}
+.au-stars circle{fill:var(--viola-soft)} .au-stars path{fill:var(--oro);animation:autwink 1.9s ease-in-out infinite}
+.au-nova circle{fill:var(--rar-legendary-soft)} .au-nova .aurays{transform-origin:32px 33px;animation:rays 18s linear infinite} .au-nova .aurays path{fill:var(--rar-legendary);opacity:.6}
+@keyframes autwink{0%,100%{opacity:1}50%{opacity:.25}}
+@media (prefers-reduced-motion: reduce){ .sk-aurora .kn-body,.aura *,.prays{animation:none} }

@@ -191,6 +191,25 @@ with sync_playwright() as p:
     plan = pg.locator('#sbpanel .plan h4').all_inner_texts(); print('its plan:', plan)
     assert plan == [pick['h']], plan
     pg.screenshot(path=out + 'sb_plan.png')
+    # ---- never the same line twice in a row. From a position with two or three lines behind it, ten games: every game
+    #      ends on another line than the one before. With one line behind the position it is that line every time.
+    PLAY = """async at => { sbSetFrom(SIDE, at); const got = [];
+        for (let g = 0; g < GAMES; g++){ sbStart();
+          for (let t = 0; t < 500; t++){ await new Promise(r => setTimeout(r, 50)); const D = S.drill; if (D.state === 'done') break;
+            if (!D.busy && myTurnAt(D.node)){ const ks = sbMyKids(D.node); if (ks.length) sbGo(ks[0], false); } }
+          got.push(S.drill.line); }
+        return got; }"""
+    pg.evaluate("useSide('w'); S.drill = S.sbState = null; SB_STATE.w.scope = 'all'; go('sandbox')"); pg.wait_for_timeout(300)
+    spot = pg.evaluate("""(() => { const ends = c => { const ks = myTurnAt(c) ? sbMyKids(c) : sbOppKids(c); return ks.length ? ks.flatMap(ends) : [sbLineFor(c)]; };
+        for (const l of Object.values(LINES)){ if (!l.main) continue;
+          for (let k = l.n.length - 2; k > 3; k--){ const c = l.n[k]; if (!sbCanFrom(c)) continue; const e = new Set(ends(c)); if (e.size === 2 || e.size === 3) return {at: c, lines: [...e]}; } }
+        return null; })()""")
+    print('a position with a few lines behind it:', spot); assert spot
+    seq = pg.evaluate(PLAY.replace('GAMES', '10'), spot['at']); print('ten games from it:', seq)
+    assert len(seq) == 10 and set(seq) <= set(spot['lines']) and all(x != y for x, y in zip(seq, seq[1:])), seq
+    one = pg.evaluate(PLAY.replace('GAMES', '3'), pick['at']); print('three games with one line to play:', one)
+    assert one == [pick['line']] * 3, one
+    pg.evaluate("sbSetFrom(SIDE, null); S.drill = S.sbState = null")
     print('errors', errors)
     assert not [e for e in errors if 'ERR_' not in e], 'page errors'
     b.close()
