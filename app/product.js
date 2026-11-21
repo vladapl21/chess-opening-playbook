@@ -1980,14 +1980,20 @@ refreshSoon = function(){ Lv.sync(); Lv.paint(); refreshSoon0(); };
 refresh = function(){ Lv.sync(); refresh0(); };
 
 
-/* ---- the tour: the coach the player picks walks them through every part of the app before they start. It can't be
-   skipped, only sped up: Fast forward plays the steps by itself (the coach makes the moves), Back goes a step back, and
-   on a step that asks for a tap, "Show me" lets the coach do it. Finished once, it is marked in the progress record
+/* ---- the tour: the coach the player picks walks them through every part of the app before they start. A first run
+   can't be skipped or sped up: Next is held behind a short bar that fills while the step is read (HOLD: longer for more
+   words, none on a step already seen), Back goes a step back, and on a step that asks for a tap, "Show me" lets the
+   coach do it. Taken again from Settings there is no bar, and Fast forward plays the steps by itself. On a phone the
+   card is a sheet docked to the bottom of the screen (to the top when the thing it points at is down there), and the
+   page gets room to scroll so that thing can always sit clear of it. Finished once, it is marked in the progress record
    (d.tour.done, merged as the earliest) and follows the player to every device; Settings has "Take the tour again".
    Nothing played on the tour counts: its lines are tour lines (no record, no lesson studied, no points). */
 const TOUR_KEY = 'playbook-tour';
 const Tour = {
-  on: false, k: 0, fast: false, replay: false, t: 0, w: 0, dt: 0, raf: 0, el: null, steps: [], back: null, ok: false, note: '',
+  on: false, k: 0, fast: false, replay: false, t: 0, w: 0, dt: 0, ht: 0, raf: 0, el: null, steps: [], back: null, ok: false, note: '', held: {},
+  // how long Next waits on a step's first showing: time to read its words, within limits
+  HOLD: {per: 26, min: 1300, max: 4200},
+  holdLeft(){ const h = this.held[this.k]; return h ? Math.max(0, h[0] + h[1] - Date.now()) : 0; },
   done(){ if (Prog.d.tour && Prog.d.tour.done) return true; try { return localStorage.getItem(TOUR_KEY) === 'done'; } catch(e){ return false; } },
   boot(){ setTimeout(() => this.maybe(), 1100); },
   // the first visit to the app itself (not the welcome or the reading screens), for anyone who hasn't taken it
@@ -1995,7 +2001,8 @@ const Tour = {
   start(replay){
     if (this.on) return;
     Settings.close(); Coach.hush(); stopPlay();
-    this.on = true; this.replay = !!replay; this.k = 0; this.fast = false; this.note = '';
+    this.on = true; this.replay = !!replay; this.k = 0; this.fast = false; this.note = ''; this.held = {};
+    document.documentElement.classList.add('twon');
     this.back = {side: SIDE, view: VIEWS.includes(S.view) ? S.view : 'course'};
     this.steps = this.build().filter(st => !st.skip || !st.skip());
     const el = this.el = document.createElement('div'); el.id = 'tour'; el.className = 'twalk';
@@ -2007,7 +2014,8 @@ const Tour = {
     this.show();
   },
   close(){
-    this.on = false; cancelAnimationFrame(this.raf); clearTimeout(this.t); clearTimeout(this.w); clearTimeout(this.dt);
+    this.on = false; cancelAnimationFrame(this.raf); clearTimeout(this.t); clearTimeout(this.w); clearTimeout(this.dt); clearTimeout(this.ht);
+    document.documentElement.classList.remove('twon');
     document.removeEventListener('keydown', this.keyH, true); if (this.el) this.el.remove(); this.el = null;
   },
   finish(){
@@ -2021,9 +2029,13 @@ const Tour = {
   words(st){ return {h: typeof st.h === 'function' ? st.h() : st.h, say: (typeof st.say === 'function' ? st.say() : st.say) || []}; },
   target(){ const st = this.cur(); if (!st || !st.at) return null; const e = typeof st.at === 'function' ? st.at() : document.querySelector(st.at); return e && e.getClientRects().length ? e : null; },
   show(){
-    clearTimeout(this.t); clearTimeout(this.w); clearTimeout(this.dt); this.ok = false; this.note = '';
+    clearTimeout(this.t); clearTimeout(this.w); clearTimeout(this.dt); clearTimeout(this.ht); this.ok = false; this.note = '';
     const st = this.cur(); if (!st) return this.finish();
     try { if (st.go) st.go(); } catch(e){}
+    // a first showing holds Next until the words have had time to be read
+    if (!this.replay && !this.held[this.k]){ const w = this.words(st), ms = Math.min(this.HOLD.max, Math.max(this.HOLD.min, this.HOLD.per * (w.h.length + w.say.join('').length)));
+      this.held[this.k] = [Date.now(), ms]; }
+    if (this.holdLeft()) this.ht = setTimeout(() => { if (this.on && this.cur() === st){ this.paint(); this.focus(); } }, this.holdLeft() + 30);
     this.paint();
     // views draw a moment later: wait for the thing to point at, bring it into view, then (fast) move on by itself
     let n = 0;
@@ -2031,9 +2043,10 @@ const Tour = {
       if (!this.on || this.cur() !== st) return;
       const t = this.target();
       if (st.at && !t && n++ < 25){ this.t = setTimeout(ready, 120); return; }
-      // on a phone the card docks under the thing when both fit on the screen: scroll it to the top
+      // on a phone the card is a sheet at the bottom: bring the thing to the top of the screen, clear of it (the page
+      // has room to scroll while the tour is on). A thing that doesn't scroll (the header, the coach) stays where it is.
       if (t){ const r = t.getBoundingClientRect(), card = this.el.querySelector('.twcard'), ch = card ? card.offsetHeight : 300;
-        if (innerWidth <= 640 && r.height + ch + 30 <= innerHeight && (r.top < 8 || r.bottom > innerHeight - ch - 20)) window.scrollBy({top: r.top - 10, behavior: 'auto'});
+        if (innerWidth <= 640){ if (r.top < 8 || r.bottom > innerHeight - ch - 16) window.scrollBy({top: r.top - 10, behavior: 'auto'}); }
         else if (r.top < 70 || r.bottom > innerHeight - 40) t.scrollIntoView({block: 'center', behavior: reduced ? 'auto' : 'smooth'}); }
       if (st.demo) try { st.demo(); } catch(e){}
       this.paint(); this.focus();
@@ -2065,15 +2078,15 @@ const Tour = {
   click(e){
     const t = e.target.closest('[data-tour]'); if (!t) return;
     const a = t.dataset.tour;
-    if (a === 'next'){ const st = this.cur(); if (st.act && !this.ok) this.doIt(); else this.next(); }
+    if (a === 'next'){ if (this.holdLeft()) return; const st = this.cur(); if (st.act && !this.ok) this.doIt(); else this.next(); }
     else if (a === 'back') this.prev();
-    else if (a === 'fast'){ this.fast = !this.fast; this.paint(); if (this.fast) this.ahead(); else clearTimeout(this.t); }
+    else if (a === 'fast' && this.replay){ this.fast = !this.fast; this.paint(); if (this.fast) this.ahead(); else clearTimeout(this.t); }
   },
   onKey(e){
     if (!this.on) return;
-    if (e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); this.note = 'The tour can\'t be skipped, but Fast forward gets you through it quickly.'; this.paint(); return; }
+    if (e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); this.note = this.replay ? 'Fast forward gets you through it quickly.' : 'The tour can\'t be skipped. It takes about two minutes.'; this.paint(); return; }
     if (e.target.closest && e.target.closest('input, textarea')) return;
-    if (e.key === 'Enter' || e.key === 'ArrowRight'){ if (e.target.closest && e.target.closest('.twcard button') && e.key === 'Enter') return; e.preventDefault(); e.stopPropagation(); const st = this.cur(); if (st.act && !this.ok) this.doIt(); else this.next(); }
+    if (e.key === 'Enter' || e.key === 'ArrowRight'){ if (e.target.closest && e.target.closest('.twcard button') && e.key === 'Enter') return; e.preventDefault(); e.stopPropagation(); if (this.holdLeft()) return; const st = this.cur(); if (st.act && !this.ok) this.doIt(); else this.next(); }
     else if (e.key === 'ArrowLeft'){ e.preventDefault(); e.stopPropagation(); this.prev(); }
   },
   focus(){ const b = this.el && this.el.querySelector('[data-tour="next"]'); if (b) try { b.focus({preventScroll: true}); } catch(e){} },
@@ -2082,12 +2095,14 @@ const Tour = {
     const st = this.cur(); if (!st) return;
     const n = this.steps.length, act = st.act && !this.ok, last = this.k === n - 1;
     const {h, say} = this.words(st);
-    this.el.querySelector('.twcard').innerHTML = `<div class="twface cface">${knightSVG(this.ok ? 'cheer' : act ? 'think' : 'cheer')}</div>
-      <div class="twbody"><p class="twstep"><b>${esc(coachName())}</b> · ${this.k + 1} of ${n}</p><div class="twbar" aria-hidden="true"><i style="width:${Math.round((this.k + 1) / n * 100)}%"></i></div>
-        <h3 id="tourH">${esc(h)}</h3>${bullets(say || [])}${st.pick ? coachPickHTML() : ''}
-        ${st.act ? `<p class="twdo ${this.ok ? 'ok' : ''}">${this.ok ? 'That\'s it' : esc(st.act.ask)}</p>` : ''}${this.note ? `<p class="twnote">${esc(this.note)}</p>` : ''}
-        <div class="twacts">${this.k ? '<button class="btn ghost" type="button" data-tour="back">Back</button>' : ''}<button class="btn twff" type="button" data-tour="fast" aria-pressed="${this.fast}">${this.fast ? 'Pause' : 'Fast forward'}</button>
-          <button class="btn primary" type="button" data-tour="next">${act ? 'Show me' : last ? (this.replay ? 'Done' : 'Start the course') : 'Next'}</button></div></div>`;
+    const hold = this.holdLeft(), H = this.held[this.k], word = act ? 'Show me' : last ? (this.replay ? 'Done' : 'Start the course') : 'Next';
+    // the bar on Next: it fills over the time the step is held, picking up where it was when the card is drawn again
+    const next = `<button class="btn primary twnext ${hold ? 'holding' : ''}" type="button" data-tour="next" ${hold ? `disabled style="--hold:${H[1]}ms;--held:-${Date.now() - H[0]}ms"` : ''}><span>${word}</span>${hold ? '<i aria-hidden="true"></i>' : ''}</button>`;
+    this.el.querySelector('.twcard').innerHTML = `<div class="twbar" aria-hidden="true"><i style="width:${Math.round((this.k + 1) / n * 100)}%"></i></div>
+      <div class="twhead"><span class="twface cface">${knightSVG(this.ok ? 'cheer' : act ? 'think' : 'cheer')}</span><p class="twstep"><b>${esc(coachName())}</b><span class="tnum">${this.k + 1} of ${n}</span></p></div>
+      <div class="twbody"><h3 id="tourH">${esc(h)}</h3>${bullets(say || [])}${st.pick ? coachPickHTML() : ''}
+        ${st.act ? `<p class="twdo ${this.ok ? 'ok' : ''}">${this.ok ? 'That\'s it' : esc(st.act.ask)}</p>` : ''}${this.note ? `<p class="twnote">${esc(this.note)}</p>` : ''}</div>
+      <div class="twacts">${this.k ? '<button class="btn ghost twback" type="button" data-tour="back">Back</button>' : ''}${this.replay ? `<button class="btn twff" type="button" data-tour="fast" aria-pressed="${this.fast}">${this.fast ? 'Pause' : 'Fast forward'}</button>` : ''}${next}</div>`;
     this.el.classList.toggle('free', !!act);
     this.place();
   },
@@ -2105,15 +2120,32 @@ const Tour = {
     else { ring.style.display = 'none'; blk.setAttribute('width', 0); blk.setAttribute('height', 0); }
     const cw = card.offsetWidth, ch = card.offsetHeight, m = 12;
     let x, y;
-    if (W <= 640){ x = m; y = !r || (r.y + r.h / 2) < H * 0.5 ? H - ch - m : m; if (r && y > r.y && y < r.y + r.h && r.y > ch + 2 * m) y = m; }
-    else if (!r){ x = (W - cw) / 2; y = Math.max(m, (H - ch) / 2); }
+    if (W <= 640){
+      // a sheet across the bottom; across the top when the thing it points at is in the lower part and can't move
+      const top = !!r && r.y + r.h > H - ch - 8 && r.y > ch + 8;
+      card.classList.toggle('attop', top); card.classList.add('sheeted');
+      Object.assign(card.style, {left: '0px', top: (top ? 0 : H - ch) + 'px'});
+      // the ring keeps to the part of the screen the sheet leaves free
+      if (r){ const lo = top ? ch + 6 : 4, hi = top ? H - 4 : H - ch - 6, y0 = Math.max(lo, r.y), y1 = Math.min(hi, r.y + r.h);
+        if (y1 - y0 > 24){ r = {x: r.x, y: y0, w: r.w, h: y1 - y0};
+          path.setAttribute('d', `M0 0H${W}V${H}H0Z M${r.x} ${r.y}V${r.y + r.h}H${r.x + r.w}V${r.y}Z`);
+          Object.assign(ring.style, {left: r.x + 'px', top: r.y + 'px', width: r.w + 'px', height: r.h + 'px'});
+          blk.setAttribute('x', r.x); blk.setAttribute('y', r.y); blk.setAttribute('width', r.w); blk.setAttribute('height', r.h); } }
+      return;
+    }
+    card.classList.remove('sheeted', 'attop');
+    if (!r){ x = (W - cw) / 2; y = Math.max(m, (H - ch) / 2); }
     else {
       x = Math.min(Math.max(m, r.x + r.w / 2 - cw / 2), W - cw - m);
       if (r.y + r.h + m + ch <= H - m) y = r.y + r.h + m;
       else if (r.y - m - ch >= m) y = r.y - m - ch;
       else if (r.x + r.w + m + cw <= W - m){ x = r.x + r.w + m; y = Math.min(Math.max(m, r.y), H - ch - m); }
       else if (r.x - m - cw >= m){ x = r.x - m - cw; y = Math.min(Math.max(m, r.y), H - ch - m); }
-      else { y = H - ch - m; }
+      else {
+        // no room beside a thing this large: the card goes where it covers the least of it
+        const yc = Math.min(Math.max(m, r.y + r.h / 2 - ch / 2), H - ch - m), over = (cx, cy) => Math.max(0, Math.min(cx + cw, r.x + r.w) - Math.max(cx, r.x)) * Math.max(0, Math.min(cy + ch, r.y + r.h) - Math.max(cy, r.y));
+        [x, y] = [[m, yc], [W - cw - m, yc], [W - cw - m, H - ch - m], [m, H - ch - m], [W - cw - m, m], [m, m]].map(c => [over(c[0], c[1]), c]).sort((a, b) => a[0] - b[0])[0][1];
+      }
     }
     card.style.left = Math.round(x) + 'px'; card.style.top = Math.round(Math.max(m, y)) + 'px';
   },
@@ -2183,8 +2215,10 @@ const Tour = {
         say: ['Practice games against an opponent who plays your book\'s lines', 'Everything plays White and Black in turn', 'Pick openings from either colour to narrow it', 'Set up a position to practise only the lines that go on from it', 'No line comes twice in a row', 'When a game ends the engine is on its board: step back through the game, or move a piece to play on']},
       {h: 'Levels', at: '#lvBtn', skip: () => document.getElementById('lvBtn').hidden, say: ['Every line you play earns points', 'The ring fills toward your next level. Tap it for your badges']},
       {h: 'Your streak', at: '#meBtn', skip: () => document.getElementById('meBtn').hidden, say: ['The flame counts the days in a row you finish today\'s five', 'It takes a new colour at 5, 10, 20, 30, 50 and 100 days', 'Every third day in a row earns a shop token']},
-      {h: 'The daily shop', at: () => document.querySelector('#app .shopmain') || document.querySelector('#app .shop'), go: () => go('shop'),
-        say: () => ['Six new pieces every day', 'Tokens from badges, levels and days in a row buy them', 'Crates hold pieces the shop never sells, in four rarities: legendary ones come only from there', 'Wear what you buy from your locker'].concat(Level.of().n < SHOP_AT ? [`It opens at level ${SHOP_AT}`] : [])},
+      {h: 'The daily shop', at: () => document.querySelector('#app .items.daily') || document.querySelector('#app .shopmain') || document.querySelector('#app .shop'), go: () => { S.shopTab = 'shop'; go('shop'); },
+        say: () => ['Six new pieces every day: most are common, some rare, and an epic one about once a week', 'Tokens from badges, levels and days in a row buy them', 'Wear what you buy from your locker'].concat(Level.of().n < SHOP_AT ? [`It opens at level ${SHOP_AT}`] : [])},
+      {h: 'Crates', at: '#app .cratebox', go: () => { if (S.view !== 'shop' || S.shopTab !== 'shop'){ S.shopTab = 'shop'; go('shop'); } },
+        say: ['Crates hold pieces the shop never sells, in four rarities', 'Legendary pieces come only from a crate', 'Buy one, then tap the crate to open it']},
       {h: 'Settings', at: '#setBtn', go: () => go('course'), say: ['Light or dark, text size, board colours and your coach', 'How pieces slide, with six animations to pick from, and sounds in three themes', 'Advanced settings hold your systems, the variations inside them (which Sicilian, which Italian) and the button to reset your account, each confirmed with your username', 'You can take this tour again from there']},
       {h: 'Your account', at: '#acctBtn', skip: () => document.getElementById('acctBtn').hidden, say: ['Sign in and your progress follows you to every device']},
       {h: 'That\'s me', at: '#coach .cav', skip: () => !SET.coach, say: ['Tap me any time for a tip', 'I speak up when a line ends, and when something new happens', 'When a game of yours leaves your book, I\'ll say so and bring the line to drill']},

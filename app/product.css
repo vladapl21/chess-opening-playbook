@@ -394,22 +394,34 @@ button.rcrow{cursor:pointer} button.rcrow:hover{border-color:var(--accent)}
 .twdim{fill:var(--tour-shade);pointer-events:auto}
 .twblock{fill:transparent;pointer-events:auto} .twalk.free .twblock{pointer-events:none}
 .twring{position:absolute;border-radius:12px;box-shadow:0 0 0 3px var(--accent),0 0 0 7px var(--tour-ring);pointer-events:none;transition:left .25s,top .25s,width .25s,height .25s}
-.twcard{position:absolute;left:12px;top:12px;width:min(410px,calc(100vw - 24px));box-sizing:border-box;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:16px;
-  box-shadow:0 18px 50px rgba(0,0,0,.3);padding:16px 16px 14px;display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;pointer-events:auto;outline:none;transition:left .25s,top .25s}
-.twface{width:52px;height:52px} .twface svg{width:100%;height:100%}
+.twcard{position:absolute;left:12px;top:12px;width:min(420px,calc(100vw - 24px));box-sizing:border-box;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:16px;
+  box-shadow:0 18px 50px rgba(0,0,0,.3);padding:0 18px 16px;pointer-events:auto;outline:none;transition:left .25s,top .25s;overflow:hidden}
+.twbar{height:4px;background:var(--line);margin:0 -18px;overflow:hidden} .twbar i{display:block;height:100%;background:var(--accent);border-radius:0 4px 4px 0;transition:width .3s}
+.twhead{display:flex;align-items:center;gap:10px;margin:14px 0 8px}
+.twface{flex:none;width:44px;height:44px;border-radius:50%;background:var(--accent-soft);display:grid;place-items:center;overflow:hidden} .twface svg{width:82%;height:82%}
+.twstep{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex:1;min-width:0;margin:0;font-size:12px;color:var(--muted);font-weight:600} .twstep b{color:var(--ink);font-size:15px}
 .twbody{min-width:0}
-.twstep{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:2px 0 0;font-weight:600} .twstep b{color:var(--accent)}
-.twbar{height:3px;background:var(--line);border-radius:3px;margin:7px 0 10px;overflow:hidden} .twbar i{display:block;height:100%;background:var(--accent);transition:width .25s}
-.twcard h3{font-size:19px;line-height:1.25;margin:0 0 6px;text-wrap:balance}
+.twcard h3{font-family:var(--f-display);font-size:22px;line-height:1.15;margin:0 0 8px;text-wrap:balance}
 .twcard .bul{font-size:14.5px;margin:0}
-.twdo{margin:10px 0 0;font-weight:700;color:var(--accent)} .twdo::before{content:"→ "} .twdo.ok::before{content:"✓ "}
+.twdo{margin:12px 0 0;padding:8px 12px;border-radius:8px;background:var(--accent-soft);font-weight:700;color:var(--accent)} .twdo::before{content:"→ "} .twdo.ok::before{content:"✓ "}
 .twnote{font-size:13px;color:var(--muted);margin:8px 0 0}
-.twacts{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;justify-content:flex-end;align-items:center}
-.twacts .btn{min-height:38px}
+.twacts{display:flex;gap:8px;margin-top:16px;align-items:stretch}
+.twacts .btn{min-height:44px} .twback{flex:none} .twnext{flex:1;justify-content:center;position:relative;overflow:hidden;min-width:112px}
+/* Next is held while the step is read: greyed, with a bar that fills along its lower edge */
+.twnext.holding{background:var(--surface-2);border-color:var(--line);color:var(--muted);opacity:1;cursor:default}
+.twnext i{position:absolute;left:0;bottom:0;height:4px;width:100%;background:var(--accent);transform-origin:0 50%;animation:twhold var(--hold) linear var(--held) both}
+@keyframes twhold{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 .twff[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
-.twcard .coachpick{margin-top:10px}
-@media (max-width:640px){ .twcard{grid-template-columns:40px minmax(0,1fr);padding:14px 14px 12px;gap:10px} .twface{width:40px;height:40px} .twcard h3{font-size:17px} .twcard .bul{font-size:14px} .twacts{margin-top:10px} }
-@media (prefers-reduced-motion: reduce){ .twring,.twcard,.twbar i{transition:none} }
+.twcard .coachpick{margin-top:12px}
+/* a phone: the card is a sheet across the bottom of the screen (or the top), and the page can scroll far enough for
+   anything to sit clear of it */
+@media (max-width:640px){
+  .twcard{width:100vw;left:0;border-radius:18px 18px 0 0;border-width:1px 0 0;padding:0 16px calc(14px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 34px rgba(0,0,0,.28);max-height:62vh;overflow-y:auto;transition:top .25s}
+  .twcard.attop{border-radius:0 0 18px 18px;border-width:0 0 1px;box-shadow:0 10px 34px rgba(0,0,0,.28);padding:env(safe-area-inset-top,0px) 16px 14px}
+  .twbar{margin:0 -16px} .twhead{margin:12px 0 6px} .twface{width:38px;height:38px} .twcard h3{font-size:20px} .twcard .bul{font-size:14px} .twacts{margin-top:12px}
+  html.twon body{padding-bottom:64vh}
+}
+@media (prefers-reduced-motion: reduce){ .twring,.twcard,.twbar i{transition:none} .twnext i{animation-timing-function:steps(1,end)} }
 
 /* the last three games: a card per game, a row per thing to drill */
 .rvwrap{display:grid;gap:14px}
