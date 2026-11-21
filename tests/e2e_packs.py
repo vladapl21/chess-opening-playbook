@@ -282,10 +282,11 @@ with sync_playwright() as p:
         pg.evaluate("go('course')"); switch(pg, f"{slot}:{pg.evaluate(f'BOOKS.w.packs.{slot}.default')}")
         e = wshape(pg); assert e['chapters'] == base_w['chapters'] and e['lines'] == base_w['lines'] and e['units'] == base_w['units'], (slot, 'back to the house book')
         assert pg.evaluate(f"Prog.rec('{main}').clean") == 1
-    # a card for a second step comes only when the games show enough of it
+    # a card for a second step inside the e-pawn repertoire comes only when the player's own games go the other way
     cs = pg.evaluate("""[makeChoices({slots: {white: {n: 40, opts: {e4: {n: 40, w: 20, l: 18, d: 2}}}, whiteSic: {n: 3, opts: {open: {n: 3, w: 1, l: 2, d: 0}}}}}).map(c => c.id),
         makeChoices({slots: {white: {n: 40, opts: {e4: {n: 40, w: 20, l: 18, d: 2}}}, whiteSic: {n: 8, opts: {open: {n: 6, w: 3, l: 3, d: 0}, alapin: {n: 2, w: 1, l: 1, d: 0}}}}}).filter(c => c.id === 'whiteSic').map(c => [c.within, c.opts.map(o => o.id)])]""")
     assert 'whiteSic' not in cs[0] and cs[1] == [[['white', 'e4'], ['open', 'alapin']]], cs
+    assert 'whiteSic' not in pg.evaluate("makeChoices({slots: {white: {n: 40, opts: {e4: {n: 40, w: 20, l: 18, d: 2}}}, whiteSic: {n: 12, opts: {alapin: {n: 10, w: 5, l: 5, d: 0}, open: {n: 2, w: 1, l: 1, d: 0}}}}}).map(c => c.id)"), 'a player who already plays the first variation is not asked'
     print('variations inside the e-pawn repertoire switch in and out:', [w[1] for w in WVARS])
 
     # phone width with the Caro-Kann on

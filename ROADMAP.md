@@ -69,6 +69,18 @@ Facts that shape the design:
 - Settings and the account button moved out of the header into the corner of the screen; the header fits one row on an ordinary monitor and centres its rows when it has to wrap.
 - A lesson opened from a course unit has "Next lesson" at the top. The Sandbox has "Free play: pick openings" to leave a course practice game.
 
+## Phase 1.24: two variations of four openings (done, November 20)
+
+The choice the last phase ended on: which Sicilian, which line against the Caro-Kann, the center attack or the slow Italian.
+
+- **Second steps.** A slot can sit within a pack of another slot (`within` in `PACKS`): it exists only while that pack is in play. One rule for the builds and checks (`pipeline/packs.py`), the page (`slotOn`) and the game analysis (`inPlay`). On the choice cards a second step comes right after the card that opens it; in Advanced settings it is a row of its own while its system is in play.
+- **The Dragon** for Black, beside the Kan: 13 lessons, 132 lines. One setup against everything, the Yugoslav Attack given by hand.
+- **Inside White's e-pawn repertoire**, each beside the house line: the **Open Sicilian** (14 lessons, 86 lines: the English Attack setup against every Sicilian), the **Advance** against the Caro-Kann (6 lessons, 25 lines) and the **slow Italian** (7 lessons, 69 lines, in place of the Italian's two units). A card asks about one of these only when the player's own games go the other way; otherwise the first line stands and Advanced settings can change it.
+- **Drafted like the Scandinavian** (`pipeline/drafts/`): the other side by the Maia odds, yours from the setup's order where Stockfish accepts it. Each has a course unit, a deep dive, cards at a glance and plans, and no line loses ground to the engine at depth 14.
+- **One line shortened.** The Nimzowitsch line that runs into the Italian is held with both Italians, so it ends where they part.
+- **The cost.** The page is 10 MB (was 8.7).
+- **Next: the French and the Queen's Gambit Declined** for Black, then second variations where players ask for them (the Najdorf, the Exchange against the Caro-Kann, the Ruy Lopez for White as a variation of the e-pawn's second step).
+
 ## Phase 1.23: notes from play, one commit each (done, November 20)
 
 - **No line twice in a row in the Sandbox.** Whatever the odds are set to, the opponent steers the next game away from the line the last one ended on (`SB_PREVL`, `sbEndsElse`); a position with one line left plays it again.
