@@ -33,6 +33,8 @@ def score(b):
     ev[k] = v
     return v
 ROOT = {'e4': 44/73, 'd4': 24/73, 'Nf3': 2/73, 'c4': 1/73, 'g3': 1/73, 'e3': 1/73}
+import deepen, bmeta as BM
+deepen.apply(BC.LESSONS, 'b', BC.PARTS, BM.PACKS, quiet=True)                # the lines as the build plays them on
 lessons = [l for l in BC.LESSONS if not only or l['id'] in only or l['part'] in only]
 paths = []
 for l in lessons:
@@ -69,7 +71,13 @@ for lid, p, tags in paths:
             bv, bm = score(before); av, _ = score(b)
             loss = av - bv  # white-POV increase = worse for you
             if ((loss > 45 and av > 30) or loss > 150) and abs(bv) < 5000:
-                issues.append(f"B-LOSS {lid}: {pre} || {s} ({av/100:+.2f}) best {bm} ({bv/100:+.2f}) loss {loss}")
+                # two searches of two positions can disagree by themselves: measure again, your move against the
+                # engine's own move, both one ply on at the same depth (the same move is no loss at all)
+                t = before.copy()
+                if bm and bm != s: t.push_san(bm); bv = score(t)[0]; loss = av - bv
+                else: loss = 0
+                if (loss > 45 and av > 30) or loss > 150:
+                    issues.append(f"B-LOSS {lid}: {pre} || {s} ({av/100:+.2f}) best {bm} ({bv/100:+.2f}) loss {loss}")
         seen.add((pre, s)); seen.add(pre + ' ' + s)
     save()
     end = score(b)[0]

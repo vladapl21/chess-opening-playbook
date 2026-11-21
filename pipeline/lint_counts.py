@@ -41,9 +41,10 @@ def house(side):
     drill = [l for l in lines if not any('warn' in (N[i].get('g') or []) and N[i].get('w') == me for i in l['n'])]
     used = {i for l in lines for i in l['n']}
     written = plans.W if side == 'white' else plans.B
+    played_on = {l['lesson'] for l in lines if l['main'] and l.get('dp')}        # a main line the build played on has a read-off plan
     return dict(chapters=len(chapters), lessons=len(lessons), drill=len(drill), positions=len(used),
-                noted=sum(1 for i in used if N[i].get('t')), planned=sum(1 for l in lessons if l['id'] in written),
-                line_plans=sum(1 for l in lines if (l['main'] and l['lesson'] in written) or l['id'] in LINE_PLANS or l['id'] in plans.LW or l['id'] in plans.LB),
+                noted=sum(1 for i in used if N[i].get('t')), planned=sum(1 for l in lessons if l['id'] in written and l['id'] not in played_on),
+                line_plans=sum(1 for l in lines if (l['main'] and l['lesson'] in written and l['lesson'] not in played_on) or l['id'] in LINE_PLANS or l['id'] in plans.LW or l['id'] in plans.LB),
                 games=len(d['games']), puzzles=len(d['puzzles']), patterns=len(d.get('insights') or []),
                 cards=sum(1 for r in d['cheat'] if r.get('lesson') in ids), ids=ids)
 

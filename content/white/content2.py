@@ -400,3 +400,4 @@ import content2_notes  # noqa
 import london  # noqa: E402,F401  the London System for White (its own pack)
 import english  # noqa: E402,F401  the English Opening for White (its own pack)
 import odd  # noqa: E402,F401  odd first, second and third moves, in the house chapters
+import wfill  # noqa: E402,F401  replies that came up often and had no line, and named gambits (side lines of the lessons above)

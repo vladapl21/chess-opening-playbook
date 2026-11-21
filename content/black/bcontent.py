@@ -526,3 +526,4 @@ import bcaro  # noqa: E402,F401  the Caro-Kann: a second system against the e-pa
 import bscandi  # noqa: E402,F401  the Scandinavian: another system against the e-pawn (its own pack)
 import bkid  # noqa: E402,F401  the King's Indian: another system against the d-pawn (its own pack, two chapters)
 import bodd  # noqa: E402,F401  odd first and second moves and the Halloween Gambit, in the house chapters
+import bfill  # noqa: E402,F401  replies that came up often and had no line, and named gambits (side lines of the lessons above)
