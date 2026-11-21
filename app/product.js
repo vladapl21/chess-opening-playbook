@@ -369,18 +369,19 @@ const Product = {
   },
   /* -- welcome */
   startHTML(){
-    const out = this.signedOut(), has = !!this.me().P, short = !has && this.me().short, step = out ? 1 : has ? 3 : 2, w = fenOf('e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4');
+    const out = this.signedOut(), has = !!this.me().P, short = !has && this.me().short, step = out ? 1 : has ? 3 : 2;
     const cta = out ? `<button class="btn primary" data-acct="signup">Create your account</button><button class="btn" data-acct="signin">I already have an account</button>`
       : has ? `<button class="btn primary" data-pgo="findings">Continue: see what I found</button>` : short ? `<button class="btn primary" data-pgo="setup">Check my games again</button>` : `<button class="btn primary" data-pgo="setup">Connect your account</button>`;
     const li = (k, h, p) => `<li class="${k < step ? 'done' : k === step ? 'now' : ''}"><b>${h}</b><span>${p}</span></li>`;
-    const lock = (v, h, p) => `<button class="lockcard" data-view="${v}"><b>${ICON.lock}${h}</b>${p}</button>`;
-    return `<section class="whero"><div><p class="kicker">An opening course built from your own games</p>
-        <h2>Connect your account.<br>Get <em>your</em> playbook.</h2>
+    // a look at the product itself: a position from a lesson with its name above it and the book's move as the arrow
+    const us = ['e2e4', 'e7e5', 'g1f3', 'b8c6', 'f1c4', 'f8c5', 'c2c3', 'g8f6'], pv = fenOf('e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6');
+    return `<section class="whero"><div><h2>Your opening course, built from your own games</h2>
+        ${short ? '<p class="wshort">Not enough games yet. Play some more, then check again.</p>' : ''}
         ${bullets(['Reads what you already play, where you score and where you leave the book', 'Asks a few would-you-rather questions', 'Builds your course in that order'], 'lede')}
         <div class="cta">${cta}<button class="btn ghost" data-view="sandbox">Try the sandbox first</button></div></div>
-      <div class="wart"><div class="board">${boardSVG(w.fen, {coords: false, last: w.last, arrows: ['c4f7r'], flip: false})}</div><p class="wbub">${short ? `Not enough games yet. Play some more and I'll be here.` : `Hi, I'm ${coachName()}. Connect your account and I'll show you your openings.`}</p><div class="wcoach cface">${knightSVG()}</div></div></section>
+      <div class="wart" aria-hidden="true"><div class="wcard">${opnHTML(Openings.ofMoves(us, START_FEN))}<div class="board">${boardSVG(pv.fen, {coords: false, last: pv.last, arrows: ['d2d4g'], flip: false})}</div></div><div class="wcoach cface">${knightSVG()}</div></div></section>
       <ol class="steps3">${li(1, 'Make an account', 'So your playbook follows you to every device.')}${li(2, 'Connect your chess account', 'Your chess.com or Lichess username. Only your public games are read.')}${li(3, 'Pick your lines', 'A few would-you-rather questions, then your course opens.')}</ol>
-      <div><p class="kicker" style="margin-bottom:10px">Opens with your games</p><div class="lockgrid">${lock('course', 'Course', 'One path, ordered by what your games say matters most.')}${lock('drill', 'Drill', 'Five lines a day from memory. Slips come back first.')}${lock('games', 'Your games', 'Results by opening, every lesson, and where you leave the book.')}${lock('shop', 'Shop', 'A new look for your coach.')}</div></div>`;
+      <p class="wopens">${ICON.lock}<span>Course, Drill, Your games and Shop open once your games are in.</span></p>`;
   },
   locked(tab){
     const T = {course: ['Your course', 'One path through your openings, in the order your games say matters most: the idea, the lines, a drill, practice games and a checkpoint for each.'],
@@ -1327,10 +1328,11 @@ const Review = {
   gid(g){ return g.url || `${g.h.White}~${g.h.Black}~${g.t}`; },
   // ---- reading the games
   parse(text, user){ return Analyze.parsePGN(text || '').map(g => { const r = Analyze.replay(g, String(user || '').toLowerCase()); return r ? Object.assign(r, {h: g.h}) : null; }).filter(Boolean); },
+  // the newest three: the month's text is cut into games, and only the newest are played through
   async read(){
-    const a = this.acct(), cur = Recap.key(Date.now());
-    let gs = this.parse(await Recap.read(a, cur), a.user);
-    if (gs.length < RG_N) gs = gs.concat(this.parse(await Recap.read(a, Recap.shift(cur, -1)), a.user));
+    const a = this.acct(), cur = Recap.key(Date.now()), get = async k => Analyze.newest(Analyze.parsePGN(await Recap.read(a, k)), a.user, RG_N);
+    let gs = await get(cur);
+    if (gs.length < RG_N) gs = gs.concat(await get(Recap.shift(cur, -1)));
     return gs.sort((x, y) => y.t - x.t).slice(0, RG_N);
   },
   async check(){
@@ -1965,8 +1967,8 @@ const Tour = {
       {h: 'Every move explained', at: '.mcard', say: ['Step through with the arrows under the board, or the arrow keys', 'Each move says what it does: the book\'s note, and what the board shows', 'Above it: the opening\'s real name, the one players know it by']},
       {h: 'Marks on the moves', at: () => document.querySelector('.mklegend') || document.querySelector('.timeline'),
         say: ['The other side\'s inaccuracies, mistakes and blunders carry a mark', 'Key move: your answer that makes a mistake cost', 'In the Sandbox and in drills the mark shows on the board beside the piece']},
-      {h: 'Your moves in order', at: '.ostrip', skip: () => myMoves(LINES[lid]).length < 2,
-        say: ['Every move of yours in this line as a small picture, in the order you play them', 'When a line plays them in another order, the main line sits above it and the move that changed places is ringed', 'Numbers on the board puts each move\'s number on its piece']},
+      {h: 'The order, on the board', at: '#sb', skip: () => myMoves(LINES[lid]).length < 2,
+        say: ['Each piece carries the number of the move that put it there', 'A purple number is played at another turn than in the main line', 'Move any piece to try something else: your book answers if it knows the move, and the engine if not']},
       {h: 'The engine in lessons', at: '.engrow', say: ['Switch it on for the best moves, their arrows and the score', 'It stays off in drills, practice games and checkpoints, and comes back when they end']},
       {h: 'The plan from here', at: '.ccol .plan', skip: () => !planOf(lid), go: () => { S.drill = S.drillState = null; openLine(lid, LINES[lid].n.length - 1, 'games'); },
         say: ['Every line ends with a plan: what to aim for once the moves you know run out', 'You get it at the end of lessons, clean drills and practice games']},

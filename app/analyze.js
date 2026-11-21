@@ -130,6 +130,31 @@ const Analyze = (() => {
   }
 
   /* ---- one game: replay it and note the plain facts */
+  /* A SAN move played without asking the chess library to spell out every legal move (its own way: slow enough to
+     freeze a phone for seconds on a month of games). The text gives the piece, the target and any hint about where it
+     came from; each piece of that kind is tried by its squares, which the library checks for legality. */
+  function sanMove(c, san){
+    const t = san.replace(/[+#!?]+$/, '');
+    if (/^[O0]-[O0](-[O0])?$/.test(t)){ const r = c.turn() === 'w' ? '1' : '8'; return c.move({from: 'e' + r, to: (t.length > 3 ? 'c' : 'g') + r}); }
+    const m = t.match(/^([KQRBN])?([a-h])?([1-8])?x?([a-h][1-8])(?:=?([QRBNqrbn]))?$/); if (!m) return null;
+    const pc = (m[1] || 'p').toLowerCase(), to = m[4], promo = m[5] ? m[5].toLowerCase() : undefined, turn = c.turn(), B = c.board();
+    for (let r = 0; r < 8; r++) for (let f = 0; f < 8; f++){
+      const q = B[r][f]; if (!q || q.type !== pc || q.color !== turn) continue;
+      const from = 'abcdefgh'[f] + (8 - r);
+      if ((m[2] && from[0] !== m[2]) || (m[3] && from[1] !== m[3])) continue;
+      if (pc === 'p' && !m[2] && from[0] !== to[0]) continue;                       // a pawn that doesn't capture stays on its file
+      const dx = Math.abs(f - (to.charCodeAt(0) - 97)), dy = Math.abs((8 - r) - +to[1]);
+      if (pc === 'n' ? !((dx === 1 && dy === 2) || (dx === 2 && dy === 1)) : pc === 'b' ? dx !== dy : pc === 'r' ? dx && dy : pc === 'q' ? dx && dy && dx !== dy : pc === 'k' ? dx > 1 || dy > 1 : dx > 1 || dy > 2 || !dy) continue;
+      const mv = c.move(promo ? {from, to, promotion: promo} : {from, to}); if (mv) return mv;
+    }
+    return null;
+  }
+  // the newest games of a set, replayed: only as many as are asked for (a month is not replayed to find three)
+  function newest(raw, user, n){
+    const out = []; user = String(user || '').toLowerCase();
+    for (const g of raw.slice().sort((a, b) => stamp(b.h) - stamp(a.h))){ const r = replay(g, user); if (r){ out.push(Object.assign(r, {h: g.h})); if (out.length >= n) break; } }
+    return out;
+  }
   function replay(g, user){
     const h = g.h, me = (h.White || '').toLowerCase() === user ? 'w' : (h.Black || '').toLowerCase() === user ? 'b' : null;
     if (!me) return null;
@@ -139,7 +164,7 @@ const Analyze = (() => {
     if (res === null || g.moves.length < 6) return null;
     const c = new Chess(), ucis = [], sans = []; let castle = {w: null, b: null}, qGone = 0, qOffPly = null, open = null;
     for (const san of g.moves){
-      const m = c.move(san, {sloppy: true}); if (!m) break;
+      const m = sanMove(c, san) || c.move(san, {sloppy: true}); if (!m) break;
       ucis.push(m.from + m.to + (m.promotion || '')); sans.push(m.san.replace(/[+#]/g, ''));
       if (m.flags.includes('k')) castle[m.color] = 'K'; else if (m.flags.includes('q')) castle[m.color] = 'Q';
       if (m.captured === 'q' && ++qGone === 2 && qOffPly === null) qOffPly = ucis.length;
@@ -160,7 +185,7 @@ const Analyze = (() => {
     const tick = () => new Promise(r => setTimeout(r, 0)), games = [];
     for (let i = 0; i < raw.length; i++){
       const g = replay(raw[i], user); if (g) games.push(g);
-      if (i % 8 === 7){ if (onProgress) onProgress({stage: 'read', done: i + 1, of: raw.length, last: g}); await tick(); }
+      if (i % 4 === 3){ if (onProgress) onProgress({stage: 'read', done: i + 1, of: raw.length, last: g}); await tick(); }
     }
     games.sort((a, b) => b.t - a.t);
     if (onProgress) onProgress({stage: 'read', done: raw.length, of: raw.length});
@@ -245,6 +270,6 @@ const Analyze = (() => {
     return out.sort((a, b) => b.d - a.d);
   }
 
-  return {parsePGN, guessUser, run, again, profile, replay, walk, homePacks, nameIn, score, pct, timeClass, NAMES};
+  return {parsePGN, guessUser, run, again, profile, replay, newest, sanMove, walk, homePacks, nameIn, score, pct, timeClass, NAMES};
 })();
 if (typeof module !== 'undefined') module.exports = Analyze;

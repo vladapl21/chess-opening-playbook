@@ -40,7 +40,8 @@ with sync_playwright() as p:
     pg.goto(URL); pg.wait_for_timeout(1000)
     assert pg.evaluate('[PERSONA, S.view]') == ['new', 'start']
     assert pg.locator('.tabs button.lock').count() == 4 and 'lock' not in (pg.get_attribute('.tabs [data-view="sandbox"]', 'class') or '')
-    w0 = pg.inner_text('.whero'); assert 'Connect your account' in w0 and not any(x in w0 for x in ('150', '200', '50 games')), w0
+    w0 = pg.inner_text('.whero'); assert 'built from your own games' in w0 and not any(x in w0 for x in ('150', '200', '50 games', 'Get your playbook', "Hi, I'm")), w0
+    assert pg.locator('.wbub, .lockcard').count() == 0 and pg.locator('.wcard .oname').count() == 1 and pg.locator('.wopens').count() == 1, 'the welcome shows the product, not a motto'
     assert pg.is_hidden('#meBtn') and pg.is_hidden('#drillDot'), 'no streak or drill mark before there is anything to drill'
     pg.screenshot(path=out + 'o_start.png', full_page=True)
     for v in ('course', 'drill', 'games', 'shop'):

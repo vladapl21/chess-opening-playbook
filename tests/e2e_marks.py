@@ -1,4 +1,4 @@
-"""Marks on the moves, the names of the lines and your moves in order (over local HTTP, the website's page).
+"""Marks on the moves, the names of the lines, the order of your moves and the lesson board that takes moves (over local HTTP, the website's page).
 
 The other side's moves are marked by what they hand you (inaccuracy ?!, mistake ?, blunder ??), yours with one mark, the
 key move (!): the answer that makes a mistake cost. Known positions first, then how many moves get a mark at all (a mark
@@ -10,9 +10,11 @@ made the key move stays while the other side answers; a checkpoint shows none.
 
 Names: the opening's name as a trail with the line's own name large, and in the lists of moves the name each move starts.
 
-Your moves in order: the strip under a lesson's board, a picture for every move, the main line beside a line whose order
-differs with the moves that changed places ringed in both rows, a tap on a move steps there, and the numbers on the
-board. A drill names a move of the line that was played before its turn as an order slip. A phone in dark mode at the end."""
+The order of your moves is on the board: each piece carries the number of the move that put it there, on from the
+start and kept with the settings, purple where a line plays it at another turn than the main line. A lesson's board
+takes moves for either side: the line's move steps on, another book move opens its line, anything else opens the explore
+board with the engine on, where the verdict and the depth are said once. A drill names a move of the line that was
+played before its turn as an order slip. A phone in dark mode at the end."""
 import re
 from playwright.sync_api import sync_playwright
 from e2e_white import launch, out, play_sandbox
@@ -183,35 +185,65 @@ with sync_playwright() as p:
     tags = pg.evaluate("[document.querySelectorAll('#sbfeed .ntag').length, document.querySelectorAll('#sbfeed .named').length]"); print('names in the list of moves:', tags); assert sum(tags) >= 2
     assert pg.evaluate("nameParts('Italian Game: Two Knights Defense, Fried Liver Attack')") == ['Italian Game', 'Two Knights Defense', 'Fried Liver Attack'] and pg.evaluate("nameParts('Queen\\'s Pawn Game')") == ["Queen's Pawn Game"]
 
-    # ---- your moves in order
+    # ---- the order of your moves, on the board itself: each piece carries the number of the move that put it there
     pg.evaluate("sbSetFrom(null); S.drill = S.sbState = null; useSide('b')")
     main = pg.evaluate("DATA.lines.find(l => l.lesson === CHAPTERS.slav.first && l.main).id")
-    pg.evaluate(f"openLine('{main}', 4)"); pg.wait_for_timeout(500); pg.evaluate("Coach.hush()")
-    strip = ' '.join(pg.inner_text('.ostrip').split()); print('the main line:', strip[:140])
-    assert 'This is the order to know for this opening' in strip and pg.locator('.otoks.ref').count() == 0
-    n_mine = pg.evaluate("myMoves(LINES[S.line]).length")
-    assert pg.locator('.otoks button.otok').count() == n_mine and pg.locator('.otoks .omap').count() == n_mine, 'a picture for every move of yours'
-    assert pg.locator('.otok.cur').count() == 1 and pg.locator('.otok.done').count() == 1, 'two of your moves made, the second one current'
-    pg.locator('.otoks button.otok').nth(4).click(); pg.wait_for_timeout(300)
-    assert pg.evaluate("[S.i, isMine(N[LINES[S.line].n[S.i]]), myMoves(LINES[S.line])[4].k]") == [pg.evaluate('S.i'), True, pg.evaluate('S.i')], 'a tap on a move steps there'
-    # the numbers on the board: every piece of yours that has moved carries the number of its last move
-    assert pg.locator('#sb g.onum').count() == 0
+    pg.evaluate(f"openLine('{main}', 10)"); pg.wait_for_timeout(500); pg.evaluate("Coach.hush()")
+    assert pg.locator('.ostrip, .otok').count() == 0, 'the strip of small pictures is gone'
+    nums = pg.evaluate("[[...document.querySelectorAll('#sb g.onum text')].map(t => +t.textContent).sort((a, b) => a - b), orderNums(LINES[S.line], S.i).map(x => x[1]).sort((a, b) => a - b), document.getElementById('cNums').getAttribute('aria-pressed'), SET.nums]")
+    print('numbers on the board, on from the start:', nums); assert nums[0] == nums[1] and len(nums[0]) >= 4 and max(nums[0]) == 5 and nums[2:] == ['true', True], nums
+    assert pg.locator('#sb g.onum.odd').count() == 0 and pg.locator('.onote').count() == 0, 'the main line is the order to know: nothing is purple'
+    # the switch is a setting: it follows the player (kept with the settings), and a lesson reopened keeps it
     pg.click('#cNums'); pg.wait_for_timeout(300)
-    nums = pg.evaluate("[[...document.querySelectorAll('#sb g.onum text')].map(t => +t.textContent).sort((a, b) => a - b), orderNums(LINES[S.line], S.i).map(x => x[1]).sort((a, b) => a - b), document.getElementById('cNums').getAttribute('aria-pressed')]")
-    print('numbers on the board:', nums); assert nums[0] == nums[1] and len(nums[0]) >= 4 and max(nums[0]) == 5 and nums[2] == 'true', nums
-    # a line whose order differs: the main line beside it, the move that changed places ringed in both rows
+    assert pg.locator('#sb g.onum').count() == 0 and pg.evaluate("[SET.nums, Prog.d.set.nums, JSON.parse(localStorage.getItem(PKEY)).set.nums]") == [False, False, False]
+    pg.click('#cNums'); pg.wait_for_timeout(300); assert pg.evaluate("[SET.nums, Prog.d.set.nums]") == [True, True] and pg.locator('#sb g.onum').count() >= 4
+    # a line that plays the same moves in another order: that move's number is purple, with one line under the board
     swap = pg.evaluate("DATA.lines.find(l => LESSONS[l.lesson] && chapterOf(LESSONS[l.lesson]).id === 'slav' && orderOf(l).diff.length === 1 && orderOf(l).diff[0].odd === 'swap').id")
     pg.evaluate(f"openLine('{swap}', LINES['{swap}'].n.length - 1)"); pg.wait_for_timeout(500); pg.evaluate("Coach.hush()")
-    strip = ' '.join(pg.inner_text('.ostrip').split()); print('a line in another order:', strip[:200])
-    assert 'THE MAIN LINE' in strip.upper() and 'THIS LINE' in strip.upper() and re.search(r'comes (later|earlier) than in the main line', strip), strip
-    odd = pg.evaluate("[[...document.querySelectorAll('.otoks.ref .otok.odd')].map(e => e.title), [...document.querySelectorAll('.otoks:not(.ref) .otok.odd')].map(e => e.title), orderOf(LINES[S.line]).diff.map(m => m.nd.l)]")
-    print('ringed in both rows:', odd); assert len(odd[1]) == 1 and odd[1] == odd[2] and len(odd[0]) == 1, odd
-    assert pg.evaluate("(() => { const a = document.querySelector('.otoks.ref .otok.odd .omap').innerHTML, b = document.querySelector('.otoks:not(.ref) .otok.odd .omap').innerHTML; return a === b; })()"), 'the same move, the same picture'
-    assert pg.locator('.otoks.ref button').count() == 0, 'the main line is there to look at, not to tap'
-    pg.locator('.ostrip').screenshot(path=out + 'mk_order.png'); pg.screenshot(path=out + 'mk_lesson.png', full_page=True)
-    # a game review has no strip (it isn't a line to learn in order), and the numbers stay off there
+    odd = pg.evaluate("[[...document.querySelectorAll('#sb g.onum.odd text')].map(t => +t.textContent), orderOf(LINES[S.line]).diff.map(m => myMoves(LINES[S.line]).findIndex(x => x.k === m.k) + 1), document.querySelector('.onote').innerText, getComputedStyle(document.querySelector('#sb g.onum.odd circle')).fill !== getComputedStyle(document.querySelector('#sb g.onum:not(.odd) circle')).fill]")
+    print('a line in another order:', odd); assert odd[0] == odd[1] and len(odd[0]) == 1 and 'another turn than in the main line' in odd[2] and odd[3], odd
+    pg.screenshot(path=out + 'mk_lesson.png', full_page=True)
+    # a game review has no numbers (it isn't a line to learn in order)
     g = pg.evaluate("DATA.games[0].id"); pg.evaluate(f"openLine('{g}', 6)"); pg.wait_for_timeout(400)
-    assert pg.locator('.ostrip').count() == 0 and pg.locator('#sb g.onum').count() == 0
+    assert pg.locator('#cNums').count() == 0 and pg.locator('#sb g.onum').count() == 0
+
+    # ---- a lesson's board takes moves for either side: the line's move steps on, another book move opens its line,
+    #      and a move the book doesn't have opens the explore board with the engine on
+    pg.evaluate("useSide('w'); openLine('setup', 2)"); pg.wait_for_timeout(500); pg.evaluate("Coach.hush(); EngineUI.set(false)")
+    def at(): return pg.evaluate("[S.view, S.line, S.i, N[LINES[S.line].n[S.i]].u]")
+    box = lambda: pg.locator('#sb svg').bounding_box()
+    def xy(q):
+        bb = box(); f = 'abcdefgh'.index(q[0]); r = int(q[1]) - 1
+        if pg.evaluate('FLIP'): f, r = 7 - f, 7 - r
+        return bb['x'] + (f + .5) * bb['width'] / 8, bb['y'] + (7 - r + .5) * bb['height'] / 8
+    def drag(a, b_):
+        x1, y1 = xy(a); x2, y2 = xy(b_); pg.mouse.move(x1, y1); pg.mouse.down(); pg.mouse.move(x2, y2, steps=6); pg.mouse.up(); pg.wait_for_timeout(450)
+    def tap(a, b_):
+        x1, y1 = xy(a); pg.mouse.click(x1, y1); pg.wait_for_timeout(120); x2, y2 = xy(b_); pg.mouse.click(x2, y2); pg.wait_for_timeout(450)
+    start = at(); nxt = pg.evaluate("N[LINES[S.line].n[S.i + 1]].u")
+    x1, y1 = xy(nxt[:2]); pg.mouse.click(x1, y1); pg.wait_for_timeout(150)
+    assert pg.locator('#sb .selsq').count() == 1 and pg.locator('#sb .dot, #sb .mvdot, #sb circle.dot').count() >= 0, 'a tap picks the piece up'
+    x2, y2 = xy(nxt[2:4]); pg.mouse.click(x2, y2); pg.wait_for_timeout(450)
+    assert at() == ['study', start[1], start[2] + 1, nxt], ('the line\'s own move steps on', at())
+    # the other side's turn now: drag a move the book has under another line
+    alt = pg.evaluate("(() => { const L = LINES[S.line]; for (let i = S.i; i < L.n.length - 1; i++){ const k = (N[L.n[i]].k || []).filter(c => c !== L.n[i + 1] && (linesByNode.get(c) || []).length); if (k.length) return {i, u: N[k[0]].u, c: k[0]}; } return null; })()")
+    pg.evaluate(f"jump({alt['i']})"); pg.wait_for_timeout(400)
+    drag(alt['u'][:2], alt['u'][2:4])
+    got = at(); print('a book move for the other side:', alt, '->', got)
+    assert got[0] == 'study' and got[3] == alt['u'] and pg.evaluate(f"LINES[S.line].n[S.i] === {alt['c']}") and got[1] != start[1], 'the book has an answer: its line opens at that move'
+    # a move the book doesn't have, for whichever side is to move: the explore board, engine on, the move made
+    off = pg.evaluate("(() => { const idx = LINES[S.line].n[S.i], ch = new Chess(nodeFen(idx)), has = new Set((N[idx].k || []).map(c => N[c].u.slice(0, 4))); const m = ch.moves({verbose: true}).find(m => !has.has(m.from + m.to) && !m.promotion && !m.flags.includes('k') && !m.flags.includes('q')); return m.from + m.to; })()")
+    before = at(); tap(off[:2], off[2:4]); pg.wait_for_timeout(500)
+    ex = pg.evaluate("[S.view, S.ex && S.ex.moves[S.ex.moves.length - 1], S.ex && S.ex.i === S.ex.moves.length, EngineUI.on(), S.ex && S.ex.base]")
+    print('a move off the book:', off, '->', ex); assert ex[:4] == ['explore', off, True, True] and ex[4] == before[2], ex
+    came = pg.evaluate("(() => { const b = document.getElementById('xCame').getBoundingClientRect(), w = document.querySelector('.board-wrap').getBoundingClientRect(); return [document.getElementById('xCame').innerText.trim(), Math.abs((b.left + b.right) / 2 - (w.left + w.right) / 2)]; })()")
+    print('the way back:', came); assert came[0] == 'Back to where you started' and came[1] < 30, 'centred under the board'
+    pg.click('#xCame'); pg.wait_for_timeout(300); assert pg.evaluate('S.ex.i === S.ex.base')
+    # one engine readout: the verdict and the depth are under the board, and the card beside it doesn't repeat them
+    pg.wait_for_function("(document.getElementById('xeval') || {}).innerText && /depth \\d+/.test(document.getElementById('xeval').innerText)", timeout=30000)
+    said = pg.evaluate("[document.getElementById('xeval').innerText, document.querySelectorAll('#engcard .eeval:not(.wait)').length, (document.querySelector('#engcard .edepth') || {innerText: ''}).innerText, document.querySelectorAll('#engcard .ebest .erow').length]")
+    print('one engine readout:', said); assert 'depth' in said[0] and said[1] == 0 and 'depth' not in said[2] and said[3] >= 1, said
+    pg.evaluate("exBack()"); pg.wait_for_timeout(400); pg.evaluate("EngineUI.set(false)")
 
     # ---- a drill: a move of the line played before its turn is named as that (the order slipped, not the move), without
     #      saying which move is due; the second miss shows the arrow as always, and the coach's note says it again
@@ -239,15 +271,15 @@ with sync_playwright() as p:
     note = ' '.join(pg.inner_text('.coachnote').split()); print('  the coach afterwards:', note[:220])
     assert 'the order slipped, not the move' in note and 'See the order' in note, note
     pg.click('.coachnote [data-line]'); pg.wait_for_timeout(500)
-    assert pg.evaluate("[S.view, S.line]") == ['study', main] and pg.locator('.ostrip').count() == 1 and pg.evaluate("N[LINES[S.line].n[S.i]].u") == early[2], 'See the order opens the lesson at the move that was due'
+    assert pg.evaluate("[S.view, S.line]") == ['study', main] and pg.locator('#sb g.onum').count() >= 1 and pg.evaluate("N[LINES[S.line].n[S.i]].u") == early[2], 'See the order opens the lesson at the move that was due, numbers on the board'
     assert pg.locator('.ccol .opn .oname').count() == 1 and pg.locator('.timeline .ntag, .timeline .named').count() >= 1, 'the lesson names its line too'
 
     # ---- a phone in dark mode
     ph = b.new_context(viewport={'width': 390, 'height': 844}, color_scheme='dark'); q = ph.new_page(); hook(q)
     q.goto(URL + '#course'); q.wait_for_timeout(800)
-    q.evaluate(f"useSide('b'); S.onums = true; openLine('{swap}', LINES['{swap}'].n.length - 1)"); q.wait_for_timeout(600); q.evaluate("Coach.hush()")
+    q.evaluate(f"useSide('b'); openLine('{swap}', LINES['{swap}'].n.length - 1)"); q.wait_for_timeout(600); q.evaluate("Coach.hush()")
     assert q.evaluate('document.documentElement.scrollWidth') <= 390, 'no sideways scroll on a phone'
-    assert q.evaluate("document.querySelector('.ostrip').getBoundingClientRect().right") <= 390
+    assert q.evaluate("document.querySelector('.engrow').getBoundingClientRect().right") <= 390 and q.locator('#sb g.onum.odd').count() == 1
     dark = colours(q); print('mark colours, dark:', dark)
     assert len(set(dark)) == 4 and not set(dark) & THEIRS and not set(dark) & set(light), 'the dark theme has its own'
     q.screenshot(path=out + 'mk_phone.png', full_page=True)

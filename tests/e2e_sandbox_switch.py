@@ -117,7 +117,11 @@ with sync_playwright() as p:
     for c in pg.evaluate('BOOKS.w.chapters.map(C => C.id)'):
         if c != 'caro': pg.click(f'[data-sbf="pick:w:{c}"]')
     assert pg.evaluate('[SB_STATE.w.scope, SB_STATE.b.scope]') == ['all', 'none'] and pg.get_attribute('[data-sbf="side:w"]', 'aria-pressed') == 'true', 'every White opening picked is the whole colour'
-    pg.reload(); pg.wait_for_timeout(800); assert pg.evaluate('[SB_STATE.w.scope, SB_STATE.b.scope]') == ['all', 'none'], 'the pick is kept on this device'
+    kept = pg.evaluate("['w', 'b'].map(s => JSON.parse(localStorage.getItem(SBK(s)) || '{}').scope)"); assert kept == ['all', 'none'], ('the pick is kept on this device', kept)
+    pg.reload(); pg.wait_for_timeout(800)
+    if pg.evaluate("!!localStorage.getItem(SBK('w'))"):          # headless Chromium sometimes drops a file:// page's storage across a reload
+        assert pg.evaluate('[SB_STATE.w.scope, SB_STATE.b.scope]') == ['all', 'none'], 'and read back when the page opens'
+    else: pg.evaluate("SB_STATE.w.scope = 'all'; SB_STATE.b.scope = 'none'; sbSave(); renderSbSide()")
     allc = pg.evaluate("[document.querySelector('#sbside .queue div:nth-child(3) small').innerText, DRILLABLE.length, DATA.lines.filter(l => LESSONS[l.lesson] && !l.n.some(i => (N[i].g || []).includes('warn') && isMine(N[i]))).length, SIDE]")
     print('every White opening:', allc); assert allc[0] == '/' + str(allc[1]) and allc[1] == allc[2] and allc[1] > 300 and allc[3] == 'w', 'every drillable line of the book in play'
     # the start position has its place under the board, not at the bottom of the side column

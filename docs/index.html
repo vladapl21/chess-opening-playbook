@@ -286,13 +286,7 @@ p{margin:0}
 .mkc{display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-size:12.5px;font-weight:700;color:var(--ink);white-space:nowrap} .mkw{margin:6px 0 0;font-size:13.5px;color:var(--muted)}
 .mklegend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:10px 0 0;font-size:12.5px;color:var(--muted)} .mklegend span{display:inline-flex;align-items:center;gap:5px}
 .onum circle{fill:var(--ink);opacity:.86} .onum text{fill:var(--surface);font:700 17px var(--f-mono)}
-.ostrip{margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)} .ohead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.otoks{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px} .otok{position:relative;width:50px;display:grid;justify-items:center;gap:2px;padding:3px 0 5px;border:1.5px solid var(--line);border-radius:6px;background:var(--surface-2);opacity:.5;font:inherit;color:inherit}
-button.otok{cursor:pointer} .otok .pico{width:26px;height:26px;margin-top:5px} .otok .on{position:absolute;top:2px;left:4px;font:700 11px var(--f-mono);color:var(--muted)} .otok.done{opacity:1} .otok.cur{opacity:1;border-color:var(--accent);background:var(--accent-soft)}
-.otok.odd{border-style:dashed;border-color:var(--ord)} .otok.odd .on{color:var(--ord)} .ocap{margin:9px 0 0;font-size:13px;color:var(--muted)} .ocap b{color:var(--ink);font-weight:650}
-.omap{width:38px;height:38px} .omb{fill:var(--surface);stroke:var(--line);stroke-width:1} .omg{stroke:var(--line);stroke-width:.6} .oml{stroke:var(--accent);stroke-width:1.6;stroke-linecap:round;opacity:.55} .omf{fill:var(--surface);stroke:var(--accent);stroke-width:1.1} .omt{fill:var(--accent)}
-.otok.odd .oml,.otok.odd .omf{stroke:var(--ord)} .otok.odd .omt{fill:var(--ord)} .olab{margin:10px 0 -4px;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)} .otoks.ref .otok{background:transparent}
-@media (max-width:460px){ .otoks{gap:5px} .otok{width:42px} .omap{width:32px;height:32px} }
+.onum.odd circle{fill:var(--ord);opacity:1} .onote{display:flex;align-items:center;justify-content:center;gap:7px;margin:8px 0 0;font-size:13px;color:var(--muted)} .onote i{flex:none;width:11px;height:11px;border-radius:50%;background:var(--ord)}
 .trow.cur{background:var(--accent-soft)}
 .trow .n{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
 .trow .pico{width:22px;height:22px}
@@ -640,6 +634,7 @@ button.ucard:hover{border-color:var(--accent);transform:translateY(-1px)}
 /* engine + explore */
 .engrow{display:flex;align-items:center;justify-content:center;gap:8px 12px;flex-wrap:wrap;margin-top:10px}
 .engrow .evaltext{margin:0}
+.xcame{display:flex;justify-content:center;margin-top:10px} .xcame .btn{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding-inline:14px} .xcame svg{width:15px;height:15px}
 .eswitch{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:4px 12px 4px 5px;font-weight:650;font-size:13px;cursor:pointer;color:var(--ink)}
 .eswitch i{width:30px;height:18px;border-radius:3px;background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line);position:relative;flex:none;transition:background .15s}
 .eswitch i::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--muted);transition:transform .15s,background .15s}
@@ -764,19 +759,19 @@ footer.foot .fcopy{margin-left:auto}
 .whero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:36px;align-items:center;padding:8px 0 6px}
 .whero .cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
 .whero .btn{min-height:46px;padding:11px 20px;font-size:15px}
-.wart{position:relative;display:grid;place-items:center;min-height:300px}
-.wart .board{width:min(100%,360px);transform:rotate(-4deg);border-radius:6px;overflow:hidden;box-shadow:var(--shadow)}
-.wart .wcoach{position:absolute;right:0;bottom:-6px;width:150px}
-.wart .wbub{position:absolute;left:0;top:6px;max-width:230px;background:var(--surface);border:1px solid var(--line);border-radius:6px 6px 6px 2px;padding:11px 14px;font-weight:600;font-size:14.5px;box-shadow:var(--shadow)}
+.wart{position:relative;display:grid;justify-items:center;padding:0 46px 0 0}
+.wcard{width:min(100%,360px);display:grid;gap:12px;padding:16px;border-radius:10px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)}
+.wcard .opn{margin:0} .wcard .oname{font-size:22px} .wcard .board{width:100%;border-radius:4px;overflow:hidden}
+.wart .wcoach{position:absolute;right:0;bottom:-10px;width:118px}
+.wshort{margin:10px 0 0;padding:10px 12px;border-radius:6px;background:var(--surface-2);font-weight:600;font-size:14.5px}
+.whero h2{font-size:clamp(32px,4.1vw,50px);line-height:1.06;margin-bottom:18px}
+.wopens{display:flex;align-items:center;gap:8px;margin:0;color:var(--muted);font-size:14px} .wopens svg{width:14px;height:14px;flex:none}
 .steps3{margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;counter-reset:st}
 .steps3 li{list-style:none;counter-increment:st;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:start;padding:16px;border-radius:6px;background:var(--surface);border:1px solid var(--line)}
 .steps3 li::before{content:counter(st);grid-row:1 / span 2;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-weight:700;font-size:18px;background:var(--surface-2);color:var(--muted)}
 .steps3 li.now{border-color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent)} .steps3 li.now::before{background:var(--accent);color:var(--accent-ink)}
 .steps3 li.done::before{content:"✓";background:var(--accent-soft);color:var(--accent);font-family:var(--f-body)}
 .steps3 b{font-size:15.5px} .steps3 span{color:var(--muted);font-size:14px;grid-column:2}
-.lockgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.lockcard{display:grid;gap:6px;align-content:start;padding:14px;border-radius:6px;border:1px dashed var(--line);color:var(--muted);font-size:13.5px;text-align:left;background:none;cursor:pointer;min-width:0}
-.lockcard:hover{border-color:var(--accent)} .lockcard b{color:var(--ink);font-size:14.5px;display:flex;align-items:center;gap:6px} .lockcard svg{width:13px;height:13px;flex:none}
 
 /* a locked section */
 .plocked{display:grid;justify-items:center;text-align:center;gap:14px;padding:clamp(28px,7vw,72px) 0}
@@ -861,6 +856,7 @@ footer.foot .fcopy{margin-left:auto}
 .cbub .cacts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .cbub .cx{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;border:0;background:none;color:var(--muted);font-size:18px;line-height:1;cursor:pointer}
 .cbub .cx:hover{background:var(--surface-2);color:var(--ink)}
+@media (pointer:coarse), (max-width:760px){ .cbub .cx{top:2px;right:2px;width:44px;height:44px;font-size:27px;color:var(--ink)} .cbub{padding-right:40px} }
 .cav{width:78px;height:78px;border-radius:50%;border:2px solid var(--surface);background:var(--accent-soft);padding:5px 3px 0;cursor:pointer;box-shadow:var(--shadow);overflow:hidden;transition:transform .15s,width .2s,height .2s}
 .cav:hover{transform:translateY(-2px) rotate(-4deg)} .cav svg{display:block;width:100%;height:100%}
 /* one size on every tab; while you are being tested the coach only steps back a little */
@@ -877,8 +873,8 @@ footer.foot .fcopy{margin-left:auto}
 @media (prefers-reduced-motion: no-preference){ .cav svg{animation:bob 3.4s ease-in-out infinite} @keyframes bob{50%{transform:translateY(-2px)}} }
 
 @media (max-width:860px){
-  .whero,.proc,.setup,.fgrid{grid-template-columns:minmax(0,1fr)} .wart{order:-1;min-height:250px} .wart .board{width:min(78%,300px)} .wart .wcoach{width:118px}
-  .lockgrid{grid-template-columns:repeat(2,minmax(0,1fr))} .tiles{grid-template-columns:repeat(2,minmax(0,1fr))} .leaks{grid-template-columns:minmax(0,1fr)}
+  .whero,.proc,.setup,.fgrid{grid-template-columns:minmax(0,1fr)} .wart{order:-1;padding-right:34px} .wcard{width:min(100%,300px)} .wart .wcoach{width:92px}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr))} .leaks{grid-template-columns:minmax(0,1fr)}
   .proc .board{max-width:300px;margin:0 auto}
 }
 @media (max-width:620px){
@@ -3090,6 +3086,31 @@ const Analyze = (() => {
   }
 
   /* ---- one game: replay it and note the plain facts */
+  /* A SAN move played without asking the chess library to spell out every legal move (its own way: slow enough to
+     freeze a phone for seconds on a month of games). The text gives the piece, the target and any hint about where it
+     came from; each piece of that kind is tried by its squares, which the library checks for legality. */
+  function sanMove(c, san){
+    const t = san.replace(/[+#!?]+$/, '');
+    if (/^[O0]-[O0](-[O0])?$/.test(t)){ const r = c.turn() === 'w' ? '1' : '8'; return c.move({from: 'e' + r, to: (t.length > 3 ? 'c' : 'g') + r}); }
+    const m = t.match(/^([KQRBN])?([a-h])?([1-8])?x?([a-h][1-8])(?:=?([QRBNqrbn]))?$/); if (!m) return null;
+    const pc = (m[1] || 'p').toLowerCase(), to = m[4], promo = m[5] ? m[5].toLowerCase() : undefined, turn = c.turn(), B = c.board();
+    for (let r = 0; r < 8; r++) for (let f = 0; f < 8; f++){
+      const q = B[r][f]; if (!q || q.type !== pc || q.color !== turn) continue;
+      const from = 'abcdefgh'[f] + (8 - r);
+      if ((m[2] && from[0] !== m[2]) || (m[3] && from[1] !== m[3])) continue;
+      if (pc === 'p' && !m[2] && from[0] !== to[0]) continue;                       // a pawn that doesn't capture stays on its file
+      const dx = Math.abs(f - (to.charCodeAt(0) - 97)), dy = Math.abs((8 - r) - +to[1]);
+      if (pc === 'n' ? !((dx === 1 && dy === 2) || (dx === 2 && dy === 1)) : pc === 'b' ? dx !== dy : pc === 'r' ? dx && dy : pc === 'q' ? dx && dy && dx !== dy : pc === 'k' ? dx > 1 || dy > 1 : dx > 1 || dy > 2 || !dy) continue;
+      const mv = c.move(promo ? {from, to, promotion: promo} : {from, to}); if (mv) return mv;
+    }
+    return null;
+  }
+  // the newest games of a set, replayed: only as many as are asked for (a month is not replayed to find three)
+  function newest(raw, user, n){
+    const out = []; user = String(user || '').toLowerCase();
+    for (const g of raw.slice().sort((a, b) => stamp(b.h) - stamp(a.h))){ const r = replay(g, user); if (r){ out.push(Object.assign(r, {h: g.h})); if (out.length >= n) break; } }
+    return out;
+  }
   function replay(g, user){
     const h = g.h, me = (h.White || '').toLowerCase() === user ? 'w' : (h.Black || '').toLowerCase() === user ? 'b' : null;
     if (!me) return null;
@@ -3099,7 +3120,7 @@ const Analyze = (() => {
     if (res === null || g.moves.length < 6) return null;
     const c = new Chess(), ucis = [], sans = []; let castle = {w: null, b: null}, qGone = 0, qOffPly = null, open = null;
     for (const san of g.moves){
-      const m = c.move(san, {sloppy: true}); if (!m) break;
+      const m = sanMove(c, san) || c.move(san, {sloppy: true}); if (!m) break;
       ucis.push(m.from + m.to + (m.promotion || '')); sans.push(m.san.replace(/[+#]/g, ''));
       if (m.flags.includes('k')) castle[m.color] = 'K'; else if (m.flags.includes('q')) castle[m.color] = 'Q';
       if (m.captured === 'q' && ++qGone === 2 && qOffPly === null) qOffPly = ucis.length;
@@ -3120,7 +3141,7 @@ const Analyze = (() => {
     const tick = () => new Promise(r => setTimeout(r, 0)), games = [];
     for (let i = 0; i < raw.length; i++){
       const g = replay(raw[i], user); if (g) games.push(g);
-      if (i % 8 === 7){ if (onProgress) onProgress({stage: 'read', done: i + 1, of: raw.length, last: g}); await tick(); }
+      if (i % 4 === 3){ if (onProgress) onProgress({stage: 'read', done: i + 1, of: raw.length, last: g}); await tick(); }
     }
     games.sort((a, b) => b.t - a.t);
     if (onProgress) onProgress({stage: 'read', done: raw.length, of: raw.length});
@@ -3205,7 +3226,7 @@ const Analyze = (() => {
     return out.sort((a, b) => b.d - a.d);
   }
 
-  return {parsePGN, guessUser, run, again, profile, replay, walk, homePacks, nameIn, score, pct, timeClass, NAMES};
+  return {parsePGN, guessUser, run, again, profile, replay, newest, sanMove, walk, homePacks, nameIn, score, pct, timeClass, NAMES};
 })();
 
 
@@ -3675,7 +3696,7 @@ function boardSVGInner(fen, o){
   for (const d of (o.dots || [])){ const [x, y] = sqxy(sqi(d)); s += a[sqi(d)] ? `<circle cx="${x+50}" cy="${y+50}" r="44" class="capring"/>` : `<circle cx="${x+50}" cy="${y+50}" r="15" class="dot"/>`; }
   for (const ar of (o.arrows || [])){ s += arrowSVG(ar.slice(0, 2), ar.slice(2, 4), ar[4], o.mini ? 22 : 17, ''); }
   if (o.hint){ s += arrowSVG(o.hint.slice(0, 2), o.hint.slice(2, 4), 'g', o.mini ? 22 : 17, 'hint'); }
-  for (const [sq, n] of (o.nums || [])){ const [x, y] = sqxy(sqi(sq)); s += `<g class="onum" transform="translate(${x + 17} ${y + 83})"><circle r="14"/><text y="6" text-anchor="middle">${n}</text></g>`; }
+  for (const [sq, n, odd] of (o.nums || [])){ const [x, y] = sqxy(sqi(sq)); s += `<g class="onum ${odd ? 'odd' : ''}" transform="translate(${x + 17} ${y + 83})"><circle r="14"/><text y="6" text-anchor="middle">${n}</text></g>`; }
   if (!o.mini) for (const m of (o.marks || (o.mark ? [o.mark] : []))){ const [x, y] = sqxy(sqi(m.sq)), bx = x + 82, by = y + 18;
     // the word beside the sign, for a moment after the move: to the right, or to the left when the board ends there
     if (m.word){ const w = m.word.length * 9.9 + 28, left = bx + w > 796;
@@ -3742,25 +3763,16 @@ function orderOf(line){
   if (n >= 3) mine.forEach((m, i) => { m.was = at[i]; if (at[i] >= 0 && !keep.has(i)) m.odd = 'swap'; else if (at[i] < 0 && i < lastShared) m.odd = 'new'; if (m.odd) diff.push(m); });
   return {mine, ref, diff, shared: n};
 }
-// a move as a picture: the board from your side, the square the piece left and the one it lands on. No names needed.
-function moveMap(u){
-  const sq = q => { let f = q.charCodeAt(0) - 97, r = +q[1] - 1; if (FLIP){ f = 7 - f; r = 7 - r; } return [f * 4 + 2, (7 - r) * 4 + 2]; };
-  const [x1, y1] = sq(u.slice(0, 2)), [x2, y2] = sq(u.slice(2, 4));
-  return `<svg class="omap" viewBox="0 0 32 32" aria-hidden="true"><rect class="omb" width="32" height="32" rx="2.5"/><path class="omg" d="M0 16H32M16 0V32"/><line class="oml" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/><circle class="omf" cx="${x1}" cy="${y1}" r="1.7"/><circle class="omt" cx="${x2}" cy="${y2}" r="2.7"/></svg>`;
-}
-function orderStripHTML(line, i){
-  const O = orderOf(line); if (O.mine.length < 2) return '';
-  const tok = (m, j, cls, tag) => `<${tag} class="otok ${cls} ${m.odd ? 'odd' : ''}" ${tag === 'button' ? `type="button" data-step="${m.k}" aria-label="Your move ${j + 1}: ${esc(m.nd.l)}"` : ''} title="${esc(m.nd.l)}"><span class="on">${j + 1}</span>${pieceIcon(m.nd.pc, m.nd.w === 1)}${moveMap(m.u)}</${tag}>`;
-  const toks = O.mine.map((m, j) => tok(m, j, m.k === i ? 'cur' : m.k < i ? 'done' : '', 'button')).join('');
-  const two = O.ref && O.shared >= 3 && O.diff.length > 0, moved = new Set(O.diff.filter(m => m.odd === 'swap').map(m => m.u));
-  const ref = two ? myMoves(O.ref).slice(0, Math.max(O.mine.length, 6)).map((m, j) => tok(Object.assign(m, {odd: moved.has(m.u) ? 'swap' : null}), j, 'done', 'span')).join('') : '';
-  const cap = !O.ref ? 'This is the order to know for this opening' : O.shared < 3 ? 'This line goes its own way early' : !O.diff.length ? 'The same order as the main line'
-    : O.diff.slice(0, 2).map(m => `<b>${esc(m.nd.l)}</b> ${m.odd === 'new' ? 'is not in the main line' : O.mine.indexOf(m) < m.was ? 'comes earlier than in the main line' : 'comes later than in the main line'}`).join(' · ');
-  return `<div class="ostrip"><div class="ohead"><p class="kicker">Your moves in order</p><button class="eswitch" id="cNums" type="button" aria-pressed="${!!S.onums}"><i aria-hidden="true"></i>Numbers on the board</button></div>
-    ${two ? `<p class="olab">The main line</p><div class="otoks ref">${ref}</div><p class="olab">This line</p>` : ''}<div class="otoks">${toks}</div><p class="ocap">${cap}</p></div>`;
-}
 // where each of your pieces stands, with the number of the move that put it there
-function orderNums(line, i){ const at = {}; let j = 0; for (let k = 1; k <= i; k++){ const nd = N[line.n[k]], f = nd.u.slice(0, 2), t = nd.u.slice(2, 4); if (isMine(nd)){ delete at[f]; at[t] = ++j; } else delete at[t]; } return Object.entries(at); }
+// (a number is purple when that move comes at another turn than in the opening's main line)
+function orderNums(line, i){
+  const odd = new Set(orderOf(line).diff.map(m => m.k)), at = {}; let j = 0;
+  for (let k = 1; k <= i; k++){ const nd = N[line.n[k]], f = nd.u.slice(0, 2), t = nd.u.slice(2, 4);
+    if (isMine(nd)){ delete at[f]; at[t] = [++j, odd.has(k)];
+      if (nd.pc === 'K' && Math.abs(f.charCodeAt(0) - t.charCodeAt(0)) === 2){ const r = f[1]; delete at[(t[0] === 'g' ? 'h' : 'a') + r]; }   // castling: the rook goes along, without a number
+    } else delete at[t]; }
+  return Object.entries(at).map(([sq, v]) => [sq, v[0], v[1]]);
+}
 function nodeBoardOpts(idx, extra = {}){
   const nd = N[idx], o = {coords: true}, mk = markOf(idx);
   if (mk && nd.u) o.mark = {sq: nd.u.slice(2, 4), k: mk};
@@ -4289,7 +4301,7 @@ function useSide(side){
 }
 /* ------------------------------------------------------------------ settings (kept on this device and with the progress) */
 const SET_KEY = 'playbook-settings', HOST_THEME = document.documentElement.dataset.theme || '';
-const SET_DEF = {theme: 'system', size: 'm', board: 'green', coords: true, coach: true, who: 'knight'};
+const SET_DEF = {theme: 'system', size: 'm', board: 'green', coords: true, coach: true, who: 'knight', nums: true};
 const SET = Object.assign({}, SET_DEF);
 try { Object.assign(SET, JSON.parse(localStorage.getItem(SET_KEY) || '{}')); } catch(e){}
 const SIZES = {s: .92, m: 1, l: 1.08, xl: 1.16};
@@ -4305,7 +4317,7 @@ function applySettings(){
 // the phone never undoes a coach picked on the laptop. A choice made before times were kept counts as very old (time 1)
 // but still beats a device that never chose (time 0). d.set keeps the older one-time-for-all form for pages still open
 // on an earlier version.
-const SET_KEYS = ['theme', 'size', 'board', 'coords', 'coach', 'who'];
+const SET_KEYS = ['theme', 'size', 'board', 'coords', 'coach', 'who', 'nums'];
 SET.ts = SET.ts || {};
 for (const k of SET_KEYS) if (SET.ts[k] === undefined) SET.ts[k] = SET.t || (SET[k] !== SET_DEF[k] ? 1 : 0);
 const setLocal = () => { try { localStorage.setItem(SET_KEY, JSON.stringify(SET)); } catch(e){} };
@@ -4620,6 +4632,7 @@ function renderStudy(){
   const plan = les && lineEnd ? planOf(S.line) : null;
   const exTitle = `${les ? les.title : 'Game vs ' + game.opp} · ${line.main ? (les ? 'main line' : 'the game') : line.title}${S.i ? `, move ${moveNo(p)}` : ''}`;
   const exOpts = extra => Object.assign({title: exTitle, plan: plan ? {side: SIDE, line: S.line} : null}, extra);
+  S.studyEx = exOpts;
   const drillBtn = (les && DRILLABLE.includes(S.line)) ? `<button class="btn ${CU && atEnd ? '' : 'primary'}" id="drillThis">Drill this line</button><button class="btn" id="playAlong">Play along</button>` : '';
   const fromBtn = les && sbCanFrom(idx) ? '<button class="btn ghost" id="sbHere">Practise from here</button>' : '';
   const lessonBtn = (!les && game.lesson) ? `<button class="btn" data-lesson="${game.lesson}">Open the related lesson</button>` : '';
@@ -4634,7 +4647,7 @@ function renderStudy(){
   <div class="sgrid study">
     <header class="lhead"><div class="chips">${chips}</div><h2>${esc(title)}</h2>${les ? `<p class="sub">${esc(sub)}</p>` : bullets(sub, 'sub')}${why ? bullets(why, 'why') : ''}</header>
     <div class="bcol">
-      <div class="board-wrap">${evalBarHTML(idx, 'sbar')}<div class="board" id="sb">${boardSVG(nd.f, nodeBoardOpts(idx, {aria: nd.l, nums: les && S.onums ? orderNums(line, S.i) : null}))}</div></div>
+      <div class="board-wrap">${evalBarHTML(idx, 'sbar')}<div class="board input" id="sb">${boardSVG(nd.f, studyBoardOpts())}</div></div>
       <div class="controls">
         <button class="ctl" id="cFirst" aria-label="To the start" ${S.i === 0 ? 'disabled' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5v14M18 6l-8 6 8 6V6z"/></svg></button>
         <button class="ctl" id="cPrev" aria-label="Back one move" ${S.i === 0 ? 'disabled' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -4642,8 +4655,8 @@ function renderStudy(){
         <button class="ctl" id="cNext" aria-label="Forward one move" ${S.i >= line.n.length - 1 ? 'disabled' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
         <button class="ctl" id="cLast" aria-label="To the end" ${S.i >= line.n.length - 1 ? 'disabled' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 5v14M6 6l8 6-8 6V6z"/></svg></button>
       </div>
-      <div class="engrow"><button class="eswitch" id="cEng" type="button" aria-pressed="${engOn}"><i aria-hidden="true"></i>Engine</button><p class="evaltext" id="stext">${curEval ? `Engine: <b>${esc(curEval.txt)}</b>${curEval.num ? ` <span class="tnum" title="${NUMHINT}">(${curEval.num})</span>` : ''}` : ''}</p></div>
-      ${les ? orderStripHTML(line, S.i) : ''}
+      <div class="engrow"><button class="eswitch" id="cEng" type="button" aria-pressed="${engOn}"><i aria-hidden="true"></i>Engine</button>${les ? `<button class="eswitch" id="cNums" type="button" aria-pressed="${!!SET.nums}"><i aria-hidden="true"></i>Move numbers</button>` : ''}<p class="evaltext" id="stext">${curEval ? `Engine: <b>${esc(curEval.txt)}</b>${curEval.num ? ` <span class="tnum" title="${NUMHINT}">(${curEval.num})</span>` : ''}` : ''}</p></div>
+      ${les && SET.nums && orderNums(line, S.i).some(x => x[2]) ? '<p class="onote"><i aria-hidden="true"></i>Played at another turn than in the main line</p>' : ''}
     </div>
     <div class="ccol">
       ${opnHTML(Openings.ofNode(idx), !!nameStart(idx))}${mcard}${engOn ? '<div id="engcard"></div>' : ''}${optHTML}${linesHTML}
@@ -4653,7 +4666,8 @@ function renderStudy(){
     </div></div>`;
   const svg = document.querySelector('#sb svg');
   if (S.anim){ const a = S.anim; S.anim = null; animateMove(svg, a.u, a.meta, a.back); }
-  const cn = document.getElementById('cNums'); if (cn) cn.onclick = () => { S.onums = !S.onums; render(); };
+  const cn = document.getElementById('cNums'); if (cn) cn.onclick = () => { setSetting('nums', !SET.nums); render(); };
+  S.ssel = null; wireStudyInput();
   document.getElementById('cFirst').onclick = () => step(-999);
   document.getElementById('cPrev').onclick = () => step(-1);
   document.getElementById('cNext').onclick = () => step(1);
@@ -4677,6 +4691,64 @@ function renderStudy(){
       if (top < tl.scrollTop || top + h > tl.scrollTop + tl.clientHeight) tl.scrollTop = Math.max(0, top - tl.clientHeight / 2 + h / 2); }
   }
   S.scrollTimeline = false;
+}
+// the lesson's board as it stands: the marks, your move numbers, and a piece picked up with the squares it can go to
+function studyBoardOpts(){
+  const line = LINES[S.line], idx = line.n[S.i], nd = N[idx], o = {aria: nd.l, nums: lessonOf(S.line) && SET.nums ? orderNums(line, S.i) : null};
+  if (S.ssel){ o.sel = S.ssel; o.dots = new Chess(nodeFen(idx)).moves({square: S.ssel, verbose: true}).map(m => m.to); }
+  return nodeBoardOpts(idx, o);
+}
+function studyBoard(){ const el = document.getElementById('sb'); if (!el || !LINES[S.line]) return; el.innerHTML = boardSVG(N[LINES[S.line].n[S.i]].f, studyBoardOpts()); if (EngineUI.host && EngineUI.host.board === 'sb') EngineUI.arrows(); }
+/* A lesson's board takes moves, for whichever side is to move. The line's own next move steps on. Another move the book
+   has an answer to opens the line that goes that way. Anything else opens the explore board with the move made and the
+   engine on, so a "what if" never needs a second tap. */
+function studyTry(from, to){
+  const line = LINES[S.line], idx = line.n[S.i], ch = new Chess(nodeFen(idx)), ms = ch.moves({verbose: true});
+  let m = ms.find(x => x.from === from && x.to === to);
+  if (!m){ const p = ch.get(from), q = ch.get(to);     // king onto its own rook = castle
+    if (p && p.type === 'k' && q && q.type === 'r' && q.color === p.color) m = ms.find(x => x.from === from && x.flags.includes(to[0] > from[0] ? 'k' : 'q')); }
+  S.ssel = null;
+  if (!m){ studyBoard(); return; }
+  const u = from + m.to + (m.promotion ? 'q' : ''), same = c => N[c].u.slice(0, 4) === u.slice(0, 4);
+  stopPlay();
+  const nx = line.n[S.i + 1];
+  if (nx !== undefined && same(nx)){ if (S.i + 1 === line.n.length - 1) S.stepped = S.line; S.i++; S.scrollTimeline = true; renderStudy(); return; }   // your hand made the move: it lands at once
+  const kid = (N[idx].k || []).find(c => same(c) && (linesByNode.get(c) || []).length);
+  if (kid !== undefined){
+    const ls = linesByNode.get(kid), les = lessonOf(S.line), pick = ls.find(id => les && LINES[id].lesson === les.id) || ls.find(id => LINES[id].main && LESSONS[LINES[id].lesson]) || ls.find(id => LESSONS[LINES[id].lesson]) || ls[0];
+    S.line = pick; S.i = LINES[pick].n.indexOf(kid); S.showPre = false; renderStudy(); setHash(); return;
+  }
+  EngineUI.set(true); exploreNode(idx, (S.studyEx || (x => x))({moves: [u], land: true}));
+}
+function wireStudyInput(){
+  const el = document.getElementById('sb'); if (!el) return;
+  let drag = null;
+  const turn = () => nodeFen(LINES[S.line].n[S.i]).split(' ')[1];
+  const mineAt = sq => { const p = fenArr(N[LINES[S.line].n[S.i]].f)[sqi(sq)]; return !!p && (turn() === 'w') === (p === p.toUpperCase()); };
+  el.addEventListener('pointerdown', e => {
+    if (!LINES[S.line] || S.view !== 'study') return;
+    const svg = el.querySelector('svg'); if (!svg) return;
+    const sq = squareAt(svg, e); if (!sq) return;
+    if (S.ssel && S.ssel !== sq && !mineAt(sq)){ e.preventDefault(); studyTry(S.ssel, sq); return; }
+    if (mineAt(sq)){
+      e.preventDefault(); stopPlay(); S.ssel = sq; studyBoard();
+      const svg2 = el.querySelector('svg'), use = svg2.querySelector(`use[data-sq="${sq}"]`);
+      if (use){ const ghost = use.cloneNode(); ghost.classList.add('ghost'); ghost.removeAttribute('data-sq'); svg2.appendChild(ghost); use.style.opacity = '.35';
+        drag = {sq, ghost, use, svg: svg2, moved: false, x0: e.clientX, y0: e.clientY}; try { el.setPointerCapture(e.pointerId); } catch(_){} }
+    } else if (S.ssel){ S.ssel = null; studyBoard(); }
+  });
+  el.addEventListener('pointermove', e => {
+    if (!drag) return; const r = drag.svg.getBoundingClientRect(); if (!drag.svg.isConnected || !r.width) return;
+    if (Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) > 4) drag.moved = true;
+    drag.ghost.setAttribute('x', ((e.clientX - r.left) / r.width * 800 - 50).toFixed(1)); drag.ghost.setAttribute('y', ((e.clientY - r.top) / r.height * 800 - 50).toFixed(1));
+  });
+  const end = e => {
+    if (!drag) return; const d = drag; drag = null;
+    const svg = d.svg.isConnected ? d.svg : el.querySelector('svg'), to = svg ? squareAt(svg, e) : null;
+    if (d.moved && to && to !== d.sq) studyTry(d.sq, to); else { d.ghost.remove(); d.use.style.opacity = ''; }
+  };
+  el.addEventListener('pointerup', end);
+  el.addEventListener('pointercancel', () => { if (drag){ drag.ghost.remove(); drag.use.style.opacity = ''; drag = null; } });
 }
 function step(d){
   const line = LINES[S.line], ni = Math.max(0, Math.min(line.n.length - 1, S.i + d));
@@ -6343,8 +6415,9 @@ function engineCardHTML(r, h){
   if (r && r.over) return `<div class="eng">${head('')}<p class="eeval"><b>${r.over === 'mate' ? `Checkmate: ${other} wins` : r.over === 'stalemate' ? 'Stalemate: a draw' : 'A draw'}</b></p></div>`;
   const L = r ? r.lines.filter(l => l && l.pv && l.pv[0]) : [], top = L[0], ei = top ? evalInfo(top.s) : null;
   const spin = !r || !r.done ? '<i class="spin" aria-hidden="true"></i>' : '';
-  const depth = `${spin}${r && r.d ? `depth ${r.d}` : 'starting…'}`;
-  let h2 = ei ? `<p class="eeval"><b>${esc(ei.txt)}</b>${ei.num ? ` <span class="tnum" title="${NUMHINT}">${ei.num}</span>` : ''}</p>` : `<p class="eeval wait">Thinking…</p>`;
+  const said = !!(h.text && document.getElementById(h.text));        // the verdict and the depth are under the board already
+  const depth = said ? spin : `${spin}${r && r.d ? `depth ${r.d}` : 'starting…'}`;
+  let h2 = !ei ? `<p class="eeval wait">Thinking…</p>` : said ? '' : `<p class="eeval"><b>${esc(ei.txt)}</b>${ei.num ? ` <span class="tnum" title="${NUMHINT}">${ei.num}</span>` : ''}</p>`;
   if (L.length){
     const ws = L.map(l => lineWords(h.fen, l.pv, 1)[0]), extra = ws.map(() => '');
     ws.forEach((w, k) => { if (!w || extra[k]) return;
@@ -6407,7 +6480,7 @@ function exploreFrom(fen, o = {}){
   stopPlay(); exStopAuto();
   const pre = (o.pre || []).slice(), own = (o.moves || []).slice(), ms = pre.concat(own);
   S.ex = {start: pre.length ? START_FEN : fen, base: pre.length, moves: ms, i: pre.length + (o.i !== undefined ? o.i : own.length), flip: o.flip !== undefined ? o.flip : FLIP, side: o.side || viewSide(), back: o.back || backHere(),
-    title: o.title || '', plan: o.plan || null, answer: false, sel: null, busy: false, auto: null, anim: o.i === undefined && own.length ? ms[ms.length - 1] : null};
+    title: o.title || '', plan: o.plan || null, answer: false, sel: null, busy: false, auto: null, anim: o.i === undefined && own.length && !o.land ? ms[ms.length - 1] : null};
   exSave(); S.view = 'explore'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
   if (o.auto) exAutoPlay();
 }
@@ -6506,8 +6579,8 @@ function renderExplore(){
         <button class="ctl" id="xLast" aria-label="To the last move" ${X.i >= n ? 'disabled' : ''}>${ICO.last}</button>
         <button class="ctl" id="xFlip" aria-label="Turn the board around">${ICO.flip}</button>
       </div>
+      ${B && X.i !== B && X.moves.length >= B ? `<div class="xcame"><button class="btn small" id="xCame"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>Back to where you started</button></div>` : ''}
       <p class="evaltext" id="xeval">&nbsp;</p>
-      ${B && X.i !== B && X.moves.length >= B ? `<button class="btn small" id="xCame">Back to where you came in</button>` : ''}
     </div>
     <div class="ccol">
       <div class="dpanel"><p class="kicker">Explore · moves for both sides</p><h3>Play on from here</h3>${opnHTML(Openings.ofMoves(X.moves.slice(0, X.i), X.start))}
@@ -6946,18 +7019,19 @@ const Product = {
   },
   /* -- welcome */
   startHTML(){
-    const out = this.signedOut(), has = !!this.me().P, short = !has && this.me().short, step = out ? 1 : has ? 3 : 2, w = fenOf('e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4');
+    const out = this.signedOut(), has = !!this.me().P, short = !has && this.me().short, step = out ? 1 : has ? 3 : 2;
     const cta = out ? `<button class="btn primary" data-acct="signup">Create your account<\/button><button class="btn" data-acct="signin">I already have an account<\/button>`
       : has ? `<button class="btn primary" data-pgo="findings">Continue: see what I found<\/button>` : short ? `<button class="btn primary" data-pgo="setup">Check my games again<\/button>` : `<button class="btn primary" data-pgo="setup">Connect your account<\/button>`;
     const li = (k, h, p) => `<li class="${k < step ? 'done' : k === step ? 'now' : ''}"><b>${h}<\/b><span>${p}<\/span><\/li>`;
-    const lock = (v, h, p) => `<button class="lockcard" data-view="${v}"><b>${ICON.lock}${h}<\/b>${p}<\/button>`;
-    return `<section class="whero"><div><p class="kicker">An opening course built from your own games<\/p>
-        <h2>Connect your account.<br>Get <em>your<\/em> playbook.<\/h2>
+    // a look at the product itself: a position from a lesson with its name above it and the book's move as the arrow
+    const us = ['e2e4', 'e7e5', 'g1f3', 'b8c6', 'f1c4', 'f8c5', 'c2c3', 'g8f6'], pv = fenOf('e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6');
+    return `<section class="whero"><div><h2>Your opening course, built from your own games<\/h2>
+        ${short ? '<p class="wshort">Not enough games yet. Play some more, then check again.<\/p>' : ''}
         ${bullets(['Reads what you already play, where you score and where you leave the book', 'Asks a few would-you-rather questions', 'Builds your course in that order'], 'lede')}
         <div class="cta">${cta}<button class="btn ghost" data-view="sandbox">Try the sandbox first<\/button><\/div><\/div>
-      <div class="wart"><div class="board">${boardSVG(w.fen, {coords: false, last: w.last, arrows: ['c4f7r'], flip: false})}<\/div><p class="wbub">${short ? `Not enough games yet. Play some more and I'll be here.` : `Hi, I'm ${coachName()}. Connect your account and I'll show you your openings.`}<\/p><div class="wcoach cface">${knightSVG()}<\/div><\/div><\/section>
+      <div class="wart" aria-hidden="true"><div class="wcard">${opnHTML(Openings.ofMoves(us, START_FEN))}<div class="board">${boardSVG(pv.fen, {coords: false, last: pv.last, arrows: ['d2d4g'], flip: false})}<\/div><\/div><div class="wcoach cface">${knightSVG()}<\/div><\/div><\/section>
       <ol class="steps3">${li(1, 'Make an account', 'So your playbook follows you to every device.')}${li(2, 'Connect your chess account', 'Your chess.com or Lichess username. Only your public games are read.')}${li(3, 'Pick your lines', 'A few would-you-rather questions, then your course opens.')}<\/ol>
-      <div><p class="kicker" style="margin-bottom:10px">Opens with your games<\/p><div class="lockgrid">${lock('course', 'Course', 'One path, ordered by what your games say matters most.')}${lock('drill', 'Drill', 'Five lines a day from memory. Slips come back first.')}${lock('games', 'Your games', 'Results by opening, every lesson, and where you leave the book.')}${lock('shop', 'Shop', 'A new look for your coach.')}<\/div><\/div>`;
+      <p class="wopens">${ICON.lock}<span>Course, Drill, Your games and Shop open once your games are in.<\/span><\/p>`;
   },
   locked(tab){
     const T = {course: ['Your course', 'One path through your openings, in the order your games say matters most: the idea, the lines, a drill, practice games and a checkpoint for each.'],
@@ -7904,10 +7978,11 @@ const Review = {
   gid(g){ return g.url || `${g.h.White}~${g.h.Black}~${g.t}`; },
   // ---- reading the games
   parse(text, user){ return Analyze.parsePGN(text || '').map(g => { const r = Analyze.replay(g, String(user || '').toLowerCase()); return r ? Object.assign(r, {h: g.h}) : null; }).filter(Boolean); },
+  // the newest three: the month's text is cut into games, and only the newest are played through
   async read(){
-    const a = this.acct(), cur = Recap.key(Date.now());
-    let gs = this.parse(await Recap.read(a, cur), a.user);
-    if (gs.length < RG_N) gs = gs.concat(this.parse(await Recap.read(a, Recap.shift(cur, -1)), a.user));
+    const a = this.acct(), cur = Recap.key(Date.now()), get = async k => Analyze.newest(Analyze.parsePGN(await Recap.read(a, k)), a.user, RG_N);
+    let gs = await get(cur);
+    if (gs.length < RG_N) gs = gs.concat(await get(Recap.shift(cur, -1)));
     return gs.sort((x, y) => y.t - x.t).slice(0, RG_N);
   },
   async check(){
@@ -8542,8 +8617,8 @@ const Tour = {
       {h: 'Every move explained', at: '.mcard', say: ['Step through with the arrows under the board, or the arrow keys', 'Each move says what it does: the book\'s note, and what the board shows', 'Above it: the opening\'s real name, the one players know it by']},
       {h: 'Marks on the moves', at: () => document.querySelector('.mklegend') || document.querySelector('.timeline'),
         say: ['The other side\'s inaccuracies, mistakes and blunders carry a mark', 'Key move: your answer that makes a mistake cost', 'In the Sandbox and in drills the mark shows on the board beside the piece']},
-      {h: 'Your moves in order', at: '.ostrip', skip: () => myMoves(LINES[lid]).length < 2,
-        say: ['Every move of yours in this line as a small picture, in the order you play them', 'When a line plays them in another order, the main line sits above it and the move that changed places is ringed', 'Numbers on the board puts each move\'s number on its piece']},
+      {h: 'The order, on the board', at: '#sb', skip: () => myMoves(LINES[lid]).length < 2,
+        say: ['Each piece carries the number of the move that put it there', 'A purple number is played at another turn than in the main line', 'Move any piece to try something else: your book answers if it knows the move, and the engine if not']},
       {h: 'The engine in lessons', at: '.engrow', say: ['Switch it on for the best moves, their arrows and the score', 'It stays off in drills, practice games and checkpoints, and comes back when they end']},
       {h: 'The plan from here', at: '.ccol .plan', skip: () => !planOf(lid), go: () => { S.drill = S.drillState = null; openLine(lid, LINES[lid].n.length - 1, 'games'); },
         say: ['Every line ends with a plan: what to aim for once the moves you know run out', 'You get it at the end of lessons, clean drills and practice games']},
