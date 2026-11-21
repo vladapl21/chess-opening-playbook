@@ -177,27 +177,6 @@ with sync_playwright() as p:
     x, y = xy(pg, u[:2]); pg.mouse.click(x, y); pg.wait_for_timeout(400); settle(pg)
     save(pg.screenshot(), 'drill.png')
 
-    # Sandbox: play until a game of 11+ plies with one slip, then shoot the report
-    pg.evaluate("go('sandbox')"); pg.wait_for_timeout(300)
-    pg.evaluate("SB_STATE.w.scope = SB_STATE.b.scope = 'all'; SB_STATE.w.odds = SB_STATE.b.odds = 'real'; sbStart()"); pg.wait_for_timeout(600)
-    for game in range(20):
-        slips = 0
-        for _ in range(150):
-            st = pg.evaluate("({state: S.drill.state, busy: S.drill.busy, mine: myTurnAt(S.drill.node)})")
-            if st['state'] == 'done': break
-            if st['busy'] or not st['mine']: pg.wait_for_timeout(250); continue
-            exp = pg.evaluate("sbMyKids(S.drill.node).map(c => N[c].u)")
-            if not slips and pg.evaluate('S.drill.hist.length') > 4:
-                wrong = [m for m in pg.evaluate("DATA.legal[String(S.drill.node)] || []") if m not in exp and len(m) == 4]
-                if wrong: tap(pg, wrong[0]); slips += 1; pg.wait_for_timeout(800); continue
-            tap(pg, exp[0]); pg.wait_for_timeout(700)
-        if pg.evaluate('S.drill.hist.length') >= 11 and slips: break
-        pg.evaluate('sbStart()'); pg.wait_for_timeout(700)
-    pg.evaluate('window.scrollTo(0, 0)'); settle(pg, 500)
-    bottom = pg.evaluate("Math.max(document.getElementById('sbfeed').getBoundingClientRect().bottom, document.getElementById('db').parentElement.getBoundingClientRect().bottom) + scrollY + 28")
-    full = pg.screenshot(full_page=True); w, h = Image.open(io.BytesIO(full)).size
-    save(full, 'sandbox.png', crop=(0, 0, w, min(h, round(bottom * 2))))
-
     # level 5: the chip in the corner and the card that opens the shop (a few lines known, a week of days)
     pg.evaluate("""(() => { const now = Date.now(), D = Prog.d.days = Prog.d.days || {}; for (let k = 1; k <= 8; k++) D[dayKey(-k)] = ['a','b','c','d','e'];
       for (const id of BOOKS.b.drillable){ if (Level.n() >= 5) break; Prog.d.lines[id] = {box: 2, seen: 2, clean: 2, last: now, due: now + 2 * DAY, v: VER[id] || 1}; }
@@ -226,6 +205,18 @@ with sync_playwright() as p:
       Prog.d.lvl = Level.n(); Prog.d.shop = {own: {'h-tophat': 1, 'c-midnight': 1}, wear: {head: ['h-tophat', 2], skin: ['c-midnight', 2]}}; Prog.save(); Badges.queue = []; Coach.hush(); go('shop'); })()""")
     pg.wait_for_timeout(500); pg.evaluate("Coach.hush(); const el = document.getElementById('lvup'); if (el) el.remove()"); settle(pg)
     save(pg.screenshot(), 'shop.png', crop=(0, 0, 2560, 1700))
+    # a crate opened on its legendary aura: the piece in its rarity's colour, ready to wear
+    pg.evaluate("""(() => { const D = Prog.d.days; for (let k = 1; k <= 40; k++) D[dayKey(-k)] = ['a','b','c','d','e']; Prog.save(); Badges.queue = []; Coach.hush();
+      Shop.crateRoll = () => SHOP.find(x => x.id === 'a-nova'); S.shopTab = 'crate'; render(); crateOpen(); })()"""); pg.wait_for_timeout(500)
+    if pg.query_selector('[data-crateskip]'): pg.click('[data-crateskip]')
+    pg.wait_for_timeout(1500); pg.evaluate("Coach.hush()"); settle(pg, 300)
+    box = pg.evaluate("(() => { const r = document.querySelector('#crateSheet .sheet, #crateSheet > div').getBoundingClientRect(); return [r.left - 16, r.top - 16, r.right + 16, Math.min(r.bottom + 16, innerHeight)]; })()")
+    save(pg.screenshot(), 'crate.png', width=1100, crop=tuple(round(v * 2) for v in box))
+    pg.evaluate("const cs = document.getElementById('crateSheet'); if (cs) cs.remove(); Prog.d.shop = {own: {'h-tophat': 1, 'c-midnight': 1}, wear: {head: ['h-tophat', 2], skin: ['c-midnight', 2]}}; Prog.save(); S.shopTab = 'shop'")
+    # Settings: how pieces slide, with its preview board, and the sounds
+    pg.evaluate("Settings.open()"); pg.wait_for_timeout(500); settle(pg, 200)
+    box = pg.evaluate("(() => { const r = document.querySelector('#setSheet .sheet, #setSheet > div').getBoundingClientRect(); return [r.left - 12, Math.max(0, r.top - 12), r.right + 12, Math.min(r.bottom + 12, innerHeight)]; })()")
+    save(pg.screenshot(), 'settings.png', width=1100, crop=tuple(round(v * 2) for v in box)); pg.evaluate("Settings.close()")
     # the monthly recap: the month that has just ended, beside the one before it, with the lines drilled
     pg.evaluate("""(() => { const ids = BOOKS.w.drillable.slice(0, 60).concat(BOOKS.b.drillable.slice(0, 60)), D = Prog.d.days;
       for (let k = 18; k <= 46; k++) if (!D[dayKey(-k)]) D[dayKey(-k)] = ids.slice((k * 7) % 110, (k * 7) % 110 + 5); Prog.save(); Badges.queue = []; })()"""); pg.wait_for_timeout(300)
@@ -341,6 +332,32 @@ with sync_playwright() as p:
             if q.evaluate('!!(EngineUI.r && EngineUI.r.done)'): break
             q.wait_for_timeout(250)
         settle(q, 400); save(q.screenshot(), 'engine.png')
+        c.close()
+        c = b.new_context(viewport={'width': 1280, 'height': 860}, device_scale_factor=2); local_fonts(c)
+        q = c.new_page(); q.on('pageerror', lambda e: errors.append(str(e))); q.goto(app + '#sandbox'); q.wait_for_timeout(900)
+        # Sandbox: play until a game of 11+ plies with one slip, then shoot the report with the engine on the finished game
+        q.evaluate("go('sandbox')"); q.wait_for_timeout(300)
+        q.evaluate("SB_STATE.w.scope = SB_STATE.b.scope = 'all'; SB_STATE.w.odds = SB_STATE.b.odds = 'real'; sbStart()"); q.wait_for_timeout(600)
+        for game in range(20):
+            slips = 0
+            for _ in range(150):
+                st = q.evaluate("({state: S.drill.state, busy: S.drill.busy, mine: myTurnAt(S.drill.node)})")
+                if st['state'] == 'done': break
+                if st['busy'] or not st['mine']: q.wait_for_timeout(250); continue
+                exp = q.evaluate("sbMyKids(S.drill.node).map(c => N[c].u)")
+                if not slips and q.evaluate('S.drill.hist.length') > 4:
+                    wrong = [m for m in q.evaluate("DATA.legal[String(S.drill.node)] || []") if m not in exp and len(m) == 4]
+                    if wrong: tap(q, wrong[0]); slips += 1; q.wait_for_timeout(800); continue
+                tap(q, exp[0]); q.wait_for_timeout(700)
+            if q.evaluate('S.drill.hist.length') >= 11 and slips: break
+            q.evaluate('sbStart()'); q.wait_for_timeout(700)
+        for _ in range(120):
+            if q.evaluate('!!(EngineUI.r && EngineUI.r.done)'): break
+            q.wait_for_timeout(250)
+        q.evaluate('window.scrollTo(0, 0); Coach.hush()'); settle(q, 500)
+        bottom = q.evaluate("Math.max(document.getElementById('sbfeed').getBoundingClientRect().bottom, document.getElementById('db').parentElement.getBoundingClientRect().bottom) + scrollY + 28")
+        full = q.screenshot(full_page=True); w, h = Image.open(io.BytesIO(full)).size
+        save(full, 'sandbox.png', crop=(0, 0, w, min(h, round(bottom * 2))))
         c.close()
     finally:
         site.stop()

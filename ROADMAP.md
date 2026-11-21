@@ -69,6 +69,16 @@ Facts that shape the design:
 - Settings and the account button moved out of the header into the corner of the screen; the header fits one row on an ordinary monitor and centres its rows when it has to wrap.
 - A lesson opened from a course unit has "Next lesson" at the top. The Sandbox has "Free play: pick openings" to leave a course practice game.
 
+## Phase 1.23: notes from play, one commit each (done, November 20)
+
+- **No line twice in a row in the Sandbox.** Whatever the odds are set to, the opponent steers the next game away from the line the last one ended on (`SB_PREVL`, `sbEndsElse`); a position with one line left plays it again.
+- **Buying is a moment, and crates.** A piece bought today stays on the shelf, greyed to *Owned*, after confetti, a chime and a hop from the coach. Crates hold thirteen pieces the shelf never sells (eight colours, five auras behind the coach) in four rarities; legendary pieces come only from there. A crate opens on a reel that slows under a marker and then shows the piece.
+- **The flame changes colour** at 5, 10, 20, 30, 50 and 100 days.
+- **Material beside the board.** The pieces each side has taken and the lead in points, above and below every big board.
+- **A finished Sandbox game keeps its board.** The engine is on it at once, with the verdict under the board and buttons to step back through the game; a move for either side opens the explore board. The Play on with the engine button is gone from there.
+- **Advanced settings.** The systems, and Reset account: both ask for the username. A reset wins over every other device's copy (`reset` in the record) and lands on the welcome screen with Use the same account again or Link another.
+- **Piece animations and sounds** in Settings: six kinds of slide with a preview board, three sound themes made in the browser. Defaults for everyone, nothing asked at the start.
+
 ## Phase 1.22: lines that don't stop when the pieces are out (done, November 20)
 
 Notes from play: in the Four Knights and the Vienna the lines ended once the knights and bishops were out, and what comes after is exactly what isn't obvious. The same was true across both books: half the Vienna lines were five moves long.

@@ -124,14 +124,16 @@ Everything is reached from the header: five tabs (**Sandbox**, **Course**, **Dri
 | try another move in a lesson | drag or tap any piece on the lesson's board | The line's own move steps on. A move your book answers opens that line. Anything else opens the explore board with the engine on. |
 | drill what went wrong in a recent game | **Your games → Last 3 games** | Your three newest games: where each left your book and its first costly move. **Drill it** plays that spot. When your own move left the book, the coach says so and **Drill the line** starts the book's line at once. The website reads the games from your account; any copy takes a pasted game. |
 | practise from one position | **Sandbox → Set up a position** (under the board), or **Practise from here** in a lesson | Practice games start there, and only the lines that go on from it come up. |
-| keep playing when a line ends | **Play on with the engine** | The button under the board when a drill line, a puzzle or a practice game ends. In a lesson: **Play on from here** at the last move, or **Explore from here** at any move. |
+| keep playing when a line ends | **Play on with the engine**, or just move a piece | The button under the board when a drill line or a puzzle ends. A finished Sandbox game already has the engine on its board: step back through the game or move a piece to play on. In a lesson: **Play on from here** at the last move, or **Explore from here** at any move. |
+| see who is ahead | the rows above and below any big board | The pieces each side has taken, with the lead in points on the side that is ahead. |
 | see what the other side can play | a lesson, from **Your games** → an opening | Every position lists the other side's moves with how often club players choose them. Tap one to see the answer. |
 | ask the engine | the **Engine** switch under a lesson's board | The three best moves as purple arrows, the other side's idea as a red dashed one, all in words. Off during drills, practice games and checkpoints. |
 | play a whole game from the book | **Sandbox** | An opponent that only plays lines from the book, picked by how often club players choose them or by what you know least. |
 | look back at the games | **Your games** | Openings, the last three games, missed shots, game reviews and the monthly recap, one at a time behind the switch at the top. Each part lists White's and then Black's. |
-| see the level, the badges and the streak | the ring or the flame in the corner | Either opens the profile. |
+| see the level, the badges and the streak | the ring or the flame in the corner | Either opens the profile. The flame takes a new colour at 5, 10, 20, 30, 50 and 100 days. |
 | dress the coach | **Shop** | Opens at level 5. The daily shop has six new pieces every day, crates hold the pieces it never sells, and what is yours is in the locker. |
-| change the look, the coach or a system, or see the tour again | **Settings** | Light or dark, text size, board colours, letters on the board, the coach, the systems, **Take the tour again**. |
+| change the look, the sound or the coach, or see the tour again | **Settings** | Light or dark, text size, board colours, letters on the board, how pieces slide, sounds, the coach, **Take the tour again**. |
+| switch a system, or start over | **Settings → Advanced settings** | The systems and **Reset account**. Each asks for your username first. |
 | keep the progress on every device | the account button | On the website. The claude.ai copy keeps it with the claude.ai account by itself. |
 | ask for a tip | tap the coach | What is worth knowing on the tab you are on. |
 
@@ -274,7 +276,7 @@ A line in a book has to stop somewhere, and the position it stops in can still l
 
 **A plan.** The last position of every line comes with a short card: where your king goes, which pawns to push, where the pieces belong, what to aim at, what the opponent wants and what to watch for. It shows at the end of a line in Study, after a clean drill and at the end of every practice game. The main lines' plans are written by hand and checked against Stockfish's continuation. A side line that ends where a main line ends shares its plan; every other line gets one read off the board and Stockfish's line from there (depth 18): the pieces still at home, castling now or once a piece is out, the pawn move the engine plays next and what it hits, the material and what it means for trades, a king that can't castle, a pawn with no neighbour, and the other side's next two moves in words. Lines that end in mate have none.
 
-**The engine.** Stockfish runs in the browser. Switch it on under the board in Study, or press **Play on with the engine** when a drill, puzzle or practice game ends. It stays out of the way while you are being tested. The card shows:
+**The engine.** Stockfish runs in the browser. Switch it on under the board in Study, or press **Play on with the engine** when a drill or a puzzle ends. A finished Sandbox game needs no button: the engine is on its board the moment the game is over. It stays out of the way while you are being tested. The card shows:
 
 - the three best moves for the side to move, in words, each with a purple arrow and its value. Numbers follow the usual convention whichever colour you play (plus: White is better, minus: Black is better); the words beside them are from your side;
 - the other side's idea, found by asking the engine what they would play if it were their move again: a red dashed arrow, marked **Threat** when it wins something;
@@ -292,6 +294,8 @@ The Drill tab opens on **today's five**: five lines from move one, about a quart
 
 You play your side's moves from memory and the opponent's moves play themselves, each with its label and what it is after. You can drag or tap, and you castle by moving the king two squares or onto its rook. A wrong move is answered with the reply that punishes it and what that would cost, and gets a second try; a second miss shows the book's move as an arrow with the reason for it. When the line is over, the coach's note says what went wrong: the move that caught you and what you played instead, what the book says about that move when it knows it (otherwise the answer that punishes it), why the line's move is the move, how many times that same move has caught you, and a link to study it. A clean run gets a note only when it means something: the move that caught you last time held, every line of a lesson is now clean, or the line has reached full strength. Lines are scheduled in Leitner boxes: a clean run sends a line further out (1, 2, 4, 8, then 16 days), and a slip brings it back today. Under **Pick lines yourself** you can still filter by opening and by priority, and start each line either from move one or from the point where it branches off lines you already know.
 
+The **flame** in the corner changes colour as the streak grows: orange to start, gold at 5 days, rose at 10, violet at 20, blue at 30, teal at 50 and white-hot at 100. The profile names the colour and the day the next one comes.
+
 **Badges** sit in the profile (the flame in the top corner, or the account button): lines known without a slip, streaks, course units passed, lines at full strength and practice games. Locked ones are grey with how far along you are; a new one arrives as a medal in the coach's bubble.
 
 **Levels** sit beside the flame, as a ring that fills toward the next level around the level number. Everything practised earns points: 10 for a line played without a slip (4 with one), 5 for a lesson studied, 5 for a practice game, 15 for a day with today's five done and 40 for a checkpoint passed. Each level asks for a little more than the last (45 points to level 2, then 60, 75, 90…). Points float up from the chip as they come in, and a new level drops a card from it; a level reached in the middle of a line waits until the line is over. The points are worked out from the progress itself, so every device shows the same level.
@@ -304,7 +308,7 @@ You play your side's moves from memory and the opponent's moves play themselves,
 
 ### Shop: a wardrobe for the coach
 
-<img src="docs/img/shop.png" alt="The shop: the coach in a top hat with the tokens beside it, the switch between the daily shop and the locker with the time left until midnight, and today's six pieces, each shown by itself with its price" width="100%">
+<img src="docs/img/shop.png" alt="The shop: the coach in a top hat with the tokens beside it, the switch between the daily shop, the crates and the locker with the time left until midnight, and today's six pieces, each shown by itself with its price" width="100%">
 
 The wardrobe opens at **level 5**, about a week of drills in, and tokens come in from the start: one for each badge, one for every third day in a row and one for every level from 5 on. They are worked out from the progress itself, minus what has been bought, so every device shows the same number.
 
@@ -312,11 +316,13 @@ The shop has a **daily shop**: 6 pieces a day (two hats, two colours, one pair o
 
 **Crates** are the third part of the switch. The collector's crate holds thirteen pieces the shelf never has: eight colours and five auras (a glow, embers, frost, a starfield and a supernova drawn behind the coach), in four rarities. A crate costs two tokens and gives one of them, never one already owned: common six times in ten, rare 27 in a hundred, epic one in ten, legendary three in a hundred, and the two legendary pieces (the Aurora colour, which shifts as you watch, and the Supernova) come from nowhere else. Opening one runs a reel of pieces past a marker, ticking as it slows, and then shows the piece in its rarity's colour, ready to wear.
 
+<img src="docs/img/crate.png" alt="A crate opened on a legendary piece: the reel stopped on the Supernova aura under the marker, the piece shown large in gold with its rarity, and the buttons Wear it, Open another and Done" width="60%">
+
 A card shows the piece by itself, up close; the whole outfit is on the coach beside the shelf. Each piece is fitted to each coach: a hat sits on its rim with a shadow under it and the picture makes room for it, and everything worn at the neck is drawn along the neck's own line (a scarf is that line as a band, a lei is beads on it, a tie hangs from a point of it). The knight is seen from the side, so what goes round its neck is cut to its outline and reads as worn, not stuck on. What the coach wears shows everywhere the coach does.
 
 ### Sandbox: play your book against a realistic opponent
 
-<img src="docs/img/sandbox.png" alt="Sandbox slip report with Black: the opening's name above it, the slip shown on a mini board, White's choices with their odds, how rare the exact line was, and the plan from the last position" width="100%">
+<img src="docs/img/sandbox.png" alt="A finished Sandbox game with Black: the material rows above and below the board, the engine's arrows on it and its verdict under it, the slip report with White's choices and their odds, the engine's three best moves in words, and the plan from the last position" width="100%">
 
 The sandbox plays one branch of the book as a full game, and it plays both books. With **Everything** picked, games come with White and with Black in turn, the board turning each time, and the count of lines met runs over both books. The opponent only plays moves that are in your book, picked with one of three settings:
 
@@ -328,7 +334,9 @@ Under **Everything** there is a row of openings for each colour. A tap on **Whit
 
 To practise one position, **Set up a position**, under the board, turns it into a set-up board: play the moves for both sides (only moves in your book go, and the book's moves for the side to move are listed as buttons, the other side's with how often they are played), then **Practise from here**. A switch on the set-up panel says whose book the position is in. The arrows under the board and the arrow keys step back and forward through the moves you made, a tap on a move in the list jumps to it, and the heading says how many lines go on from the position on the board. Every game until you change it starts there, and only the lines that go on from it come up; the position sits under the board as a small picture with **Change the position** and **Start from move one** beside it. On the set-up board nothing slides: a move for either side, a step back and a step forward are there at once. **Practise from here** under a lesson's board does the same from the move on the board, and a review in Last 3 games does it from the move where you left your book.
 
-A move that leaves the book is answered on the spot with the reply that punishes it, when there is one, and a second miss shows the book's move with its reason. The opening's name sits above the game and follows it move by move, and the marks come up on the board as the moves are played (see [Key moves](#key-moves-and-the-order-of-your-moves)). At the end you get a slip report and the plan from the last position, whichever line the game took. Each mistake is shown on a mini board (red for what you tried, green for the move in your book), along with the chain of the opponent's choices and their odds and how rare the exact line was (*"under 1 in 2,000 games"*). Any line you slipped on goes straight back into today's drill. Changing the opening or the odds mid-game applies to the next game, with a button to start it right away, so the current game is never cut off.
+A move that leaves the book is answered on the spot with the reply that punishes it, when there is one, and a second miss shows the book's move with its reason. The opening's name sits above the game and follows it move by move, and the marks come up on the board as the moves are played (see [Key moves](#key-moves-and-the-order-of-your-moves)). At the end you get a slip report and the plan from the last position, whichever line the game took. Each mistake is shown on a mini board (red for what you tried, green for the move in your book), along with the chain of the opponent's choices and their odds and how rare the exact line was (*"under 1 in 2,000 games"*). Any line you slipped on goes straight back into today's drill. No line comes twice in a row, whichever odds are set: the opponent steers the next game to another line, and only a position with a single line left repeats it. Changing the opening or the odds mid-game applies to the next game, with a button to start it right away, so the current game is never cut off.
+
+A finished game stays on the board with the engine on it: the verdict in words and the number under the board, the engine's arrows on it, and buttons (or the arrow keys) to step back through the game. Move a piece for either side and the explore board opens with that move made. **Next game** leaves all of it behind.
 
 Your own move lands the moment you let go of the piece, here and in every drill, checkpoint and on the explore board; only the other side's reply slides in. **What else Black could play here** folds away behind its arrow and stays the way you left it. The count beside the session numbers (*12 / 343 of your White lines met here*) is every line a game can end on with the openings picked, or from the position set up, counted from the book on the page.
 
@@ -355,6 +363,16 @@ The games are checked when the app opens and when Your games opens, at most ever
 <img src="docs/img/glance.png" alt="The Italian at a glance: one card per decision, the opponent's move highlighted and the answer drawn as a green arrow, with the rule in a few words" width="100%">
 
 Every opening's page has a switch between its lessons and the opening **at a glance**: one card per decision, the opponent's move highlighted, your answer as the green arrow and the rule in a few words. Tap a card to open that position in its lesson. Together the cards are what used to be the cheat sheet, now kept with the opening they belong to.
+
+### Material, movement and sound
+
+<img src="docs/img/settings.png" alt="Settings: appearance, text size, board colour, the letters on the board, piece animations with six kinds and a small preview board, sounds with three themes and a Hear it button, and the coach" width="50%">
+
+Two thin rows sit above and below every big board (a lesson, a drill, a Sandbox game, the explore board): the pieces each side has taken, and **+3** or whatever the lead is on the side that is ahead.
+
+How a piece slides is a setting. **Piece animations** has six kinds: slow, medium (the default), fast, natural (a longer move takes longer), arcade (it runs past its square and settles back) and dynamic (the piece lifts as it travels). A small board beside them plays the one picked, and the switch turns sliding off. **Sounds** has a switch, three themes (wood, soft, arcade) and **Hear it**: a move, a capture, castling and a check each have their own, a wrong move in a drill buzzes, a clean line chimes, and the shop has its own for a buy and a crate. Every sound is made in the browser, so there are no files to load. Nobody is asked about either when they start: both come with a default and follow the player to every device.
+
+**Advanced settings**, folded at the bottom of Settings, holds what shouldn't happen by accident: switching a system, and **Reset account**. Each asks for your username. A reset clears the lines, the streak, the badges, the level and the locker on every device, keeps the settings, and lands on the welcome screen with two choices: use the same chess account again, or link another.
 
 ### On a phone, in light or dark
 
