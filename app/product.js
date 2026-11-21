@@ -22,28 +22,47 @@ const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 /* the coaches: three original characters drawn here. They say the same things; the player picks the face and the name comes with it. */
 const COACHES = [{id: 'knight', name: 'Pip', what: 'the knight'}, {id: 'rook', name: 'Rocco', what: 'the rook'}, {id: 'pawn', name: 'Dot', what: 'the pawn'}];
 const coachWho = () => COACHES.find(c => c.id === SET.who) || COACHES[0], coachName = () => coachWho().name;
-// two eyes for the characters that face you: round and looking at you, looking up when thinking, shut and smiling when pleased
+// two eyes for the characters that face you: round and looking at you, looking up when thinking, shut and smiling when pleased.
+// Each eye has a lid line over it and two glints, so it reads as an eye at any size.
 const eyes2 = (x1, x2, y, r, mood) => mood === 'cheer' ? `<path class="kn-line" d="M${x1 - r + 1} ${y + 1}q${r - 1}-${r} ${2 * r - 2} 0M${x2 - r + 1} ${y + 1}q${r - 1}-${r} ${2 * r - 2} 0"/>`
-  : [x1, x2].map(x => `<circle class="kn-eye" cx="${x}" cy="${y}" r="${r}"/><circle class="kn-pupil" cx="${x + (mood === 'think' ? 1.1 : 0)}" cy="${y + (mood === 'think' ? -1.5 : .5)}" r="${r / 2}"/><circle class="kn-eye" cx="${x + (mood === 'think' ? 1.9 : .9)}" cy="${y - (mood === 'think' ? 2.3 : .5)}" r=".9"/>`).join('');
+  : [x1, x2].map((x, k) => { const t = mood === 'think', px = x + (t ? 1.1 : k ? -.5 : .5), py = y + (t ? -1.5 : .5);
+    return `<circle class="kn-eye" cx="${x}" cy="${y}" r="${r}"/><circle class="kn-pupil" cx="${px}" cy="${py}" r="${(r * .56).toFixed(2)}"/><circle class="kn-glint" cx="${(px + r * .22).toFixed(2)}" cy="${(py - r * .24).toFixed(2)}" r="${(r * .2).toFixed(2)}"/><circle class="kn-glint" cx="${(px - r * .22).toFixed(2)}" cy="${(py + r * .22).toFixed(2)}" r="${(r * .09).toFixed(2)}"/>`
+      + `<path class="kn-lid" d="M${(x - r * .8).toFixed(2)} ${(y - r * .66).toFixed(2)}q${(r * .8).toFixed(2)} ${(-r * .7).toFixed(2)} ${(r * 1.6).toFixed(2)} 0"/>`; }).join('')
+    + (mood === 'think' ? `<path class="kn-brow" d="M${x2 - r} ${y - r - 2.2}q${r} -1.8 ${2 * r} .2"/>` : '');
+// the mouth of a face seen from the front: a smile, a flat line when thinking, open when pleased
+const mouth2 = (x, y, w, mood) => mood === 'think' ? `<path class="kn-line" d="M${x - w * .55} ${y + 1}q${w * .55} 1.5 ${w * 1.1} 0"/>`
+  : mood === 'cheer' ? `<path class="kn-mouth" d="M${x - w} ${y}q${w} ${w * 1.5} ${2 * w} 0z"/><path class="kn-tongue" d="M${x - w * .5} ${y + w * .56}q${w * .5} -${w * .42} ${w} 0q-${w * .5} ${w * .5} -${w} 0z"/>`
+  : `<path class="kn-line" d="M${x - w} ${y}q${w} ${w * .82} ${2 * w} 0"/>`;
 const KN_MANE = 'M33 6c12 1 22 11 23 26l1 26H44c4-16 2-34-11-52z', KN_BODY = 'M22 58c-2-12 1-19 8-25l-5-3c-4 5-11 9-15 5-4-5 1-15 12-21l1-10 8 6c13 0 22 11 22 26v22z';
+/* Every character is flat shapes with a second layer for depth: kn-sh is a shade and kn-hi a light, both see-through, so
+   they work on any of the colours. The shapes a piece of gear is fitted to (the outlines above, the eyes, the neckline,
+   the top of the head) are the same as before. */
 const FACES = {
   knight(mood){
-    const eye = mood === 'cheer' ? '<path class="kn-line" d="M25 22q3.5-4.5 7 0"/>' : `<circle class="kn-eye" cx="28.5" cy="21" r="5"/><circle class="kn-pupil" cx="${mood === 'think' ? 29.6 : 27.6}" cy="${mood === 'think' ? 19.4 : 21.4}" r="2.5"/><circle class="kn-eye" cx="${mood === 'think' ? 30.4 : 28.4}" cy="${mood === 'think' ? 18.6 : 20.4}" r=".9"/>`;
-    return `<path class="kn-mane" d="${KN_MANE}"/>
+    const t = mood === 'think', px = t ? 29.6 : 27.6, py = t ? 19.4 : 21.4;
+    const eye = mood === 'cheer' ? '<path class="kn-line" d="M24.6 22.4q3.9-5 7.8 0"/>'
+      : `<circle class="kn-eye" cx="28.5" cy="21" r="5"/><circle class="kn-pupil" cx="${px}" cy="${py}" r="2.8"/><circle class="kn-glint" cx="${px + 1.1}" cy="${py - 1.2}" r="1"/><circle class="kn-glint" cx="${px - 1.1}" cy="${py + 1.1}" r=".45"/><path class="kn-lid" d="M24.5 17.7q4-3.6 8 0"/>${t ? '<path class="kn-brow" d="M24 13.6q4.4-2.4 8.6-.2"/>' : ''}`;
+    return `<path class="kn-mane" d="${KN_MANE}"/><path class="kn-strand" d="M40.5 13.5c6.5 4.4 10.6 11.6 11.6 20M47.6 26c2.6 6.2 3.6 14.4 3.6 23.6M36.6 9.6c2.2 1 4.2 2.4 6 4.2"/>
     <path class="kn-body" d="${KN_BODY}"/>
-    <path class="kn-muzzle" d="M10 35c-3-4 0-11 7-16 2 4 6 7 10 8-5 6-12 11-17 8z"/>${eye}
-    <ellipse class="kn-pupil" cx="13.2" cy="29.6" rx="1.3" ry="1.7"/><path class="kn-line" d="M13.5 34.5q3.6 2.6 7.4-.6"/><circle class="kn-blush" cx="24" cy="29.5" r="2.6"/>
-    <rect class="kn-base" x="16" y="56" width="42" height="7" rx="3.5"/>`;
+    <path class="kn-sh" d="M41 12.4c7.6 3.4 12 12 12 23.6v22h-7.2c2.3-16.4.9-33-4.8-45.6z"/><path class="kn-sh" d="M30 33l-5-3c-1.2 1.5-2.7 2.9-4.3 4.1 2.4 1.3 4.9 1.5 7.3.9z"/>
+    <path class="kn-hi" d="M24.3 57c-.9-8.8 1.3-15.3 6.5-20.3.9 1.2 1.2 2.6.8 4.2-3.2 4.3-4.2 9.5-3.8 16.1z"/><path class="kn-hi" d="M20.6 16.4c3.2-2.7 7.2-4.2 11.2-4.5-4 1.7-7.3 3.9-9.9 6.7z"/>
+    <path class="kn-ear" d="M24.3 7.8l.3 5 3.7-2.3z"/>
+    <path class="kn-muzzle" d="M10 35c-3-4 0-11 7-16 2 4 6 7 10 8-5 6-12 11-17 8z"/><path class="kn-sh" d="M10 35c5 3 12-2 17-8-1.2-.3-2.4-.8-3.5-1.5-4.3 4.8-9.6 8.3-14.3 8.2z"/>${eye}
+    <ellipse class="kn-pupil" cx="13.2" cy="29.6" rx="1.3" ry="1.7"/><path class="kn-line" d="${mood === 'cheer' ? 'M13 33.8q4.2 3.8 8.4-.4' : t ? 'M14 34.4q3 1.2 6.2-.2' : 'M13.5 34.5q3.6 2.6 7.4-.6'}"/><circle class="kn-blush" cx="24" cy="29.5" r="2.6"/>
+    <rect class="kn-foot" x="20" y="52.6" width="34" height="5" rx="2.5"/><rect class="kn-base" x="16" y="56" width="42" height="7" rx="3.5"/><rect class="kn-hi" x="19.5" y="57.3" width="24" height="1.3" rx=".65"/>`;
   },
   rook(mood, L){
-    return `<path class="kn-mane" d="M13 7h9v6h5V7h10v6h5V7h9v15H13z"/>${L && L.head && !HAT_LOOSE[L.head] ? '<rect class="kn-mane" x="21" y="8.6" width="22" height="5"/>' : ''}<path class="kn-body" d="M17 21h30l4 37H13z"/><rect class="kn-muzzle" x="15" y="20" width="34" height="5.5" rx="2.2"/>
-    ${eyes2(25, 39, 35.5, 5.2, mood)}<path class="kn-line" d="M${mood === 'think' ? '28 46q4 1.6 8 0' : '26.5 45q5.5 5 11 0'}"/><circle class="kn-blush" cx="19.5" cy="43" r="2.6"/><circle class="kn-blush" cx="44.5" cy="43" r="2.6"/>
-    <rect class="kn-base" x="9" y="56" width="46" height="7" rx="3.5"/>`;
+    return `<path class="kn-mane" d="M13 7h9v6h5V7h10v6h5V7h9v15H13z"/><path class="kn-hi" d="M13 7h9v1.5h-9zM27 7h10v1.5H27zM42 7h9v1.5h-9z"/>${L && L.head && !HAT_LOOSE[L.head] ? '<rect class="kn-mane" x="21" y="8.6" width="22" height="5"/>' : ''}<path class="kn-body" d="M17 21h30l4 37H13z"/>
+    <path class="kn-sh" d="M40.5 25.5h7l3.5 32.5h-8.6z"/><path class="kn-hi" d="M18.3 27h2.8l-2.6 29h-3.3z"/><path class="kn-brick" d="M21.5 30.5h5.5M37 29.5h6.5M20.5 50h5M38.5 50.8h7"/>
+    <rect class="kn-muzzle" x="15" y="20" width="34" height="5.5" rx="2.2"/><rect class="kn-sh" x="15.6" y="23.9" width="32.8" height="1.6" rx=".8"/>
+    ${eyes2(25, 39, 35.5, 5.2, mood)}${mouth2(32, 44.6, 5.2, mood)}<circle class="kn-blush" cx="19.5" cy="43" r="2.6"/><circle class="kn-blush" cx="44.5" cy="43" r="2.6"/>
+    <rect class="kn-base" x="9" y="56" width="46" height="7" rx="3.5"/><rect class="kn-hi" x="12.5" y="57.3" width="26" height="1.3" rx=".65"/>`;
   },
   pawn(mood, L){
-    return `${L && L.head ? '' : '<path class="kn-crown" d="M22.5 13.5 21 4l6.2 4.6L32 2.5l4.8 6.1L43 4l-1.5 9.5z"/>'}<path class="kn-body" d="M17 58c0-10 5-16 15-16s15 6 15 16z"/><circle class="kn-body" cx="32" cy="26" r="15.5"/>
-    <rect class="kn-mane" x="19" y="39.5" width="26" height="5.6" rx="2.8"/>${eyes2(26, 38, 25, 4.8, mood)}<path class="kn-line" d="M${mood === 'think' ? '29 33.5q3 1.4 6 0' : '27.5 32.5q4.5 4.4 9 0'}"/>
-    <circle class="kn-blush" cx="20.5" cy="31" r="2.4"/><circle class="kn-blush" cx="43.5" cy="31" r="2.4"/><rect class="kn-base" x="12" y="56" width="40" height="7" rx="3.5"/>`;
+    return `${L && L.head ? '' : '<path class="kn-crown" d="M22.5 13.5 21 4l6.2 4.6L32 2.5l4.8 6.1L43 4l-1.5 9.5z"/><path class="kn-sh" d="M22.2 11.4h19.6l-.3 2.1h-19z"/><circle class="kn-jewel" cx="21" cy="4" r="1.3"/><circle class="kn-jewel" cx="32" cy="2.6" r="1.4"/><circle class="kn-jewel" cx="43" cy="4" r="1.3"/><path class="kn-hi" d="M24 12l-.8-4.8 1.5 1.1.7 3.7z"/>'}<path class="kn-body" d="M17 58c0-10 5-16 15-16s15 6 15 16z"/><path class="kn-sh" d="M39.5 43.6c5 2.4 7.5 7.2 7.5 14.4h-6.4c.3-5.6-.1-10.4-1.1-14.4z"/><circle class="kn-body" cx="32" cy="26" r="15.5"/>
+    <path class="kn-sh" d="M47.26 23.31A15.5 15.5 0 0129.31 41.26A17.8 17.8 0 0047.26 23.31z"/><ellipse class="kn-hi" cx="25.6" cy="16.8" rx="5.6" ry="3" transform="rotate(-32 25.6 16.8)"/>
+    <rect class="kn-mane" x="19" y="39.5" width="26" height="5.6" rx="2.8"/><rect class="kn-hi" x="21.5" y="40.5" width="13" height="1.2" rx=".6"/>${eyes2(26, 38, 25, 4.8, mood)}${mouth2(32, 32.4, 4.4, mood)}
+    <circle class="kn-blush" cx="20.5" cy="31" r="2.4"/><circle class="kn-blush" cx="43.5" cy="31" r="2.4"/><rect class="kn-foot" x="15.5" y="52.8" width="33" height="5" rx="2.5"/><rect class="kn-base" x="12" y="56" width="40" height="7" rx="3.5"/><rect class="kn-hi" x="15.5" y="57.3" width="22" height="1.3" rx=".65"/>`;
   }
 };
 // What the coach wears (the Shop tab). Colours are CSS tokens; each piece is drawn once around its own anchor and
@@ -82,7 +101,7 @@ function neckCurve(who, deep = 1){
   return {Q, d: `M${ax} ${ay}Q${r2(cx)} ${r2(cy)} ${bx} ${by}`, at, len: Math.hypot(bx - ax, by - ay) + Math.abs(Q.sag * deep) * .9};
 }
 // how tall each hat stands above its rim, so the picture makes room for it and no more
-const HAT_H = {'h-cap': 10.5, 'h-beanie': 15, 'h-party': 20, 'h-tophat': 16, 'h-wizard': 19.5, 'h-grad': 12, 'h-crown': 14, 'h-beret': 14.5, 'h-chef': 19, 'h-cowboy': 14.5, 'h-halo': 13.5, 'h-pirate': 14, 'h-propeller': 15, 'h-viking': 16, 'h-flower': 7};
+const HAT_H = {'h-cap': 10.5, 'h-beanie': 15, 'h-party': 20, 'h-tophat': 16, 'h-wizard': 19.5, 'h-grad': 12, 'h-crown': 15.5, 'h-beret': 14.5, 'h-chef': 19, 'h-cowboy': 14.5, 'h-halo': 13.5, 'h-pirate': 14, 'h-propeller': 15, 'h-viking': 16, 'h-flower': 7};
 const HAT_LOOSE = {'h-halo': 1, 'h-flower': 1};        // these don't sit on a rim: no shadow under them
 function hatBox(who, head){
   if (!head || !HATS[head]) return '0 0 64 64';
@@ -91,22 +110,22 @@ function hatBox(who, head){
   return `${top / 2} ${top} ${64 - top} ${64 - top}`;
 }
 const HATS = {
-  'h-cap': '<path class="g-blu" d="M-10.5 0C-10.5-11.5 10.5-11.5 10.5 0Z"/><ellipse class="g-blu2" cx="3.5" cy=".4" rx="14" ry="2.6"/><circle class="g-surf" cx="0" cy="-9.2" r="1.3"/>',
-  'h-beanie': '<path class="g-ros" d="M-10.5 0C-10.5-12.5 10.5-12.5 10.5 0Z"/><path class="g-dash" d="M-5-2.5v-6M0-2.5v-8M5-2.5v-6"/><rect class="g-surf g-edge" x="-11.5" y="-3.4" width="23" height="4.8" rx="2.4"/><circle class="g-surf g-edge" cx="0" cy="-11.6" r="3.2"/>',
-  'h-party': '<path class="g-vio" d="M-7.5 0L0-17L7.5 0Z"/><circle class="g-oro" cx="-2.6" cy="-4.5" r="1.3"/><circle class="g-oro" cx="2.4" cy="-8.6" r="1.2"/><circle class="g-oro" cx="-.4" cy="-12.6" r="1"/><circle class="g-oro" cx="0" cy="-17.4" r="2.3"/>',
-  'h-tophat': '<rect class="g-ink" x="-7.5" y="-15.5" width="15" height="14.5" rx="1.2"/><rect class="g-ros" x="-7.5" y="-5.6" width="15" height="2.8"/><rect class="g-ink" x="-12.5" y="-2" width="25" height="3.2" rx="1.6"/>',
-  'h-wizard': '<path class="g-vio" d="M-11 0Q-5-6.5 3.6-19.4Q5-8 11 0Z"/><ellipse class="g-vio2" cx="0" cy="0" rx="13.5" ry="2.4"/><path class="g-oro" d="M1.2-11.6l1.1 2.3 2.5.4-1.8 1.7.4 2.5-2.2-1.2-2.2 1.2.4-2.5-1.8-1.7 2.5-.4z"/>',
-  'h-grad': '<path class="g-ink" d="M-7.5-1v-5.5h15V-1q-7.5 3.2-15 0z"/><path class="g-ink" d="M-14.5-7.2L0-11.8L14.5-7.2L0-2.6Z"/><path class="g-tass" d="M0-7.2L9.5-5.8V1.6"/><circle class="g-oro" cx="9.5" cy="2.4" r="1.6"/>',
-  'h-crown': '<path class="g-oro g-edge2" d="M-10.5 0L-12-11.5L-5.8-5.8L0-13.8L5.8-5.8L12-11.5L10.5 0Z"/><circle class="g-ros" cx="0" cy="-4" r="1.7"/><circle class="g-blu" cx="-6.2" cy="-3" r="1.2"/><circle class="g-blu" cx="6.2" cy="-3" r="1.2"/>',
+  'h-cap': '<path class="g-blu" d="M-10.5 0C-10.5-11.5 10.5-11.5 10.5 0Z"/><ellipse class="g-blu2" cx="3.5" cy=".4" rx="14" ry="2.6"/><circle class="g-surf" cx="0" cy="-9.2" r="1.3"/><path class="g-seam" d="M0-8.4V0M-5.4-6.8q-1.5 3-1.7 6.8M5.4-6.8q1.5 3 1.7 6.8"/><path class="g-hi" d="M-7.8-3.2C-6.8-7.4-3.6-8.6-.8-8.8-4.2-7.4-6.2-5.3-7.8-3.2Z"/><path class="g-sh" d="M-5 2.1q9.5 1.4 21.6-1-8 3.4-21.6 1z"/>',
+  'h-beanie': '<path class="g-ros" d="M-10.5 0C-10.5-12.5 10.5-12.5 10.5 0Z"/><path class="g-dash" d="M-5-2.5v-6M0-2.5v-8M5-2.5v-6"/><rect class="g-surf g-edge" x="-11.5" y="-3.4" width="23" height="4.8" rx="2.4"/><circle class="g-surf g-edge" cx="0" cy="-11.6" r="3.2"/><path class="g-sh" d="M4-9.4C8-7.6 10.4-4 10.5 0h-3.2C7.4-3.6 6.2-6.8 4-9.4Z"/><circle class="g-hi" cx="-1" cy="-12.7" r="1.1"/>',
+  'h-party': '<path class="g-vio" d="M-7.5 0L0-17L7.5 0Z"/><circle class="g-oro" cx="-2.6" cy="-4.5" r="1.3"/><circle class="g-oro" cx="2.4" cy="-8.6" r="1.2"/><circle class="g-oro" cx="-.4" cy="-12.6" r="1"/><circle class="g-oro" cx="0" cy="-17.4" r="2.3"/><path class="g-sh" d="M0-17L7.5 0H2.8Z"/><path class="g-hi" d="M-5.8-1.2L-.9-12.6l-2 11.4z"/>',
+  'h-tophat': '<rect class="g-ink" x="-7.5" y="-15.5" width="15" height="14.5" rx="1.2"/><rect class="g-ros" x="-7.5" y="-5.6" width="15" height="2.8"/><rect class="g-ink" x="-12.5" y="-2" width="25" height="3.2" rx="1.6"/><rect class="g-hi" x="-6" y="-14.4" width="1.7" height="8" rx=".85"/><rect class="g-hi" x="-10.8" y="-1.5" width="11" height=".8" rx=".4"/>',
+  'h-wizard': '<path class="g-vio" d="M-11 0Q-5-6.5 3.6-19.4Q5-8 11 0Z"/><ellipse class="g-vio2" cx="0" cy="0" rx="13.5" ry="2.4"/><path class="g-oro" d="M1.2-11.6l1.1 2.3 2.5.4-1.8 1.7.4 2.5-2.2-1.2-2.2 1.2.4-2.5-1.8-1.7 2.5-.4z"/><path class="g-sh" d="M3.6-19.4Q5-8 11 0H5.6Q4.6-9 3.6-19.4Z"/><circle class="g-oro" cx="-4.8" cy="-3.8" r=".8"/><circle class="g-oro" cx="5.8" cy="-2.8" r=".7"/><circle class="g-oro" cx="-1.2" cy="-15" r=".6"/>',
+  'h-grad': '<path class="g-ink" d="M-7.5-1v-5.5h15V-1q-7.5 3.2-15 0z"/><path class="g-ink" d="M-14.5-7.2L0-11.8L14.5-7.2L0-2.6Z"/><path class="g-tass" d="M0-7.2L9.5-5.8V1.6"/><circle class="g-oro" cx="9.5" cy="2.4" r="1.6"/><path class="g-hi" d="M-11.6-7.3L0-11l4 1.3L-7.6-6z"/>',
+  'h-crown': '<path class="g-oro g-edge2" d="M-10.5 0L-12-11.5L-5.8-5.8L0-13.8L5.8-5.8L12-11.5L10.5 0Z"/><circle class="g-ros" cx="0" cy="-4" r="1.7"/><circle class="g-blu" cx="-6.2" cy="-3" r="1.2"/><circle class="g-blu" cx="6.2" cy="-3" r="1.2"/><path class="g-sh" d="M-10.3-1.9h20.6L10.5 0h-21z"/><path class="g-hi" d="M-11.2-10.2l1 8.2h1.7l-.9-6.5z"/><circle class="g-surf g-edge2" cx="-11.4" cy="-10.8" r=".9"/><circle class="g-surf g-edge2" cx="0" cy="-13.2" r="1"/><circle class="g-surf g-edge2" cx="11.4" cy="-10.8" r=".9"/>',
   // the daily drops
-  'h-beret': '<path class="g-ros" d="M-11.5-.6C-14-7.8-3.5-12.2 6.4-10.6C13.6-9.4 15.2-4.6 11-1.2Q0-3.6-11.5-.6Z"/><path class="g-wire" d="M-.6-11.4l.7-2.8"/>',
-  'h-chef': '<circle class="g-cloth" cx="-5.6" cy="-10" r="5"/><circle class="g-cloth" cx="5.6" cy="-10" r="5"/><circle class="g-cloth" cx="0" cy="-12.6" r="6"/><rect class="g-cloth" x="-8.2" y="-7.4" width="16.4" height="7.4" rx="1.2"/>',
-  'h-cowboy': '<path class="g-oro g-edge2" d="M-7-2.4L-6.2-11.6Q-3.2-14 0-11.2Q3.2-14 6.2-11.6L7-2.4Z"/><rect class="g-ink" x="-7" y="-5.4" width="14" height="2.4"/><path class="g-oro g-edge2" d="M-16.5-3.6Q-15 1.8 0 1.4Q15 1.8 16.5-3.6Q11-.4 0-.8Q-11-.4-16.5-3.6Z"/>',
+  'h-beret': '<path class="g-ros" d="M-11.5-.6C-14-7.8-3.5-12.2 6.4-10.6C13.6-9.4 15.2-4.6 11-1.2Q0-3.6-11.5-.6Z"/><path class="g-wire" d="M-.6-11.4l.7-2.8"/><path class="g-hi" d="M-9-4.8C-6.2-8.3-.8-9.9 4.2-9.7-1.6-8.7-5.8-7.1-9-4.8Z"/><path class="g-sh" d="M6.4-10.6C13.6-9.4 15.2-4.6 11-1.2Q8.8-1.7 6.4-2 12-5.4 6.4-10.6Z"/>',
+  'h-chef': '<circle class="g-cloth" cx="-5.6" cy="-10" r="5"/><circle class="g-cloth" cx="5.6" cy="-10" r="5"/><circle class="g-cloth" cx="0" cy="-12.6" r="6"/><rect class="g-cloth" x="-8.2" y="-7.4" width="16.4" height="7.4" rx="1.2"/><path class="g-seam" d="M-3.6-7v6M0-7v6M3.6-7v6"/><path class="g-sh" d="M-8.2-1.5h16.4V0h-16.4z"/>',
+  'h-cowboy': '<path class="g-oro g-edge2" d="M-7-2.4L-6.2-11.6Q-3.2-14 0-11.2Q3.2-14 6.2-11.6L7-2.4Z"/><rect class="g-ink" x="-7" y="-5.4" width="14" height="2.4"/><path class="g-oro g-edge2" d="M-16.5-3.6Q-15 1.8 0 1.4Q15 1.8 16.5-3.6Q11-.4 0-.8Q-11-.4-16.5-3.6Z"/><path class="g-sh" d="M0-11.2Q3.2-14 6.2-11.6L7-5.4H2.8Q2-8.6 0-11.2Z"/><path class="g-hi" d="M-13.6-2.2Q-8-.2 0-.2-9 .9-14.8-1z"/>',
   'h-halo': '<ellipse class="g-halo" cx="0" cy="-10.5" rx="10" ry="2.8"/>',
-  'h-pirate': '<path class="g-ink" d="M-14.5-1.4Q-10-13.6 0-13Q10-13.6 14.5-1.4Q0-5.2-14.5-1.4Z"/><circle class="g-surf" cx="0" cy="-8.4" r="2.1"/><path class="g-bone" d="M-2.6-4.4l5.2-1.8M2.6-4.4l-5.2-1.8"/>',
-  'h-propeller': '<path class="g-blu" d="M-10.5 0C-10.5-12.5 10.5-12.5 10.5 0Z"/><path class="g-ros" d="M-3.6 0C-3.4-9.6 3.4-9.6 3.6 0Z"/><path class="g-wire" d="M0-9.4V-13"/><ellipse class="g-oro" cx="-4.3" cy="-13.4" rx="4.3" ry="1.3"/><ellipse class="g-ros" cx="4.3" cy="-13.4" rx="4.3" ry="1.3"/><circle class="g-ink" cx="0" cy="-13.4" r="1.2"/>',
-  'h-viking': '<path class="g-cloth" d="M-9.8-5.6Q-14.6-9-15.8-15.6Q-11-12.4-8-8.4Z"/><path class="g-cloth" d="M9.8-5.6Q14.6-9 15.8-15.6Q11-12.4 8-8.4Z"/><path class="g-steel" d="M-10.5 0C-10.5-13 10.5-13 10.5 0Z"/><rect class="g-steel" x="-11.2" y="-2.6" width="22.4" height="3.6" rx="1.2"/><circle class="g-ink" cx="-5.6" cy="-.8" r=".8"/><circle class="g-ink" cx="0" cy="-.8" r=".8"/><circle class="g-ink" cx="5.6" cy="-.8" r=".8"/>',
-  'h-flower': '<path class="g-vine" d="M-11.5-1Q0-5.6 11.5-1"/><circle class="g-ros" cx="-8.2" cy="-2.6" r="2.6"/><circle class="g-oro" cx="-2.8" cy="-4" r="2.6"/><circle class="g-vio" cx="2.8" cy="-4" r="2.6"/><circle class="g-ros" cx="8.2" cy="-2.6" r="2.6"/><circle class="g-surf" cx="-8.2" cy="-2.6" r=".9"/><circle class="g-ros" cx="-2.8" cy="-4" r=".9"/><circle class="g-surf" cx="2.8" cy="-4" r=".9"/><circle class="g-surf" cx="8.2" cy="-2.6" r=".9"/>'
+  'h-pirate': '<path class="g-ink" d="M-14.5-1.4Q-10-13.6 0-13Q10-13.6 14.5-1.4Q0-5.2-14.5-1.4Z"/><circle class="g-surf" cx="0" cy="-8.4" r="2.1"/><path class="g-bone" d="M-2.6-4.4l5.2-1.8M2.6-4.4l-5.2-1.8"/><path class="g-trim" d="M-14.2-1.9Q0-5.7 14.2-1.9"/><path class="g-hi" d="M-11.2-5.2Q-8-11 -2.4-12.4-7.6-9.8-9.6-4.4Z"/>',
+  'h-propeller': '<path class="g-blu" d="M-10.5 0C-10.5-12.5 10.5-12.5 10.5 0Z"/><path class="g-ros" d="M-3.6 0C-3.4-9.6 3.4-9.6 3.6 0Z"/><path class="g-wire" d="M0-9.4V-13"/><ellipse class="g-oro" cx="-4.3" cy="-13.4" rx="4.3" ry="1.3"/><ellipse class="g-ros" cx="4.3" cy="-13.4" rx="4.3" ry="1.3"/><circle class="g-ink" cx="0" cy="-13.4" r="1.2"/><path class="g-hi" d="M-8-3.4C-7-7.4-4.4-9-2.6-9.3-5-7.6-6.6-5.6-8-3.4Z"/>',
+  'h-viking': '<path class="g-cloth" d="M-9.8-5.6Q-14.6-9-15.8-15.6Q-11-12.4-8-8.4Z"/><path class="g-cloth" d="M9.8-5.6Q14.6-9 15.8-15.6Q11-12.4 8-8.4Z"/><path class="g-steel" d="M-10.5 0C-10.5-13 10.5-13 10.5 0Z"/><rect class="g-steel" x="-11.2" y="-2.6" width="22.4" height="3.6" rx="1.2"/><circle class="g-ink" cx="-5.6" cy="-.8" r=".8"/><circle class="g-ink" cx="0" cy="-.8" r=".8"/><circle class="g-ink" cx="5.6" cy="-.8" r=".8"/><path class="g-hi" d="M-7.8-4.6C-6.6-8.4-3.4-10-.6-10.2-4.2-8.6-6.2-6.8-7.8-4.6Z"/><path class="g-sh" d="M-13.5-10.3l2.6-1.5.6 1.2-2.6 1.6zM13.5-10.3l-2.6-1.5-.6 1.2 2.6 1.6z"/><path class="g-seam" d="M0-9.7V-2.6"/>',
+  'h-flower': '<path class="g-vine" d="M-11.5-1Q0-5.6 11.5-1"/><circle class="g-ros" cx="-8.2" cy="-2.6" r="2.6"/><circle class="g-oro" cx="-2.8" cy="-4" r="2.6"/><circle class="g-vio" cx="2.8" cy="-4" r="2.6"/><circle class="g-ros" cx="8.2" cy="-2.6" r="2.6"/><circle class="g-surf" cx="-8.2" cy="-2.6" r=".9"/><circle class="g-ros" cx="-2.8" cy="-4" r=".9"/><circle class="g-surf" cx="2.8" cy="-4" r=".9"/><circle class="g-surf" cx="8.2" cy="-2.6" r=".9"/><path class="g-leaf" d="M-11.2-1.3q-2.5-.5-3.4-2.5 2.4-.1 3.7 1.5zM11.2-1.3q2.5-.5 3.4-2.5-2.4-.1-3.7 1.5z"/>'
 };
 // what hangs from one point of the neck, drawn around that point
 const KNOTS = {
@@ -751,45 +770,46 @@ function profileHTML(){
    at midnight unless it was bought; a bought drop stays in the locker like everything else. */
 const SHOP = [
   {id: 'c-classic', slot: 'skin', name: 'Classic', price: 0},
-  {id: 'c-midnight', slot: 'skin', name: 'Midnight', price: 2},
-  {id: 'c-ruby', slot: 'skin', name: 'Ruby', price: 2},
-  {id: 'c-plum', slot: 'skin', name: 'Plum', price: 2},
-  {id: 'c-tangerine', slot: 'skin', name: 'Tangerine', price: 2},
-  {id: 'c-gold', slot: 'skin', name: 'Gold leaf', price: 4, needs: 's30'},
-  {id: 'h-cap', slot: 'head', name: 'Cap', price: 1},
-  {id: 'h-beanie', slot: 'head', name: 'Beanie', price: 1},
-  {id: 'h-party', slot: 'head', name: 'Party hat', price: 1},
-  {id: 'h-tophat', slot: 'head', name: 'Top hat', price: 3},
-  {id: 'h-wizard', slot: 'head', name: 'Wizard hat', price: 3, needs: 'l50'},
-  {id: 'h-grad', slot: 'head', name: 'Graduation cap', price: 2, needs: 'uall'},
-  {id: 'h-crown', slot: 'head', name: 'Crown', price: 5, needs: 's30'},
-  {id: 'f-glasses', slot: 'face', name: 'Reading glasses', price: 1},
-  {id: 'f-shades', slot: 'face', name: 'Sunglasses', price: 2},
-  {id: 'f-monocle', slot: 'face', name: 'Monocle', price: 2, needs: 'm10'},
-  {id: 'n-bowtie', slot: 'neck', name: 'Bow tie', price: 1},
-  {id: 'n-scarf', slot: 'neck', name: 'Scarf', price: 2},
-  {id: 'n-medal', slot: 'neck', name: 'Medal', price: 2, needs: 'u1'},
-  {id: 'h-halo', slot: 'head', name: 'Halo', price: 4},
-  {id: 'c-rose', slot: 'skin', name: 'Rose', price: 3},
-  {id: 'h-flower', slot: 'head', name: 'Flower crown', price: 2},
-  {id: 'n-tie', slot: 'neck', name: 'Necktie', price: 2},
-  {id: 'c-ocean', slot: 'skin', name: 'Ocean', price: 3},
-  {id: 'h-viking', slot: 'head', name: 'Viking helmet', price: 3},
-  {id: 'h-beret', slot: 'head', name: 'Beret', price: 2},
-  {id: 'n-stripe', slot: 'neck', name: 'Striped scarf', price: 2},
-  {id: 'f-redspecs', slot: 'face', name: 'Red specs', price: 2},
-  {id: 'c-mint', slot: 'skin', name: 'Mint', price: 3},
-  {id: 'h-pirate', slot: 'head', name: 'Pirate hat', price: 3},
-  {id: 'n-chain', slot: 'neck', name: 'Gold chain', price: 3},
-  {id: 'h-chef', slot: 'head', name: 'Chef\'s hat', price: 2},
-  {id: 'c-slate', slot: 'skin', name: 'Slate', price: 3},
-  {id: 'h-propeller', slot: 'head', name: 'Propeller beanie', price: 2},
-  {id: 'f-stars', slot: 'face', name: 'Star glasses', price: 3},
-  {id: 'n-lei', slot: 'neck', name: 'Flower lei', price: 2},
-  {id: 'h-cowboy', slot: 'head', name: 'Cowboy hat', price: 3},
-  {id: 'f-hearts', slot: 'face', name: 'Heart shades', price: 2},
-  {id: 'c-sand', slot: 'skin', name: 'Sand', price: 3},
-  // the collector's crate: pieces the shelf never has, by rarity (RAR). No price: a crate costs CRATE_PRICE.
+  {id: 'c-midnight', slot: 'skin', name: 'Midnight', price: 2, rar: 'common'},
+  {id: 'c-ruby', slot: 'skin', name: 'Ruby', price: 2, rar: 'common'},
+  {id: 'c-plum', slot: 'skin', name: 'Plum', price: 2, rar: 'common'},
+  {id: 'c-tangerine', slot: 'skin', name: 'Tangerine', price: 2, rar: 'common'},
+  {id: 'c-gold', slot: 'skin', name: 'Gold leaf', price: 4, needs: 's30', rar: 'epic'},
+  {id: 'h-cap', slot: 'head', name: 'Cap', price: 1, rar: 'common'},
+  {id: 'h-beanie', slot: 'head', name: 'Beanie', price: 1, rar: 'common'},
+  {id: 'h-party', slot: 'head', name: 'Party hat', price: 1, rar: 'common'},
+  {id: 'h-tophat', slot: 'head', name: 'Top hat', price: 3, rar: 'rare'},
+  {id: 'h-wizard', slot: 'head', name: 'Wizard hat', price: 4, needs: 'l50', rar: 'epic'},
+  {id: 'h-grad', slot: 'head', name: 'Graduation cap', price: 2, needs: 'uall', rar: 'rare'},
+  {id: 'h-crown', slot: 'head', name: 'Crown', price: 5, needs: 's30', rar: 'epic'},
+  {id: 'f-glasses', slot: 'face', name: 'Reading glasses', price: 1, rar: 'common'},
+  {id: 'f-shades', slot: 'face', name: 'Sunglasses', price: 2, rar: 'common'},
+  {id: 'f-monocle', slot: 'face', name: 'Monocle', price: 2, needs: 'm10', rar: 'rare'},
+  {id: 'n-bowtie', slot: 'neck', name: 'Bow tie', price: 1, rar: 'common'},
+  {id: 'n-scarf', slot: 'neck', name: 'Scarf', price: 2, rar: 'common'},
+  {id: 'n-medal', slot: 'neck', name: 'Medal', price: 2, needs: 'u1', rar: 'rare'},
+  {id: 'h-halo', slot: 'head', name: 'Halo', price: 4, rar: 'epic'},
+  {id: 'c-rose', slot: 'skin', name: 'Rose', price: 3, rar: 'rare'},
+  {id: 'h-flower', slot: 'head', name: 'Flower crown', price: 2, rar: 'common'},
+  {id: 'n-tie', slot: 'neck', name: 'Necktie', price: 2, rar: 'common'},
+  {id: 'c-ocean', slot: 'skin', name: 'Ocean', price: 3, rar: 'rare'},
+  {id: 'h-viking', slot: 'head', name: 'Viking helmet', price: 4, rar: 'epic'},
+  {id: 'h-beret', slot: 'head', name: 'Beret', price: 2, rar: 'common'},
+  {id: 'n-stripe', slot: 'neck', name: 'Striped scarf', price: 2, rar: 'common'},
+  {id: 'f-redspecs', slot: 'face', name: 'Red specs', price: 2, rar: 'common'},
+  {id: 'c-mint', slot: 'skin', name: 'Mint', price: 3, rar: 'rare'},
+  {id: 'h-pirate', slot: 'head', name: 'Pirate hat', price: 3, rar: 'rare'},
+  {id: 'n-chain', slot: 'neck', name: 'Gold chain', price: 4, rar: 'epic'},
+  {id: 'h-chef', slot: 'head', name: 'Chef\'s hat', price: 2, rar: 'common'},
+  {id: 'c-slate', slot: 'skin', name: 'Slate', price: 3, rar: 'common'},
+  {id: 'h-propeller', slot: 'head', name: 'Propeller beanie', price: 2, rar: 'common'},
+  {id: 'f-stars', slot: 'face', name: 'Star glasses', price: 4, rar: 'epic'},
+  {id: 'n-lei', slot: 'neck', name: 'Flower lei', price: 2, rar: 'common'},
+  {id: 'h-cowboy', slot: 'head', name: 'Cowboy hat', price: 3, rar: 'rare'},
+  {id: 'f-hearts', slot: 'face', name: 'Heart shades', price: 2, rar: 'common'},
+  {id: 'c-sand', slot: 'skin', name: 'Sand', price: 3, rar: 'common'},
+  // the collector's crate: pieces the shelf never has, by rarity (RAR). No price: a crate costs CRATE_PRICE. Legendary
+  // pieces exist only here; the shelf's own pieces are common, rare or epic.
   {id: 'c-moss', slot: 'skin', name: 'Moss', crate: 1, rar: 'common'},
   {id: 'c-clay', slot: 'skin', name: 'Clay', crate: 1, rar: 'common'},
   {id: 'c-sky', slot: 'skin', name: 'Sky', crate: 1, rar: 'common'},
@@ -806,9 +826,15 @@ const SHOP = [
 ];
 // a crate: what it costs, and how often each rarity comes out of it (out of 100, while pieces of that rarity are left)
 const CRATE_PRICE = 2, RAR = {common: {w: 60, name: 'Common', lv: 0}, rare: {w: 27, name: 'Rare', lv: 1}, epic: {w: 10, name: 'Epic', lv: 2}, legendary: {w: 3, name: 'Legendary', lv: 3}};
-const CRATE_ART = '<svg viewBox="0 0 120 96" aria-hidden="true"><path class="cr-wood" d="M12 44h96v40a6 6 0 01-6 6H18a6 6 0 01-6-6z"/><path class="cr-lid" d="M12 44c0-17 13-30 30-30h36c17 0 30 13 30 30z"/><path class="cr-band" d="M30 15.800v74h8v-75.300zM82 14.500v75.300h8v-74zM12 41h96v7H12z"/><rect class="cr-lock" x="52" y="36" width="16" height="19" rx="3"/><circle class="cr-key" cx="60" cy="44" r="2.6"/><path class="cr-key" d="M59 45h2v5h-2z"/></svg>';
+const CRATE_ART = '<svg viewBox="0 0 120 100" aria-hidden="true"><ellipse class="cr-shadow" cx="60" cy="94" rx="43" ry="4.5"/><path class="cr-wood" d="M14 46h92v38a7 7 0 01-7 7H21a7 7 0 01-7-7z"/><path class="cr-dark" d="M14 50h92v7H14z"/><path class="cr-plank" d="M43 57v34M60 57v34M77 57v34"/>'
+  + '<path class="cr-lid" d="M12 47c0-18 14-32 32-32h32c18 0 32 14 32 32z"/><path class="cr-lite" d="M21 41c1-11.500 10.500-19.500 23-19.500h18c-13 2-33 5-41 19.500z"/><path class="cr-plank" d="M43 16v31M60 15v32M77 16v31"/>'
+  + '<path class="cr-band" d="M10 43h100v8H10z"/><path class="cr-band" d="M23 19.500q4-2.500 8-3.300V91h-8zM89 16.200q4 .8 8 3.300V91h-8z"/><path class="cr-lite" d="M10 43h100v1.800H10z"/>'
+  + '<circle class="cr-rivet" cx="27" cy="47" r="1.500"/><circle class="cr-rivet" cx="93" cy="47" r="1.500"/><circle class="cr-rivet" cx="27" cy="84" r="1.500"/><circle class="cr-rivet" cx="93" cy="84" r="1.500"/><circle class="cr-rivet" cx="27" cy="27" r="1.500"/><circle class="cr-rivet" cx="93" cy="27" r="1.500"/>'
+  + '<path class="cr-lock" d="M50 39h20v17a10 10 0 01-20 0z"/><path class="cr-lite" d="M51.500 40.500h3.500v15a8 8 0 01-3.500-6z"/><circle class="cr-key" cx="60" cy="48.500" r="3.200"/><path class="cr-key" d="M58.600 50h2.800l1.100 6.500h-5z"/></svg>'.replace(/(\d)\.(\d)00\b/g, '$1.$2');
 // the daily shop holds this many of each kind
 const SHELF = {head: 2, skin: 2, face: 1, neck: 1};
+// a number in [0, 1) from a whole number, the same everywhere (mulberry32's mixing): the shelf's dice
+const rnd32 = n => { let t = (n + 0x6D2B79F5) | 0; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 const SLOTS = [['skin', 'Colours'], ['head', 'Hats'], ['face', 'Glasses'], ['neck', 'Round the neck'], ['aura', 'Auras']];
 const COIN = '<svg class="coin" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9"/><circle class="c2" cx="10" cy="10" r="6.4"/><path class="c3" d="M10 5.6l1.3 2.7 3 .4-2.2 2.1.5 2.9L10 12.3l-2.6 1.4.5-2.9-2.2-2.1 3-.4z"/></svg>';
 const Shop = {
@@ -821,16 +847,26 @@ const Shop = {
   // a piece out of a crate cost one crate (there are no doubles, so the pieces owned count the crates opened)
   spent(){ return Object.keys(this.st().own).reduce((a, id) => { const I = SHOP.find(i => i.id === id) || {}; return a + (I.crate ? CRATE_PRICE : I.price || 0); }, 0); },
   total(){ const e = this.earned(); return e.badges + e.streak + e.level; },
-  // The daily shop: six pieces set by the date from what the player doesn't have yet, so every device shows the same
-  // shelf. Each kind takes its turn through what is left of it; a piece that needs a badge joins once the badge is
-  // earned. One bought today still counts for today, so the shelf doesn't reshuffle under the player.
+  // The daily shop: six pieces set by the date alone, so every device shows the same shelf, from what the player doesn't
+  // have yet. Each kind goes round a deck that holds every common three times and every rare once (the commons in the
+  // same order each round, so a piece is never on two shelves running while there are enough others), and one day of
+  // each week one epic takes a place, each epic in its turn. Legendary pieces are never here. A piece that needs a
+  // badge joins once the badge is earned, and one bought today still counts for today.
+  deck(slot, pool){
+    const z = slot.charCodeAt(0) * 131, sh = (a, salt) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(rnd32(salt + z + i * 977) * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+    const C = sh(pool.filter(I => I.rar !== 'rare'), 11), R = sh(pool.filter(I => I.rar === 'rare'), 23), d = [];
+    for (let r = 0; r < 3; r++){ const round = C.slice(); R.forEach((I, i) => { if (i % 3 === r) round.splice(Math.floor(rnd32(z * 7 + i * 389) * (round.length + 1)), 0, I); }); d.push(...round); }
+    return d;
+  },
   on(d){
-    const start = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(), own = this.st().own, have = Prog.d.badges || {};
-    const day = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / DAY), out = [];
+    const start = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(), day = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / DAY);
+    const own = this.st().own, have = Prog.d.badges || {}, out = [], week = Math.floor((day + 3) / 7);
+    const ok = I => I.price && !(own[I.id] && own[I.id] < start) && (!I.needs || have[I.needs]);
+    const epics = SHOP.filter(I => I.rar === 'epic' && ok(I)), E = epics.length && ((day + 3) % 7 + 7) % 7 === Math.floor(rnd32(week * 7919 + 5) * 7) ? epics[week % epics.length] : null;
     for (const [slot, n] of Object.entries(SHELF)){
-      const pool = SHOP.filter(I => I.slot === slot && I.price && !(own[I.id] && own[I.id] < start) && (!I.needs || have[I.needs]));
-      const at = pool.length ? (day * n) % pool.length : 0;
-      for (let k = 0; k < Math.min(n, pool.length); k++) out.push(pool[(at + k) % pool.length]);
+      const pool = SHOP.filter(I => I.slot === slot && I.rar !== 'epic' && ok(I)), picks = E && E.slot === slot ? [E] : [], deck = this.deck(slot, pool);
+      for (let k = day * n, end = k + deck.length; picks.length < n && k < end; k++){ const I = deck[k % deck.length]; if (!picks.includes(I)) picks.push(I); }
+      out.push(...picks);
     }
     return out;
   },
@@ -857,8 +893,9 @@ const Shop = {
     this.st().own[id] = Date.now(); this.st().wear[I.slot] = [id, Date.now()]; Prog.save(); return true;
   }
 };
-// The shop page: the coach in what they wear with the tokens, and a switch between the daily shop (today's shelf and the
-// time left on it) and the locker (everything bought, to wear or take off, and the pieces a badge still has to earn).
+// The shop page: the coach in what they wear with the tokens, and a switch between the daily shop (today's shelf, the
+// time left on it and the crate under it) and the locker (everything bought, to wear or take off, and the pieces a badge
+// still has to earn). The crate has a page of its own behind the shop (S.shopTab 'crate'): what is in it and the odds.
 function renderShop(){
   const view = document.getElementById('view'), bal = Shop.balance(), e = Shop.earned(), open = Shop.isOpen(), L = Shop.worn(), who = coachWho().id;
   const st = Daily.streak(), toNext = 3 - (st % 3), tab = ['locker', 'crate'].includes(S.shopTab) ? S.shopTab : 'shop', have = Prog.d.badges || {};
@@ -878,9 +915,15 @@ function renderShop(){
   // a piece bought today stays on the shelf, marked as owned, until the shelf changes
   const shelf = Owner.on ? SHOP.filter(I => I.price) : Shop.today();
   const inCrate = SHOP.filter(I => I.crate), crateLeft = Shop.crateLeft();
-  const crateHTML = () => `<section class="cratebox"><div class="crateart">${CRATE_ART}</div>
+  const buyCrate = crateLeft.length ? `<button class="btn primary" type="button" data-crate ${open && bal >= CRATE_PRICE ? '' : 'disabled'} aria-label="Buy a crate for ${CRATE_PRICE} tokens">Buy a crate ${COIN}${CRATE_PRICE}</button>` : '<span class="wearing">You have every piece in it</span>';
+  // in the shop: the crate as a banner under the shelf, with the way to its own page
+  const crateBanner = () => `<section class="cratebox" data-cratepage><div class="crateart">${CRATE_ART}</div>
       <div class="crateinfo"><h3>Collector's crate</h3><p>One piece the shop never sells, picked at random and never one you have.</p>
-        ${crateLeft.length ? `<button class="btn primary" type="button" data-crate ${open && bal >= CRATE_PRICE ? '' : 'disabled'} aria-label="Open a crate for ${CRATE_PRICE} tokens">Open a crate ${COIN}${CRATE_PRICE}</button>` : '<span class="wearing">You have every piece in it</span>'}
+        <div class="crateacts">${buyCrate}<button class="btn" type="button" data-cratepage>What's inside</button></div></div></section>`;
+  const crateHTML = () => `<div class="crumbs"><button class="btn small" type="button" data-shoptab="shop">← Daily shop</button><span class="where">Collector's crate</span></div>
+    <section class="cratebox"><div class="crateart">${CRATE_ART}</div>
+      <div class="crateinfo"><h3>Collector's crate</h3><p>One piece the shop never sells, picked at random and never one you have.</p>
+        <div class="crateacts">${buyCrate}</div>
         <p class="codds">${Object.entries(RAR).map(([k, r]) => `<span class="rar r-${k}">${r.name} ${r.w}%</span>`).join('')}</p></div></section>
     <ul class="items cratein">${inCrate.map(card).join('')}</ul>`;
   const locker = SHOP.filter(I => Shop.owns(I.id)), earn = Owner.on ? [] : SHOP.filter(I => I.needs && !have[I.needs] && !Shop.owns(I.id));
@@ -897,8 +940,8 @@ function renderShop(){
       <div class="shopmain">
         ${open ? '' : `<section class="wlock"><div><h3>Opens at level ${SHOP_AT}</h3><p>${toGo} more ${toGo === 1 ? 'point' : 'points'} to go.</p></div>
           <div class="wlv" aria-label="Level ${lv.n} of ${SHOP_AT}">${Array.from({length: SHOP_AT}, (_, k) => `<i class="${k < lv.n ? 'on' : ''}">${k + 1}</i>`).join('')}</div></section>`}
-        <div class="shophd">${segHTML([['shop', 'Daily shop'], ['crate', 'Crates'], ['locker', 'Locker', locker.length]], tab, 'shoptab')}${tab === 'shop' ? `<span class="sdt tnum" id="dropT">${Shop.endsIn()} left</span>` : ''}</div>
-        ${tab === 'shop' ? (shelf.length ? `<ul class="items daily">${shelf.map(card).join('')}</ul>` : '<p class="snone">Nothing new today.</p>')
+        <div class="shophd">${segHTML([['shop', 'Daily shop'], ['locker', 'Locker', locker.length]], tab === 'crate' ? 'shop' : tab, 'shoptab')}${tab === 'shop' ? `<span class="sdt tnum" id="dropT">${Shop.endsIn()} left</span>` : ''}</div>
+        ${tab === 'shop' ? (shelf.length ? `<ul class="items daily">${shelf.map(card).join('')}</ul>` : '<p class="snone">Nothing new today.</p>') + (Owner.on && !inCrate.length ? '' : crateBanner())
           : tab === 'crate' ? crateHTML()
           : groups.map(([name, l]) => `<section class="slot"><h3>${name}</h3><ul class="items">${l.map(card).join('')}</ul></section>`).join('')}
       </div>
@@ -906,7 +949,8 @@ function renderShop(){
   Shop.day = dayKey();
   view.querySelectorAll('[data-shoptab]').forEach(b => b.onclick = () => { S.shopTab = b.dataset.shoptab; renderShop(); });
   view.querySelectorAll('[data-buy]').forEach(b => b.onclick = () => { const I = SHOP.find(x => x.id === b.dataset.buy); if (Shop.buy(I.id)){ Sound.play('buy'); renderShop(); Coach.refresh(); shopFx(I.id); } });
-  const cr = view.querySelector('[data-crate]'); if (cr) cr.onclick = crateOpen;
+  const cr = view.querySelector('[data-crate]'); if (cr) cr.onclick = e => { e.stopPropagation(); crateOpen(); };
+  view.querySelectorAll('[data-cratepage]').forEach(b => b.onclick = e => { e.stopPropagation(); S.shopTab = 'crate'; renderShop(); window.scrollTo(0, 0); });
   view.querySelectorAll('[data-wear]').forEach(b => b.onclick = () => { Shop.put(b.dataset.wear); renderShop(); Coach.refresh(); });
   view.querySelectorAll('[data-off]').forEach(b => b.onclick = () => { Shop.off(b.dataset.off); renderShop(); Coach.refresh(); });
 }
@@ -923,8 +967,10 @@ function shopFx(id){
   if (m){ m.classList.remove('hop'); void m.offsetWidth; m.classList.add('hop'); }
   if (bal) bal.classList.add('baltick');
 }
-// Opening a crate: the piece is drawn first (Shop.openCrate), then shown. A reel of pieces runs past a marker and slows
-// down onto it, ticking as each one passes; then the piece itself, in its rarity's colour. Skip jumps to the piece.
+// Opening a crate: the piece is drawn when the crate is bought (Shop.openCrate), so it is the player's whatever happens
+// next. The crate then floats in front of them, glowing, and waits for a tap. The tap starts a reel of pieces that runs
+// past a marker and slows down onto the one drawn, ticking as each passes; then the piece itself, in its rarity's colour.
+// Skip jumps from the reel to the piece.
 function crateOpen(){
   const I = Shop.openCrate(); if (!I) return;
   const who = coachWho().id, L = Shop.worn(), pool = SHOP.filter(x => x.crate), look = x => x.slot === 'skin' ? {skin: x.id} : {skin: L.skin, [x.slot]: x.id};
@@ -932,15 +978,16 @@ function crateOpen(){
   const N = 46, WIN = 40, tiles = Array.from({length: N}, (_, i) => i === WIN ? I : filler());
   const sheet = document.createElement('div'); sheet.className = 'scrim cratescrim'; sheet.id = 'crateSheet';
   sheet.innerHTML = `<div class="sheet cratesheet" role="dialog" aria-modal="true" aria-label="Opening a crate"><p class="kicker">Collector's crate</p>
-      <div class="reel"><ul class="strip">${tiles.map(x => `<li class="rt r-${x.rar}"><span class="ipv z-${x.slot} zk-${who}">${knightSVG('', who, look(x))}</span><b>${esc(x.name)}</b></li>`).join('')}</ul><i class="reelmark" aria-hidden="true"></i></div>
-      <div class="prize" hidden></div><div class="lesson-actions cratebtns"><button class="btn ghost" type="button" data-crateskip>Skip</button></div></div>`;
+      <div class="cratewait"><i class="crays" aria-hidden="true"></i><button class="cratetap" type="button" data-cratetap aria-label="Open the crate">${CRATE_ART}</button><p class="cratehint">Tap the crate to open it</p></div>
+      <div class="reel" hidden><ul class="strip">${tiles.map(x => `<li class="rt r-${x.rar}"><span class="ipv z-${x.slot} zk-${who}">${knightSVG('', who, look(x))}</span><b>${esc(x.name)}</b></li>`).join('')}</ul><i class="reelmark" aria-hidden="true"></i></div>
+      <div class="prize" hidden></div><div class="lesson-actions cratebtns"></div></div>`;
   document.body.appendChild(sheet);
-  const strip = sheet.querySelector('.strip'), reel = sheet.querySelector('.reel'), btns = sheet.querySelector('.cratebtns');
+  const strip = sheet.querySelector('.strip'), reel = sheet.querySelector('.reel'), btns = sheet.querySelector('.cratebtns'), wait = sheet.querySelector('.cratewait');
   const close = () => { sheet.remove(); renderShop(); Coach.refresh(); };
   let over = false, raf = 0, an = null;
   const show = () => {
     if (over) return; over = true; cancelAnimationFrame(raf); if (an){ try { an.finish(); } catch(e){} }
-    reel.classList.add('done'); strip.children[WIN].classList.add('won');
+    wait.hidden = true; reel.hidden = false; reel.classList.add('done'); strip.children[WIN].classList.add('won');
     const prize = sheet.querySelector('.prize'); prize.hidden = false; prize.className = 'prize r-' + I.rar;
     prize.innerHTML = `<i class="prays" aria-hidden="true"></i><span class="ipv z-${I.slot} zk-${who}">${knightSVG('cheer', who, look(I))}</span><p class="rar r-${I.rar}">${RAR[I.rar].name}</p><h3>${esc(I.name)}</h3>`;
     Sound.play('win', {level: RAR[I.rar].lv}); burst(prize, 14 + RAR[I.rar].lv * 10, 'r-' + I.rar);
@@ -950,14 +997,23 @@ function crateOpen(){
     const ag = btns.querySelector('[data-crateagain]'); if (ag) ag.onclick = () => { sheet.remove(); crateOpen(); };
     btns.querySelector('[data-cratewear]').focus();
   };
-  sheet.querySelector('[data-crateskip]').onclick = show;
-  if (reduced){ show(); return; }
-  const tw = strip.children[1].offsetLeft - strip.children[0].offsetLeft, mid = reel.clientWidth / 2;
-  const end = strip.children[WIN].offsetLeft + strip.children[WIN].offsetWidth * (0.18 + Math.random() * 0.64) - mid;
-  an = strip.animate([{transform: 'translateX(0px)'}, {transform: `translateX(${-end.toFixed(1)}px)`}], {duration: 5600, easing: 'cubic-bezier(.08,.62,.1,1)', fill: 'forwards'});
-  let last = -1; const tick = () => { if (over) return; const k = Math.floor((-new DOMMatrixReadOnly(getComputedStyle(strip).transform).m41 + mid) / tw); if (k !== last){ last = k; Sound.play('tick'); } raf = requestAnimationFrame(tick); };
-  raf = requestAnimationFrame(tick);
+  // the reel, once the crate has been tapped
+  const spin = () => {
+    wait.hidden = true; reel.hidden = false;
+    btns.innerHTML = '<button class="btn ghost" type="button" data-crateskip>Skip</button>'; btns.querySelector('[data-crateskip]').onclick = show;
+    const tw = strip.children[1].offsetLeft - strip.children[0].offsetLeft, mid = reel.clientWidth / 2;
+    const end = strip.children[WIN].offsetLeft + strip.children[WIN].offsetWidth * (0.18 + Math.random() * 0.64) - mid;
+    an = strip.animate([{transform: 'translateX(0px)'}, {transform: `translateX(${-end.toFixed(1)}px)`}], {duration: 5600, easing: 'cubic-bezier(.08,.62,.1,1)', fill: 'forwards'});
+    let last = -1; const tick = () => { if (over) return; const k = Math.floor((-new DOMMatrixReadOnly(getComputedStyle(strip).transform).m41 + mid) / tw); if (k !== last){ last = k; Sound.play('tick'); } raf = requestAnimationFrame(tick); };
+    raf = requestAnimationFrame(tick);
   an.finished.then(() => setTimeout(show, 420)).catch(() => {});
+  };
+  const tap = sheet.querySelector('[data-cratetap]'); let tapped = false;
+  tap.onclick = () => { if (tapped) return; tapped = true; Sound.play('buy');
+    if (reduced){ show(); return; }
+    wait.classList.add('opening'); burst(wait, 18); setTimeout(spin, 640); };
+  tap.focus();
+
 }
 // the time left on today's shelf, and a fresh one after midnight
 setInterval(() => {
