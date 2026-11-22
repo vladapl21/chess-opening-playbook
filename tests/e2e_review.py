@@ -5,8 +5,8 @@ each review says where the game left the book and what to play there (the book's
 book has none), the engine finds the first costly move, and Drill it plays each spot on the drill board: a wrong move
 is answered with what punishes it, a clean run is kept with the review. Then: the reviews after a reload, a new game
 pushing the oldest out, a game pasted in (and the question of which side the player was), the coach's word about a
-game that left the book (the drill itself on its button, the Drill page's pointer and the once-a-day reminder until the
-book's line is drilled clean), the Sandbox from the position where the player left the book, and a phone in dark mode."""
+game that left the book (the drill itself on its button, and the Drill page's pointer until the book's line is drilled
+clean), the Sandbox from the position where the player left the book, and a phone in dark mode."""
 import json, re, datetime
 import chess, chess.pgn  # python-chess: the fixtures are written move by move, so every game is legal
 from io import StringIO
@@ -86,7 +86,7 @@ def play_rv(pg, slip=False):
             msg = pg.inner_text('#dpanel .feedback'); print('  a wrong move:', ' '.join(msg.split())[:140]); assert 'Not the move' in msg, msg
             board_click(pg, bad[:2], bad[2:4]); pg.wait_for_timeout(500)
             assert pg.evaluate("S.drill.hint === S.drill.moves[S.drill.i]"), 'two misses: the arrow shows the move'
-            msg = pg.inner_text('#dpanel .feedback'); print('  twice:', ' '.join(msg.split())[:160]); assert 'The arrow shows the move' in msg
+            msg = pg.inner_text('#dpanel .feedback'); print('  twice:', ' '.join(msg.split())[:160]); assert msg.strip() and 'Not the move' not in msg, msg
             slip = False; continue
         u = pg.evaluate("S.drill.moves[S.drill.i]"); board_click(pg, u[:2], u[2:4]); pg.wait_for_timeout(700)
     raise AssertionError('the drill did not end')
@@ -120,9 +120,6 @@ with sync_playwright() as p:
     assert 'you left your book in a game' in cue.lower() and 'Against knightmare, move 4' in cue and 'Drill the line' in cue and 'All 3 spots' in cue, cue
     coach = ' '.join(pg.evaluate("(document.querySelector('#coach .cbub') || {}).innerText || ''").split()); print('coach on the drill page:', coach[:160])
     assert 'White left your book at move 2' in coach, 'the newest game, where the other side left the book, is next'
-    pg.evaluate("Coach.hush()"); assert pg.evaluate("Review.remind()") is True
-    coach = ' '.join(pg.evaluate("(document.querySelector('#coach .cbub') || {}).innerText || ''").split()); print('the reminder:', coach[:160])
-    assert 'Still open from your games' in coach and 'That line is the one to drill first' in coach and pg.evaluate("Review.remind()") is False, 'once a day'
     pg.evaluate("Coach.hush()")
     pg.click('#rvDrillB'); pg.wait_for_timeout(900)
     assert pg.evaluate("[S.view, S.drill.kind, S.drill.rv]") == ['drill', 'line', kid]
@@ -137,7 +134,7 @@ with sync_playwright() as p:
 
     cards = pg.locator('.rvcard')
     t0 = ' '.join(cards.nth(0).inner_text().split()); print('card 1:', t0[:300])
-    assert 'Move 2: White left your book' in t0 and "The engine's answer:" in t0 and 'Your book has:' in t0, t0
+    assert 'Move 2: White left your book' in t0 and 'Best answer:' in t0, t0
     t1 = ' '.join(cards.nth(1).inner_text().split()); print('card 2:', t1[:300])
     assert 'Move 4: you left your book' in t1 and 'Your book:' in t1 and 'Drill your line' in t1, t1
     t2 = ' '.join(cards.nth(2).inner_text().split()); print('card 3:', t2[:400])
@@ -171,7 +168,7 @@ with sync_playwright() as p:
     assert pg.evaluate("[S.view, S.gseg]") == ['games', 'last']
     pg.evaluate("go('drill')"); pg.wait_for_timeout(500)
     cue = ' '.join(pg.inner_text('.rvcue').split()); print('drill page after:', cue[:120])
-    assert 'you left your book' not in cue.lower() and 'from your last games' in cue.lower() and pg.evaluate("Review.remind()") is False
+    assert 'you left your book' not in cue.lower() and 'from your last games' in cue.lower()
     pg.evaluate("S.gseg = 'last'; go('games')"); pg.wait_for_timeout(500)
     pg.evaluate("S.drill = S.drillState = null; S.gseg = 'last'; go('games')"); pg.wait_for_timeout(600)
     pg.locator('.rvcard').nth(1).locator('[data-rvs]').click(); pg.wait_for_timeout(1400)

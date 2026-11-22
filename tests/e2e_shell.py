@@ -67,20 +67,41 @@ with sync_playwright() as p:
     pg.click('[data-set^="coords:"]'); pg.wait_for_timeout(300)
     n1 = pg.locator('#view .coord').count(); print('coords', n0, '->', n1); assert n0 > 0 and n1 == 0
     # piece animations: on by default (medium), six ways to slide with a little board that shows the one picked; off hides them
-    assert pg.evaluate("[SET.anim, SET.animk, SET.snd, SET.sndk]") == [True, 'medium', True, 'wood']
+    assert pg.evaluate("[SET.anim, SET.animk, SET.snd, SET.sndk]") == [True, 'medium', True, 'soft']
     kinds = pg.locator('#setPanel [data-set^="animk:"]').all_inner_texts(); print('animations:', kinds)
     assert kinds == ['Slow', 'Medium', 'Fast', 'Natural', 'Arcade', 'Dynamic'] and pg.locator('#setPanel .animpv svg use').count() == 1
     durs = pg.evaluate("ANIMS.map(([k]) => [k, animSpec(300, 0, k).opts.duration, animSpec(700, 0, k).opts.duration, animSpec(300, 0, k).frames.length])")
     print('  how long a three-square and a seven-square move take:', durs)
     d = {k: (a, b2, n) for k, a, b2, n in durs}
-    assert d['slow'][0] > d['medium'][0] > d['fast'][0] and d['natural'][1] > d['natural'][0] and d['medium'][0] == d['medium'][1] and d['dynamic'][2] == 3
-    pg.click('#setPanel [data-set="animk:arcade"]'); pg.wait_for_timeout(450)
-    assert pg.evaluate("[SET.animk, document.getElementById('animPc').getAttribute('x')]") == ['arcade', '0'], 'the bishop crossed the little board'
+    assert d['slow'][0] > d['medium'][0] > d['fast'][0] and d['natural'][1] > d['natural'][0] and d['medium'][0] == d['medium'][1] and d['dynamic'][2] >= 5 and d['dynamic'][1] > d['dynamic'][0]
+    # the three with flair keep the piece on its way: lifted, tilted or squashed, it never leaves the line between the two
+    # squares by more than a square (a piece once grew about the corner of the board and flew off it)
+    for kind in ['natural', 'arcade', 'dynamic']:
+        pg.evaluate(f"setSetting('animk', '{kind}')"); pg.wait_for_timeout(250)
+        off = pg.evaluate("""(() => { const el = document.getElementById('animPc'), svg = el.ownerSVGElement, sb = svg.getBoundingClientRect(), u = sb.width / 300;
+          el.setAttribute('x', 0); el.setAttribute('y', 200); el.getAnimations().forEach(a => a.cancel()); const an = slide(el, 200, -200, undefined, false), d = an.effect.getTiming().duration; let worst = 0;
+          for (let f = 0; f <= 1.001; f += .05){ an.pause(); an.currentTime = d * f; const r = el.getBoundingClientRect(), x = (r.left + r.width / 2 - sb.left) / u, y = (r.top + r.height / 2 - sb.top) / u;
+            worst = Math.max(worst, Math.abs((x - 50) + (y - 250)) / Math.SQRT2); }   // how far from the diagonal it travels along
+          an.cancel(); return Math.round(worst); })()""")
+        print(f'  {kind}: at most {off} of 100 off its line'); assert off < 70, (kind, off)
+    pg.click('#setPanel [data-set="animk:arcade"]'); pg.wait_for_timeout(120)
+    ghosts = pg.locator('#setPanel .animpv svg .fx-ghost').count(); pg.wait_for_timeout(180)
+    sparks = pg.evaluate("[document.querySelectorAll('#setPanel .animpv svg .fx-ring').length, document.querySelectorAll('#setPanel .animpv svg .fx-spark').length]"); pg.wait_for_timeout(900)
+    left = pg.locator('#setPanel .animpv svg .fx-ghost, #setPanel .animpv svg .fx-ring, #setPanel .animpv svg .fx-spark').count()
+    print('  arcade: after-images', ghosts, '| ring and sparks where it lands', sparks, '| left on the board afterwards', left)
+    assert ghosts == 3 and sparks[0] == 1 and sparks[1] >= 7 and left == 0
+    assert pg.evaluate("SET.animk") == 'arcade' and pg.evaluate("document.getElementById('animPc').getAttribute('x')") in ('0', '200'), 'the bishop crossed the little board'
     pg.click('#setPanel [data-set="anim:0"]'); pg.wait_for_timeout(200)
     assert pg.evaluate("SET.anim") is False and pg.locator('#setPanel [data-set^="animk:"]').count() == 0
     pg.click('#setPanel [data-set="anim:1"]'); pg.wait_for_timeout(300)
     # sounds: on by default, three themes and a button to hear them; a move on a board plays one, and off means silence
-    themes = pg.locator('#setPanel [data-set^="sndk:"]').all_inner_texts(); assert themes == ['Wood', 'Soft', 'Arcade'], themes
+    themes = pg.locator('#setPanel [data-set^="sndk:"]').all_inner_texts(); assert themes == ['Soft', 'Wood', 'Arcade'], themes
+    # every sound of every theme is as loud as the same sound in the others (Soft was the quiet one), none clips, and a move is short
+    lv = pg.evaluate("""['move', 'capture', 'castle', 'check', 'wrong', 'done', 'buy', 'tick', 'win'].map(n => [n].concat(['soft', 'wood', 'arcade'].map(t => { const d = SND.render(t, n, 0, 48000, 0); let pk = 0; for (const v of d) pk = Math.max(pk, Math.abs(v));
+      return [Math.round(200 * Math.log10(SND.loud(d, 48000))) / 10, Math.round(pk * 100) / 100, Math.round(d.length / 48)]; })))""")
+    for n, *t in lv:
+        assert max(x[0] for x in t) - min(x[0] for x in t) < 0.6 and all(0.05 < x[1] <= 0.93 for x in t), (n, t)
+    mv = next(t for n, *t in lv if n == 'move'); print('  a move, [dB, peak, ms] for soft, wood, arcade:', mv); assert all(x[2] < 600 for x in mv)
     n0s = pg.evaluate("Sound.n"); pg.click('#setPanel [data-sndpv]'); pg.wait_for_timeout(1000)
     heard = pg.evaluate("[Sound.n, Sound.last]"); print('sounds: hear it ->', heard); assert heard[0] - n0s == 3 and heard[1] == 'check'
     snd = pg.evaluate("""(() => { const got = [], say = f => { boardSound('t', f); got.push(Sound.last); };

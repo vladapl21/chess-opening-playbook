@@ -41,7 +41,7 @@ with sync_playwright() as p:
     assert pg.evaluate('[PERSONA, S.view]') == ['new', 'start']
     assert pg.locator('.tabs button.lock').count() == 4 and 'lock' not in (pg.get_attribute('.tabs [data-view="sandbox"]', 'class') or '')
     w0 = pg.inner_text('.whero'); assert 'built from your own games' in w0 and not any(x in w0 for x in ('150', '200', '50 games', 'Get your playbook', "Hi, I'm")), w0
-    assert pg.locator('.wbub, .lockcard').count() == 0 and pg.locator('.wcard .oname').count() == 1 and pg.locator('.wopens').count() == 1, 'the welcome shows the product, not a motto'
+    assert pg.locator('.wbub, .lockcard').count() == 0 and pg.locator('.wcard .oname').count() == 1 and pg.locator('.steps3 li').count() == 3, 'the welcome shows the product, not a motto'
     assert pg.is_hidden('#meBtn') and pg.is_hidden('#drillDot'), 'no streak or drill mark before there is anything to drill'
     pg.screenshot(path=out + 'o_start.png', full_page=True)
     for v in ('course', 'drill', 'games', 'shop'):
@@ -95,14 +95,14 @@ with sync_playwright() as p:
     assert 'blackSic' not in kinds and 'blackSic' in pg.evaluate('Product.cards.map(c => c.id)'), 'which Sicilian? is asked only once the Sicilian is picked'
     assert 'blackD4' in kinds and kinds[-2:] == ['order', 'depth'], kinds   # this player met the d-pawn with something the library lacks
     assert kinds[:2] == ['white', 'blackE4'], kinds                          # the library has two first moves for White and two answers to the e-pawn, so both are asked too
-    txt = pg.inner_text('.wyr'); assert 'Ready now' in txt and 'What you play now' in txt and 'Being written' not in txt
+    txt = pg.inner_text('.wyr'); assert 'You play this' in txt and 'Being written' not in txt and pg.locator('.wyr .pdots i').count() == n, txt[:300]
     for k in range(n):
         q = pg.evaluate('Product.shown()[Product.ci]')
         if q['id'] == 'blackE4':   # the second step: pick the Sicilian and the next card asks which one; Back, and another pick, take it away again
             sic = next(i for i, o in enumerate(q['opts']) if o['id'] == 'sicilian'); pg.click(f'.duo .wopt >> nth={sic}'); pg.wait_for_timeout(900)
             q2 = pg.evaluate('Product.shown()[Product.ci]'); txt = pg.inner_text('.wyr')
             assert q2['id'] == 'blackSic' and [o['id'] for o in q2['opts']] == ['kan', 'dragon'] and all(o['ready'] for o in q2['opts']), q2
-            assert 'Which Sicilian' in txt and 'Dragon' in txt and 'Kan' in txt and f'of {n + 1}' in txt.lower(), txt[:200]
+            assert 'Which Sicilian' in txt and 'Dragon' in txt and 'Kan' in txt and pg.locator('.wyr .pdots i').count() == n + 1, txt[:200]
             pg.screenshot(path=out + 'o_choice_second.png', full_page=True)
             pg.click('[data-cback]'); pg.wait_for_timeout(500); assert pg.evaluate('Product.shown()[Product.ci].id') == 'blackE4'
         if q['id'] == 'blackE4':   # five systems on one card: a grid on a wide screen, none cut off or over another, and stacked on a phone
@@ -117,7 +117,7 @@ with sync_playwright() as p:
             pg.screenshot(path=out + 'o_choice_four_phone.png', full_page=True); pg.set_viewport_size({'width': 1280, 'height': 900}); pg.wait_for_timeout(300)
         if q['id'] == 'blackD4':
             pg.screenshot(path=out + 'o_choice_system.png', full_page=True)
-            txt = pg.inner_text('.wyr'); assert 'Being written' not in txt and 'Ready now' in txt and 'What you play now' in txt   # every system on the cards is written
+            txt = pg.inner_text('.wyr'); assert 'Being written' not in txt and 'You play this' in txt   # every system on the cards is written
             assert [o['id'] for o in q['opts']][0] == 'qgd' and len(q['opts']) == 3 and all(o['ready'] for o in q['opts']), q['opts']
         # take the system the books were first written for; first option for the style cards
         pick = next(i for i, o in enumerate(q['opts']) if o['id'] in ('e4', 'e5', 'slav')) if q['kind'] == 'system' else 0
@@ -144,7 +144,7 @@ with sync_playwright() as p:
     assert pg.locator('.otile').count() == n_open and pg.locator('.leak, .gtable').count() == 0 and pg.locator('[data-gseg]').count() == 5
     assert pg.locator('[data-gseg]').nth(1).get_attribute('data-gseg') == 'last', 'the last three games come right after the openings'
     assert pg.locator('[data-gseg="recap"]').count() == 1 and pg.evaluate('Recap.aid()') == 'chess.com:vladapl', 'the monthly recap reads the account the playbook was built from'
-    assert pg.locator('.otile:has-text("Not met yet")').count() == n_open - pg.evaluate("Object.keys(Product.me().P.white.systems).filter(id => BOOKS.w.chapters.some(c => c.id === id)).length + Object.keys(Product.me().P.black.systems).filter(id => BOOKS.b.chapters.some(c => c.id === id)).length")
+    assert pg.locator('.otile:not(:has(.orec))').count() == n_open - pg.evaluate("Object.keys(Product.me().P.white.systems).filter(id => BOOKS.w.chapters.some(c => c.id === id)).length + Object.keys(Product.me().P.black.systems).filter(id => BOOKS.b.chapters.some(c => c.id === id)).length")
     pg.screenshot(path=out + 'o_games.png', full_page=True)
     pg.click('[data-gseg="games"]'); pg.wait_for_timeout(300)
     assert pg.locator('.gtable tbody tr').count() == 40 and pg.locator('.factl li').count() >= 1

@@ -2,7 +2,8 @@
 
 - "Show me the danger" draws the threat and gives up the first-try point.
 - A move that loses nothing is accepted even when it is not the engine's own answer.
-- A wrong move gets its reason in words; a longer trick is listed move by move and can be played out on the board.
+- A wrong move gets its reason in one line; a trick whose point comes later is listed move by move, and any line can
+  be played out on the board.
 - In a practice set the engine opens on the position once it is answered; in a checkpoint it does not.
 - Engine numbers are from White's side whichever colour you play; the words are from yours."""
 import re
@@ -38,7 +39,7 @@ with sync_playwright() as p:
 
     # ---- a practice set
     pg.evaluate("startQuiz('threats', 's1')"); pg.wait_for_timeout(500)
-    items = pg.evaluate("S.quizState.items.map(it => ({fine: it.fine || [], safe: it.safe, deep: Object.keys(it.refute).filter(u => (it.refute[u][3] || []).length), now: Object.keys(it.refute).filter(u => !(it.refute[u][3] || []).length && it.refute[u][4] > 0), played: it.played}))")
+    items = pg.evaluate("S.quizState.items.map(it => ({fine: it.fine || [], safe: it.safe, deep: Object.keys(it.refute).filter(u => (it.refute[u][3] || []).length && !(it.refute[u][2] > 0)), now: Object.keys(it.refute).filter(u => !(it.refute[u][3] || []).length && it.refute[u][4] > 0), played: it.played}))")
     assert all(it['played'] not in it['fine'] and not set(it['fine']) & set(it['safe']) for it in items)
     # show me the danger
     assert pg.locator('#qPeek').count() == 1 and pg.locator('#qEngine').count() == 0, 'before answering: a hint, no engine'
@@ -49,13 +50,13 @@ with sync_playwright() as p:
     # a move that loses nothing counts
     k = next(i for i, it in enumerate(items) if it['fine']); at(pg, k); try_move(pg, items[k]['fine'][0])
     msg = pg.inner_text('#qpanel .feedback'); print('fine move:', msg[:150].replace('\n', ' '))
-    assert pg.evaluate(f"[S.quizState.state, S.quizState.res[{k}]]") == ['shown', True] and 'loses nothing' in msg and not NOTATION.search(msg)
+    assert pg.evaluate(f"[S.quizState.state, S.quizState.res[{k}]]") == ['shown', True] and "The engine's choice" in msg and not NOTATION.search(msg)
     assert pg.locator('#qEngine').count() == 1
     # a wrong move with a longer point
     k = next(i for i, it in enumerate(items) if it['deep']); at(pg, k); u = items[k]['deep'][0]; try_move(pg, u)
     msg = pg.inner_text('#qpanel .feedback'); print('deep:', msg[:330].replace('\n', ' | '))
     assert pg.evaluate("S.quizState.state") == 'refuted' and pg.locator('#qpanel .qline li').count() >= 1 and not NOTATION.search(msg)
-    assert 'answers:' in msg and ('The engine now calls it' in msg or 'That costs you' in msg)
+    assert 'answers:' in msg and ('Now:' in msg or 'That costs you' in msg)
     pg.screenshot(path=out + 'k_deep.png')
     pg.click('#qPlay'); pg.wait_for_timeout(400); assert pg.evaluate('S.quizState.busy')
     for _ in range(40):
@@ -84,7 +85,7 @@ with sync_playwright() as p:
         pg.evaluate(f"startQuiz('{uid}', 's1')"); pg.wait_for_timeout(400)
         u = pg.evaluate("(() => { const it = S.quizState.items[0]; return Object.keys(it.refute).find(u => (it.refute[u][3] || []).length) || Object.keys(it.refute)[0]; })()"); try_move(pg, u)
         msg = pg.inner_text('#qpanel .feedback'); print(uid + ':', msg[:260].replace('\n', ' | '))
-        assert 'The engine now calls it' in msg or 'checkmate' in msg.lower(), msg
+        assert 'Now:' in msg or 'checkmate' in msg.lower(), msg
         assert not NOTATION.search(msg), NOTATION.search(msg)
         assert pg.locator('#qPeek').count() == 0
 

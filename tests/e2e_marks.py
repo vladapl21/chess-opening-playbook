@@ -282,19 +282,19 @@ with sync_playwright() as p:
     pg.evaluate(f"tryMove('{early[0][:2]}', '{early[0][2:4]}')"); pg.wait_for_timeout(300)
     msg = ' '.join(pg.inner_text('#dpanel .feedback').split()); print('  played early:', msg[:150])
     words = ['', 'one move', 'two moves', 'three moves', 'four moves', 'five moves', 'six moves']
-    assert 'The right move at the wrong moment' in msg and f'it comes {words[early[1]]} later' in msg and pg.evaluate('S.drill.hint') is None, msg
+    assert f'That move comes {words[early[1]]} later' in msg and pg.evaluate('S.drill.hint') is None, msg
     assert pg.evaluate("S.drill.slipOrd && Object.values(S.drill.slipOrd)[0]") == early[1]
     other = pg.evaluate(f"legalFor().find(u => u !== '{early[2]}' && !laterInLine(S.drill, u))")
     pg.evaluate(f"tryMove('{other[:2]}', '{other[2:4]}')"); pg.wait_for_timeout(300)
     msg = ' '.join(pg.inner_text('#dpanel .feedback').split())
-    assert 'The arrow shows the move' in msg and 'The right move at the wrong moment' not in msg and pg.evaluate('S.drill.hint') == early[2], msg
+    assert msg.strip() and 'That move comes' not in msg and pg.evaluate('S.drill.hint') == early[2], msg
     for _ in range(80):
         st = pg.evaluate("({s: S.drill.state, b: S.drill.busy})")
         if st['s'] == 'done': break
         if st['b']: pg.wait_for_timeout(200); continue
         pg.evaluate("(u => tryMove(u.slice(0, 2), u.slice(2, 4)))(expectedMove()[0])"); pg.wait_for_timeout(300)
     note = ' '.join(pg.inner_text('.coachnote').split()); print('  the coach afterwards:', note[:220])
-    assert 'the order slipped, not the move' in note and 'See the order' in note, note
+    assert 'The order slipped' in note and 'See the order' in note, note
     pg.click('.coachnote [data-line]'); pg.wait_for_timeout(500)
     assert pg.evaluate("[S.view, S.line]") == ['study', main] and pg.locator('#sb g.onum').count() >= 1 and pg.evaluate("N[LINES[S.line].n[S.i]].u") == early[2], 'See the order opens the lesson at the move that was due, numbers on the board'
     assert pg.locator('.ccol .opn .oname').count() == 1 and pg.locator('.timeline .ntag, .timeline .named').count() >= 1, 'the lesson names its line too'

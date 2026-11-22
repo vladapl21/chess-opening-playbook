@@ -179,7 +179,7 @@ function coachPickHTML(){ return `<div class="coachpick" role="group" aria-label
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-coachwho]'); if (!b) return;
   setSetting('who', b.dataset.coachwho); if (!document.getElementById('setSheet').hidden) Settings.render();
-  render(); Coach.say(`${coachName()} here. Same advice, new face.`, {mood: 'cheer', ms: 5000});
+  render(); Coach.say(`${coachName()} here.`, {mood: 'cheer', ms: 5000});
   if (typeof Tour !== 'undefined' && Tour.on) Tour.paint();
 });
 
@@ -260,12 +260,12 @@ function packRowsHTML(){
     return `<div class="setrow"><b>${slotName(slot)}</b><div class="setseg" role="group">${Object.keys(v.packs).map(id => `<button type="button" data-packask="${slot}:${id}" aria-pressed="${cur === id}">${esc(nm(id))}</button>`).join('')}</div>${ask}</div>`; }).join('');
   // Reset account: confirmed with the username like everything here (not offered while the page works on a copy)
   const rword = names[0] || 'reset';
-  const reset = Owner.on ? '' : `<div class="resetbox"><div><b>Reset account</b><span>Wipes your progress, streak, badges, levels and shop on every device${SITE ? ', and starts again from the welcome page' : ''}. It can't be undone.</span></div>
+  const reset = Owner.on ? '' : `<div class="resetbox"><div><b>Reset account</b><span>Wipes your progress on every device. It can't be undone.</span></div>
       ${Rep.reset ? `<form class="repask resetask" data-resetform><label for="resetName">${names.length > 1 ? 'Type one of your usernames' : `Type <b>${esc(rword)}</b>`} to reset.</label>
         <div class="reprow"><input id="resetName" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Your username"><button class="btn danger small" type="submit" disabled>Reset account</button><button class="btn small ghost" type="button" data-resetcancel>Cancel</button></div></form>`
         : '<button type="button" class="btn danger" data-resetask>Reset account</button>'}</div>`;
-  return `<details class="repdet" ${Rep.open || A || Rep.reset ? 'open' : ''}><summary><span><b>Advanced settings</b><span>Your systems, and a reset. Each change asks for your username</span></span></summary>
-    <div class="repbody"><p>Switching a system swaps the lessons, drills and course units for that part. Your progress in the other system is kept, and you can switch back.</p>${rows}${reset}</div></details>`;
+  return `<details class="repdet" ${Rep.open || A || Rep.reset ? 'open' : ''}><summary><span><b>Advanced settings</b></span></summary>
+    <div class="repbody">${rows}${reset}</div></details>`;
 }
 const resetOk = v => { const t = String(v || '').trim().toLowerCase(), names = repNames(); return !!t && (names.length ? names.includes(t) : t === 'reset'); };
 /* Reset account: everything a player has earned or set up goes, on every device, and the page opens again on the welcome
@@ -352,10 +352,8 @@ function depersonalise(){
   if (I && setup) Object.assign(I, {hero: setup.n[setup.n.length - 1], arrows: ['c4f7r', 'f3g5g'], circles: ['f7r'], cap: 'Bishop and knight both aim at f7.', kicker: 'Black\'s e-pawn mirrors yours · then the knight',
     headline: 'Aim everything at <em>f7</em>.', lede: 'The pawn beside Black\'s king has only one defender. Your bishop, your knight and often your queen all point at it.'});
   for (const U of COURSE) for (const sl of (U.idea || [])) for (const k in sl) if (typeof sl[k] === 'string') sl[k] = scrub(sl[k]) || sl[k];
-  const gen = t => t.replace('from your games', 'from real club games').replace('you were winning and the next move', 'the player was winning and the next move')
-    .replace('In this game your next move lost material.', 'In the game the next move lost material.').replace('In the game your next move let most of it slip.', 'In the game the next move let most of it slip.')
-    .replace('An ending from your game. Your next move in the game', 'An ending from a real game. The next move in the game');
-  for (const k in SKILL){ const K = SKILL[k]; K.what = gen(K.what); const ask = K.ask; K.ask = it => gen(ask(it)); }
+  const gen = t => String(t || '').replace('from your games', 'from real club games').replace('Your move here lost material.', 'The move played here lost material.');
+  for (const k in SKILL){ const K = SKILL[k], ask = K.ask; K.ask = it => gen(ask(it)); }
   const skillWhy = {threats: 'Positions from real club games where the next move lost material. Spot what is attacked before you move.', finish: 'Winning positions from real club games that were let slip. Find the move that keeps the win.',
     endings: 'Endings from real club games where one move decided the result.'};
   for (const U of COURSE) if (U.kind === 'skill'){ U.why = skillWhy[U.id] || U.why; U.kicker = 'Skill · from real club games'; for (const sl of (U.idea || [])) for (const k in sl) if (typeof sl[k] === 'string') sl[k] = gen(sl[k]).replace(/\byour (own )?games\b/g, 'real club games'); }
@@ -454,24 +452,19 @@ const Product = {
     const cta = out ? `<button class="btn primary" data-acct="signup">Create your account</button><button class="btn" data-acct="signin">I already have an account</button>`
       : has ? `<button class="btn primary" data-pgo="findings">Continue: see what I found</button>` : short ? `<button class="btn primary" data-pgo="setup">Check my games again</button>`
       : this.me().was ? `<button class="btn primary" data-again>Use ${esc(this.me().was.user)} again</button><button class="btn" data-pgo="setup">Link another account</button>` : `<button class="btn primary" data-pgo="setup">Connect your account</button>`;
-    const li = (k, h, p) => `<li class="${k < step ? 'done' : k === step ? 'now' : ''}"><b>${h}</b><span>${p}</span></li>`;
+    const li = (k, h) => `<li class="${k < step ? 'done' : k === step ? 'now' : ''}"><b>${h}</b></li>`;
     // a look at the product itself: a position from a lesson with its name above it and the book's move as the arrow
     const us = ['e2e4', 'e7e5', 'g1f3', 'b8c6', 'f1c4', 'f8c5', 'c2c3', 'g8f6'], pv = fenOf('e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6');
     return `<section class="whero"><div><h2>Your opening course, built from your own games</h2>
         ${short ? '<p class="wshort">Not enough games yet. Play some more, then check again.</p>' : ''}
-        ${bullets(['Reads what you already play, where you score and where you leave the book', 'Asks a few would-you-rather questions', 'Builds your course in that order'], 'lede')}
         <div class="cta">${cta}<button class="btn ghost" data-view="sandbox">Try the sandbox first</button></div></div>
       <div class="wart" aria-hidden="true"><div class="wcard">${opnHTML(Openings.ofMoves(us, START_FEN))}<div class="board">${boardSVG(pv.fen, {coords: false, last: pv.last, arrows: ['d2d4g'], flip: false})}</div></div><div class="wcoach cface">${knightSVG()}</div></div></section>
-      <ol class="steps3">${li(1, 'Make an account', 'So your playbook follows you to every device.')}${li(2, 'Connect your chess account', 'Your chess.com or Lichess username. Only your public games are read.')}${li(3, 'Pick your lines', 'A few would-you-rather questions, then your course opens.')}</ol>
-      <p class="wopens">${ICON.lock}<span>Course, Drill, Your games and Shop open once your games are in.</span></p>`;
+      <ol class="steps3">${li(1, 'Make an account')}${li(2, 'Connect your chess account')}${li(3, 'Pick your lines')}</ol>`;
   },
   locked(tab){
-    const T = {course: ['Your course', 'One path through your openings, in the order your games say matters most: the idea, the lines, a drill, practice games and a checkpoint for each.'],
-      drill: ['Drill', 'Five lines a day from memory. The ones you slipped on come first.'],
-      games: ['Your games', 'Your results by opening, every lesson in each one, and the exact positions where you leave your playbook most often.'],
-      shop: ['Shop', 'A new look for your coach. It opens at level 5.']}[tab] || ['This section', ''];
+    const T = {course: ['Your course'], drill: ['Drill'], games: ['Your games'], shop: ['Shop']}[tab] || ['This section'];
     const out = this.signedOut(), idx = [LINES[DATA.lessons[0].lines[0]].n.slice(-1)[0], LINES[DATA.lessons[1].lines[0]].n.slice(-1)[0], LINES[DATA.lessons[2].lines[0]].n.slice(-1)[0]];
-    view.innerHTML = `<div class="pv"><section class="plocked"><div class="lk">${ICON.lock}</div><p class="kicker">Locked until your games are in</p><h3>${T[0]}</h3><p>${T[1]}</p>
+    view.innerHTML = `<div class="pv"><section class="plocked"><div class="lk">${ICON.lock}</div><h3>${T[0]}</h3><p>Opens once your games are in.</p>
       <div class="cta">${out ? `<button class="btn primary" data-acct="signup">Create your account</button>` : `<button class="btn primary" data-pgo="setup">Connect your account</button>`}<button class="btn" data-view="sandbox">Open the sandbox</button></div>
       <div class="ghost3" aria-hidden="true">${idx.map(i => thumb(i, {coords: false})).join('')}</div></section></div>`;
     this.wire();
@@ -481,28 +474,28 @@ const Product = {
   siteName(x){ return (x || this.site) === 'lichess' ? 'Lichess' : 'chess.com'; },
   // too few games that are not bullet: the repertoire waits until there are more
   shortHTML(){
-    const sh = this.short || this.me().short || {}, who = sh.user ? `${esc(sh.user)} on ${this.siteName(sh.site)} has so far` : 'these files hold';
-    return `<section class="pshort pcard"><div class="say"><div class="cface">${knightSVG('think')}</div><p>Not enough games yet.</p></div>
-      <div><h3>Play some more first</h3><p>To build a repertoire I need more of your games than ${who}. Play some more blitz, rapid or classical games, then come back and check again. Bullet games don't count: they're too fast to show what you really know.</p>
+    const sh = this.short || this.me().short || {};
+    return `<section class="pshort pcard"><div class="say"><div class="cface">${knightSVG('think')}</div><p>Not enough games yet${sh.user ? ` for ${esc(sh.user)}` : ' in these files'}.</p></div>
+      <div><h3>Play some more first</h3><p>Blitz, rapid and classical games count. Bullet doesn't.</p>
         <p class="kicker" style="margin-top:14px">How close you are</p><div class="pbar" style="margin-top:6px" aria-hidden="true"><i style="width:${Math.max(4, Math.min(96, pc(sh.n || 0, NEED)))}%"></i></div>
         <div class="cta" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:16px">${sh.user ? `<button class="btn primary" data-recheck>Check again</button>` : ''}<button class="btn" data-other>Use another username</button><button class="btn ghost" data-view="sandbox">Open the sandbox</button></div></div></section>`;
   },
   setupHTML(){
-    if (this.signedOut()) return `<section class="plocked"><div class="lk">${ICON.lock}</div><h3>Start with an account</h3><p>Your games and your playbook are kept with your account, so they are there on every device.</p><div class="cta"><button class="btn primary" data-acct="signup">Create your account</button><button class="btn" data-acct="signin">Sign in</button></div></section>`;
+    if (this.signedOut()) return `<section class="plocked"><div class="lk">${ICON.lock}</div><h3>Start with an account</h3><div class="cta"><button class="btn primary" data-acct="signup">Create your account</button><button class="btn" data-acct="signin">Sign in</button></div></section>`;
     const seg = (v, l) => `<button type="button" data-site="${v}" aria-pressed="${this.site === v}">${l}</button>`;
     const month = new Date().toISOString().slice(0, 7).replace('-', '/');
     if (!this.busy && (this.short || (this.me().short && !this.fresh))) return `<div class="chead"><div><p class="kicker">Step 2 of 3</p><h2 style="font-size:clamp(30px,4vw,46px)">Connect your chess account</h2></div></div>${this.shortHTML()}`;
-    return `<div class="chead"><div><p class="kicker">Step 2 of 3</p><h2 style="font-size:clamp(30px,4vw,46px)">Connect your chess account</h2><p>I read your recent blitz, rapid and classical games to see what you really play. Bullet is skipped: it's too fast to show what you know.</p></div></div>
+    return `<div class="chead"><div><p class="kicker">Step 2 of 3</p><h2 style="font-size:clamp(30px,4vw,46px)">Connect your chess account</h2></div></div>
       ${this.msg ? `<p class="pmsg ${this.msg.bad ? 'bad' : 'ok'}" role="status">${esc(this.msg.t)}</p>` : ''}${this.busy ? `<div class="pbar" aria-hidden="true" style="margin-top:0"><i id="fetchbar" style="width:3%"></i></div>` : ''}
-      <div class="pcard pickc"><div><h3>Pick your coach</h3><p>They say the same things. Change your mind any time in Settings.</p></div>${coachPickHTML()}</div>
+      <div class="pcard pickc"><div><h3>Pick your coach</h3></div>${coachPickHTML()}</div>
       ${this.names ? `<div class="pcard"><b>Which one is you?</b><div class="pwho" style="margin-top:10px">${this.names.map(x => `<button class="btn" data-who="${esc(x)}">${esc(x)}</button>`).join('')}</div></div>` : ''}
       <div class="setup"><form class="pcard" id="uform"><h3>Your username</h3>
           <div class="setseg" role="group" aria-label="Where you play">${seg('chess.com', 'chess.com')}${seg('lichess', 'Lichess')}</div>
           <div class="pfield"><label for="uname">Your username on ${this.site === 'lichess' ? 'Lichess' : 'chess.com'}</label><input type="text" id="uname" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(this.user)}" placeholder="for example: ${this.site === 'lichess' ? 'your_lichess_name' : 'your_chesscom_name'}"></div>
           <button class="btn primary" type="submit" ${this.busy ? 'disabled' : ''} style="justify-content:center;min-height:46px">${this.busy ? 'Reading your games…' : 'Connect and read my games'}</button>
-          <p style="color:var(--muted);font-size:13.5px">Only your public games are read, straight from ${this.site === 'lichess' ? 'Lichess' : 'chess.com'} to this page. Nothing is posted and no password is needed.</p></form>
+          <p style="color:var(--muted);font-size:13.5px">Only your public games are read. No password needed.</p></form>
         <div class="pcard"><h3>No account online? Drop a PGN file</h3>
-          <label class="drop" id="drop"><input type="file" id="pgnFile" accept=".pgn,.txt,text/plain" multiple><b>Drop PGN files here, or tap to choose</b><span>Several files are fine. They add up.</span></label>
+          <label class="drop" id="drop"><input type="file" id="pgnFile" accept=".pgn,.txt,text/plain" multiple><b>Drop PGN files here, or tap to choose</b></label>
           <details class="how"><summary>How do I get a PGN file?</summary>
             <ol><li><b>chess.com:</b> open this address in your browser with your own name in it, once for each month you need. Each one downloads a file.<br><code>api.chess.com/pub/player/YOUR_NAME/games/${month}/pgn</code></li>
               <li><b>Lichess:</b> open your profile, press the download button above your games, and choose "Export games".</li><li>Drop every file you got into the box above.</li></ol></details></div></div>`;
@@ -570,7 +563,7 @@ const Product = {
     stage(1, `${Object.keys(P.white.systems).length + Object.keys(P.black.systems).length} openings`);
     const tw = top(P.white), tb = top(P.black); say(tw ? `With White you land in the ${cn('w', tw[0])} most: ${plural(tw[1].n, 'game')}.` : `${P.white.all.n} games with White, ${P.black.all.n} with Black.`); await wait(1500);
     stage(2, `${pc(P.all.w + P.all.d / 2, P.all.n)}% overall`); say(P.facts[0] ? P.facts[0].text : `You score ${pc(P.all.w + P.all.d / 2, P.all.n)}% over these ${P.n} games.`); await wait(1700);
-    stage(3, plural(P.leaks.length, 'spot')); say(P.leaks[0] ? `One position came up ${plural(P.leaks[0].n, 'time')} and you left the playbook the same way each time. We'll fix that one first.` : 'You stay in the book longer than most.'); await wait(1700);
+    stage(3, plural(P.leaks.length, 'spot')); say(P.leaks[0] ? `One position caught you ${plural(P.leaks[0].n, 'time')}. We'll fix it first.` : 'You stay in the book longer than most.'); await wait(1700);
     stage(4); say(tb ? `Against you, White goes for the ${cn('b', tb[0])} most. Nearly done.` : 'Nearly done.'); await wait(1300);
     stage(5); clearInterval(anim);
     this.pool = ''; this.short = null; this.fresh = P; Prog.d.me = {state: 'new', since: this.me().since || Date.now(), updated: Date.now(), src: this.src || {site: 'pgn', user}, P}; Prog.save();
@@ -589,21 +582,21 @@ const Product = {
     const les = new Set(D.lessons.map(l => l.id)), ln = bk ? D.lines.find(l => les.has(l.lesson) && l.n.includes(kid)) : null, line = ln ? ln.id : null;
     const open = btn && line, tag = open ? `button type="button" data-leak="${L.side}:${line}:${kid}"` : 'div';
     return `<${tag} class="leak"><div class="thumb">${boardSVG(n.f, {mini: true, coords: false, flip: L.side === 'b', arrows: [L.uci.slice(0, 4) + 'r'].concat(bk ? [bk.u.slice(0, 4) + 'g'] : [])})}</div>
-      <div><p><b>${plural(L.n, 'time')}</b> · you scored ${rec(L)}</p><p>You played: <b>${esc(lc(words))}</b>.${bk ? ` The playbook plays: <b>${esc(lc(bk.l || 'the green arrow'))}</b>.` : ''}</p>
+      <div><p><b>${plural(L.n, 'time')}</b> · you scored ${rec(L)}</p><p>You played: <b>${esc(lc(words))}</b>.${bk ? ` Your book: <b>${esc(lc(bk.l || 'the green arrow'))}</b>.` : ''}</p>
       ${open ? '<span class="lgo">Open the lesson ›</span>' : ''}</div></${open ? 'button' : 'div'}>`;
   },
   findingsHTML(){
     const P = this.me().P; if (!P) return this.startHTML();
     const tile = (b, s) => `<div class="tile"><b>${b}</b><span>${s}</span></div>`;
-    return `<div class="chead"><div><p class="kicker">Step 2 of 3 · done</p><h2 style="font-size:clamp(30px,4vw,48px)">What your games say</h2></div></div>
+    return `<div class="chead"><div><h2 style="font-size:clamp(30px,4vw,48px)">What your games say</h2></div></div>
       <div class="tiles">${tile(P.n, 'games read')}${tile(P.rating || '–', `your ${P.tc} rating${P.peak > P.rating ? `, best ${P.peak}` : ''}`)}${tile(rec(P.all), 'wins and losses')}${tile(pc(P.all.w + P.all.d / 2, P.all.n) + '%', `score against ${P.oppAvg || '?'}-rated opponents`)}</div>
       <div class="fgrid"><div class="pcard"><p class="kicker">What you already play</p>
           <h3 style="margin-top:6px">With White</h3><div class="bars">${this.barsHTML('white', P)}</div>
           <h3 style="margin-top:20px">Against the e-pawn</h3><div class="bars">${this.barsHTML('blackE4', P) || '<p style="color:var(--muted)">Not enough games yet.</p>'}</div>
           <h3 style="margin-top:20px">Against the d-pawn</h3><div class="bars">${this.barsHTML('blackD4', P) || '<p style="color:var(--muted)">Not enough games yet.</p>'}</div></div>
         <div style="display:grid;gap:16px"><div class="pcard"><p class="kicker">Where you score</p>
-          <ul class="factl">${(P.facts.length ? P.facts.slice(0, 4) : [{big: pc(P.all.w + P.all.d / 2, P.all.n) + '%', text: 'Your results are even across the kinds of game I measured.'}]).map(f => `<li><b>${f.big}</b><span>${esc(f.text)}</span></li>`).join('')}</ul></div>
-          ${P.leaks.length ? `<div class="pcard"><p class="kicker">Where you leave the book most</p><div style="display:grid;gap:10px;margin-top:12px">${P.leaks.slice(0, 2).map(L => this.leakHTML(L)).join('')}</div></div>` : ''}</div></div>
+          <ul class="factl">${(P.facts.length ? P.facts.slice(0, 2) : [{big: pc(P.all.w + P.all.d / 2, P.all.n) + '%', text: 'Your results are even.'}]).map(f => `<li><b>${f.big}</b><span>${esc(f.text)}</span></li>`).join('')}</ul></div>
+          ${P.leaks.length ? `<div class="pcard"><p class="kicker">Where you leave the book most</p><div style="display:grid;gap:10px;margin-top:12px">${P.leaks.slice(0, 1).map(L => this.leakHTML(L)).join('')}</div></div>` : ''}</div></div>
       <div class="cta" style="justify-content:flex-end;display:flex"><button class="btn primary" data-pgo="choices" style="min-height:46px;padding:11px 22px">Next: a few choices</button></div>`;
   },
   /* -- would you rather */
@@ -612,13 +605,13 @@ const Product = {
     if (!this.cards){ this.cards = makeChoices(P); this.ci = 0; this.picks = defaultPicks(); }
     const cards = this.shown(), Q = cards[this.ci], dots = cards.map((_, k) => `<i class="${k <= this.ci ? 'on' : ''}"></i>`).join('');
     const opt = (o, k) => {
-      if (Q.kind === 'style') return `<button class="wopt plain pop" data-pick="${o.id}" style="animation-delay:${k * 90}ms"><svg class="pbig" viewBox="0 0 45 45" aria-hidden="true"><use href="#${o.big}"/></svg><b>${esc(o.name)}</b><p>${esc(o.pitch)}</p></button>`;
+      if (Q.kind === 'style') return `<button class="wopt plain pop" data-pick="${o.id}" style="animation-delay:${k * 90}ms"><svg class="pbig" viewBox="0 0 45 45" aria-hidden="true"><use href="#${o.big}"/></svg><b>${esc(o.name)}</b><p>${esc(firstSentence(o.pitch))}</p></button>`;
       const f = fenOf(o.line), mine = o.t.n / o.of >= 0.3;
       return `<button class="wopt pop" data-pick="${o.id}" style="animation-delay:${k * 90}ms"><div class="board">${boardSVG(f.fen, {coords: false, flip: Q.flip, last: f.last})}</div>
-        <span><span class="chip ${o.ready ? 'good' : 'new'}">${o.ready ? 'Ready now' : 'Being written'}</span></span><b>${esc(o.name)}</b><p>${esc(o.pitch)}</p>
-        <span class="you">${mine ? `What you play now: ${pc(o.t.n, o.of)}% of these games, ${rec(o.t)}.` : o.t.n ? `You have tried it ${plural(o.t.n, 'time')}: ${rec(o.t)}.` : 'New to you.'}${o.ready ? '' : ' Its lessons are not written yet, so this part of your course would wait.'}</span></button>`;
+        ${mine ? '<span><span class="chip good">You play this</span></span>' : ''}<b>${esc(o.name)}</b><p>${esc(firstSentence(o.pitch))}</p>
+        ${o.t.n ? `<span class="you">Your record: ${rec(o.t)}</span>` : ''}</button>`;
     };
-    return `<section class="wyr"><p class="kicker">Step 3 of 3 · would you rather · ${this.ci + 1} of ${cards.length}</p><div class="pdots" aria-hidden="true">${dots}</div>
+    return `<section class="wyr"><p class="kicker">Step 3 of 3</p><div class="pdots" aria-hidden="true">${dots}</div>
       <div class="say"><div class="cface">${knightSVG()}</div><p>${esc(Q.ask)}</p></div>
       <div class="duo${Q.opts.length > 4 ? ' many' : Q.opts.length > 3 ? ' quad' : Q.opts.length > 2 ? ' trio' : ''}">${Q.opts.map(opt).join('<span class="or">or</span>')}</div>
       ${this.ci ? `<button class="btn ghost" data-cback>Back</button>` : ''}</section>`;
@@ -636,8 +629,7 @@ const Product = {
   },
   builtHTML(){
     const P = this.me().P || {n: 0};
-    return `<section class="done-art"><div class="cface pop">${knightSVG('cheer')}</div><p class="kicker">Built from your games</p><h2>Your playbook is <em>ready</em>.</h2>
-      ${bullets(['Your course is ordered by your own games', 'Every chapter shows your own record', 'Your games shows where you leave the book'], 'lede')}
+    return `<section class="done-art"><div class="cface pop">${knightSVG('cheer')}</div><h2>Your playbook is <em>ready</em>.</h2>
       <div class="cta"><button class="btn primary" data-open style="min-height:48px;padding:12px 24px;font-size:16px">Open my course</button></div></section>`;
   },
   /* -- Your games, for a player with a profile. The same switch as the house page: your openings (both colours, every
@@ -655,10 +647,10 @@ const Product = {
     const seg = segs.some(x => x[0] === S.gseg) ? S.gseg : 'open';
     segs[1][4] = seg !== 'last' && Review.fresh();
     const rows = games.map(g => `<tr><td>${g.me === 'w' ? 'White' : 'Black'}</td><td>${esc(g.opp)}${g.oe ? ` <span style="color:var(--muted)">${g.oe}</span>` : ''}</td><td><span class="chip ${g.r === 1 ? 'win' : g.r === 0 ? 'loss' : 'draw'}">${g.r === 1 ? 'Won' : g.r === 0 ? 'Lost' : 'Draw'}</span></td><td>${esc(g.ch ? cn(g.me, g.ch) || 'Outside the playbook' : 'Outside the playbook')}</td><td>${g.ch ? plural(Math.floor(g.bp / 2), 'move') + ' in the book' : ''}</td></tr>`).join('');
-    const body = seg === 'last' ? Review.html() : seg === 'recap' ? Recap.html() : seg === 'leaks' ? `<p class="legendline">The same position, the same different move. Red is what you played, green is the playbook.</p><div class="leaks">${leaks.map(L => this.leakHTML(L, true)).join('')}</div>`
+    const body = seg === 'last' ? Review.html() : seg === 'recap' ? Recap.html() : seg === 'leaks' ? `<div class="leaks">${leaks.map(L => this.leakHTML(L, true)).join('')}</div>`
       : seg === 'games' ? `${P.facts.length ? `<div class="pcard"><p class="kicker">Where you score</p><ul class="factl">${P.facts.map(f => `<li><b>${f.big}</b><span>${esc(f.text)}</span></li>`).join('')}</ul></div>` : ''}
           <div class="gwrap pcard" style="padding:6px 10px"><table class="gtable"><thead><tr><th>Colour</th><th>Opponent</th><th>Result</th><th>Opening</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`
-      : `<p class="legendline">The other side's move is highlighted. The green arrow is your answer.</p>${group('w')}${group('b')}`;
+      : `${group('w')}${group('b')}`;
     const num = (b, w) => `<span><b class="tnum">${b}</b> ${w}</span>`;
     if (Recap.on()) segs[segs.length - 1][4] = Recap.fresh();      // after the body: opening a finished month marks it seen
     view.innerHTML = `<div class="pv"><div class="chead ghd"><div><p class="kicker">Your games${P.user ? ' · ' + esc(P.user) : ''}</p>
@@ -746,7 +738,7 @@ const Badges = {
     const B = this.queue.slice().sort((a, b) => rank(a) - rank(b))[0]; if (!B) return;
     const more = this.queue.length - 1; this.queue = [];
     if (!SET.coach){ toast(`New badge: ${B.name}${more ? ` and ${more} more` : ''}.`); return; }
-    Coach.say(`${B.did || B.need} ${more ? `And ${more} more ${more === 1 ? 'badge' : 'badges'} with it: ${more + 1} shop tokens.` : 'That\'s a shop token too.'}`, {mood: 'cheer', stay: true, head: `New badge: ${B.name}`, art: `<span class="cmedal">${medalSVG(B.tier, B.glyph)}</span>`, cta: ['me', 'See your badges']});
+    Coach.say(more ? `${more} more ${more === 1 ? 'badge' : 'badges'} with it: +${more + 1} shop tokens` : '+1 shop token', {mood: 'cheer', stay: true, head: `New badge: ${B.name}`, art: `<span class="cmedal">${medalSVG(B.tier, B.glyph)}</span>`, cta: ['me', 'See your badges']});
   }
 };
 // the profile: the streak, the last seven days and every badge, earned or not
@@ -755,12 +747,12 @@ function profileHTML(){
   const got = BADGES.filter(B => have[B.id]).length, groups = [...new Set(BADGES.map(B => B.group))];
   const week = [-6, -5, -4, -3, -2, -1, 0].map(o => { const d = dayDate(o), on = Daily.done(o); return `<li class="${on ? 'on' : ''} ${o === 0 ? 'now' : ''}"><i>${on ? ICON.check : ''}</i><span>${d.toLocaleDateString(undefined, {weekday: 'narrow'})}</span></li>`; }).join('');
   const one = B => { const at = have[B.id], need = badgeNeed(B, x), cur = Math.min(need, B.n(x));
-    return `<li class="bdg ${at ? 'got' : 'lock'}" title="${esc(B.need)}">${medalSVG(at ? B.tier : 'locked', B.glyph)}<b>${esc(B.name)}</b><span>${at ? 'Earned ' + new Date(at).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'}) : esc(B.need)}</span>${at ? '' : `<i class="bprog" aria-hidden="true"><i style="width:${Math.round(cur / need * 100)}%"></i></i>`}</li>`; };
+    return `<li class="bdg ${at ? 'got' : 'lock'}" title="${esc(B.need)}">${medalSVG(at ? B.tier : 'locked', B.glyph)}<b>${esc(B.name)}</b>${at ? '' : `<span>${esc(B.need)}</span>`}${at ? '' : `<i class="bprog" aria-hidden="true"><i style="width:${Math.round(cur / need * 100)}%"></i></i>`}</li>`; };
   const L = Level.of(), pts = [['A line without a slip', XP.clean], ['A line with a slip', XP.slip], ['A lesson studied', XP.lesson], ['A practice game', XP.game], ['Today\'s five', XP.day], ['A checkpoint passed', XP.pass]];
-  return `<div class="prof"><div class="plevel"><span class="lvc big tnum" style="--p:${Math.round(L.into / L.need * 100)}">${L.n}</span><div><b>Level ${L.n}</b><span class="tnum">${L.into} of ${L.need} points to level ${L.n + 1}</span><span class="lvbar wide" aria-hidden="true"><i style="width:${Math.round(L.into / L.need * 100)}%"></i></span>
-      ${L.n < SHOP_AT ? `<span class="lvnote">The shop opens at level ${SHOP_AT}.</span>` : ''}</div></div>
+  return `<div class="prof"><div class="plevel"><span class="lvc big tnum" style="--p:${Math.round(L.into / L.need * 100)}">${L.n}</span><div><b>Level ${L.n}</b><span class="tnum">${L.into} / ${L.need}</span><span class="lvbar wide" aria-hidden="true"><i style="width:${Math.round(L.into / L.need * 100)}%"></i></span>
+      ${L.n < SHOP_AT ? `<span class="lvnote">Shop at level ${SHOP_AT}</span>` : ''}</div></div>
     <details class="pxp"><summary>How points add up</summary><ul>${pts.map(([t, n]) => `<li><span>${t}</span><b class="tnum">+${n}</b></li>`).join('')}</ul></details>
-    <div class="pstreak ${st ? '' : 'zero'}">${FLAME}<div><b class="tnum">${st}</b><span>${st === 1 ? 'day' : 'days'} in a row</span></div><p>Best: ${best} · today: ${k} of ${DAILY} lines${(f => f.next ? ` · ${f.name.toLowerCase()} flame, a new colour at ${f.next} days` : ` · ${f.name.toLowerCase()} flame`)(flameTier(st))}</p></div>
+    <div class="pstreak ${st ? '' : 'zero'}">${FLAME}<div><b class="tnum">${st}</b><span>${st === 1 ? 'day' : 'days'} in a row</span></div><p>Best: ${best}${(f => f.next ? ` · new flame at ${f.next}` : '')(flameTier(st))}</p></div>
     <ol class="week" aria-label="The last seven days">${week}</ol>
     <div class="bdgs"><p class="kicker">Badges · ${got} of ${BADGES.length}</p>${groups.map(g => `<div><p class="bgh">${esc(g)}</p><ul class="bgrid">${BADGES.filter(B => B.group === g).map(one).join('')}</ul></div>`).join('')}</div></div>`;
 }
@@ -906,7 +898,7 @@ function renderShop(){
     const look = I.slot === 'skin' ? {skin: I.id} : {skin: L.skin, [I.slot]: I.id}, x = needB ? badgeStats() : null;
     const act = needB ? `<span class="need">Badge: ${esc(B.name)}<i>${Math.min(B.n(x), badgeNeed(B, x))} of ${badgeNeed(B, x)}</i></span>`
       : own && tab === 'shop' ? `<button class="btn small ownedbtn" type="button" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Owned</button>`
-      : I.crate && !own ? '<span class="price">In the crate</span>'
+      : I.crate && !own ? ''
       : on ? (I.slot === 'skin' && I.id === 'c-classic' ? '<span class="wearing">Wearing</span>' : `<button class="btn small" data-off="${I.slot}">Take off</button>`)
       : own ? `<button class="btn small" data-wear="${I.id}">Wear</button>`
       : lk === 'level' ? `<span class="price">${COIN}${I.price}</span>`
@@ -916,14 +908,14 @@ function renderShop(){
   // a piece bought today stays on the shelf, marked as owned, until the shelf changes
   const shelf = Owner.on ? SHOP.filter(I => I.price) : Shop.today();
   const inCrate = SHOP.filter(I => I.crate), crateLeft = Shop.crateLeft();
-  const buyCrate = crateLeft.length ? `<button class="btn primary" type="button" data-crate ${open && bal >= CRATE_PRICE ? '' : 'disabled'} aria-label="Buy a crate for ${CRATE_PRICE} tokens">Buy a crate ${COIN}${CRATE_PRICE}</button>` : '<span class="wearing">You have every piece in it</span>';
+  const buyCrate = crateLeft.length ? `<button class="btn primary" type="button" data-crate ${open && bal >= CRATE_PRICE ? '' : 'disabled'} aria-label="Buy a crate for ${CRATE_PRICE} tokens">Buy a crate ${COIN}${CRATE_PRICE}</button>` : '<span class="wearing">All collected</span>';
   // in the shop: the crate as a banner under the shelf, with the way to its own page
   const crateBanner = () => `<section class="cratebox" data-cratepage><div class="crateart">${CRATE_ART}</div>
-      <div class="crateinfo"><h3>Collector's crate</h3><p>One piece the shop never sells, picked at random and never one you have.</p>
+      <div class="crateinfo"><h3>Collector's crate</h3>
         <div class="crateacts">${buyCrate}<button class="btn" type="button" data-cratepage>What's inside</button></div></div></section>`;
-  const crateHTML = () => `<div class="crumbs"><button class="btn small" type="button" data-shoptab="shop">← Daily shop</button><span class="where">Collector's crate</span></div>
+  const crateHTML = () => `<div class="crumbs"><button class="btn small" type="button" data-shoptab="shop">← Daily shop</button></div>
     <section class="cratebox"><div class="crateart">${CRATE_ART}</div>
-      <div class="crateinfo"><h3>Collector's crate</h3><p>One piece the shop never sells, picked at random and never one you have.</p>
+      <div class="crateinfo"><h3>Collector's crate</h3>
         <div class="crateacts">${buyCrate}</div>
         <p class="codds">${Object.entries(RAR).map(([k, r]) => `<span class="rar r-${k}">${r.name} ${r.w}%</span>`).join('')}</p></div></section>
     <ul class="items cratein">${inCrate.map(card).join('')}</ul>`;
@@ -934,12 +926,11 @@ function renderShop(){
     <div class="shop">
       <aside class="shopside">
         <div class="mannequin">${knightSVG('cheer', who, L)}</div>
-        <p class="bal">${COIN}<b class="tnum">${bal === Infinity ? '∞' : bal}</b><span>${bal === 1 ? 'token' : 'tokens'}</span></p>
-        <ul class="earn"><li><span>Badges</span><b class="tnum">${e.badges}</b></li><li><span>Levels from ${SHOP_AT} on</span><b class="tnum">${e.level}</b></li><li><span>Every third day in a row</span><b class="tnum">${e.streak}</b></li></ul>
+        <p class="bal" title="Earned: ${e.badges} from badges, ${e.level} from levels, ${e.streak} from days in a row">${COIN}<b class="tnum">${bal === Infinity ? '∞' : bal}</b><span>${bal === 1 ? 'token' : 'tokens'}</span></p>
         <div class="coachpick mini">${COACHES.map(c => `<button type="button" data-coachwho="${c.id}" aria-pressed="${who === c.id}"><span class="cface">${knightSVG('', c.id, L)}</span><b>${c.name}</b></button>`).join('')}</div>
       </aside>
       <div class="shopmain">
-        ${open ? '' : `<section class="wlock"><div><h3>Opens at level ${SHOP_AT}</h3><p>${toGo} more ${toGo === 1 ? 'point' : 'points'} to go.</p></div>
+        ${open ? '' : `<section class="wlock"><div><h3>Opens at level ${SHOP_AT}</h3></div>
           <div class="wlv" aria-label="Level ${lv.n} of ${SHOP_AT}">${Array.from({length: SHOP_AT}, (_, k) => `<i class="${k < lv.n ? 'on' : ''}">${k + 1}</i>`).join('')}</div></section>`}
         <div class="shophd">${segHTML([['shop', 'Daily shop'], ['locker', 'Locker', locker.length]], tab === 'crate' ? 'shop' : tab, 'shoptab')}${tab === 'shop' ? `<span class="sdt tnum" id="dropT">${Shop.endsIn()} left</span>` : ''}</div>
         ${tab === 'shop' ? (shelf.length ? `<ul class="items daily">${shelf.map(card).join('')}</ul>` : '<p class="snone">Nothing new today.</p>') + (Owner.on && !inCrate.length ? '' : crateBanner())
@@ -979,7 +970,7 @@ function crateOpen(){
   const N = 46, WIN = 40, tiles = Array.from({length: N}, (_, i) => i === WIN ? I : filler());
   const sheet = document.createElement('div'); sheet.className = 'scrim cratescrim'; sheet.id = 'crateSheet';
   sheet.innerHTML = `<div class="sheet cratesheet" role="dialog" aria-modal="true" aria-label="Opening a crate"><p class="kicker">Collector's crate</p>
-      <div class="cratewait"><i class="crays" aria-hidden="true"></i><button class="cratetap" type="button" data-cratetap aria-label="Open the crate">${CRATE_ART}</button><p class="cratehint">Tap the crate to open it</p></div>
+      <div class="cratewait"><i class="crays" aria-hidden="true"></i><button class="cratetap" type="button" data-cratetap aria-label="Open the crate">${CRATE_ART}</button><p class="cratehint">Tap to open</p></div>
       <div class="reel" hidden><ul class="strip">${tiles.map(x => `<li class="rt r-${x.rar}"><span class="ipv z-${x.slot} zk-${who}">${knightSVG('', who, look(x))}</span><b>${esc(x.name)}</b></li>`).join('')}</ul><i class="reelmark" aria-hidden="true"></i></div>
       <div class="prize" hidden></div><div class="lesson-actions cratebtns"></div></div>`;
   document.body.appendChild(sheet);
@@ -1074,25 +1065,23 @@ function deepCard(o, top){
   const cta = o.touched && cur ? `Continue: ${unitNo(cur).toLowerCase()}` : 'Start';
   return `<li class="dcard ${top ? 'dpick' : ''}"><button type="button" data-deep="${X.id}" aria-label="${esc(X.title)}, deep dive${top ? ', the coach\'s pick' : ''}">
     <span class="dtop"><span class="dthumb">${slideSVG(U0, U0.idea[0], {coords: false, mini: true})}</span>
-      <span class="dhead"><span class="chips">${sideChip(U0)}${top ? `<span class="chip pick">${esc(coachName())}'s pick</span>` : o.touched ? '<span class="chip">Started</span>' : ''}</span><b>${esc(X.title)}</b><span class="dtag">${esc(X.tag)}</span></span></span>
-    <span class="dwhy">${esc(o.why)}</span>
+      <span class="dhead"><span class="chips">${sideChip(U0)}${top ? `<span class="chip pick">${esc(coachName())}'s pick</span>` : o.touched ? '<span class="chip">Started</span>' : ''}</span><b>${esc(X.title)}</b></span></span>
     <span class="dfoot"><span class="dmeta"><span class="pips" aria-hidden="true">${X.units.map(U => `<i class="${unitPassed(U) ? 'on' : ''}"></i>`).join('')}</span>${X.units.length} parts · ${deepLessons(X)} lessons</span>
       <span class="btn small ${top ? 'primary' : ''}">${cta}</span></span></button></li>`;
 }
 function renderLibrary(){
   const view = document.getElementById('view'), rank = deepRank(), {pick, cards, rest} = libCards(rank), done = rank.filter(o => o.done), open = COURSE.filter(U => !U.soon);
   const say = pick ? `<section class="libcoach"><span class="libav">${knightSVG('cheer')}</span><div class="libsay"><p class="kicker">${esc(coachName())}'s pick for you</p>
-      <p><b>${pick.touched ? `Keep going with ${esc(pick.X.name)}.` : `Go deeper on ${esc(pick.X.name)} next.`}</b> ${esc(pick.why)}</p>
+      <p><b>${pick.touched ? `Keep going with ${esc(pick.X.name)}.` : `Go deeper on ${esc(pick.X.name)} next.`}</b></p>
       <div class="lesson-actions"><button class="btn primary" type="button" data-deep="${pick.X.id}">${pick.touched ? 'Pick up where you left off' : `Start: ${esc(pick.X.title)}`}</button></div></div></section>`
-    : `<section class="libcoach"><span class="libav">${knightSVG('cheer')}</span><div class="libsay"><p class="kicker">${esc(coachName())}</p><p><b>Every deep dive finished.</b> That's the whole library for now. Your lines stay in the Drill tab, and today's five keep them fresh.</p></div></section>`;
+    : `<section class="libcoach"><span class="libav">${knightSVG('cheer')}</span><div class="libsay"><p class="kicker">${esc(coachName())}</p><p><b>Every deep dive finished.</b></p></div></section>`;
   const shelf = `<section class="libshelf"><p class="kicker">Finished</p><ul>
       <li><button type="button" class="lmed" data-grad aria-label="Your first course is complete">${medalSVG('gold', 'star')}</button><div><b>Your first course</b><span>${open.length} units · finished ${dayFmt(gradAt())}</span></div><button class="btn small" type="button" data-cpath>Review the path</button></li>
       ${done.map(o => `<li><span class="lmed">${medalSVG('silver', 'flag')}</span><div><b>${esc(o.X.title)}</b><span>Deep dive · ${o.X.units.length} parts</span></div><button class="btn small" type="button" data-deep="${o.X.id}">Open</button></li>`).join('')}</ul></section>`;
-  const more = rest.length ? `<details class="libmore"><summary>Not these? Every other deep dive (${rest.length})</summary><ul>${rest.map(o => `<li><button type="button" data-deep="${o.X.id}">${sideChip(o.X.units[0])}<b>${esc(o.X.title)}</b><span>${esc(o.X.tag)}</span><span class="lm">${o.touched && o.cur ? `${unitNo(o.cur)} of ${o.X.units.length}` : `${o.X.units.length} parts`}</span></button></li>`).join('')}</ul></details>` : '';
-  view.innerHTML = `<div class="nudge" id="nudge" hidden></div>${changedNote()}<div class="chead"><div><p class="kicker">Course · your library</p><h2 style="font-size:clamp(30px,4vw,46px)">What's next</h2>
-      <p>You finished your first course on ${dayFmt(gradAt())}. From here it's depth: one opening at a time, picked from how your course went.</p></div></div>
+  const more = rest.length ? `<details class="libmore"><summary>Every other deep dive (${rest.length})</summary><ul>${rest.map(o => `<li><button type="button" data-deep="${o.X.id}">${sideChip(o.X.units[0])}<b>${esc(o.X.title)}</b><span class="lm">${o.touched && o.cur ? `${unitNo(o.cur)} of ${o.X.units.length}` : `${o.X.units.length} parts`}</span></button></li>`).join('')}</ul></details>` : '';
+  view.innerHTML = `<div class="nudge" id="nudge" hidden></div>${changedNote()}<div class="chead"><div><h2 style="font-size:clamp(30px,4vw,46px)">What's next</h2></div></div>
     ${say}
-    ${cards.length ? `<section class="libpicks"><p class="kicker">Picked for you</p><ul class="dcards">${cards.map((o, k) => deepCard(o, k === 0 && o === pick)).join('')}</ul></section>` : ''}
+    ${(xs => xs.length ? `<section class="libpicks"><p class="kicker">Also for you</p><ul class="dcards">${xs.map(o => deepCard(o, false)).join('')}</ul></section>` : '')(cards.filter(o => o !== pick))}
     ${shelf}${more}`;
   courseNotes();
 }
@@ -1104,13 +1093,13 @@ function renderDeep(X){
     const steps = unitSteps(cur), nx = steps.find(s => !s.done), open = unitOpen(cur);
     hero = `<section class="chero"><div class="board">${slideSVG(cur, cur.idea[0])}</div>
       <div><div class="chips">${sideChip(cur)}<span class="chip">Up next · ${unitNo(cur)} of ${X.units.length}</span></div>
-        <h3>${esc(cur.title)}</h3>${bullets(cur.why, 'lede')}
+        <h3>${esc(cur.title)}</h3>
         <ol class="ministeps" aria-label="Steps in this part">${steps.map(s => `<li class="${s.done ? 'done' : s === nx ? 'next' : ''}">${s.done ? ICON.check : ''}${esc(s.title)}</li>`).join('')}</ol>
-        <div class="cta">${open ? `<button class="btn primary" id="dGo">${esc(stepCta(cur, nx))}</button>` : ''}<button class="btn" data-unit="${cur.id}">See the whole part</button></div></div></section>`;
-  } else hero = `<section class="chero done dfin"><span class="dmedal">${medalSVG('silver', 'flag')}</span><div><p class="kicker">Deep dive finished</p><h3>Every part passed.</h3><p class="lede">Its lines stay in your reviews, and today's five bring them back. The library has more picks waiting.</p><div class="cta"><button class="btn primary" data-lib>Back to the library</button></div></div></section>`;
+        <div class="cta">${open ? `<button class="btn primary" id="dGo">${esc(stepCta(cur, nx))}</button>` : `<button class="btn" data-unit="${cur.id}">Open the part</button>`}</div></div></section>`;
+  } else hero = `<section class="chero done dfin"><span class="dmedal">${medalSVG('silver', 'flag')}</span><div><h3>Deep dive finished</h3><div class="cta"><button class="btn primary" data-lib>Back to the library</button></div></div></section>`;
   view.innerHTML = `<div class="crumbs"><button class="btn small" data-lib>← Library</button><span class="where">Deep dive · ${word}</span></div>
-    <div class="chead"><div><div class="chips">${sideChip(X.units[0])}<span class="chip deep">Deep dive</span><span class="chip">${X.units.length} parts · ${deepLessons(X)} lessons</span></div>
-      <h2 style="font-size:clamp(30px,4vw,46px)">${esc(X.title)}</h2><p>${esc(X.why)}</p>${o ? `<p class="dfor"><span class="libav sm">${knightSVG('')}</span><span><b>Why it's here for you:</b> ${esc(o.why)}</span></p>` : ''}</div></div>
+    <div class="chead"><div><div class="chips">${sideChip(X.units[0])}<span class="chip">${X.units.length} parts · ${deepLessons(X)} lessons</span></div>
+      <h2 style="font-size:clamp(30px,4vw,46px)">${esc(X.title)}</h2></div></div>
     <div class="nudge" id="nudge" hidden></div>${changedNote()}${hero}<ol class="path" aria-label="Parts of this deep dive">${X.units.map(U => unitRow(U, cur)).join('')}</ol>`;
   courseNotes();
   const g = document.getElementById('dGo'); if (g) g.onclick = () => { const nx = unitSteps(cur).find(s => !s.done); if (nx) doStep(cur, nx.key); else openUnit(cur.id); };
@@ -1126,17 +1115,15 @@ function renderGrad(){
   const stamps = Object.values(c.u || {}).flatMap(p => Object.values(p).filter(v => v > 1e12)).concat(Object.values(c.seen || {}).filter(v => v > 1e12));
   const days = Math.max(1, Math.round((at - Math.min(at, ...stamps)) / DAY));
   const pick = deepRank().find(o => !o.done), look = Object.assign({}, Shop.worn(), {head: 'h-grad'});
-  const cap = Shop.owns('h-grad') ? '' : Shop.isOpen() ? ' The graduation cap is in the shop now.' : ` The graduation cap is waiting in the shop, which opens at level ${SHOP_AT}.`;
   const bits = ['--gold', '--accent', '--rosso', '--blu', '--viola', '--oro', '--gold-2'];
   const conf = fresh ? `<div class="grconf" aria-hidden="true">${Array.from({length: 42}, (_, k) => `<i style="--x:${(k * 37) % 100}%;--d:${(k % 7) * .17}s;--s:${2.6 + (k % 5) * .35}s;--r:${(k * 53) % 360}deg;background:var(${bits[k % bits.length]})"></i>`).join('')}</div>` : '';
   const stat = (n, t) => `<li><b class="tnum">${n}</b><span>${t}</span></li>`;
   view.innerHTML = `<section class="gradv ${fresh ? 'fresh' : ''}">${conf}
     <div class="grhero"><div class="grstage"><span class="grcoach">${knightSVG('cheer', null, look)}</span><span class="grmedal">${medalSVG('gold', 'star')}</span></div>
-      <p class="kicker">Course complete · ${dayFmt(at)}</p><h2>You finished your course.</h2>
-      <p class="lede">${open.length} units, every checkpoint passed. The openings in it are yours now; next comes depth.</p></div>
-    <ul class="grstats">${stat(open.length, 'units passed')}${stat(badgeStats().clean, 'lines played clean')}${stat(`${cpR}<small>/${cpN}</small>`, 'checkpoint positions right first time')}${stat(games, games === 1 ? 'practice game' : 'practice games')}${stat(days, days === 1 ? 'day, start to finish' : 'days, start to finish')}</ul>
-    <div class="grearn"><span class="grbadge">${medalSVG('gold', 'star')}</span><div><b>New badge: Course complete</b><span>That's a shop token too.${esc(cap)}</span></div>${Shop.isOpen() && !Shop.owns('h-grad') ? '<button class="btn small" type="button" data-go="shop">Open the shop</button>' : ''}</div>
-    ${pick ? `<div class="grnext"><span class="libav">${knightSVG('')}</span><div><p class="kicker">${esc(coachName())} says</p><p><b>What next? Go deeper on ${esc(pick.X.name)}.</b> ${esc(pick.why)} Your Course tab is a library now, and I've picked three deep dives for you.</p>
+      <p class="kicker">${dayFmt(at)}</p><h2>You finished your course.</h2></div>
+    <ul class="grstats">${stat(open.length, 'units passed')}${stat(badgeStats().clean, 'lines played clean')}${stat(`${cpR}<small>/${cpN}</small>`, 'checkpoint answers right')}${stat(games, games === 1 ? 'practice game' : 'practice games')}${stat(days, days === 1 ? 'day' : 'days')}</ul>
+    <div class="grearn"><span class="grbadge">${medalSVG('gold', 'star')}</span><div><b>New badge: Course complete</b><span>+1 shop token</span></div>${Shop.isOpen() && !Shop.owns('h-grad') ? '<button class="btn small" type="button" data-go="shop">Open the shop</button>' : ''}</div>
+    ${pick ? `<div class="grnext"><span class="libav">${knightSVG('')}</span><div><p><b>Next: go deeper on ${esc(pick.X.name)}.</b></p>
       <div class="lesson-actions"><button class="btn primary" type="button" data-deep="${pick.X.id}">Start: ${esc(pick.X.title)}</button><button class="btn" type="button" data-lib>See the library</button></div></div></div>` : ''}
     ${S.quizState && S.quizState.state === 'done' && UNIT[S.quizState.unit] && !UNIT[S.quizState.unit].deep ? '<p class="grback"><button class="linkish" type="button" id="grQuiz">See the last checkpoint</button></p>' : ''}
   </section>`;
@@ -1177,40 +1164,33 @@ const Coach = {
     if (this.last && this.last.v === S.view) return this.say(this.last.t, this.last.o);
     this.say(this.tip());
   },
-  once(key, t, o){ if (this.seen[key]) return false; this.seen[key] = 1; this.prune(); try { localStorage.setItem('playbook-coach', JSON.stringify(this.seen)); } catch(e){} this.say(t, o); return true; },
+  once(key, t, o){ if (this.seen[key]) return false; this.mark(key); this.say(t, o); return true; },
+  mark(key){ this.seen[key] = 1; this.prune(); try { localStorage.setItem('playbook-coach', JSON.stringify(this.seen)); } catch(e){} },
   // once a day: what the coach says about a tab is worth hearing once that day
   today(key, t, o){ return this.once(`${key}@${dayKey()}`, t, o); },
   prune(){ const old = dayKey(-14); for (const k in this.seen){ const d = k.split('@')[1]; if (d && d < old) delete this.seen[k]; } },
   refresh(){ this.hush(); },
-  // the first visit to a tab: what it is for
+  // the first visit to a place: what it is for, in a line or two. This is where the app is explained (the tour is three steps).
   tip(){
-    const T = {start: 'Connect your chess account and I\'ll build your course around your games.', setup: 'A username is the quickest way. I only read your public games.', sandbox: 'Play your side; the other side answers the way club players do. Set up a position to practise only what follows it.',
-      course: 'The button on the open unit always takes you to its next step.', learn: 'Pick a lesson, or switch to At a glance for every decision in this opening on one page.', drill: 'A wrong move shows the answer that punishes it. Miss twice and the arrow shows your move.',
-      games: 'Your openings, with your record in each. Open one for its lessons and every position in it at a glance.', study: 'Step through with the arrow keys. Practise from here plays only the lines that go on from this move.',
-      shop: 'The daily shop changes at midnight. What you buy goes in your locker.'};
-    if (S.view === 'drill' && S.drill && S.drill.guided) return 'Play the move the green arrow shows. Then the same line once from memory.';
-    if (S.view === 'games' && S.gseg === 'last') return 'Your three newest games: where each left your book and its first costly move. Drill it plays that spot.';
-    if (S.view === 'drill' && S.drill && S.drill.unit) return 'Clean once from memory and the line counts for this unit. A slip: play it again.';
+    const T = {start: 'Connect your chess account and I\'ll build your course around your games.', setup: 'A username is the quickest way. I only read your public games.',
+      sandbox: ['Practice games', 'The other side plays what club players play'],
+      course: 'The big button is always your next step.',
+      learn: 'Tap a lesson to step through it.',
+      drill: ['Five lines a day keep your streak', 'Miss twice and the arrow shows it'],
+      games: 'Your record in each opening. Tap one to open it.',
+      study: ['Step through with the arrows', 'Move a piece to try something else'],
+      explore: ['Move for either side', 'The engine answers'],
+      shop: Shop.isOpen() ? 'New pieces every midnight.' : 'Every line you play brings it closer.'};
+    if (S.view === 'drill' && S.drill && S.drill.guided) return 'Play the green arrow\'s move.';
+    if (S.view === 'games' && S.gseg === 'last') return 'Your newest games, and where each left your book.';
+    if (S.view === 'games' && S.gseg === 'recap') return 'Your month, set beside the one before.';
+    if (S.view === 'drill' && S.drill && S.drill.unit) return 'Once from memory without a slip and it counts.';
     return T[S.view] || T[tabOf(S.view, S.studyFrom)] || 'Keep going.';
   },
-  // what is worth knowing on a tab today, about this player's own lines and games. Nothing when there is nothing.
+  // what is worth knowing on a tab that the page doesn't already say. Only the shop has any: the course and the Drill
+  // page show their own next step.
   news(v){
-    if (v === 'drill' && !S.drill){
-      if (Daily.count() >= DAILY){ const due = Prog.dueCount(); return due ? `Today's five are done. ${due} more ${due === 1 ? 'line is' : 'lines are'} due if you want to keep going.` : null; }
-      const x = dailyNext(); if (!x) return null; const t = lineTitleOf(x.s, x.id); if (!t) return null;
-      const due = Prog.dueCount();
-      return {'You slipped here last time': `Today's five start with ${t}. It caught you last time.`, 
-        'Due for review': `${due} ${due === 1 ? 'line is' : 'lines are'} due today. First up: ${t}.`, 'New line from a lesson you studied': `Nothing is due, so today's five bring new lines, starting with ${t} from a lesson you studied.`,
-        'New line': `Nothing is due, so today's five bring new lines, starting with ${t}.`}[x.why] || null;
-    }
-    if (v === 'course' && !gradAt()){
-      const U = COURSE.find(U => !U.soon && U.lessons && !unitPassed(U)); if (!U) return null;
-      const ls = U.lessons, seen = ls.filter(l => lessonSeen(U.side, l)).length, m = unitNext(U);
-      return [`Next: ${unitNo(U)}, ${U.title}`, seen >= ls.length ? 'Every lesson played along' : seen ? `${seen} of ${ls.length} lessons played along` : `${plural(ls.length, 'lesson')} to play along`, m ? m.cta : ''].filter(Boolean);
-    }
-    if (v === 'shop'){
-      if (!Shop.isOpen()){ const L = Level.of(), toGo = Array.from({length: Math.max(0, SHOP_AT - L.n)}, (_, k) => Level.step(L.n + k)).reduce((a, x) => a + x, 0) - L.into;
-        return toGo > 0 ? `${toGo} more ${toGo === 1 ? 'point' : 'points'} and the shop opens. A clean line is ten.` : null; }
+    if (v === 'shop' && Shop.isOpen()){
       const bal = Shop.balance(), d = Shop.today().filter(I => !Shop.owns(I.id) && I.price <= bal).sort((x, y) => y.price - x.price); if (!d.length) return null;
       return `You have the tokens for the ${lc(d[0].name)} today.`;
     }
@@ -1218,68 +1198,58 @@ const Coach = {
   },
   // called after every full render: at most one thing to say
   onView(){
-    const v = S.view, e = this.el();
-    if (typeof Tour !== 'undefined' && Tour.on){ this.lastView = v; return this.hush(); }   // the tour does the talking
-    if (S.drill && S.drill.state === 'play'){ this.lastView = v; return this.hush(); } // never while a drill, a practice game or a checkpoint is being played
-    if (v === 'grad' || libOn()){ this.lastView = v; return this.hush(); }            // the coach is part of those pages
+    const v = S.view, e = this.el(), at = v === 'games' ? 'games:' + (S.gseg || 'open') : v;   // a part of Your games is a place of its own
+    if (typeof Tour !== 'undefined' && Tour.on){ this.lastView = at; return this.hush(); }   // the tour does the talking
+    if (S.drill && S.drill.state === 'play'){ this.lastView = at; return this.hush(); } // never while a drill, a practice game or a checkpoint is being played
+    if (v === 'grad' || libOn()){ this.lastView = at; return this.hush(); }            // the coach is part of those pages
     if (Badges.queue.length && PERSONA !== 'new') return Badges.show();
-    if (e.querySelector('.cbub') && this.lastView === v) return this.draw(e.querySelector('.cbub').outerHTML); this.lastView = v;
+    if (e.querySelector('.cbub') && this.lastView === at) return this.draw(e.querySelector('.cbub').outerHTML); this.lastView = at;
     if (v === 'drill' && S.drill && (S.drill.unit || S.drill.guided)) return this.hush();  // a course line: its panel has the coach's word already
     if (v === 'reading' || v === 'choices' || v === 'built' || v === 'findings') return this.hush(); // the coach is already on the page there
     if (PERSONA === 'new'){
       if (v === 'start') return this.hush();
       if (v === 'setup') return this.once('setup', this.tip()) || this.hush();
-      if (v === 'sandbox') return this.once('sb-new', `This is the sandbox: pick an opening and play. I'll stop you where the playbook has a better move. Connect your account and the rest opens.`, {cta: Product.signedOut() ? null : ['setup', 'Connect my account']}) || this.hush();
+      if (v === 'sandbox') return this.once('sb-new', `Pick an opening and play. Connect your account and the rest opens.`, {cta: Product.signedOut() ? null : ['setup', 'Connect my account']}) || this.hush();
       if (!OPEN_NEW.includes(v)) return this.say('This opens once I\'ve read your games.', {cta: Product.signedOut() ? null : ['setup', 'Connect my account']});
       return this.hush();
     }
-    if (PERSONA === 'ready' && v === 'course' && this.once('ready-course', 'This is your course, in the order your games asked for. Start with the unit at the top.')) return;
     if (Recap.announce()) return;                                                      // a finished month's recap that hasn't been opened yet
     if (!(v === 'games' && S.gseg === 'last') && Review.announce()) return;            // a game that left the book: the line to drill
-    if (v === 'drill' && !S.drill && Review.remind()) return;                          // and once a day on the Drill page until it is drilled
-    const tab = ['course', 'learn', 'drill', 'games', 'sandbox', 'shop', 'study'].includes(v) ? v : null;
-    if (tab && this.once('tab-' + tab, this.tip())) return;
+    const tab = ['course', 'learn', 'drill', 'games', 'sandbox', 'shop', 'study', 'explore'].includes(v) ? v : null;
+    // a part of Your games has its own first word
+    const part = v === 'games' && (S.gseg === 'last' || S.gseg === 'recap') ? 'games-' + S.gseg : tab;
+    if (part && this.once('tab-' + part, this.tip())) return;
     const n = tab && this.news(tab); if (n && this.today('news-' + tab, n)) return;
     this.hush();
   },
   // the fifth line of the day: the streak, and the token every third day in a row
   daily(){
-    const st = Daily.streak(), fix = Daily.ids().filter(id => { const r = Prog.rec(id); return r && !r.box; }).length, tok = st > 0 && st % 3 === 0, sh = Shop.isOpen() ? ['shop', 'Open the shop'] : null;
-    this.say([fix ? `${fix} of them still to get clean` : 'All five clean', tok ? 'Third day in a row: a shop token' : `${3 - st % 3 === 1 ? 'One more day' : 'Two more days'} to the next shop token`],
+    const st = Daily.streak(), tok = st > 0 && st % 3 === 0, sh = Shop.isOpen() ? ['shop', 'Open the shop'] : null;
+    this.say(tok ? '+1 shop token' : `${3 - st % 3 === 1 ? 'One more day' : 'Two more days'} to the next shop token`,
       {mood: 'cheer', head: st === 7 ? 'A week in a row' : st === 30 ? 'A month in a row' : 'Today\'s five: done', art: `<span class="cstreak">${FLAME}<b class="tnum">${st}</b><i>${st === 1 ? 'day' : 'days'}<br>in a row</i></span>`, cta: tok ? sh : null});
   },
-  // a drill line is over: what happened in it, for the drill panel. Where it caught the player, what they played
-  // instead (and what the book says about that move, when it knows it), why the line's move is the move, and whether
-  // that spot has caught them before. On a clean run: a move that held after catching them last time, a lesson whose
-  // lines are now all clean, a line at full strength. Nothing for an ordinary clean run: the panel says when it comes
-  // back. Badges and today's five get the bubble.
+  // a drill line is over: one line from the coach in the drill panel. Where it caught the player and the line's move
+  // there (or that the order slipped), and whether that spot has caught them before. On a clean run: a move that held
+  // after catching them last time, a lesson whose lines are now all clean, a line at full strength. Nothing for an
+  // ordinary clean run. Badges and today's five get the bubble.
   lineNote(id, clean, prev, D){
-    const r = Prog.rec(id) || {}, line = LINES[id], L = lessonOf(id), out = []; let cta = '', mood = 'cheer', head = '';
+    const r = Prog.rec(id) || {}, line = LINES[id], L = lessonOf(id); let cta = '', mood = 'cheer', head = '', sub = '';
     if (!clean && D.slipAt && D.slipAt.length){
       mood = 'think';
-      const [i, u] = D.slipAt[0], par = line.n[i - 1], nd = N[line.n[i]], no = Math.ceil(i / 2), times = (r.sl || {})[i] || 1;
-      const alt = (N[par].k || []).map(c => N[c]).find(x => x.u === u && x !== nd);       // the move tried, when the book has it
-      let played = ''; try { played = wordsAt(nodeFen(par), u); } catch(e){}
-      head = times > 1 ? `Move ${no} has caught you ${times === 2 ? 'twice' : times + ' times'} now` : `Move ${no} caught you`;
-      // what was played, what it allowed (the book's word on it, or the answer that punishes it), the line's move and why
-      const pw = D.slipWhy && D.slipWhy[i], why = moveWhy(line.n[i], 1)[0];
-      out.push(`You played: ${played ? lc(played) : 'another move'}`);
+      const [i] = D.slipAt[0], nd = N[line.n[i]], no = Math.ceil(i / 2), times = (r.sl || {})[i] || 1;
       const ord = D.slipOrd && D.slipOrd[i];                 // a move of this line, played before its turn
-      if (ord) out.push(`That move is in this line, ${movesLater(ord)} later: the order slipped, not the move`);
-      else if (alt && alt.t) out.push(`${(alt.g || []).includes('warn') ? 'A known mistake here' : 'About your move'}: ${firstSentence(alt.t)}`);
-      else if (pw) out.push(pw[0] + (pw[1] ? ': ' + lc(pw[1]) : ''));
-      out.push(`The line's move: ${lc(nd.l)}`); if (why) out.push(`Why: ${why}`);
-      if (D.slipAt.length > 1 && out.length < 5) out.push(`${D.slipAt.length === 2 ? 'One more slip' : `${D.slipAt.length - 1} more slips`} after that`);
+      head = times > 1 ? `Move ${no} has caught you ${times === 2 ? 'twice' : times + ' times'}` : `Move ${no} caught you`;
+      sub = ord ? 'The order slipped' : nd.l;
       cta = `<button class="linkish" type="button" data-line="${id}" data-i="${ord ? i : i - 1}">${ord ? 'See the order' : `Study move ${no}`}</button>`;
     } else if (clean){
       const was = prev && prev.sl ? Object.keys(prev.sl).map(Number).sort((a, b) => prev.sl[b] - prev.sl[a]) : [], spot = was[0];
       const ls = L ? L.lines.filter(x => DRILLSET.has(x)) : [], all = ls.length > 1 && ls.every(lineClean) && !(prev && prev.clean);
-      if (spot && prev && !prev.box && N[line.n[spot]]){ head = `Move ${Math.ceil(spot / 2)} held this time`; out.push(`${N[line.n[spot]].l}: the one that caught you before`); }
-      if (all){ head = head || `Every line of ${L.title} is clean`; out.push(`All ${ls.length} of them`); }
-      else if ((r.box || 0) >= 5 && (prev && prev.box || 0) < 5){ head = head || 'Full strength'; out.push('Five clean reviews in a row', `Next review in ${INTERVALS[5]} days`); }
+      if (spot && prev && !prev.box && N[line.n[spot]]) head = `Move ${Math.ceil(spot / 2)} held this time`;
+      else if (all) head = `Every line of ${L.title} is clean`;
+      else if ((r.box || 0) >= 5 && (prev && prev.box || 0) < 5) head = 'Five clean reviews in a row';
     }
     if (!head) return '';
-    return `<div class="coachnote" role="status">${SET.coach ? `<span class="cnface">${knightSVG(mood)}</span>` : ''}<div class="cntx">${SET.coach ? `<b>${esc(coachName())}</b>` : ''}<p class="cnhead">${esc(head)}</p>${bullets(out)}${cta}</div></div>`;
+    return `<div class="coachnote" role="status">${SET.coach ? `<span class="cnface">${knightSVG(mood)}</span>` : ''}<div class="cntx"><p class="cnhead">${esc(head)}</p>${sub ? `<p class="cnsub">${esc(sub)}</p>` : ''}${cta}</div></div>`;
   },
   // a checkpoint or practice set is over with misses: which lesson they come from, so the next try starts there
   quizNote(Q, U){
@@ -1290,7 +1260,7 @@ const Coach = {
     const top = Object.entries(by).sort((a, b) => b[1] - a[1])[0]; if (!top) return '';
     const [lid, k] = top, L = LESSONS[lid], passed = Q.res.filter(Boolean).length >= quizPass(U, Q.set);
     const head = misses.length === 1 ? `Your miss: ${L.title}` : k === misses.length ? `All ${misses.length} misses: ${L.title}` : `${k} of ${misses.length} misses: ${L.title}`;
-    return `<div class="coachnote" role="status">${SET.coach ? `<span class="cnface">${knightSVG(passed ? 'cheer' : 'think')}</span>` : ''}<div class="cntx">${SET.coach ? `<b>${esc(coachName())}</b>` : ''}<p class="cnhead">${esc(head)}</p>${bullets([passed ? 'Worth a look before it comes up in a game' : 'Play it along once more, then try again'])}<button class="linkish" type="button" data-guided="${L.lines[0]}@${U.id}">Play along: ${esc(L.title)}</button></div></div>`;
+    return `<div class="coachnote" role="status">${SET.coach ? `<span class="cnface">${knightSVG(passed ? 'cheer' : 'think')}</span>` : ''}<div class="cntx"><p class="cnhead">${esc(head)}</p><button class="linkish" type="button" data-guided="${L.lines[0]}@${U.id}">Play it along</button></div></div>`;
   },
 };
 
@@ -1450,12 +1420,12 @@ const Recap = {
   // the whole part of Your games
   html(){
     const ks = this.months(), k = this.cur(), st = this.st(); if (k) this.sel = k;     // the month stays put while the page redraws
-    if (!k) return `${this.statusHTML()}<section class="rcempty"><div class="cface">${knightSVG('think')}</div><div><h3>No recap yet</h3><p>${SITE ? (this.busy ? 'Reading this month\'s games now, and the two months before it, so there is something to compare with.' : 'The first check reads this month\'s games and the two months before it, so there is something to compare with.') : 'Open the website and your recaps start there.'}</p></div></section>`;
+    if (!k) return `${this.statusHTML()}<section class="rcempty"><div class="cface">${knightSVG('think')}</div><div><h3>${this.busy ? 'Reading your games…' : 'No recap yet'}</h3>${SITE ? '' : '<p>Recaps start on the website.</p>'}</div></section>`;
     if ((this.month(k) || {}).fin && (!st.seen || st.seen < k)){ st.seen = k; Prog.save(); }
     const M = this.month(k), pk = this.shift(k, -1), P = this.month(pk), pn = this.name(pk), i = ks.indexOf(k), n = M.all[0], s = this.score(M.all), dr = this.rating(M);
     const nav = `<div class="rcnav"><button class="btn ghost small" type="button" data-rcm="${ks[i + 1] || ''}" ${ks[i + 1] ? '' : 'disabled'} aria-label="Month before">${ICON.prev}</button>
       <h3>${this.name(k, true)}${M.fin ? '' : ' <span class="chip">So far</span>'}</h3><button class="btn ghost small" type="button" data-rcm="${ks[i - 1] || ''}" ${ks[i - 1] ? '' : 'disabled'} aria-label="Month after">${ICON.next}</button></div>`;
-    if (!n) return `${this.statusHTML()}${nav}<section class="rcempty"><div class="cface">${knightSVG('think')}</div><div><h3>No games in ${this.name(k)}</h3><p>${M.fin ? 'Nothing at blitz or slower that month.' : 'Play a few blitz or rapid games and the recap fills in at the next check.'}</p></div></section>`;
+    if (!n) return `${this.statusHTML()}${nav}<section class="rcempty"><div class="cface">${knightSVG('think')}</div><div><h3>No games in ${this.name(k)}</h3></div></section>`;
     const tile = (lab, val, sub) => `<li><span class="rclab">${lab}</span><b class="tnum">${val}</b>${sub}</li>`;
     const pv = P && P.all[0] ? P : null, D = this.drilled(k);
     const tiles = `<ul class="rctiles">
@@ -1474,7 +1444,7 @@ const Recap = {
         <span class="rcv">${c ? `${plural(c[0], 'game')} · ${this.score(c)}%` : '<i>not met in a game</i>'}</span>
         <span class="rcv">${c ? `${Math.round(c[4] / c[0] / 2 * 10) / 10} moves in the book${dv ? ` <em class="${dv > 0 ? 'up' : 'dn'}">${dv > 0 ? '+' : '−'}${Math.abs(dv)}</em>` : ''}` : ''}</span>
         <span class="rcv">${dl ? plural(dl, 'line') + ' drilled' : '<i>not drilled</i>'}</span></${op ? 'button' : 'div'}>`; }).join('');
-    const prac = keys.length ? `<section class="pcard rcprac"><p class="kicker">Your openings in ${this.name(k)}</p><p class="rcnote">Games and time in the book beside the lines you drilled.${D.n ? ` ${plural(D.n, 'line')} drilled in all.` : ''}</p><div class="rcrows">${rows}</div></section>` : '';
+    const prac = keys.length ? `<section class="pcard rcprac"><p class="kicker">Your openings in ${this.name(k)}</p><div class="rcrows">${rows}</div></section>` : '';
     const link = (g, t) => g.url ? `<a class="linkish" href="${esc(g.url)}" target="_blank" rel="noopener">${t}</a>` : '';
     const where = g => `With ${g.me === 'w' ? 'White' : 'Black'}${g.ch ? ' · ' + esc(this.chName(g.me, g.ch)) : ''}`;
     const hl = [M.best ? `<li><span class="rclab">Best win</span><b>vs ${esc(M.best.opp)} (${M.best.oe})</b><span>${where(M.best)}</span>${link(M.best, 'See the game')}</li>` : '',
@@ -1667,14 +1637,8 @@ const Review = {
     }
     const R = this.list()[0]; if (!R || R.by === 'me' || !this.todo(R)) return false;
     const no = Math.floor(R.at / 2) + 1, oc = R.me === 'w' ? 'Black' : 'White';
-    const t = R.by === 'opp' ? `Your game against ${R.opp}: ${oc} left your book at move ${no}. I've got an answer to drill.` : `Your game against ${R.opp} is reviewed.`;
+    const t = R.by === 'opp' ? `Against ${R.opp}: ${oc} left your book at move ${no}.` : `Your game against ${R.opp} is reviewed.`;
     return Coach.once('rg-' + R.id, t, {mood: 'think', stay: true, head: 'Your last game', cta: ['last', 'See the review']});
-  },
-  // on the Drill page, once a day for as long as the line hasn't been drilled clean
-  remind(){
-    if (!this.on() || !SET.coach || PERSONA === 'new') return false;
-    const R = this.left()[0]; if (!R) return false;
-    return Coach.today('rgd-' + R.id, this.leftWords(R).concat(['That line is the one to drill first']), {mood: 'think', head: 'Still open from your games', cta: ['rvb:' + R.id, 'Drill the line']});
   },
   // the book's line was drilled from a game: counted like the other spots (runs, clean, last)
   drilled(id, clean){ const R = this.get(id); if (!R) return; const d = R.d || (R.d = {}), x = d.o || [0, 0, 0]; d.o = [x[0] + 1, x[1] + (clean ? 1 : 0), Date.now()]; },
@@ -1687,9 +1651,9 @@ const Review = {
   },
   statusHTML(){
     const a = this.acct(), st = this.rd();
-    if (!SITE || !a) return `<section class="rcstat"><div><b>Paste a game to review it</b><span>${!SITE ? 'This copy can\'t reach chess.com or Lichess. On the website your newest games are read by themselves.' : 'Your newest games are read from your account once it is connected.'}</span></div>${!SITE && HOME ? `<a class="btn small" href="${HOME}#games" target="_blank" rel="noopener">Open the website</a>` : ''}</section>`;
+    if (!SITE || !a) return `<section class="rcstat"><div><b>Paste a game to review it</b>${!SITE ? '<span>On the website your newest games come in by themselves.</span>' : ''}</div>${!SITE && HOME ? `<a class="btn small" href="${HOME}#games" target="_blank" rel="noopener">Open the website</a>` : ''}</section>`;
     const site = a.site === 'lichess' ? 'Lichess' : 'chess.com';
-    const when = this.busy ? 'Reading your newest games…' : this.err === 'missing' ? `${site} doesn't know ${esc(a.user)}.` : this.err ? `${site} didn't answer. Try again in a minute.` : st.chk ? `Checked ${Recap.ago(st.chk)}. Your newest three games are kept here.` : 'Not checked yet.';
+    const when = this.busy ? 'Reading your newest games…' : this.err === 'missing' ? `${site} doesn't know ${esc(a.user)}.` : this.err ? `${site} didn't answer. Try again in a minute.` : st.chk ? `Checked ${Recap.ago(st.chk)}.` : 'Not checked yet.';
     return `<section class="rcstat"><div><b>${site} · ${esc(a.user)}</b><span>${when}</span></div><button class="btn small" type="button" id="rvGo" ${this.busy ? 'disabled' : ''}>${this.busy ? 'Checking…' : 'Check now'}</button></section>`;
   },
   listHTML(){ const L = this.list(); return L.length ? L.map(R => this.cardHTML(R)).join('') : `<p class="rcnone">${this.busy ? 'Reading…' : 'No games here yet.'}</p>`; },
@@ -1712,32 +1676,28 @@ const Review = {
     if (R.by !== 'opp' && R.by !== 'me') return this.item('ok', '', k >= R.u.length ? 'The whole game stayed in your book' : `Your book's line ended at move ${no}, with the game still on it`, []);
     const fenB = this.fenAt(R.u, k), node = this.walk(R.me, R.u.slice(0, k + 1)).node;
     if (R.by === 'me'){
-      const bk = this.bookMove(R.me, node), p = this.punish(fenB, R.u[k], R.me), wk = (Nn[node].k || []).find(c => Nn[c].u === R.u[k]);
-      const known = R.w && wk !== undefined && Nn[wk].t ? `A known mistake here: ${lc(firstSentence(Nn[wk].t))}` : '';
-      const why = bk === undefined ? '' : Nn[bk].t ? `Why: ${noteLine(Nn[bk].t)}` : (x => x ? `Why: ${x}` : '')(this.idea(fenB, Nn[bk].u, R.me));
+      const bk = this.bookMove(R.me, node);
       const o = {last: this.sq(R.u[k - 1]), arrows: [R.u[k].slice(0, 4) + 'r'].concat(bk !== undefined ? [Nn[bk].u.slice(0, 4) + 'g'] : [])};
-      return this.item('', this.board(R, k, o), `Move ${no}: you left your book`, [`You played: ${lc(this.words(fenB, R.u[k]))}${(n => n ? ` (${n})` : '')(Openings.startedBy(R.u, k))}`, known || (p ? `${p.lines[0]}${p.lines[1] ? ': ' + lc(p.lines[1]) : ''}` : ''), bk !== undefined ? `Your book: ${lc(Nn[bk].l)}` : '', why],
+      return this.item('', this.board(R, k, o), `Move ${no}: you left your book`, [`You played: ${lc(this.words(fenB, R.u[k]))}`, bk !== undefined ? `Your book: ${lc(Nn[bk].l)}` : ''],
         bk !== undefined ? `<button class="btn small primary" type="button" data-rvb="${id}">Drill your line</button>${sbCanFromIn(R.me, node) ? `<button class="btn small" type="button" data-rvs="${id}">Practise from here</button>` : ''}` : '');
     }
-    const fenA = this.fenAt(R.u, k + 1), kids = (Nn[node].k || []).filter(c => this.inBook(R.me).has(c)).sort((a, b) => (Nn[b].q || 0) - (Nn[a].q || 0)).slice(0, 3);
-    const idea = this.idea(fenB, R.u[k], R.me, R.u[k - 1]), ans = R.ln && R.ln[0];
+    const fenA = this.fenAt(R.u, k + 1), ans = R.ln && R.ln[0];
     const o = {last: this.sq(R.u[k]), arrows: ans ? [ans.slice(0, 4) + 'g'] : []};
-    const wait = !R.ln ? (this.noEngine || Engine.state === 'failed' ? 'The answer needs the engine, which can\'t start here' : 'Working out the answer…') : !R.ln.length ? 'No answer to drill: the game was over' : '';
+    const wait = !R.ln ? (this.noEngine || Engine.state === 'failed' ? 'The engine can\'t start here' : 'Working out the answer…') : '';
     return this.item('', this.board(R, k + 1, o), `Move ${no}: ${oc} left your book`,
-      [`${oc} played: ${lc(this.words(fenB, R.u[k]))}${(n => n ? ` (${n})` : '')(Openings.startedBy(R.u, k))}${idea ? `. ${idea}` : ''}`, kids.length ? `Your book has: ${kids.map(c => lc(Nn[c].l) + (Nn[c].q ? ` (${pctTxt(Nn[c].q)})` : '')).join(', ')}` : '',
-       ans ? `The engine's answer: ${lc(this.words(fenA, ans))}` : wait, ans ? (x => x ? `Why: ${x}` : '')(this.idea(fenA, ans, R.me, R.u[k])) : ''],
+      [`${oc} played: ${lc(this.words(fenB, R.u[k]))}`, ans ? `Best answer: ${lc(this.words(fenA, ans))}` : wait],
       ans ? `<button class="btn small primary" type="button" data-rvd="${id}:o">Drill it</button><button class="btn small ghost" type="button" data-rvx="${id}:o">Play on with the engine</button>` : '');
   },
   mkHTML(R){
     if (R.mk === undefined){
       const p = this.prog && this.prog.id === R.id && this.prog.k !== undefined ? ` (move ${Math.floor(this.prog.k / 2) + 1})` : '';
-      return this.item('wait', '', this.noEngine || Engine.state === 'failed' ? 'The costly moves need the engine, which can\'t start here' : `Looking for the first costly move${p}…`, []);
+      return this.item('wait', '', this.noEngine || Engine.state === 'failed' ? 'The engine can\'t start here' : `Looking for the first costly move${p}…`, []);
     }
     if (!R.mk) return this.item('ok', '', `No costly move in the first ${RG_PLY / 2} moves`, []);
-    const M = R.mk, k = M.k, no = Math.floor(k / 2) + 1, fenB = this.fenAt(R.u, k), p = this.punish(fenB, R.u[k], R.me), id = esc(R.id);
-    const o = {last: this.sq(R.u[k - 1]), arrows: [R.u[k].slice(0, 4) + 'r', M.best.slice(0, 4) + 'g']}, why = this.idea(fenB, M.best, R.me, R.u[k - 1]);
+    const M = R.mk, k = M.k, no = Math.floor(k / 2) + 1, fenB = this.fenAt(R.u, k), id = esc(R.id);
+    const o = {last: this.sq(R.u[k - 1]), arrows: [R.u[k].slice(0, 4) + 'r', M.best.slice(0, 4) + 'g']};
     return this.item('', this.board(R, k, o), `Move ${no}: the first costly move`,
-      [`You played: ${lc(this.words(fenB, R.u[k]))}`, p ? `${p.lines[0]}${p.lines[1] ? ': ' + lc(p.lines[1]) : ''}` : '', `Better: ${lc(this.words(fenB, M.best))}${why ? `. ${why}` : ''}`, M.mate ? 'It allowed a mate' : `The engine puts the cost at ${this.cost(M.loss)}`],
+      [`You played: ${lc(this.words(fenB, R.u[k]))}`, `Better: ${lc(this.words(fenB, M.best))}`],
       `<button class="btn small primary" type="button" data-rvd="${id}:m">Drill it</button><button class="btn small ghost" type="button" data-rvx="${id}:m">Play on with the engine</button>`);
   },
   paint(){ if (!this.visible()) return; const s = document.getElementById('rvStat'); if (s){ s.innerHTML = this.statusHTML(); this.wire(view); } this.paintList(); const pb = view.querySelector('.rvpaste'); if (pb){ const t = document.getElementById('rvPgn'), v = t ? t.value : '', open = pb.open; pb.outerHTML = this.pasteHTML(); const pb2 = view.querySelector('.rvpaste'), t2 = document.getElementById('rvPgn'); if (open && pb2) pb2.open = true; if (t2) t2.value = v; this.wire(view); } },
@@ -1787,8 +1747,8 @@ const Review = {
     const D = S.drill, exp = D.moves[D.i], fen = this.fen(D); D.sel = null;
     if (u === exp){
       D.i++; D.flash = {sq: u.slice(2, 4), ok: true}; D.hint = null; D.msg = ''; D.tries = 0;
-      const w = this.words(fen, u), why = this.idea(fen, u, D.me, D.i > 1 ? D.moves[D.i - 2] : D.last);
-      D.feed = [`<span class="mfeed"><b>${esc(w.charAt(0).toUpperCase() + w.slice(1))}.</b> ${esc(why)}</span>`];
+      const w = this.words(fen, u);
+      D.feed = [`<span class="mfeed"><b>${esc(w.charAt(0).toUpperCase() + w.slice(1))}</b></span>`];
       renderDrillBoard(); renderDrillPanel();
       D.busy = true; setTimeout(() => { if (S.drill === D){ D.flash = null; this.advance(); } }, 650);
       return;
@@ -1796,8 +1756,7 @@ const Review = {
     if (D.tries === 0) D.mistakes++;
     D.tries++; D.flash = {sq: to, ok: false};
     const p = this.punish(fen, u, D.me), ew = this.words(fen, exp), ewhy = this.idea(fen, exp, D.me);
-    D.msg = (D.tries >= 2 ? 'Not that one. The arrow shows the move; play it to continue.' : 'Not the move. Try again.') + (p ? punishHTML(p) : '')
-      + (D.tries >= 2 ? `<span class="pwhy"><b>${esc(ew.charAt(0).toUpperCase() + ew.slice(1))}${ewhy ? ':' : ''}</b> ${esc(lc(ewhy))}</span>` : '');
+    D.msg = D.tries >= 2 ? `<span class="pwhy"><b>${esc(ew.charAt(0).toUpperCase() + ew.slice(1))}${ewhy ? ':' : ''}</b> ${esc(lc(ewhy))}</span>` : p ? punishHTML(p) : 'Not the move.';
     if (D.tries >= 2) D.hint = exp;
     renderDrillBoard(); renderDrillPanel();
     setTimeout(() => { if (S.drill === D && D.flash && !D.flash.ok){ D.flash = null; renderDrillBoard(); } }, 650);
@@ -1821,14 +1780,13 @@ const Review = {
   panelHTML(D){
     const mine = Math.ceil(D.moves.length / 2), done = Math.min(mine, Math.ceil(D.i / 2)), pct = D.state === 'done' ? 100 : Math.round(done / mine * 100);
     const status = D.state === 'done' ? '' : D.busy ? `${OPP} is thinking…` : 'Your move';
-    const intro = D.part === 'o' ? `${OPP}'s move in your game wasn't in your book. Play the engine's answer and the moves after it.` : 'Find the better move from your game, then play the engine\'s line on.';
     const clean = !D.mistakes;
-    const doneBox = D.state !== 'done' ? '' : `<div class="donebox ${clean ? '' : 'bad'}"><h4>${clean ? 'Clean run' : plural(D.mistakes, 'slip') + ': again until it\'s clean'}</h4>
+    const doneBox = D.state !== 'done' ? '' : `<div class="donebox ${clean ? '' : 'bad'}"><h4>${clean ? 'Clean run' : plural(D.mistakes, 'slip')}</h4>
       <div class="lesson-actions"><button class="btn ${clean ? '' : 'primary'}" id="rvAgain">Again</button><button class="btn ${clean ? 'primary' : ''}" id="rvBack">Back to your games</button><button class="btn ghost" id="rvEx">Play on with the engine</button></div></div>`;
-    return `<div class="dpanel"><p class="kicker">Your game against ${esc(D.opp)} · move ${D.no}</p><h3>${D.part === 'o' ? 'An answer to the new move' : 'The better move'}</h3>
+    return `<div class="dpanel"><p class="kicker">Move ${D.no}</p><h3>${D.part === 'o' ? 'Find the answer' : 'Find the better move'}</h3>
       <div class="progressbar" aria-hidden="true"><i style="width:${pct}%"></i></div>
       ${status ? `<div class="status ${D.busy ? 'wait' : ''} ${D.tries ? 'bad' : ''}"><span class="bub"></span>${status}</div>` : ''}
-      ${D.state === 'done' ? '' : `<p class="feedback">${D.msg || (D.feed && D.feed.length ? D.feed.join('') : intro)}</p>`}${doneBox}</div>`;
+      ${D.state === 'done' ? '' : `<p class="feedback">${D.msg || (D.feed && D.feed.length ? D.feed.join('') : '&nbsp;')}</p>`}${doneBox}</div>`;
   },
   wirePanel(){
     const D = S.drill; if (!D || D.kind !== 'rv') return;
@@ -1845,7 +1803,7 @@ const Review = {
     const lf = this.left()[0];
     if (lf){ const w = this.leftWords(lf);
       return `<section class="dpanel rvcue"><div><p class="kicker">You left your book in a game</p><p class="tline">${esc(w[0])}.</p>${w[1] ? `<p class="rvsub">${esc(w[1])}.</p>` : ''}</div><div class="lesson-actions"><button class="btn primary" type="button" id="rvDrillB" data-id="${esc(lf.id)}">Drill the line</button><button class="btn" type="button" id="rvLast">${n > 1 ? `All ${n} spots` : 'See the game'}</button></div></section>`; }
-    return `<section class="dpanel rvcue"><div><p class="kicker">From your last games</p><p class="tline">${plural(n, 'spot')} to drill, starting with your game against ${esc(R.opp)}.</p></div><div class="lesson-actions"><button class="btn" type="button" id="rvLast">See them</button></div></section>`;
+    return `<section class="dpanel rvcue"><div><p class="kicker">From your last games</p><p class="tline">${plural(n, 'spot')} to drill</p></div><div class="lesson-actions"><button class="btn" type="button" id="rvLast">See them</button></div></section>`;
   }
 };
 // a position the Sandbox can start from, in either book
@@ -1915,7 +1873,7 @@ const Lv = {
     const shop = this.shop && !Owner.on, L = Level.of(), old = document.getElementById('lvup'); if (old) old.remove(); this.shop = false;
     const el = document.createElement('div'); el.id = 'lvup'; el.className = 'lvup'; el.setAttribute('role', 'status');
     el.innerHTML = `<div class="lvring" aria-hidden="true"><span class="tnum">${n}</span>${Array.from({length: 10}, (_, k) => `<i style="--a:${k * 36}deg"></i>`).join('')}</div>
-      <div class="lvsay"><p class="kicker">Level up</p><b>Level ${n}</b><span>${shop ? 'The shop is open: a new look for your coach. Every level from here on is a token.' : n > SHOP_AT ? `That's a shop token too. ${L.need - L.into} points to level ${n + 1}.` : `${L.need - L.into} points to level ${n + 1}.${n < SHOP_AT ? ` The shop opens at level ${SHOP_AT}.` : ''}`}</span>
+      <div class="lvsay"><p class="kicker">Level up</p><b>Level ${n}</b><span>${shop ? 'The shop is open' : n > SHOP_AT ? '+1 shop token' : n < SHOP_AT ? `Shop at level ${SHOP_AT}` : ''}</span>
         ${shop ? '<button class="btn small primary" type="button" data-go="shop">Open the shop</button>' : ''}</div>
       <button class="x" type="button" aria-label="Close">×</button>`;
     document.body.appendChild(el);
@@ -1981,19 +1939,19 @@ refreshSoon = function(){ Lv.sync(); Lv.paint(); refreshSoon0(); };
 refresh = function(){ Lv.sync(); refresh0(); };
 
 
-/* ---- the tour: the coach the player picks walks them through every part of the app before they start. A first run
-   can't be skipped or sped up: Next is held behind a short bar that fills while the step is read (HOLD: longer for more
-   words, none on a step already seen), Back goes a step back, and on a step that asks for a tap, "Show me" lets the
-   coach do it. Taken again from Settings there is no bar, and Fast forward plays the steps by itself. On a phone the
-   card is a sheet docked to the bottom of the screen (to the top when the thing it points at is down there), and the
-   page gets room to scroll so that thing can always sit clear of it. Finished once, it is marked in the progress record
-   (d.tour.done, merged as the earliest) and follows the player to every device; Settings has "Take the tour again".
-   Nothing played on the tour counts: its lines are tour lines (no record, no lesson studied, no points). */
+/* ---- the tour: three steps and no more. Pick a coach, play one move on the board, and see the button that always
+   leads on. Everything else is said where it is met: the coach has one short tip for each place, the first time it is
+   opened (Coach.tip). Next is held behind a short bar on a first run (HOLD), Back goes a step back, and on the step
+   that asks for a move "Show me" lets the coach make it. On a phone the card is a sheet docked to the bottom of the
+   screen (to the top when the thing it points at is down there), and the page gets room to scroll so that thing can
+   always sit clear of it. Finished once, it is marked in the progress record (d.tour.done, merged as the earliest) and
+   follows the player to every device; Settings has "Take the tour again". Nothing played on the tour counts: its line
+   is a tour line (no record, no lesson studied, no points). */
 const TOUR_KEY = 'playbook-tour';
 const Tour = {
-  on: false, k: 0, fast: false, replay: false, t: 0, w: 0, dt: 0, ht: 0, raf: 0, el: null, steps: [], back: null, ok: false, note: '', held: {},
-  // how long Next waits on a step's first showing: time to read its words, within limits
-  HOLD: {per: 26, min: 1300, max: 4200},
+  on: false, k: 0, replay: false, t: 0, w: 0, dt: 0, ht: 0, raf: 0, el: null, steps: [], back: null, ok: false, note: '', held: {},
+  // how long Next waits on a step's first showing: a moment, so a tap can't fly through all three
+  HOLD: {per: 16, min: 600, max: 1400},
   holdLeft(){ const h = this.held[this.k]; return h ? Math.max(0, h[0] + h[1] - Date.now()) : 0; },
   done(){ if (Prog.d.tour && Prog.d.tour.done) return true; try { return localStorage.getItem(TOUR_KEY) === 'done'; } catch(e){ return false; } },
   boot(){ setTimeout(() => this.maybe(), 1100); },
@@ -2002,7 +1960,7 @@ const Tour = {
   start(replay){
     if (this.on) return;
     Settings.close(); Coach.hush(); stopPlay();
-    this.on = true; this.replay = !!replay; this.k = 0; this.fast = false; this.note = ''; this.held = {};
+    this.on = true; this.replay = !!replay; this.k = 0; this.note = ''; this.held = {};
     document.documentElement.classList.add('twon');
     this.back = {side: SIDE, view: VIEWS.includes(S.view) ? S.view : 'course'};
     this.steps = this.build().filter(st => !st.skip || !st.skip());
@@ -2022,6 +1980,7 @@ const Tour = {
   finish(){
     if (!(Prog.d.tour && Prog.d.tour.done)){ Prog.d.tour = {done: Date.now()}; Prog.save(); }
     try { localStorage.setItem(TOUR_KEY, 'done'); } catch(e){}
+    if (!this.replay) Coach.mark('tab-course');          // its last step said what the course's button is for
     const b = this.back, replay = this.replay; this.close();
     S.drill = S.drillState = null; if (b.side !== SIDE) useSide(b.side);
     go(replay ? b.view : 'course');
@@ -2038,7 +1997,7 @@ const Tour = {
       this.held[this.k] = [Date.now(), ms]; }
     if (this.holdLeft()) this.ht = setTimeout(() => { if (this.on && this.cur() === st){ this.paint(); this.focus(); } }, this.holdLeft() + 30);
     this.paint();
-    // views draw a moment later: wait for the thing to point at, bring it into view, then (fast) move on by itself
+    // views draw a moment later: wait for the thing to point at and bring it into view
     let n = 0;
     const ready = () => {
       if (!this.on || this.cur() !== st) return;
@@ -2052,7 +2011,6 @@ const Tour = {
       if (st.demo) try { st.demo(); } catch(e){}
       this.paint(); this.focus();
       if (st.act) this.watch(st);
-      if (this.fast) this.ahead();
     };
     this.t = setTimeout(ready, 80);
   },
@@ -2060,32 +2018,24 @@ const Tour = {
   watch(st){
     const tick = () => {
       if (!this.on || this.cur() !== st) return;
-      if (!this.ok && st.act.done()){ this.ok = true; this.paint(); this.w = setTimeout(() => { if (this.cur() === st) this.next(); }, this.fast ? 500 : 900); return; }
+      if (!this.ok && st.act.done()){ this.ok = true; this.paint(); this.w = setTimeout(() => { if (this.cur() === st) this.next(); }, 800); return; }
       this.w = setTimeout(tick, 150);
     };
     tick();
   },
-  // fast forward: the coach does the step's tap, or reads it out and turns the page
-  ahead(){
-    const st = this.cur(); if (!st || !this.fast) return;
-    clearTimeout(this.t);
-    if (st.act && !this.ok) this.t = setTimeout(() => { if (this.fast && this.cur() === st && !this.ok) this.doIt(); }, 650);
-    else if (st.ready && !st.ready()) this.t = setTimeout(() => this.ahead(), 300);
-    else if (!st.act){ const w = this.words(st); this.t = setTimeout(() => { if (this.fast && this.cur() === st) this.next(); }, Math.max(1600, 26 * (w.h.length + w.say.join('').length))); }
-  },
   doIt(){ const st = this.cur(); if (st && st.act && !this.ok) try { st.act.auto(); } catch(e){} },
   next(){ if (this.k < this.steps.length - 1){ this.k++; this.show(); } else this.finish(); },
-  prev(){ if (this.k > 0){ this.fast = false; this.k--; this.show(); } },
+  prev(){ if (this.k > 0){ this.k--; this.show(); } },
   click(e){
     const t = e.target.closest('[data-tour]'); if (!t) return;
     const a = t.dataset.tour;
     if (a === 'next'){ if (this.holdLeft()) return; const st = this.cur(); if (st.act && !this.ok) this.doIt(); else this.next(); }
     else if (a === 'back') this.prev();
-    else if (a === 'fast' && this.replay){ this.fast = !this.fast; this.paint(); if (this.fast) this.ahead(); else clearTimeout(this.t); }
   },
   onKey(e){
     if (!this.on) return;
-    if (e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); this.note = this.replay ? 'Fast forward gets you through it quickly.' : 'The tour can\'t be skipped. It takes about two minutes.'; this.paint(); return; }
+    // taken again from Settings it closes; a first run is too short to skip
+    if (e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); if (this.replay) return this.finish(); this.note = `${['', 'One step', 'Two steps', 'Three steps'][this.steps.length] || 'A few steps'} and you're in.`; this.paint(); return; }
     if (e.target.closest && e.target.closest('input, textarea')) return;
     if (e.key === 'Enter' || e.key === 'ArrowRight'){ if (e.target.closest && e.target.closest('.twcard button') && e.key === 'Enter') return; e.preventDefault(); e.stopPropagation(); if (this.holdLeft()) return; const st = this.cur(); if (st.act && !this.ok) this.doIt(); else this.next(); }
     else if (e.key === 'ArrowLeft'){ e.preventDefault(); e.stopPropagation(); this.prev(); }
@@ -2096,14 +2046,14 @@ const Tour = {
     const st = this.cur(); if (!st) return;
     const n = this.steps.length, act = st.act && !this.ok, last = this.k === n - 1;
     const {h, say} = this.words(st);
-    const hold = this.holdLeft(), H = this.held[this.k], word = act ? 'Show me' : last ? (this.replay ? 'Done' : 'Start the course') : 'Next';
+    const hold = this.holdLeft(), H = this.held[this.k], word = act ? 'Show me' : last ? (this.replay ? 'Done' : 'Let\'s go') : 'Next';
     // the bar on Next: it fills over the time the step is held, picking up where it was when the card is drawn again
     const next = `<button class="btn primary twnext ${hold ? 'holding' : ''}" type="button" data-tour="next" ${hold ? `disabled style="--hold:${H[1]}ms;--held:-${Date.now() - H[0]}ms"` : ''}><span>${word}</span>${hold ? '<i aria-hidden="true"></i>' : ''}</button>`;
     this.el.querySelector('.twcard').innerHTML = `<div class="twbar" aria-hidden="true"><i style="width:${Math.round((this.k + 1) / n * 100)}%"></i></div>
       <div class="twhead"><span class="twface cface">${knightSVG(this.ok ? 'cheer' : act ? 'think' : 'cheer')}</span><p class="twstep"><b>${esc(coachName())}</b><span class="tnum">${this.k + 1} of ${n}</span></p></div>
       <div class="twbody"><h3 id="tourH">${esc(h)}</h3>${bullets(say || [])}${st.pick ? coachPickHTML() : ''}
         ${st.act ? `<p class="twdo ${this.ok ? 'ok' : ''}">${this.ok ? 'That\'s it' : esc(st.act.ask)}</p>` : ''}${this.note ? `<p class="twnote">${esc(this.note)}</p>` : ''}</div>
-      <div class="twacts">${this.k ? '<button class="btn ghost twback" type="button" data-tour="back">Back</button>' : ''}${this.replay ? `<button class="btn twff" type="button" data-tour="fast" aria-pressed="${this.fast}">${this.fast ? 'Pause' : 'Fast forward'}</button>` : ''}${next}</div>`;
+      <div class="twacts">${this.k ? '<button class="btn ghost twback" type="button" data-tour="back">Back</button>' : ''}${next}</div>`;
     this.el.classList.toggle('free', !!act);
     this.place();
   },
@@ -2152,78 +2102,19 @@ const Tour = {
   },
 
   build(){
-    const tap = sel => { const e = document.querySelector(sel); if (e) e.click(); };
     const mine = () => { const D = S.drill; if (!D || !D.id) return 0; const n = LINES[D.id].n; return n.slice(D.s0 + 1, D.i + 1).filter(i => isMine(N[i])).length; };
     const playRight = () => { const D = S.drill; if (!D || D.busy || D.state !== 'play') return false; const u = N[LINES[D.id].n[D.i + 1]].u; tryMove(u.slice(0, 2), u.slice(2, 4)); return true; };
-    // the unit a new player starts with, its first lesson's main line, and a position in it where the other side has choices
+    // the unit a new player starts with, and its first lesson's main line
     const unit = () => COURSE.find(U => !U.soon && U.lessons && U.lessons.length && U.side === SIDE && !unitPassed(U)) || COURSE.find(U => !U.soon && U.lessons && U.lessons.length && U.side === SIDE);
     const lineOf = U => { const L = U && LIDX[U.side] && LIDX[U.side][U.lessons[0]]; return L ? L.lines[0] : DRILLABLE[0]; };
-    const choiceAt = id => { const n = LINES[id].n; for (let i = 0; i < n.length - 1; i++) if (!isMine(N[n[i + 1]]) && optionsFor(n[i], id).length >= 2) return i; return 1; };
-    // the demo slip: from memory, the coach plays the line until a move that would lose a piece is there to try, and tries it
-    const slip = () => {
-      const D = S.drill; if (!D || !D.tour || D.guided) return;
-      const step = () => {
-        if (!this.on || S.drill !== D || D.state !== 'play') return;
-        if (D.busy){ this.dt = setTimeout(step, 150); return; }
-        const fen = nodeFen(dNode()), exp = N[LINES[D.id].n[D.i + 1]].u;
-        // a move that leaves the piece where it can be taken for free: quick to find, and it shows what a slip costs
-        const hangs = u => { const ch = new Chess(fen); if (!ch.move(uciObj(u))) return false; const t = sqi(u.slice(2, 4)); return Ideas.captures(ch.fen()).some(x => x.t === t && x.v >= 3); };
-        const bad = mine() >= 1 ? legalFor().find(u => u !== exp && hangs(u) && punishOf(fen, u)) : null;
-        if (bad){ tryMove(bad.slice(0, 2), bad.slice(2, 4)); return; }
-        if (D.i >= LINES[D.id].n.length - 2){ const u = legalFor().find(x => x !== exp); if (u) tryMove(u.slice(0, 2), u.slice(2, 4)); return; }
-        playRight(); this.dt = setTimeout(step, 900);
-      };
-      this.dt = setTimeout(step, 700);
-    };
     const U = unit(), lid = lineOf(U);
     return [
-      {h: () => `Hi! I'm ${coachName()}, your coach`, say: ['I\'ll show you around: it takes about two minutes', 'First, pick who shows you around'], pick: true},
-      {h: 'Five tabs', at: '.tabs', go: () => { S.drill = null; go('course'); },
-        say: ['Your White openings and your Black defences are both in here', 'Sandbox: practice games with both colours', 'Course: your openings in order', 'Drill: five lines a day', 'Your games: your record with each opening', 'Shop: a new look for me']},
-      {h: () => gradAt() ? 'The library' : 'The course', at: () => document.getElementById('cGo') || document.querySelector('.path') || document.querySelector('#app .libcoach'), go: () => { S.drill = S.drillState = null; go('course'); },
-        say: () => gradAt() ? ['You finished the course, so this tab is your library now', 'Deep dives take one opening further']
-          : ['One opening idea per unit', 'This button always takes you to the next thing to do']},
-      {h: 'Inside a unit', at: '.steps', go: () => { if (U) openUnit(U.id); },
-        say: ['Five steps: the idea, play along, drill, practice games, the checkpoint', 'Five right in the checkpoint and the next unit opens']},
-      {h: 'Play along', at: '#db', go: () => startGuided(lid, U ? U.id : null, {tour: true}),
-        say: ['The green arrow shows the move: you play it', 'Drag the piece, or tap it and then tap where it goes'],
-        act: {ask: 'Play the arrow\'s move', done: () => mine() >= 1, auto: () => { if (!playRight()) setTimeout(() => this.doIt(), 300); }}},
-      {h: 'I explain every move', at: '.gcoach', say: ['What the other side just played, and the idea behind it', 'Why your next move is the move', 'A wrong move here just doesn\'t go, and nothing is counted']},
-      {h: 'Drill: today\'s five', at: '.today', go: () => { S.drill = S.drillState = null; go('drill'); },
-        say: ['Five lines a day keep your streak going', 'A line you slip on comes back sooner']},
-      {h: 'What a wrong move costs', at: '#dpanel', go: () => startDrillLine(lid, '', null, {tour: true, from0: true}), demo: slip, ready: () => !!S.drill && S.drill.tries >= 1,
-        say: ['Watch: I\'ll play a move that isn\'t in the book', 'You see the answer that punishes it, and what it costs', 'A move of the line played before its turn is called the right move at the wrong moment']},
-      {h: 'Miss twice and the arrow shows it', at: '#db', ready: () => !!S.drill && S.drill.tries >= 2, demo: () => { const D = S.drill; if (D && D.tour && D.state === 'play' && D.tries < 2){ const exp = N[LINES[D.id].n[D.i + 1]].u, u = legalFor().find(x => x !== exp); if (u) setTimeout(() => tryMove(u.slice(0, 2), u.slice(2, 4)), 500); } },
-        say: ['The arrow shows the book\'s move, with the reason for it', 'Play it and the line goes on']},
-      {h: 'Play on with the engine', at: '#dExplore', go: () => { const D = S.drill; if (D && D.tour && D.state === 'play'){ D.hint = null; D.i = LINES[D.id].n.length - 1; finishLine(); } },
-        say: ['When a line ends, keep playing from there against the engine', 'You get it after drills, lessons and practice games'],
-        act: {ask: 'Tap Play on with the engine', done: () => S.view === 'explore', auto: () => tap('#dExplore')}},
-      {h: 'The explore board', at: () => { const x = document.querySelector('.xans'); return x && x.closest('.dpanel'); },
-        say: ['Move for either side, and the engine answers your moves', 'Purple arrows: its best moves. Red dashes: what the other side wants', 'Under the board: what the last move does']},
-      {h: 'Lessons: the other side\'s answers', at: '.opts', go: () => { S.drill = S.drillState = null; openLine(lid, choiceAt(lid), 'games'); },
-        say: ['Every position lists what the other side can play, and how often at your level', 'Tap one to see how your book meets it']},
-      {h: 'Every move explained', at: '.mcard', say: ['Step through with the arrows under the board, or the arrow keys', 'Each move says what it does: the book\'s note, and what the board shows', 'Above it: the opening\'s real name, the one players know it by']},
-      {h: 'Marks on the moves', at: () => document.querySelector('.mklegend') || document.querySelector('.timeline'),
-        say: ['The other side\'s inaccuracies, mistakes and blunders carry a mark', 'Key move: your answer that makes a mistake cost', 'In the Sandbox and in drills the mark shows on the board beside the piece']},
-      {h: 'The order, on the board', at: '#sb', skip: () => myMoves(LINES[lid]).length < 2,
-        say: ['Each piece carries the number of the move that put it there', 'A purple number is played at another turn than in the main line', 'Move any piece to try something else: your book answers if it knows the move, and the engine if not', 'Above and below the board: the pieces each side has taken, with the lead in points on the side that is ahead']},
-      {h: 'The engine in lessons', at: '.engrow', say: ['Switch it on for the best moves, their arrows and the score', 'It stays off in drills, practice games and checkpoints, and comes back when they end']},
-      {h: 'The plan from here', at: '.ccol .plan', skip: () => !planOf(lid), go: () => { S.drill = S.drillState = null; openLine(lid, LINES[lid].n.length - 1, 'games'); },
-        say: ['Every line ends with a plan: what to aim for once the moves you know run out', 'You get it at the end of lessons, clean drills and practice games', 'In the list of moves, a divider marks where the opening is done: the moves after it are how it usually goes on']},
-      {h: 'Your games', at: '.gseg', go: () => go('games'),
-        say: () => PERSONA === 'ready' ? ['Your openings with both colours and your record in each', 'Last 3 games: your newest games reviewed, with the spot to drill in each', 'Where you leave the book most, and the monthly recap'] : ['Your openings and your record in each', 'Last 3 games: your newest games reviewed, with the spot to drill in each', 'Missed shots, game reviews and the monthly recap']},
-      {h: 'The Sandbox', at: '#sbpanel', go: () => { S.drill = S.drillState = null; go('sandbox'); },
-        say: ['Practice games against an opponent who plays your book\'s lines', 'Everything plays White and Black in turn', 'Pick openings from either colour to narrow it', 'Set up a position to practise only the lines that go on from it', 'No line comes twice in a row', 'When a game ends the engine is on its board: step back through the game, or move a piece to play on']},
-      {h: 'Levels', at: '#lvBtn', skip: () => document.getElementById('lvBtn').hidden, say: ['Every line you play earns points', 'The ring fills toward your next level. Tap it for your badges']},
-      {h: 'Your streak', at: '#meBtn', skip: () => document.getElementById('meBtn').hidden, say: ['The flame counts the days in a row you finish today\'s five', 'It takes a new colour at 5, 10, 20, 30, 50 and 100 days', 'Every third day in a row earns a shop token']},
-      {h: 'The daily shop', at: () => document.querySelector('#app .items.daily') || document.querySelector('#app .shopmain') || document.querySelector('#app .shop'), go: () => { S.shopTab = 'shop'; go('shop'); },
-        say: () => ['Six new pieces every day: most are common, some rare, and an epic one about once a week', 'Tokens from badges, levels and days in a row buy them', 'Wear what you buy from your locker'].concat(Level.of().n < SHOP_AT ? [`It opens at level ${SHOP_AT}`] : [])},
-      {h: 'Crates', at: '#app .cratebox', go: () => { if (S.view !== 'shop' || S.shopTab !== 'shop'){ S.shopTab = 'shop'; go('shop'); } },
-        say: ['Crates hold pieces the shop never sells, in four rarities', 'Legendary pieces come only from a crate', 'Buy one, then tap the crate to open it']},
-      {h: 'Settings', at: '#setBtn', go: () => go('course'), say: ['Light or dark, text size, board colours and your coach', 'How pieces slide, with six animations to pick from, and sounds in three themes', 'Advanced settings hold your systems, the variations inside them (which Sicilian, which Italian) and the button to reset your account, each confirmed with your username', 'You can take this tour again from there']},
-      {h: 'Your account', at: '#acctBtn', skip: () => document.getElementById('acctBtn').hidden, say: ['Sign in and your progress follows you to every device']},
-      {h: 'That\'s me', at: '#coach .cav', skip: () => !SET.coach, say: ['Tap me any time for a tip', 'I speak up when a line ends, and when something new happens', 'When a game of yours leaves your book, I\'ll say so and bring the line to drill']},
-      {h: 'You\'re all set', say: () => this.replay ? ['That\'s everything', 'Back to where you were'] : ['Start with the course: your first unit is waiting', 'Five lines a day and the openings stick']}
+      {h: 'Pick your coach', pick: true, skip: () => this.replay || !!(SET.ts && SET.ts.who)},   // not asked twice: the welcome screens ask it too
+      {h: 'Your first move', at: '#db', go: () => startGuided(lid, U ? U.id : null, {tour: true}),
+        say: ['Drag the piece, or tap it and then where it goes'],
+        act: {ask: 'Play the green arrow\'s move', done: () => mine() >= 1, auto: () => { if (!playRight()) setTimeout(() => this.doIt(), 300); }}},
+      {h: () => gradAt() ? 'Your library' : 'Start here', at: () => document.getElementById('cGo') || document.querySelector('.path') || document.querySelector('#app .libcoach'), go: () => { S.drill = S.drillState = null; go('course'); },
+        say: () => gradAt() ? ['Deep dives take an opening further'] : ['This button is always your next step']}
     ];
   }
 };
