@@ -272,7 +272,7 @@ with sync_playwright() as p:
     c = b.new_context(viewport={'width': 1280, 'height': 860}, device_scale_factor=2); local_fonts(c)
     q = c.new_page(); q.on('pageerror', lambda e: errors.append(str(e))); q.goto(URL + '#course'); q.wait_for_timeout(900)
     q.evaluate("Tour.start(false)"); q.wait_for_timeout(500)
-    q.evaluate("Tour.k = Tour.steps.findIndex(st => st.h === 'Play along'); Tour.show()"); q.wait_for_timeout(2200)
+    q.evaluate("Tour.k = Tour.steps.findIndex(st => st.h === 'Your first move'); Tour.show()"); q.wait_for_timeout(2200)
     settle(q, 400); q.evaluate("Tour.place()"); q.wait_for_timeout(200)
     save(q.screenshot(), 'tour.png'); c.close()
 

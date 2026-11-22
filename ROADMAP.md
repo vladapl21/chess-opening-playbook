@@ -69,6 +69,16 @@ Facts that shape the design:
 - Settings and the account button moved out of the header into the corner of the screen; the header fits one row on an ordinary monitor and centres its rows when it has to wrap.
 - A lesson opened from a course unit has "Next lesson" at the top. The Sandbox has "Free play: pick openings" to leave a course practice game.
 
+## Phase 1.26: less to read, and better sound and movement (done, November 21)
+
+A friend's first try of it found too much reading and too much in the way before the first move. Every screen was gone over with one question for each line of text: does something on the same screen already say it, and would anyone miss it?
+
+- **The tour is three steps**: pick your coach, play the green arrow's move, and the button that always leads on. No shop, no Fast forward, and Next is held for a moment only. The rest is explained where it is met: the first time a place is opened, the coach says what it is for in a line or two, once.
+- **Drills.** A slip gets one thing, the answer that punishes it; a second miss, the arrow and why. The coach's note after the line is one line (the move that caught you and the line's move there) instead of four bullets. While a line is on the board the page is the board and its panel: the Today card and the line picker wait (the panel's own button says which of today's five is next).
+- **Everywhere else.** Units lose their explanations of each step (a step is its name, its count and its button), lessons show the first line of a note with the rest behind More and the five likeliest answers with the rest folded, plans two lines, the opening pages their title and their lessons, the Sandbox and the explore board their instructions, Settings the line under each setting, the shop its earnings table, the onboarding its sub-lines, and the coach its daily repeats of what the page already shows. The library shows the coach's pick once.
+- **Sound.** Every sound is synthesised again, sample by sample, and levelled to the same loudness in every theme. Soft is the default.
+- **Movement.** Natural lifts the piece with a shadow, Arcade leaves after-images and lands with a ring and sparks, Dynamic arcs, tilts and lands with a squash, and a Dynamic capture shakes the board. A piece that scales or turns now does it around its own foot (it used to fly off the board).
+
 ## Phase 1.25: the last openings on the cards, and a polish pass (done, November 21)
 
 Nothing on a choice card says "being written" any more, and the app was gone over screen by screen on a phone and a desktop.

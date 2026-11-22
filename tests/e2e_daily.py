@@ -65,9 +65,9 @@ with sync_playwright() as p:
     st = pg.evaluate('({n: Daily.count(), streak: Daily.streak(), dot: document.getElementById("drillDot").hidden, chip: document.getElementById("meN").textContent})')
     print('after five:', st); assert st == {'n': 5, 'streak': 1, 'dot': True, 'chip': '1'}
     bub = pg.inner_text('#coach .cbub'); print('coach:', bub.replace('\n', ' | ')); assert "today's five" in bub.lower() or 'New badge' in bub
-    assert 'Keep going' in pg.inner_text('.donebox') and "today's five" in pg.inner_text('.donebox')
+    assert 'Keep going' in pg.inner_text('.donebox') and 'Done for today' in pg.inner_text('.donebox')
     pg.screenshot(path=out + 'd_five.png')
-    pg.click('#dToday'); pg.wait_for_timeout(300); assert pg.evaluate('S.drill') is None and 'done' in pg.inner_text('.today')
+    pg.click('#dToday'); pg.wait_for_timeout(300); assert pg.evaluate('S.drill') is None and pg.locator('.today.done').count() == 1 and '5' in pg.inner_text('.today .tring')
 
     # ---- the streak: days in a row, today counted once it is done; two devices' days add up
     pg.evaluate("""(() => { const D = Prog.d.days; D[dayKey(-1)] = ['a','b','c','d','e']; D[dayKey(-2)] = ['a','b','c','d','e','f']; D[dayKey(-4)] = 9; Prog.save(); })()""")
@@ -106,8 +106,8 @@ with sync_playwright() as p:
     pg.keyboard.press('Escape'); pg.wait_for_timeout(200); assert pg.evaluate('Acct.mode') is None
     assert pg.evaluate("mergeProg({badges: {l1: 5}}, {badges: {l1: 3, l10: 9}}).badges") == {'l1': 3, 'l10': 9}
 
-    # ---- the coach's note when a drill line ends: the move that caught you, what you played, what the book says about
-    # that move, the same move counted when it catches you again, and a word when it holds; a checkpoint names the lesson
+    # ---- the coach's note when a drill line ends, one line: the move that caught you and the line's move there, the same
+    # move counted when it catches you again, and a word when it holds; a checkpoint names the lesson
     def play_slip(at=None, bad=None):
         for _ in range(200):
             st = pg.evaluate('({state: S.drill.state, busy: S.drill.busy, i: S.drill.i})')
@@ -126,8 +126,9 @@ with sync_playwright() as p:
         play_slip(at if slip else None, bad); pg.wait_for_timeout(400)
         notes.append(pg.inner_text('.coachnote') if pg.locator('.coachnote').count() else ''); print(f'note {k}:', notes[-1].replace('\n', ' | '))
     mv = (at + 1) // 2
-    assert f'Move {mv} caught you' in notes[0] and 'You played:' in notes[0] and 'known mistake' in notes[0] and pg.evaluate(f"Prog.rec('{lid}').sl[{at}]") == 2
-    assert f'Move {mv} has caught you twice now' in notes[1] and f'Study move {mv}' in notes[1]
+    want = pg.evaluate(f"N[LINES['{lid}'].n[{at}]].l")
+    assert f'Move {mv} caught you' in notes[0] and want in notes[0] and len([x for x in notes[0].split('\n') if x.strip()]) <= 3 and pg.evaluate(f"Prog.rec('{lid}').sl[{at}]") == 2, notes[0]
+    assert f'Move {mv} has caught you twice' in notes[1] and f'Study move {mv}' in notes[1]
     assert f'Move {mv} held this time' in notes[2]
     assert not any(__import__('re').search(r'\b[KQRBN]?[a-h]x?[a-h]?[1-8]\b', __import__('re').sub(r'\b(f7|f2)\b', '', t)) for t in notes), 'no notation in the notes'
     pg.screenshot(path=out + 'd_note.png')
@@ -140,7 +141,7 @@ with sync_playwright() as p:
         mv2 = pg.evaluate("(() => { const Q = S.quizState, it = Q.items[Q.k], L = DATA.legal[String(it.node)] || []; return Q.tries ? it.ans : (L.find(m => !it.ok.includes(m) && m.length === 4) || it.ans); })()")
         pg.evaluate(f"quizTry('{mv2}', '{mv2[2:4]}')"); pg.wait_for_timeout(400)
     qn = pg.inner_text('.coachnote'); print('checkpoint note:', qn.replace('\n', ' | '))
-    assert ('misses: ' in qn or 'Your miss: ' in qn) and 'Play it along once more' in qn and pg.locator('.coachnote [data-guided]').count() == 1
+    assert ('misses: ' in qn or 'Your miss: ' in qn) and 'Play it along' in qn and pg.locator('.coachnote [data-guided]').count() == 1
     pg.click('.coachnote [data-guided]'); pg.wait_for_timeout(500)
     assert pg.evaluate('[S.view, !!(S.drill && S.drill.guided), S.drill && S.drill.unit]') == ['drill', True, uid], 'the note leads into a play-along of that lesson'
     pg.evaluate("S.drill = S.drillState = S.quizState = null; go('course')"); pg.wait_for_timeout(300)

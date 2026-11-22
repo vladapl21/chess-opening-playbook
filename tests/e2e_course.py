@@ -97,7 +97,7 @@ with sync_playwright() as p:
     # the arrow shows the move on every one of the player's turns; a wrong move doesn't go and isn't counted
     lid = pg.evaluate('S.drill.id'); u = my_turn(pg)
     assert pg.evaluate('S.drill.hint') == u and pg.locator('#db .arr.hint').count() == 1
-    assert 'Your move:' in pg.inner_text('.gcoach'), pg.inner_text('.gcoach')
+    assert pg.inner_text('.gcoach .gmove').strip() == pg.evaluate("N[LINES[S.drill.id].n[S.drill.i + 1]].l"), pg.inner_text('.gcoach')
     i0 = pg.evaluate('S.drill.i'); play(pg, wrong_move(pg, u)); pg.wait_for_timeout(250)
     assert pg.evaluate('[S.drill.i, S.drill.mistakes, (S.drill.slipAt || []).length]') == [i0, 0, 0]
     assert pg.is_visible('.gcoach .gwarn'), pg.inner_text('.gcoach')
@@ -153,7 +153,7 @@ with sync_playwright() as p:
     print('practice games:', pg.evaluate("up('b-slav')"))
     assert pg.evaluate("up('b-slav').spar") == 2
     top = pg.inner_text('.sbcourse'); print('course strip:', top.replace('\n', ' | '))
-    assert '2 of 3 clean practice games' in top and pg.locator('.sbcourse .pdots i.on').count() == 2 and pg.locator('.cban').count() == 0
+    assert '2 of 3 clean' in top and pg.locator('.sbcourse .pdots i.on').count() == 2 and pg.locator('.cban').count() == 0
     assert pg.is_visible('#sbFree') and pg.locator('#sbside [data-sbf]').count() == 0, 'no opening picker during a course game; free play sits under the board'
     bx, fx = pg.locator('#db').bounding_box(), pg.locator('#sbFree').bounding_box(); assert fx['y'] > bx['y'] + bx['height'] and abs(fx['width'] - bx['width']) < 4
     pg.screenshot(path=out + 'c_spar_report.png', full_page=True)
@@ -187,7 +187,7 @@ with sync_playwright() as p:
     pg.goto(URL + '#unit.b-italian'); pg.reload(); pg.wait_for_timeout(900)
     print('deep link b-italian ->', pg.evaluate('[S.view, S.unit, SIDE]'))
     assert pg.evaluate('[S.view, S.unit, SIDE]') == ['unit', 'b-italian', 'b']
-    assert 'opens when you pass' in pg.inner_text('.lockednote')
+    assert 'Pass unit' in pg.inner_text('.lockednote') and 'to open this' in pg.inner_text('.lockednote')
     pg.click('.tabs [data-view="course"]'); pg.wait_for_timeout(400)
     assert pg.evaluate('S.view') == 'course' and pg.locator('.top .sidesw').count() == 0, 'the path, and no colour switch above it'
     print('stored keys:', pg.evaluate("[PERSONA, Object.keys(JSON.parse(localStorage.getItem('italian-playbook-progress-v1'))), Object.keys(Prog.d), JSON.stringify(Prog.d.me)]"))

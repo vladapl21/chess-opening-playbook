@@ -63,7 +63,7 @@ with sync_playwright() as p:
     assert n_deep >= 8 and pg.evaluate("DEEP.every(X => X.units.every(U => U.deep === X.id && UNIT[U.id] === U))"), n_deep
     # ---- before the course is finished: deep dives stay shut, the Course tab is the path
     pg.evaluate("openUnit('x-w-italian-1')"); pg.wait_for_timeout(300)
-    assert pg.evaluate('unitOpen(UNIT["x-w-italian-1"])') is False and 'Deep dives open when you finish your first course' in pg.inner_text('#view')
+    assert pg.evaluate('unitOpen(UNIT["x-w-italian-1"])') is False and 'Finish your first course to open this' in pg.inner_text('#view')
     last = pg.evaluate(SEED); pg.reload(); pg.wait_for_timeout(900)
     pg.click('.tabs [data-view="course"]'); pg.wait_for_timeout(300)
     assert pg.evaluate('gradAt()') == 0 and pg.locator('.path').count() == 1 and pg.locator('.libcoach').count() == 0
@@ -77,22 +77,22 @@ with sync_playwright() as p:
     assert pg.evaluate("document.getElementById('coach').hidden"), 'the corner coach stays away: the page has the coach in it'
     g = pg.inner_text('#view'); no_notation(g, 'grad')
     open_n = pg.evaluate('COURSE.filter(U => !U.soon).length')
-    assert 'You finished your course.' in g and f'{open_n} units, every checkpoint passed' in g and 'New badge: Course complete' in g and 'What next? Go deeper on' in g, g
+    assert 'You finished your course.' in g and pg.inner_text('.grstats li:first-child b') == str(open_n) and 'New badge: Course complete' in g and 'Next: go deeper on' in g, g
     assert pg.locator('.grconf i').count() > 20 and pg.locator('.grstats li').count() == 5
     pg.wait_for_timeout(900); pg.screenshot(path=out + 'lib_grad.png', full_page=True)
     pg.click('#grQuiz'); pg.wait_for_timeout(300)
-    assert pg.evaluate('S.view') == 'quiz' and 'your course is finished' in pg.inner_text('#qpanel')
+    assert pg.evaluate('S.view') == 'quiz' and 'Course finished' in pg.inner_text('#qpanel')
     pg.click('[data-grad]'); pg.wait_for_timeout(300)
     assert pg.evaluate('S.view') == 'grad' and pg.locator('.grconf').count() == 0, 'the confetti falls once'
     print('grad screen: medal, five numbers, the coach\'s pick; the last checkpoint one click away')
 
-    # ---- the Course tab is a library now: the coach's pick, two more, the finished course, the rest folded
+    # ---- the Course tab is a library now: the coach's pick, two more beside it, the finished course, the rest folded
     pg.click('.tabs [data-view="course"]'); pg.wait_for_timeout(400)
     v = pg.inner_text('#view'); no_notation(v, 'library')
-    assert "What's next" in v and 'Picked for you' in v.replace('PICKED FOR YOU', 'Picked for you') and 'Your first course' in v, v[:600]
-    assert pg.locator('.dcard').count() == 3 and pg.locator('.dcard.dpick').count() == 1 and pg.locator('.libmore li').count() == n_deep - 3
+    assert "What's next" in v and 'Also for you' in v.replace('ALSO FOR YOU', 'Also for you') and 'Your first course' in v, v[:600]
+    assert pg.locator('.dcard').count() == 2 and pg.locator('.dcard.dpick').count() == 0 and pg.locator('.libmore li').count() == n_deep - 3, 'the coach\'s pick once, two more beside it'
     rank = pg.evaluate("deepRank().map(o => [o.X.id, o.why, o.slips])")
-    pick = rank[0][0]; assert pg.evaluate("document.querySelector('.dcard.dpick [data-deep]').dataset.deep") == pick
+    pick = rank[0][0]; assert pg.evaluate("document.querySelector('.libcoach [data-deep]').dataset.deep") == pick and pg.locator(f'.dcard [data-deep="{pick}"]').count() == 0
     scot = next(r for r in rank if r[0] == 'x-b-scotch')
     assert 'slipped on its lines more than anywhere else' in scot[1] and scot[2] > 0, scot
     assert next(r for r in rank if r[0] == 'x-w-sicilian')[1].endswith('its checkpoint was your lowest, 5 of 6.'), rank
@@ -114,12 +114,12 @@ with sync_playwright() as p:
 
     # ---- a deep dive's page: why it's here for this player, the next part, every part
     d = pg.inner_text('#view'); no_notation(d, 'deep page')
-    assert 'Why it\'s here for you' in d and 'Up next · Part 1 of 4' in d and d.count('Opens after part') == 3, d[:900]
+    assert 'Up next · Part 1 of 4' in d and pg.locator('.path .ucard.locked').count() == 3, d[:900]
     pg.screenshot(path=out + 'lib_deep.png', full_page=True)
     pg.click('#dGo'); pg.wait_for_timeout(300)
     assert pg.evaluate('S.view') == 'unit' and pg.evaluate('S.unit') == 'x-w-italian-1' and pg.evaluate("Prog.d.course.u['x-w-italian-1'].o > 0"), 'starting a step marks the deep dive as started'
     u = pg.inner_text('#view'); no_notation(u, 'part page')
-    assert 'Deep dive · Part 1 of 4' in u and '← The Italian' in u and 'positions from this part' in u and 'opens the next part' in u, u[:800]
+    assert 'Deep dive · Part 1 of 4' in u and '← The Italian' in u and 'to pass' in u, u[:800]
     cards = pg.evaluate("UNIT['x-w-italian-1'].idea.map(s => slideOf(UNIT['x-w-italian-1'], s))")
     assert cards[0]['h'] == 'Black steps off early' and all(a.endswith('b') for a in cards[0]['arrows']) and len(cards[0]['arrows']) >= 2
     assert all(c['t'].startswith('Green:') for c in cards[1:]) and len(cards) == 1 + len(pg.evaluate("UNIT['x-w-italian-1'].lessons"))
@@ -134,19 +134,19 @@ with sync_playwright() as p:
     # ---- practice games in a part: the opponent plays only the part's moves; the strip names the deep dive
     pg.evaluate("doStep(UNIT['x-w-italian-1'], 'spar')"); pg.wait_for_timeout(500)
     s = pg.inner_text('#sbpanel').lower()
-    assert 'deep dive · the italian · part 1' in s and "plays only this part's moves" in s and 'back to the part' in s, s[:300]
+    assert 'part 1 · black steps off early' in s and 'back to the part' in s, s[:300]
     r = spar_clean(pg); assert r == {'state': 'done', 'slips': 0}, r
     assert pg.evaluate("up('x-w-italian-1').spar") == 1 and pg.evaluate("UNIT['x-w-italian-1'].spar.includes(S.drill.line)")
     print('part: cards, practice game in the part\'s lines')
 
     # ---- the checkpoint opens the next part; the last part finishes the deep dive (a badge, the shelf)
     pg.evaluate("startQuiz('x-w-italian-1', 'cp')"); pg.wait_for_timeout(400); quiz(pg); pg.wait_for_timeout(400)
-    assert 'New: part 2' in pg.inner_text('#qpanel') and pg.evaluate("unitOpen(UNIT['x-w-italian-2'])")
+    assert 'Part 2 is open' in pg.inner_text('#qpanel') and pg.evaluate("unitOpen(UNIT['x-w-italian-2'])")
     X = pg.evaluate("DEEP.find(X => X.units.length === 2 && X.side === 'w').id")
     for part in pg.evaluate(f"DEEPOF['{X}'].units.map(U => U.id)"):
         pg.evaluate(f"startQuiz('{part}', 'cp')"); pg.wait_for_timeout(400); quiz(pg); pg.wait_for_timeout(500)
     q = pg.inner_text('#qpanel')
-    assert 'you finished the deep dive into' in q and pg.locator('#qpanel [data-lib]').count() == 1, q
+    assert 'Deep dive finished' in q and pg.locator('#qpanel [data-lib]').count() == 1, q
     assert pg.evaluate("deepDone(DEEPOF['" + X + "']) && !!Prog.d.badges.x1"), 'the deep diver badge'
     pg.click('#qpanel [data-lib]'); pg.wait_for_timeout(400)
     assert pg.locator(f'.libshelf [data-deep="{X}"]').count() == 1 and pg.locator(f'.dcard [data-deep="{X}"]').count() == 0

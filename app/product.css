@@ -183,7 +183,7 @@ body:has(.coach:not([hidden])) .foot{padding-right:100px}
 .cstreak .flame{width:34px;height:34px;animation:medalIn .6s cubic-bezier(.2,1.4,.4,1)}
 .cstreak b{font:800 30px/1 var(--f-display);color:var(--ink)} .cstreak i{font-style:normal;font-size:11.5px;line-height:1.15;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
 .cbub .cbul{margin-top:4px;font-size:14px;font-weight:550} .cbub .cbul li::before{top:.58em}
-.coachnote .cntx .cnhead{font-weight:700;font-size:15px;margin:0} .coachnote .bul{margin-top:3px}
+.coachnote .cntx .cnhead{font-weight:700;font-size:15px;margin:0} .coachnote .cntx .cnsub{font-size:14px;color:var(--muted)} .coachnote .bul{margin-top:3px}
 .chead2{display:block;font-size:15px;margin-bottom:2px}
 @keyframes medalIn{0%{transform:scale(.3) rotate(-16deg);opacity:0}70%{transform:scale(1.08) rotate(3deg);opacity:1}100%{transform:none}}
 /* the profile */
@@ -425,7 +425,6 @@ button.rcrow{cursor:pointer} button.rcrow:hover{border-color:var(--accent)}
 .twnext.holding{background:var(--surface-2);border-color:var(--line);color:var(--muted);opacity:1;cursor:default}
 .twnext i{position:absolute;left:0;bottom:0;height:4px;width:100%;background:var(--accent);transform-origin:0 50%;animation:twhold var(--hold) linear var(--held) both}
 @keyframes twhold{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-.twff[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
 .twcard .coachpick{margin-top:12px}
 /* a phone: the card is a sheet across the bottom of the screen (or the top), and the page can scroll far enough for
    anything to sit clear of it */

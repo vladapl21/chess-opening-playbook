@@ -200,7 +200,7 @@ g.fx,.fx-ghost{pointer-events:none} .fx-ring{fill:none;stroke:var(--accent);stro
 .lhead .why.bul{display:grid;gap:3px} .lhead .why.bul li::before{background:var(--muted)}
 /* play along: the coach's word on the move to make */
 .coachnote.gcoach{margin:12px 0 4px;font-size:15px} .gcoach .cntx .gwho{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:2px}
-.gcoach .gsaid{font-size:13px;color:var(--muted);margin:0 0 4px} .gcoach .gmove{font-weight:700;font-size:16px;margin:0} .gcoach .gmove.wait{font-weight:600;color:var(--muted);font-size:15px}
+.gcoach .gsaid{font-size:13px;color:var(--muted);margin:0 0 4px} .gcoach .gmove{font-weight:700;font-size:16px;margin:0} .gcoach .gmove.wait{font-weight:600;color:var(--muted);font-size:15px} .gcoach .gwhy{font-size:14px;color:var(--muted);margin:2px 0 0}
 .gcoach .bul{margin-top:4px;font-size:14.5px} .gcoach .gwarn{margin:6px 0 0;color:var(--rosso);font-weight:650;font-size:14px}
 .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:24px 0}
 .stat{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:12px 14px}
@@ -623,7 +623,7 @@ button.ucard:hover{border-color:var(--accent);transform:translateY(-1px)}
 .swatch i{display:grid;grid-template-columns:1fr 1fr;width:100%;max-width:44px;aspect-ratio:1;border-radius:3px;overflow:hidden}
 .swatch i b{display:block}
 .swatch[aria-pressed="true"]{border-color:var(--accent);color:var(--ink);box-shadow:0 0 0 2px var(--accent-soft)}
-.switch{display:flex;align-items:center;justify-content:space-between;gap:14px;border:0;background:none;padding:0;text-align:left;cursor:pointer;width:100%}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:14px;border:0;background:none;padding:0;text-align:left;cursor:pointer;width:100%;min-height:40px}
 .switch .knob{flex:none;width:42px;height:24px;border-radius:4px;background:var(--line);position:relative;transition:background .15s}
 .switch .knob::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--surface);transition:transform .15s;box-shadow:var(--shadow)}
 .switch[aria-checked="true"] .knob{background:var(--accent)} .switch[aria-checked="true"] .knob::after{transform:translateX(18px)}
@@ -1606,8 +1606,8 @@ function renderNudge(){
   n.hidden = false;
   const back = returning();
   n.innerHTML = back
-    ? `<span><b>You're signed out.</b> New progress is only kept in this browser until you sign back in.</span><span class="nbtns"><button class="btn primary small" type="button" data-nudge="signin">Sign in</button><button class="linkish" type="button" data-nudge="off">Not now</button></span>`
-    : `<span><b>Your progress is only saved in this browser.</b> Make a free account to keep it on every device.</span><span class="nbtns"><button class="btn primary small" type="button" data-nudge="signup">Make an account</button><button class="btn small" type="button" data-nudge="signin">Sign in</button><button class="linkish" type="button" data-nudge="off">Not now</button></span>`;
+    ? `<span><b>You're signed out.</b></span><span class="nbtns"><button class="btn primary small" type="button" data-nudge="signin">Sign in</button><button class="linkish" type="button" data-nudge="off">Not now</button></span>`
+    : `<span><b>Your progress is only in this browser.</b></span><span class="nbtns"><button class="btn primary small" type="button" data-nudge="signup">Make an account</button><button class="btn small" type="button" data-nudge="signin">Sign in</button><button class="linkish" type="button" data-nudge="off">Not now</button></span>`;
   n.querySelectorAll('[data-nudge]').forEach(x => x.onclick = () => {
     if (x.dataset.nudge === 'off'){ try { sessionStorage.setItem('nudge-off', '1'); } catch(e){} n.hidden = true; return; }
     Acct.open(x.dataset.nudge);
@@ -1616,7 +1616,7 @@ function renderNudge(){
 // Reminder emails (supabase/functions/nudge): off unless the player turns them on. At most one a week.
 function mailHTML(){
   const on = !!(Prog.d.mail && Prog.d.mail.on);
-  return `<button type="button" class="switch" role="switch" aria-checked="${on}" data-mail><span><b>Reminder emails</b><span>At most one a week: when lines you slipped on have been waiting a few days, or your streak is about to end.</span></span><i class="knob" aria-hidden="true"></i></button>`;
+  return `<button type="button" class="switch" role="switch" aria-checked="${on}" data-mail><span><b>Reminder emails</b><span>At most one a week</span></span><i class="knob" aria-hidden="true"></i></button>`;
 }
 // a chess username given at sign-up, kept until the games have been read (the account carries it too, in its metadata)
 const CONNECT_KEY = 'playbook-connect';
@@ -1651,20 +1651,20 @@ const Acct = {
     const chess = fresh ? `<div class="field chessacct"><span>Your chess account</span><div class="setseg" role="group" aria-label="Where you play">${['chess.com', 'lichess'].map(x => `<button type="button" data-csite="${x}" aria-pressed="${this.csite === x}">${x === 'lichess' ? 'Lichess' : 'chess.com'}</button>`).join('')}</div>
         <input name="chess" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Your username on ${this.csite === 'lichess' ? 'Lichess' : 'chess.com'}" value="${esc(this.cuser)}" aria-label="Your username on ${this.csite === 'lichess' ? 'Lichess' : 'chess.com'}">
         <small>Your playbook is built from your public games there. You can leave this empty and add games later.</small></div>
-      <label class="tickrow"><input type="checkbox" name="mail" checked><span>Email me a reminder when lines I slipped on are waiting or my streak is about to end. At most once a week.</span></label>` : '';
-    if (m === 'signup') h = `${tabs}<h2 id="acctTitle">${fresh ? 'Make your account' : 'Save your progress'}</h2><p>${fresh ? 'Your playbook, drills and streak are kept with it, on every device.' : 'Make an account to keep your drills, course and practice games on every device. What you\'ve done on this device comes with you.'}</p>${msg}
+      <label class="tickrow"><input type="checkbox" name="mail" checked><span>Email me a reminder, at most once a week</span></label>` : '';
+    if (m === 'signup') h = `${tabs}<h2 id="acctTitle">${fresh ? 'Make your account' : 'Save your progress'}</h2><p>${fresh ? 'Your playbook on every device.' : 'What you\'ve done here comes with you.'}</p>${msg}
       <form data-act="signup">${email}${pass('new-password', true)}${chess}${go(fresh ? 'Create account and connect' : 'Create account')}</form>`;
-    else if (m === 'signin') h = `${tabs}<h2 id="acctTitle">Welcome back</h2><p>Sign in to pick up where you left off. What you've done on this device while signed out comes with you.</p>${msg}
+    else if (m === 'signin') h = `${tabs}<h2 id="acctTitle">Welcome back</h2>${msg}
       <form data-act="signin">${email}${pass('current-password')}${go('Sign in')}</form><div class="alt"><button class="linkish" data-mode="forgot" type="button">Forgot your password?</button></div>`;
     else if (m === 'forgot') h = `<h2 id="acctTitle">Reset your password</h2><p>We'll email you a link. Open it in this browser to choose a new password.</p>${msg}
       <form data-act="forgot">${email}${go('Send the link')}</form><div class="alt"><button class="linkish" data-mode="signin" type="button">Back to sign in</button></div>`;
     else if (m === 'newpass') h = `<h2 id="acctTitle">Choose a new password</h2>${msg}<form data-act="newpass">${pass('new-password', true)}${go('Save the password')}</form>`;
-    else if (m === 'check') h = `<h2 id="acctTitle">Check your email</h2><p>We sent a confirmation link to <b>${em}</b>. Open it in this browser to finish. Your progress here stays safe in the meantime.</p>${msg}
+    else if (m === 'check') h = `<h2 id="acctTitle">Check your email</h2><p>We sent a confirmation link to <b>${em}</b>. Open it in this browser to finish.</p>${msg}
       <div class="alt"><button class="linkish" data-mode="signin" type="button">Back to sign in</button></div>`;
-    else if (m === 'me') h = `<h2 id="acctTitle">You</h2>${typeof profileHTML === 'function' ? profileHTML() : ''}${Cloud.on() ? `<div class="alt"><span>Sign in to keep your streak and badges on every device.</span> <button class="linkish" data-mode="signin" type="button">Sign in</button></div>` : ''}`;
+    else if (m === 'me') h = `<h2 id="acctTitle">You</h2>${typeof profileHTML === 'function' ? profileHTML() : ''}${Cloud.on() ? `<div class="alt"><span>Keep it on every device:</span> <button class="linkish" data-mode="signin" type="button">Sign in</button></div>` : ''}`;
     else {
-      const st = Cloud.state, line = st === 'sync' ? 'Saving to your account…' : st === 'err' ? `Couldn't reach your account (${esc(Cloud.err)}). Your progress is still kept on this device and will be saved when the connection is back.` : `Progress saved to your account ${Cloud.at ? ago(Cloud.at) : ''}.`;
-      h = `<h2 id="acctTitle">You</h2><p>Signed in as <b>${esc(u ? u.email : '')}</b>. Sign in with the same email on any device to pick up where you left off.</p>${msg}
+      const st = Cloud.state, line = st === 'sync' ? 'Saving to your account…' : st === 'err' ? `Couldn't reach your account (${esc(Cloud.err)}). Kept on this device until it's back.` : `Progress saved to your account ${Cloud.at ? ago(Cloud.at) : ''}.`;
+      h = `<h2 id="acctTitle">You</h2><p>Signed in as <b>${esc(u ? u.email : '')}</b>.</p>${msg}
         ${typeof profileHTML === 'function' && !(typeof PERSONA !== 'undefined' && PERSONA === 'new') ? profileHTML() + mailHTML() : ''}
         <p class="syncline ${st}"><i aria-hidden="true"></i><span>${line}</span></p>
         <div class="lesson-actions"><button class="btn" data-act="sync" type="button">Sync now</button><button class="btn ghost" data-act="signout" type="button">Sign out</button></div>`;
@@ -1694,11 +1694,11 @@ const Acct = {
         const data = cu ? {chess_site: this.csite, chess_user: cu} : {};
         if (cu) try { localStorage.setItem(CONNECT_KEY, JSON.stringify({site: this.csite, user: cu})); } catch(e){}
         r = await A.signUp({email, password, options: {emailRedirectTo: SITE.home, data}});
-        if (!r.error){ keepEmail(email); if (r.data && r.data.session){ this.close(); toast('Account made. Your progress is saved to it now.'); return; } this.busy = false; this.mode = 'check'; this.render(); return; }
+        if (!r.error){ keepEmail(email); if (r.data && r.data.session){ this.close(); toast('Account made.'); return; } this.busy = false; this.mode = 'check'; this.render(); return; }
       }
       else if (act === 'signin'){
         r = await A.signInWithPassword({email, password});
-        if (!r.error){ keepEmail(email); this.close(); toast('Signed in. Your progress is saved to your account.'); return; }
+        if (!r.error){ keepEmail(email); this.close(); toast('Signed in.'); return; }
       }
       else if (act === 'forgot'){
         r = await A.resetPasswordForEmail(email, {redirectTo: SITE.home + '?reset=1'});
@@ -1709,7 +1709,7 @@ const Acct = {
         if (!r.error){ this.close(); toast('Password changed.'); return; }
       }
       else if (act === 'sync'){ this.busy = false; await Cloud.pull(); this.render(); return; }
-      else if (act === 'signout'){ await A.signOut(); this.close(); toast('Signed out. Your progress stays on this device.'); return; }
+      else if (act === 'signout'){ await A.signOut(); this.close(); toast('Signed out.'); return; }
     } catch(e){ r = {error: e}; }
     this.busy = false; this.msg = (r.error && r.error.message) || 'Something went wrong. Try again.'; this.bad = true; this.render();
   }
@@ -1722,9 +1722,9 @@ const CH_KEY = s => s === 'w' ? 'e4-playbook-chapter' : 'playbook-b-chapter';
 function savedChapter(s){ try { const c = localStorage.getItem(CH_KEY(s)); if (c && BOOKS[s].chapters.some(x => x.id === c)) return c; } catch(e){} return BOOKS[s].chapters[0].id; }
 const TXT = {
   w: {kick: 'White repertoire', piece: 'p-wb',
-      byHead: 'Black\'s reply', miss: 'Not the move in your book. Try again.', miss2: 'Not that one. The arrow shows the move in your book; play it to continue.'},
+      byHead: 'Black\'s reply', miss: 'Not your book\'s move.', miss2: 'Play the arrow\'s move.'},
   b: {kick: 'Black repertoire', piece: 'p-bb',
-      byHead: 'White\'s opening', miss: 'Not the move in your book. Try again.', miss2: 'Not that one. The arrow shows the move in your book; play it to continue.'}};
+      byHead: 'White\'s opening', miss: 'Not your book\'s move.', miss2: 'Play the arrow\'s move.'}};
 function renderChrome(){
   const T = TXT[SIDE];
   const mb = document.getElementById('meBtn'), st = Daily.streak(), np = typeof PERSONA !== 'undefined' && PERSONA === 'new';
@@ -1800,23 +1800,23 @@ const Settings = {
   close(){ document.getElementById('setSheet').hidden = true; document.getElementById('setBtn').focus(); },
   render(){
     const seg = (k, opts) => `<div class="setseg" role="group">${opts.map(([v, label]) => `<button type="button" data-set="${k}:${v}" aria-pressed="${SET[k] === v}">${label}</button>`).join('')}</div>`;
-    const sw = (k, h, p) => `<button type="button" class="switch" role="switch" aria-checked="${!!SET[k]}" data-set="${k}:${SET[k] ? 0 : 1}"><span><b>${h}</b><span>${p}</span></span><i class="knob" aria-hidden="true"></i></button>`;
+    const sw = (k, h) => `<button type="button" class="switch" role="switch" aria-checked="${!!SET[k]}" data-set="${k}:${SET[k] ? 0 : 1}"><span><b>${h}</b></span><i class="knob" aria-hidden="true"></i></button>`;
     document.getElementById('setPanel').innerHTML = `<button class="x" type="button" aria-label="Close" data-setx>×</button>
-      <div><p class="kicker">${Cloud.user || Prog.ref ? 'Saved with your progress' : 'On this device'}</p><h2 id="setTitle">Settings</h2></div>
+      <div><h2 id="setTitle">Settings</h2></div>
       <div class="setrow"><b>Appearance</b>${seg('theme', [['system', 'Match device'], ['light', 'Light'], ['dark', 'Dark']])}</div>
-      <div class="setrow"><b>Text size</b>${seg('size', [['s', '<span class="aa" style="font-size:13px">A</span>'], ['m', '<span class="aa" style="font-size:16px">A</span>'], ['l', '<span class="aa" style="font-size:19px">A</span>'], ['xl', '<span class="aa" style="font-size:22px">A</span>']])}<span>Boards grow with the text.</span></div>
+      <div class="setrow"><b>Text size</b>${seg('size', [['s', '<span class="aa" style="font-size:13px">A</span>'], ['m', '<span class="aa" style="font-size:16px">A</span>'], ['l', '<span class="aa" style="font-size:19px">A</span>'], ['xl', '<span class="aa" style="font-size:22px">A</span>']])}</div>
       <div class="setrow"><b>Board colour</b><div class="swatches" role="group">${BOARDS.map(([v, label, l, d]) => `<button type="button" class="swatch" data-set="board:${v}" aria-pressed="${SET.board === v}"><i aria-hidden="true"><b style="background:${l}"></b><b style="background:${d}"></b><b style="background:${d}"></b><b style="background:${l}"></b></i>${label}</button>`).join('')}</div></div>
-      ${sw('coords', 'Letters and numbers on the board', 'The small file and rank marks along the edge.')}
-      ${sw('anim', 'Piece animations', 'The other side\'s moves slide to their square. Your own land at once.')}
+      ${sw('coords', 'Letters and numbers on the board')}
+      ${sw('anim', 'Piece animations')}
       ${SET.anim ? `<div class="setrow animrow"><div class="setseg wrap3" role="group" aria-label="How pieces slide">${ANIMS.map(([v, label]) => `<button type="button" data-set="animk:${v}" aria-pressed="${SET.animk === v}">${label}</button>`).join('')}</div>
         <button type="button" class="animpv" data-animpv aria-label="Play this animation"><svg viewBox="0 0 300 300" aria-hidden="true"><rect width="300" height="300" class="sq-l"/><rect x="0" y="0" width="100" height="100" class="sq-d"/><rect x="200" y="0" width="100" height="100" class="sq-d"/><rect x="100" y="100" width="100" height="100" class="sq-d"/><rect x="0" y="200" width="100" height="100" class="sq-d"/><rect x="200" y="200" width="100" height="100" class="sq-d"/><use id="animPc" href="#p-wb" x="200" y="0" width="100" height="100"/></svg></button></div>` : ''}
-      ${sw('snd', 'Sounds', 'A move, a capture, a check, and the shop.')}
+      ${sw('snd', 'Sounds')}
       ${SET.snd ? `<div class="setrow sndrow"><div class="setseg" role="group" aria-label="Sound theme">${SND_THEMES.map(([v, label]) => `<button type="button" data-set="sndk:${v}" aria-pressed="${SET.sndk === v}">${label}</button>`).join('')}</div>
         <button type="button" class="btn small sndpv" data-sndpv aria-label="Hear a move, a capture and a check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4zM16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>Hear it</button></div>` : ''}
-      ${sw('coach', 'Coach', 'Notes after a line or a checkpoint and a word on each tab.')}
+      ${sw('coach', 'Coach')}
       ${typeof coachPickHTML === 'function' ? `<div class="setrow"><b>Your coach</b>${coachPickHTML()}</div>` : ''}${typeof packRowsHTML === 'function' ? packRowsHTML() : ''}
       ${typeof Tour !== 'undefined' && PERSONA !== 'new' ? `<div class="setrow"><b>The tour</b><div class="lesson-actions" style="margin:0"><button type="button" class="btn small" data-tourgo>Take the tour again</button></div></div>` : ''}
-      ${Owner.can ? `<button type="button" class="switch" role="switch" aria-checked="${Owner.on}" data-own><span><b>Admin mode</b><span>Everything open, the shop free, and tools to jump ahead. It works on a copy of your progress: nothing done here is saved to your account.</span></span><i class="knob" aria-hidden="true"></i></button>` : ''}`;
+      ${Owner.can ? `<button type="button" class="switch" role="switch" aria-checked="${Owner.on}" data-own><span><b>Admin mode</b></span><i class="knob" aria-hidden="true"></i></button>` : ''}`;
   }
 };
 document.getElementById('setBtn').addEventListener('click', () => Settings.open());
@@ -1933,9 +1933,8 @@ function lessonCard(L, variant){
   const chips = [`<span class="chip ${L.pri}">${{core: 'Core', common: 'Common', rare: 'Rare'}[L.pri]}</span>`];
   if (L.tags.includes('game') && (typeof PERSONA === 'undefined' || PERSONA === 'house')) chips.push('<span class="chip game">In your games</span>');
   const nl = L.lines.length;
-  const often = L.id === 'setup' ? '' : oneIn(L.lines.filter(x => DRILLSET.has(x)).reduce((a, x) => a + lineReach(x), 0) || lineReach(L.lines[0]));
-  return `<button class="lcard ${variant || ''}" data-lesson="${L.id}">${thumb(idx, o)}<div><div class="chips">${chips.join('')}</div><h4>${esc(L.title)}</h4><p>${esc(L.sub)}</p>${variant ? bullets(noStudy(L.why), 'lwhy') : ''}
-    <div class="meta"><span class="pips" title="Drill progress" aria-label="Drill progress ${lvl} of 5">${[1,2,3,4,5].map(k => `<i class="${k <= lvl ? 'on' : ''}"></i>`).join('')}</span><span>${nl} ${nl === 1 ? 'line' : 'lines'}${often ? ' · ' + often : ''}</span></div></div></button>`;
+  return `<button class="lcard ${variant || ''}" data-lesson="${L.id}">${thumb(idx, o)}<div><div class="chips">${chips.join('')}</div><h4>${esc(L.title)}</h4>
+    <div class="meta"><span class="pips" title="Drill progress" aria-label="Drill progress ${lvl} of 5">${[1,2,3,4,5].map(k => `<i class="${k <= lvl ? 'on' : ''}"></i>`).join('')}</span><span>${nl} ${nl === 1 ? 'line' : 'lines'}</span></div></div></button>`;
 }
 function partsHTML(C){
   let html = '';
@@ -1944,7 +1943,7 @@ function partsHTML(C){
     const ls = DATA.lessons.filter(l => l.part === P.id);
     const nl = ls.reduce((a, l) => a + l.lines.length, 0);
     const feat = ls.length > 1 && ls.length % 4 === 1;
-    html += `<section class="part"><div class="part-head"><div><p class="kicker">${esc(P.kicker)}</p><h3>${esc(P.title)}</h3></div>${bullets(P.blurb, 'pblurb')}<span class="count tnum">${ls.length} ${ls.length === 1 ? 'lesson' : 'lessons'} · ${nl} ${nl === 1 ? 'line' : 'lines'}</span></div>
+    html += `<section class="part"><div class="part-head"><div><p class="kicker">${esc(P.kicker)}</p><h3>${esc(P.title)}</h3></div><span class="count tnum">${ls.length} ${ls.length === 1 ? 'lesson' : 'lessons'} · ${nl} ${nl === 1 ? 'line' : 'lines'}</span></div>
       <div class="cards">${ls.map((L, k) => lessonCard(L, ls.length === 1 ? 'wide' : (feat && k === 0 ? 'feat' : ''))).join('')}</div></section>`;
   }
   return html;
@@ -1953,18 +1952,14 @@ function chapterHero(C){
   const st = C.stats, dueN = Prog.dueCount();
   return `<section class="hero">
     <div class="hero-board"><div class="board">${boardSVG(N[C.hero].f, {coords: true, last: N[C.hero].u ? [N[C.hero].u.slice(0,2), N[C.hero].u.slice(2,4)] : null, arrows: C.arrows, circles: C.circles, aria: C.cap})}</div>
-      <div class="hero-cap"><span>${esc(C.cap)}</span></div></div>
-    <div><p class="kicker">${esc(C.kicker)}</p>
-      <h2>${C.headline}</h2>
-      ${bullets(C.lede, 'lede')}
-      <div class="stats">${C.facts.map(f => `<div class="stat ${f.alert ? 'alert' : ''}"><b class="tnum">${esc(f.big)}</b><span>${esc(f.text)}</span></div>`).join('')}</div>
+      </div>
+    <div><h2>${C.headline}</h2>
       <div class="cta"><button class="btn primary" data-lesson="${C.first}">Start with the main line</button><button class="btn" data-sbch="${C.id}">Spar in the Sandbox</button><button class="btn ghost" data-drillch="${C.id}">Drill this opening${dueN ? '' : ''}</button></div>
     </div></section>`;
 }
-function chapterNotes(C){
-  if (!C.notes || !C.notes.length) return '';
-  return `<section class="changes"><div class="panel" style="grid-column:1/-1"><h3>${esc(C.notesTitle || 'From your games')}</h3><ul>${C.notes.map(n => `<li><b>${esc(n.b)}</b> ${esc(firstSentence(n.t))}${n.lesson ? ` <button class="linkish" data-lesson="${n.lesson}">Open</button>` : n.line ? ` <button class="linkish" data-line="${n.line}">Open</button>` : ''}</li>`).join('')}</ul></div></section>`;
-}
+// an opening's notes from the house player's games are left out of its page: the lessons tagged In your games say it,
+// and Your games has the games themselves
+function chapterNotes(C){ return ''; }
 // keep words like 'e-pawn' on one line instead of breaking at the hyphen
 const keepHyph = h => h.replace(/\b([a-h])-pawn\b/g, '<span class="nw">$1-pawn</span>');
 // below an opening's hero: its lessons (and the notes), or every decision in it at a glance
@@ -1986,14 +1981,8 @@ function renderLearn(){
   const heroIdx = LINES['setup'].n[LINES['setup'].n.length - 1];
   html += `<section class="hero">
     <div class="hero-board"><div class="board" id="heroBoard">${boardSVG(N[heroIdx].f, {coords: true, last: ['f1','c4'], arrows: ['c4f7r', 'f3g5g'], circles: ['f7r'], aria: 'The Italian setup: your bishop aims at f7'})}</div>
-      <div class="hero-cap"><span>Bishop and knight both aim at f7.</span><button class="btn small" id="heroReplay" aria-label="Replay the first moves"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Replay</button></div></div>
+      <div class="hero-cap"><button class="btn small" id="heroReplay" aria-label="Replay the first moves"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Replay</button></div></div>
     <div><h2>Aim everything at <em>f7</em>.</h2>
-      ${bullets(['The pawn beside Black\'s king has only one defender', 'Your bishop, your knight and often your queen all point at it', 'Every line below is a board to play along with or step through'], 'lede')}
-      <div class="stats">
-        <div class="stat"><b class="tnum">${C.stats.n}</b><span>Italian games with White</span></div>
-        <div class="stat"><b class="tnum">${C.stats.w}–${C.stats.l}</b><span>your record in them</span></div>
-        <div class="stat alert"><b class="tnum">5×</b><span>you missed the bishop shot on f7 in two of those losses</span></div>
-      </div>
       <div class="cta"><button class="btn primary" data-lesson="setup">Start with the setup</button><button class="btn" data-sbch="italian">Spar in the Sandbox</button><button class="btn ghost" data-drillch="italian">Drill this opening</button></div>
     </div></section>`;
   html += learnBody(C, chapterNotes(C)) + '</div>';
@@ -2060,19 +2049,17 @@ function renderStudy(){
   const chips = les ? [`<span class="chip ${les.pri}">${{core:'Core',common:'Common',rare:'Rare'}[les.pri]}</span>`].concat(les.tags.filter(t => !QUIET_TAGS.has(t) && (t !== 'game' || typeof PERSONA === 'undefined' || PERSONA === 'house')).map(t => `<span class="chip ${t}">${esc(TAGNAMES[t])}</span>`)).join('')
                     : `<span class="chip ${game.result === 'W' ? 'win' : 'loss'}">${game.result === 'W' ? 'Win' : 'Loss'}</span><span class="chip">${esc(game.tc)}</span><span class="chip">${esc(game.opp)} ${game.oppElo}</span>`;
   const title = les ? les.title : game.title;
-  const sub = les ? les.sub : game.summary;
-  const why = les ? noStudy(les.why) : '';
   // lines in lesson
   const linesHTML = allLines.length > 1 ? `<div class="linesin"><h4>${les ? 'Lines in this lesson' : 'Lines'}</h4><div class="seg">${allLines.map(id => `<button data-line="${id}" aria-pressed="${id === S.line}">${esc(LINES[id].main ? (les ? 'Main line' : 'The game') : LINES[id].title)}</button>`).join('')}</div></div>` : '';
   // move card
   const p = ply(idx);
   let mcard;
-  if (S.i === 0){ mcard = `<div class="mcard empty"><h3>Starting position</h3><p class="note">Press the forward arrow (or the → key) to step through the moves.</p></div>`; }
+  if (S.i === 0){ mcard = `<div class="mcard empty"><h3>Starting position</h3></div>`; }
   else {
     const mk = markOf(idx), said = mk ? ['mistake', 'blunder', 'warn'] : [];
     mcard = `<div class="mcard"><div class="who">${sideBadge(nd)}<span class="stepno">Move ${moveNo(p)}</span>${mk ? markChip(mk) : ''}</div>
       <h3>${pieceIcon(nd.pc, nd.w === 1)}<span>${esc(nd.l)}</span></h3>${mk ? `<p class="mkw">${markWords(idx, mk)}</p>` : ''}
-      ${nd.t ? bullets(nd.t, 'note') : ''}${(xs => xs.length ? `<div class="mideas"><p class="ideak">On the board</p>${bullets(xs, 'ideas')}</div>` : '')(ideasBeyond(idx))}${(c => c ? `<div class="chips">${c}</div>` : '')(tagChips((nd.g || []).filter(t => !said.includes(t))))}</div>`;
+      ${noteHTML(idx)}${(c => c ? `<div class="chips">${c}</div>` : '')(tagChips((nd.g || []).filter(t => !said.includes(t))))}</div>`;
   }
   // options at this node
   const opts = optionsFor(idx, S.line);
@@ -2080,12 +2067,13 @@ function renderStudy(){
   if (opts){
     const blackToMove = ((p % 2) === 1) === (ME === 1); // the opponent is to move
     const sorted = blackToMove ? opts.slice().sort((a, b) => (N[b.c].q || 0) - (N[a.c].q || 0)) : opts;
-    optHTML = `<div class="opts"><h4>${blackToMove ? `${OPP} can play here · ${idx === ODDS_ROOT ? 'share of your games' : 'how often at your level'}` : 'Your choices here'}</h4><div class="optlist">${sorted.map(o => { const c = N[o.c]; const warn = (c.g || []).includes('warn');
+    // a move and how often it comes: the likeliest few, the rest behind a fold (the line on the board always shows)
+    const row = o => { const c = N[o.c]; const warn = (c.g || []).includes('warn');
       const q = blackToMove && c.q ? `<span class="chip">${pctTxt(c.q)}</span>` : '';
-      const norm = s => String(s || '').toLowerCase().replace(/^the\s+/, '').trim();
-      const subT = norm(o.title) === norm(c.l) ? (warn ? 'Avoid' : '') : esc(o.title) + (warn ? ' · avoid' : '');
-      const tail = o.cur ? `<span class="chip key">This line${blackToMove && c.q ? ' · ' + pctTxt(c.q) : ''}</span>` : (q || '<span aria-hidden="true">›</span>');
-      return `<button class="opt ${o.cur ? 'cur' : ''} ${warn ? 'warn' : ''}" data-line="${o.line}" data-i="${LINES[o.line].n.indexOf(o.c)}">${pieceIcon(c.pc, c.w === 1)}<span><b>${esc(c.l)}</b>${subT ? `<span>${subT}</span>` : ''}</span>${tail}</button>`; }).join('')}</div></div>`;
+      const tail = o.cur ? `<span class="chip key">${blackToMove && c.q ? pctTxt(c.q) : 'This line'}</span>` : (q || '<span aria-hidden="true">›</span>');
+      return `<button class="opt ${o.cur ? 'cur' : ''} ${warn ? 'warn' : ''}" data-line="${o.line}" data-i="${LINES[o.line].n.indexOf(o.c)}">${pieceIcon(c.pc, c.w === 1)}<span><b>${esc(c.l)}</b>${warn ? '<span>Avoid</span>' : ''}</span>${tail}</button>`; };
+    const TOP = 5, top = sorted.length > TOP + 1 ? sorted.filter((o, k) => k < TOP || o.cur) : sorted, rest = sorted.filter(o => !top.includes(o));
+    optHTML = `<div class="opts"><h4>${blackToMove ? `${OPP} can play` : 'Your choices'}</h4><div class="optlist">${top.map(row).join('')}</div>${rest.length ? `<details class="xmore optmore" ${S.optMore ? 'open' : ''}><summary>${rest.length} more</summary><div class="optlist">${rest.map(row).join('')}</div></details>` : ''}</div>`;
   }
   // timeline
   const rows = [];
@@ -2101,7 +2089,6 @@ function renderStudy(){
     rows.push(`<li><button class="trow ${isMine(m) ? 'you' : 'blk'} ${k === S.i ? 'cur' : ''}" data-step="${k}"><span class="n">${moveNo(pk)}${m.w === 1 ? '' : '…'}</span>${pieceIcon(m.pc, m.w === 1)}${namedLabel(line.n[k], 'lbl')}<span class="tg">${(q => (q ? markIcon(q) : '') + (m.g || []).filter(t => t !== 'game' && !QUIET_TAGS.has(t) && !(q && ['mistake', 'blunder', 'warn'].includes(t))).slice(0, 2).map(t => `<i class="${t}" title="${esc(TAGNAMES[t])}"></i>`).join(''))(markOf(line.n[k]))}</span></button></li>`);
   }
   const endIdx = line.n[line.n.length - 1], ei = evalInfo(N[endIdx].e);
-  const outcome = les ? `<div class="outcome"><span class="kicker">Where it ends</span><b>${esc(line.main && !line.dp ? (les.outcome || (ei && ei.txt)) : (ei ? ei.txt : ''))}</b></div>` : '';
   const curEval = evalInfo(nd.e);
   // the engine: a switch under the board; at the end of a line, the plan for what comes next
   const engOn = EngineUI.on(), lineEnd = S.i === line.n.length - 1;
@@ -2123,7 +2110,7 @@ function renderStudy(){
   S.renderedLine = S.line;
   view.innerHTML = `<div class="crumbs">${back}<span class="where">${where}</span><span class="spacer"></span>${navPrev}${navNext}</div>
   <div class="sgrid study">
-    <header class="lhead"><div class="chips">${chips}</div><h2>${esc(title)}</h2>${les ? `<p class="sub">${esc(sub)}</p>` : bullets(sub, 'sub')}${why ? bullets(why, 'why') : ''}</header>
+    <header class="lhead"><div class="chips">${chips}</div><h2>${esc(title)}</h2></header>
     <div class="bcol">
       <div class="mat top in"></div><div class="board-wrap">${evalBarHTML(idx, 'sbar')}<div class="board input" id="sb">${boardSVG(nd.f, studyBoardOpts())}</div></div><div class="mat bot in"></div>
       <div class="controls">
@@ -2139,10 +2126,11 @@ function renderStudy(){
     <div class="ccol">
       ${opnHTML(Openings.ofNode(idx), !!nameStart(idx))}${mcard}${engOn ? '<div id="engcard"></div>' : ''}${optHTML}${linesHTML}
       <ol class="timeline" aria-label="Moves in this line">${rows.join('')}</ol>${line.n.some((x, k) => k && markOf(x)) ? markLegend() : ''}
-      ${outcome}${plan ? planCardHTML(plan, planKick(S.line)) : plan0 ? planCardHTML(plan0) : ''}
+      ${plan ? planCardHTML(plan, planKick(S.line)) : plan0 ? planCardHTML(plan0) : ''}
       <div class="lesson-actions">${unitBtns}${drillBtn}${fromBtn}${lessonBtn}<button class="btn ${lineEnd && !unitBtns && !drillBtn ? 'primary' : 'ghost'}" id="exHere">${lineEnd ? 'Play on from here' : 'Explore from here'}</button></div>
     </div></div>`;
   const svg = document.querySelector('#sb svg');
+  const om = view.querySelector('.optmore'); if (om) om.ontoggle = () => { S.optMore = om.open; };
   if (S.anim){ const a = S.anim; S.anim = null; animateMove(svg, a.u, a.meta, a.back); }
   const cn = document.getElementById('cNums'); if (cn) cn.onclick = () => { setSetting('nums', !SET.nums); render(); };
   S.ssel = null; wireStudyInput();
@@ -2351,7 +2339,7 @@ function legalFor(){ const D = S.drill; if (sbOver(D)) return new Chess(nodeFen(
 function laterInLine(D, u){ const n = LINES[D.id].n; let c = 0; for (let k = D.i + 2; k < n.length; k++){ if (!isMine(N[n[k]])) continue; c++; if (N[n[k]].u === u) return c; } return 0; }
 const HOWMANY = ['', 'one move', 'two moves', 'three moves', 'four moves', 'five moves', 'six moves'];
 const movesLater = c => HOWMANY[c] || `${c} moves`;
-const earlyHTML = c => `<b>The right move at the wrong moment.</b> In this line it comes ${movesLater(c)} later: something else has to happen first.`;
+const earlyHTML = c => `<b>That move comes ${movesLater(c)} later.</b>`;
 function tryMove(from, to){
   const D = S.drill; if (sbOver(D)) return sbEndTry(from, to);
   if (!D || D.busy || D.state !== 'play') return;
@@ -2379,17 +2367,17 @@ function tryMove(from, to){
     }
     D.i++; D.flash = {sq: u.slice(2, 4), ok: true}; D.hint = null; D.said = null;
     const ni = LINES[D.id].n[D.i], nd = N[ni];
-    D.msg = ''; D.feed = [`<span class="mfeed">${markOf(ni) === 'key' && !D.guided ? markChipIn('key') : ''}<b>${esc(nd.l)}.</b> ${esc(moveWhy(ni, 1)[0] || '')}</span>`];
+    D.msg = ''; D.feed = [`<span class="mfeed">${markOf(ni) === 'key' && !D.guided ? markChipIn('key') : ''}<b>${esc(nd.l)}</b></span>`];
     renderDrillBoard(); renderDrillPanel();                    // your own move snaps into place; only the other side's slides
     D.busy = true; setTimeout(() => { if (S.drill === D){ D.flash = null; drillAdvance(); } }, 700);
   } else if (D.guided){
-    D.flash = {sq: to, ok: false}; D.msg = 'Not that one: follow the green arrow.';
+    D.flash = {sq: to, ok: false}; D.msg = 'Follow the green arrow.';
     renderDrillBoard(); renderDrillPanel();
     setTimeout(() => { if (S.drill === D && D.flash && !D.flash.ok){ D.flash = null; renderDrillBoard(); } }, 650);
   } else {
     if (D.tries === 0){ D.mistakes++; if (D.kind === 'puz') Prog.puz(DATA.puzzles[D.k].id, false); else (D.slipAt || (D.slipAt = [])).push([D.i + 1, u]); }   // where the line caught them, and with what
     D.tries++; D.flash = {sq: to, ok: false};
-    if (D.kind === 'puz') D.msg = D.tries >= 2 ? 'Not that one. The arrow shows the move; play it to continue.' : 'Not that one. Try again.';
+    if (D.kind === 'puz') D.msg = D.tries >= 2 ? 'Play the arrow\'s move.' : 'Not that one.';
     else {
       // what the move tried allows, when it loses something: kept for the coach's note at the end of the line
       const p = punishOf(nodeFen(dNode()), u), ni = LINES[D.id].n[D.i + 1];
@@ -2397,7 +2385,8 @@ function tryMove(from, to){
       // a move of this very line, played before its turn: the order slipped, not the move. Saying so gives nothing away.
       const early = laterInLine(D, u);
       if (early && D.tries === 1) (D.slipOrd || (D.slipOrd = {}))[D.i + 1] = early;
-      D.msg = (D.tries >= 2 ? TXT[SIDE].miss2 : early ? earlyHTML(early) : TXT[SIDE].miss) + (p ? punishHTML(p) : '') + (D.tries >= 2 ? whyHTML(ni) : '');
+      // one thing at a time: the answer that punishes the move, and on the second miss why the book's move is the move
+      D.msg = D.tries >= 2 ? (whyHTML(ni) || TXT[SIDE].miss2) : early ? earlyHTML(early) : p ? punishHTML(p) : TXT[SIDE].miss;
     }
     if (D.tries >= 2) D.hint = exp[0];
     renderDrillBoard(); renderDrillPanel();
@@ -2447,10 +2436,10 @@ function drillPanelHTML(){
   if (!D) return '';
   if (D.kind === 'puz'){
     const P = DATA.puzzles[D.k], G = GAMES[P.game];
-    const doneBox = D.state === 'done' ? `<div class="donebox"><h4>${D.tries === 0 ? 'Found it.' : 'That\'s the one.'}</h4><p>${esc(P.t)}</p><div class="lesson-actions">${D.k < DATA.puzzles.length - 1 || (!D.wrapped && BOOKS[otherSide(SIDE)].puzzles.length) ? `<button class="btn primary" id="nextPuz">Next shot</button>` : ''}<button class="btn" data-line="${P.game}" data-i="${LINES[P.game].n.indexOf(P.node)}">See it in the game</button><button class="btn ghost" id="pExplore">Play on with the engine</button></div></div>` : '';
+    const doneBox = D.state === 'done' ? `<div class="donebox"><h4>${D.tries === 0 ? 'Found it.' : 'That\'s the one.'}</h4><p>${esc(firstSentence(P.t))}</p><div class="lesson-actions">${D.k < DATA.puzzles.length - 1 || (!D.wrapped && BOOKS[otherSide(SIDE)].puzzles.length) ? `<button class="btn primary" id="nextPuz">Next shot</button>` : ''}<button class="btn" data-line="${P.game}" data-i="${LINES[P.game].n.indexOf(P.node)}">See it in the game</button><button class="btn ghost" id="pExplore">Play on with the engine</button></div></div>` : '';
     return `<div class="dpanel"><p class="kicker">Missed shot ${D.k + 1} of ${DATA.puzzles.length} · vs ${esc(G.opp)}</p><h3>${esc(P.title)}</h3>
       <div class="status ${D.state === 'done' ? '' : 'wait'}"><span class="bub"></span>${D.state === 'done' ? 'Solved' : esc(P.q || `${MYC} to move: find the best move`)}</div>
-      ${D.state === 'done' ? '' : `<p class="feedback">${D.msg || 'Drag a piece or tap it, then tap where it goes.'}</p>`}${doneBox}</div>`;
+      ${D.state === 'done' ? '' : `<p class="feedback">${D.msg || '&nbsp;'}</p>`}${doneBox}</div>`;
   }
   if (D.guided) return guidedPanelHTML(D);
   if (D.kind === 'rv') return Review.panelHTML(D);
@@ -2472,38 +2461,37 @@ function drillPanelHTML(){
       : D.rv ? `<button class="btn primary" id="${clean ? 'dRvBack' : 'dAgain'}">${clean ? 'Back to your games' : 'Again'}</button><button class="btn" id="${clean ? 'dAgain' : 'dRvBack'}">${clean ? 'Again' : 'Back to your games'}</button><button class="btn ghost" data-line="${D.id}">Study it</button>`
       : `<button class="btn primary" id="dNext">Next line</button><button class="btn" id="dAgain">Again</button><button class="btn ghost" data-line="${D.id}">Study it</button>`;
     const pl = planOf(D.id);
-    const cnote = CU ? `${CU.lines.filter(lineClean).length} of ${CU.lines.length} lines in this ${uword(CU)} clean` : D.daily ? (left ? `Today: ${dk} of ${DAILY}` : `That's today's five: ${Daily.streak()} ${Daily.streak() === 1 ? 'day' : 'days'} in a row`) : '';
-    doneBox = `<div class="donebox ${clean ? '' : 'bad'}"><h4>${clean ? 'Clean run' : `${D.mistakes} ${D.mistakes === 1 ? 'slip' : 'slips'}${CU ? ': again until it\'s clean' : ''}`}</h4>
-      ${bullets([clean ? `Back in ${days} ${days === 1 ? 'day' : 'days'}` : CU ? '' : 'Stays in today\'s review until it\'s clean', cnote])}
+    // the fifth line of the day is the coach's to celebrate; without the coach the panel says it
+    const cnote = D.daily && !left && !SET.coach ? `${Daily.streak()} ${Daily.streak() === 1 ? 'day' : 'days'} in a row` : '';
+    doneBox = `<div class="donebox ${clean ? '' : 'bad'}"><h4>${clean ? 'Clean run' : `${D.mistakes} ${D.mistakes === 1 ? 'slip' : 'slips'}`}</h4>
+      ${bullets([clean ? `Back in ${days} ${days === 1 ? 'day' : 'days'}` : '', cnote])}
       ${D.note || ''}<div class="lesson-actions">${acts}<button class="btn ghost" id="dExplore">Play on with the engine</button></div></div>${clean && pl ? planCardHTML(pl, planKick(D.id)) : ''}`;
   }
-  return `<div class="dpanel"><p class="kicker">${D.unit && UNIT[D.unit] ? 'Course · ' + esc(UNIT[D.unit].title) + ' · ' : D.daily ? 'Today · ' : ''}${esc(L.title)}${line.main ? '' : ' · ' + esc(line.title)}${D.msgWhy ? ' · ' + esc(D.msgWhy) : ''}</p>${opnHTML(Openings.ofNode(dNode()), D.state === 'play' && !!nameStart(dNode())) || `<h3>${esc(line.main ? L.title : line.title)}</h3>`}
+  return `<div class="dpanel"><p class="kicker">${esc(L.title)}${line.main ? '' : ' · ' + esc(line.title)}</p>${opnHTML(Openings.ofNode(dNode()), D.state === 'play' && !!nameStart(dNode())) || `<h3>${esc(line.main ? L.title : line.title)}</h3>`}
     <div class="progressbar" aria-hidden="true"><i style="width:${pct}%"></i></div>
     ${status ? `<div class="status ${D.busy ? 'wait' : ''} ${D.tries ? 'bad' : ''}"><span class="bub"></span>${status}</div>` : ''}
-    ${D.state === 'done' ? '' : `<p class="feedback">${D.msg || (D.feed && D.feed.length ? D.feed.join('') : D.i === D.s0 ? `${OPP}'s moves play automatically. Drag a piece or tap it, then tap where it goes.` : '&nbsp;')}</p>`}${doneBox}</div>`;
+    ${D.state === 'done' ? '' : `<p class="feedback">${D.msg || (D.feed && D.feed.length ? D.feed.join('') : '&nbsp;')}</p>`}${doneBox}</div>`;
 }
 // a guided run: the move to make as an arrow on the board, and the coach's word on it in a line or two
 function guidedPanelHTML(D){
   const line = LINES[D.id], L = lessonOf(D.id), n = line.n, CU = D.unit && UNIT[D.unit];
   const mine = n.slice(D.s0 + 1).filter(i => isMine(N[i])).length, done = n.slice(D.s0 + 1, D.i + 1).filter(i => isMine(N[i])).length;
-  const head = `<p class="kicker">${CU ? 'Course · ' + esc(CU.title) + ' · ' : ''}Play along · ${esc(L ? L.title : line.title)}${line.main ? '' : ' · ' + esc(line.title)}</p>`;
+  const head = `<p class="kicker">Play along${line.main ? '' : ' · ' + esc(line.title)}</p><h3>${esc(L ? L.title : line.title)}</h3>`;
   const face = m => typeof knightSVG === 'function' && SET.coach ? `<span class="cnface">${knightSVG(m)}</span>` : '';
   const who = typeof coachName === 'function' && SET.coach ? `<b class="gwho">${esc(coachName())}</b>` : '';
   if (D.state === 'done'){
-    const ei = evalInfo(N[n[n.length - 1]].e), ends = line.main && !line.dp ? (L && L.outcome) || (ei && ei.txt) : ei && ei.txt;   // a line played on ends somewhere else than its lesson's words say
-    return `<div class="dpanel">${head}<h3>You played the whole line</h3><div class="progressbar" aria-hidden="true"><i style="width:100%"></i></div>
-      <div class="donebox"><h4>Now from memory</h4>${bullets([ends ? 'Ends: ' + ends : '', 'No arrows this time: two tries, then the arrow shows the move', CU ? `Clean once and it counts for this ${uword(CU)}` : 'Clean once and it comes back for review'])}
+    return `<div class="dpanel">${head}<div class="progressbar" aria-hidden="true"><i style="width:100%"></i></div>
+      <div class="donebox"><h4>Played along</h4>
       <div class="lesson-actions"><button class="btn primary" id="gMem">Play it from memory</button><button class="btn" id="gAgain">Play along again</button><button class="btn ghost" data-line="${D.id}">Read the notes</button></div></div></div>`;
   }
   const nx = N[n[D.i + 1]], my = nx && isMine(nx) && !D.busy, warn = D.flash && !D.flash.ok;
   // most of the other side's labels already start with "Black …" or "White …": those stand on their own
-  const si = D.said ? n[D.i] : null, sw = si !== null ? moveWhy(si, 1)[0] : '';
-  const said = D.said ? `<p class="gsaid">${D.said.l.toLowerCase().startsWith(OPP.toLowerCase()) ? esc(D.said.l) : `${OPP} played: ${esc(lc(D.said.l))}`}${sw ? `<span class="gidea">${esc(sw)}</span>` : ''}</p>` : '';
-  const why = my ? moveWhy(n[D.i + 1], 2) : [];
-  const guide = my ? `<p class="gmove">Your move: ${esc(lc(nx.l))}</p>${why.length ? bullets(why) : ''}` : `<p class="gmove wait">${OPP} is thinking…</p>`;
-  return `<div class="dpanel">${head}<h3>Follow the arrows</h3><div class="progressbar" aria-hidden="true"><i style="width:${mine ? Math.round(done / mine * 100) : 100}%"></i></div>
-    <div class="coachnote gcoach" role="status">${face(warn ? 'think' : 'cheer')}<div class="cntx">${who}${said}${guide}${warn ? `<p class="gwarn">${esc(D.msg)}</p>` : ''}</div></div>
-    <p class="feedback">${D.i === D.s0 ? 'Drag a piece or tap it, then tap where it goes.' : '&nbsp;'}</p></div>`;
+  // three short lines at most: what the other side played, your move, and why
+  const said = D.said ? `<p class="gsaid">${D.said.l.toLowerCase().startsWith(OPP.toLowerCase()) ? esc(D.said.l) : `${OPP}: ${esc(lc(D.said.l))}`}</p>` : '';
+  const why = my ? moveWhy(n[D.i + 1], 1)[0] : '';
+  const guide = my ? `<p class="gmove">${esc(nx.l)}</p>${why ? `<p class="gwhy">${esc(why)}</p>` : ''}` : `<p class="gmove wait">${OPP} is thinking…</p>`;
+  return `<div class="dpanel">${head}<div class="progressbar" aria-hidden="true"><i style="width:${mine ? Math.round(done / mine * 100) : 100}%"></i></div>
+    <div class="coachnote gcoach" role="status">${face(warn ? 'think' : 'cheer')}<div class="cntx">${who}${said}${guide}${warn ? `<p class="gwarn">${esc(D.msg)}</p>` : ''}</div></div></div>`;
 }
 function renderDrillPanel(){ const el = document.getElementById('dpanel'); if (el){ el.innerHTML = drillPanelHTML(); wireDrillPanel(); } }
 function wireDrillPanel(){
@@ -2538,11 +2526,10 @@ function todayHTML(){
   const k = Daily.count(), st = Daily.streak(), done = k >= DAILY, D = S.drill, playing = !!D;
   const week = [-6, -5, -4, -3, -2, -1, 0].map(o => { const d = dayDate(o), on = Daily.done(o);
     return `<li class="${on ? 'on' : ''} ${o === 0 ? 'now' : ''}" title="${d.toLocaleDateString(undefined, {weekday: 'long', month: 'short', day: 'numeric'})}${on ? ': five lines' : ''}"><i>${on ? ICON.check : ''}</i><span>${d.toLocaleDateString(undefined, {weekday: 'narrow'})}</span></li>`; }).join('');
-  const line = done ? 'Today\'s five are done. Anything more is a bonus.' : k ? `${DAILY - k} more ${DAILY - k === 1 ? 'line' : 'lines'} today to ${st ? 'keep' : 'start'} your streak.` : 'The lines you slipped on come first.';
   const cta = playing ? '' : `<button class="btn primary" id="dailyGo">${done ? 'Keep going' : k ? `Next line · ${k + 1} of ${DAILY}` : 'Start today\'s five'}</button>`;
   return `<section class="today ${done ? 'done' : ''}" aria-label="Today's practice">
     <div class="tring" style="--p:${Math.min(100, Math.round(k / DAILY * 100))}" aria-label="${Math.min(k, DAILY)} of ${DAILY} lines today"><i><b class="tnum">${Math.min(k, DAILY)}</b><small>of ${DAILY}</small></i></div>
-    <div class="tmain"><p class="kicker">Today</p><p class="tline">${line}</p>${cta ? `<div class="lesson-actions">${cta}</div>` : ''}</div>
+    <div class="tmain"><p class="kicker">Today</p>${cta ? `<div class="lesson-actions">${cta}</div>` : ''}</div>
     <div class="tside"><p class="streak ${st ? '' : 'zero'}">${FLAME}<b class="tnum">${st}</b><span>${st === 1 ? 'day' : 'days'} in a row</span></p><ol class="week" aria-label="The last seven days">${week}</ol></div></section>`;
 }
 function fmtDue(r){ if (!r) return 'new'; const d = r.due - Date.now(); if (d <= 0) return 'due'; const days = Math.ceil(d / DAY); return `in ${days}d`; }
@@ -2572,13 +2559,15 @@ function renderDrill(){
   // a line played inside a unit (along with the arrows or from memory) keeps a way back to that unit above the board
   const UC = D && D.unit && UNIT[D.unit], RV = D && D.kind === 'rv';
   const crumbs = UC ? `<div class="crumbs"><button class="btn small" data-unit="${UC.id}">← ${esc(unitNo(UC))}</button><span class="where">${esc(UC.title)}</span></div>`
-    : RV ? `<div class="crumbs"><button class="btn small" id="rvCrumb">← Your last games</button><span class="where">Your game against ${esc(D.opp)}</span></div>` : '';
+    : RV ? `<div class="crumbs"><button class="btn small" id="rvCrumb">← Your last games</button><span class="where">Your game against ${esc(D.opp)}</span></div>`
+    : D && D.rv ? `<div class="crumbs"><button class="btn small" id="rvCrumb">← Your last games</button></div>`
+    : D && !D.guided && !D.tour ? `<div class="crumbs"><button class="btn small" id="dHome">← Drill</button></div>` : '';
   view.innerHTML = `${crumbs}<div class="sgrid ${D ? '' : 'idle'}">
     <div class="bcol"><div class="mat top"></div><div class="board ${D && D.state === 'play' ? 'input' : ''} ${D && D.guided ? 'guided' : ''}" id="db">${boardHTML}</div><div class="mat bot"></div>
       </div>
     <div class="ccol">
       <div id="dpanel">${D ? drillPanelHTML() : ''}</div>
-      ${D && (D.unit || D.guided || RV) ? '<div hidden>' : ''}${todayHTML()}${!D && typeof Review !== 'undefined' ? Review.drillCard() : ''}
+      ${D ? '<div hidden>' : ''}${todayHTML()}${!D && typeof Review !== 'undefined' ? Review.drillCard() : ''}
       <details class="dmore" ${S.dmore ? 'open' : ''}><summary><span><b>Pick lines yourself</b><span>${due} due · ${fresh} not started · ${mastered} solid</span></span></summary>
       <div class="dpanel">
         <div class="lesson-actions"><button class="btn" id="smart">${due ? 'Review what\'s due' : 'Start next line'}</button>${puzN ? `<button class="btn" id="shots">Missed shots from your games</button>` : ''}</div>
@@ -2586,13 +2575,14 @@ function renderDrill(){
         <div><div class="seg">${segBtn('pri','all','Any priority')}${segBtn('pri','core','Core')}${segBtn('pri','common','Common')}${segBtn('pri','rare','Rare')}</div></div>
         <div><p class="kicker" style="margin-bottom:6px">Start each line</p><div class="seg">${segBtn('from','branch','Where it branches')}${segBtn('from','start','From move 1')}</div></div>
       </div>
-      <div class="dpanel"><p class="kicker">Every line</p><div class="mtable">${rows}</div></div></details>${D && (D.unit || D.guided || RV) ? '</div>' : ''}
+      <div class="dpanel"><p class="kicker">Every line</p><div class="mtable">${rows}</div></div></details>${D ? '</div>' : ''}
     </div></div>`;
   if (D) renderDrillBoard();
   wireDrillPanel();
   if (D && D.kind === 'line' && D.state === 'play' && D.busy){ D.busy = false; setTimeout(drillAdvance, 300); }
   if (RV && D.state === 'play' && (D.busy || D.i === 0)){ D.busy = false; setTimeout(() => Review.advance(), 300); }
   const rc = document.getElementById('rvCrumb'); if (rc) rc.onclick = () => Review.back();
+  const dh = document.getElementById('dHome'); if (dh) dh.onclick = () => { S.drill = S.drillState = null; renderDrill(); window.scrollTo({top: 0, behavior: 'auto'}); };
   const dg = document.getElementById('dailyGo'); if (dg) dg.onclick = dailyGo;
   const rl = document.getElementById('rvLast'); if (rl) rl.onclick = () => { S.gseg = 'last'; go('games'); };
   const rdb = document.getElementById('rvDrillB'); if (rdb) rdb.onclick = () => Review.drillBook(rdb.dataset.id);
@@ -2793,7 +2783,7 @@ function sbTry(u, to){
   if (!D.slipAt.has(D.node)){ D.slipAt.add(D.node); D.slips.push({at: D.node, tried: u, warn: warnKid}); }
   D.tries++; D.flash = {sq: to, ok: false};
   if (warnKid !== undefined) D.msg = `<b>That's the move to avoid here.</b> ${esc(N[warnKid].t || '')}`;
-  else { const p = punishOf(nodeFen(D.node), u); D.msg = (D.tries >= 2 ? TXT[SIDE].miss2 : TXT[SIDE].miss) + (p ? punishHTML(p) : '') + (D.tries >= 2 ? whyHTML(sbMyKids(D.node)[0]) : ''); }
+  else { const p = punishOf(nodeFen(D.node), u); D.msg = D.tries >= 2 ? (whyHTML(sbMyKids(D.node)[0]) || TXT[SIDE].miss2) : p ? punishHTML(p) : TXT[SIDE].miss; }
   if (D.tries >= 2) D.hint = N[sbMyKids(D.node)[0]].u;
   renderDrillBoard(); renderSbPanel();
   setTimeout(() => { if (S.drill === D && D.flash && !D.flash.ok){ D.flash = null; renderDrillBoard(); } }, 650);
@@ -2813,7 +2803,7 @@ function sbSetTry(u, to){
   const D = S.drill; D.sel = null;
   const c = sbBookKids(D.node).find(k => N[k].u === u);
   if (c !== undefined) return sbSetGo(c);
-  D.flash = {sq: to, ok: false}; D.msg = 'That move isn\'t in your book here. Pick one of the moves listed below.';
+  D.flash = {sq: to, ok: false}; D.msg = 'That move isn\'t in your book.';
   renderDrillBoard(); renderSbPanel();
   setTimeout(() => { if (S.drill === D && D.flash){ D.flash = null; renderDrillBoard(); } }, 650);
 }
@@ -2868,13 +2858,13 @@ function sbCtlHTML(){
       <button class="ctl" data-sbv="999" aria-label="To the last move" ${i < n ? '' : 'disabled'}>${ic('M18 5v14M6 6l8 6-8 6V6z')}</button></div>
     <p class="evaltext" id="sbeval">${(ei => ei ? `Engine: <b>${esc(ei.txt)}</b>${ei.num ? ` <span class="tnum" title="${NUMHINT}">(${ei.num})</span>` : ''}` : 'Engine: thinking…')(evalInfo(N[D.hist[i]].e))}</p>`;
   }
-  if (!D || D.kind !== 'sbset') return `<div class="legend" style="margin-top:10px"><span><i style="background:var(--arr-g)"></i>the move in your book</span><span><i style="background:var(--arr-r)"></i>what you tried</span></div>`;
+  if (!D || D.kind !== 'sbset') return '';
   const back = D.hist.length > 1, fwd = D.fwd.length > 0, ic = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
   return `<div class="controls"><button class="ctl" data-sbstep="-999" aria-label="To the start" ${back ? '' : 'disabled'}>${ic('M6 5v14M18 6l-8 6 8 6V6z')}</button>
       <button class="ctl" id="sbSetBack" data-sbstep="-1" aria-label="Back one move" ${back ? '' : 'disabled'}>${ic('M15 6l-6 6 6 6')}</button>
       <button class="ctl" id="sbSetFwd" data-sbstep="1" aria-label="Forward one move" ${fwd ? '' : 'disabled'}>${ic('M9 6l6 6-6 6')}</button>
       <button class="ctl" data-sbstep="999" aria-label="To the last move" ${fwd ? '' : 'disabled'}>${ic('M18 5v14M6 6l8 6-8 6V6z')}</button></div>
-    <p class="evaltext sbkeys">The arrow keys step back and forward too</p>`;
+`;
 }
 function sbSetPanelHTML(){
   const D = S.drill, kids = sbBookKids(D.node), wt = ply(D.node) % 2 === 0, mine = (ME === 1) === wt, all = sbSetAll(), at = D.hist.length - 1;
@@ -2882,10 +2872,10 @@ function sbSetPanelHTML(){
   const moves = kids.slice().sort((a, b) => (N[b].q || 0) - (N[a].q || 0)).map(c => `<button class="chip sbk" type="button" data-sbk="${c}">${pieceIcon(N[c].pc, N[c].w === 1)}${esc(N[c].l)}${!mine && N[c].q ? `<span class="tnum">${pctTxt(N[c].q)}</span>` : ''}</button>`).join('');
   const rows = all.slice(1).map((i, j) => { const k = j + 1, m = N[i];
     return `<li><button type="button" class="${isMine(m) ? 'you' : 'blk'} ${k === at ? 'last' : ''} ${k > at ? 'fut' : ''}" data-sbj="${k}" ${k === at ? 'aria-current="step"' : ''}><span class="n">${moveNo(k)}${m.w === 1 ? '' : '…'}</span>${pieceIcon(m.pc, m.w === 1)}${namedLabel(i, 'fl')}<span class="fq">${!isMine(m) && m.q ? pctTxt(m.q) : ''}</span></button></li>`; }).join('');
-  const where = D.msg ? `<p class="feedback">${D.msg}</p>` : at === 0 ? bullets(['Make the moves for both sides, on the board or from the list below', 'Stop at the position you want to practise', 'Practise from here then starts every game there'], 'sbhow') : '';
-  return `<div class="dpanel"><div class="sbsethd"><p class="kicker">Set up a position</p><div class="sidesw" role="group" aria-label="Your colour">${['w', 'b'].map(sd => `<button type="button" data-sbset="${sd}" aria-pressed="${SIDE === sd}"><i class="sw ${sd}" aria-hidden="true"></i>${sideName(sd)}</button>`).join('')}</div></div><h3>${at === 0 ? 'Play the moves up to your position' : `After move ${moveNo(at)}${can ? `: ${nl} ${nl === 1 ? 'line goes' : 'lines go'} on from here` : ''}`}</h3>
+  const where = D.msg ? `<p class="feedback">${D.msg}</p>` : '';
+  return `<div class="dpanel"><div class="sbsethd"><p class="kicker">Set up a position</p><div class="sidesw" role="group" aria-label="Your colour">${['w', 'b'].map(sd => `<button type="button" data-sbset="${sd}" aria-pressed="${SIDE === sd}"><i class="sw ${sd}" aria-hidden="true"></i>${sideName(sd)}</button>`).join('')}</div></div><h3>${at === 0 ? 'Play the moves up to your position' : `After move ${moveNo(at)}${can ? ` · ${nl} ${nl === 1 ? 'line' : 'lines'}` : ''}`}</h3>
     ${at ? opnHTML(Openings.ofNode(D.node), !!nameStart(D.node)) : ''}${where}
-    ${kids.length ? `<div><p class="kicker" style="margin-bottom:6px">${mine ? 'Your move in your book' : `What ${wt ? 'White' : 'Black'} can play in your book`}</p><div class="sbks">${moves}</div></div>` : '<p class="evaltext" style="text-align:left">Your book ends here. Step back a move to practise.</p>'}
+    ${kids.length ? `<div><p class="kicker" style="margin-bottom:6px">${mine ? 'Your move' : `${wt ? 'White' : 'Black'} can play`}</p><div class="sbks">${moves}</div></div>` : '<p class="evaltext" style="text-align:left">Your book ends here.</p>'}
     <div class="lesson-actions"><button class="btn primary" id="sbFromGo" ${can ? '' : 'disabled'}>Practise from here</button><button class="btn ghost" id="sbSetCancel">Cancel</button></div></div>
     ${rows ? `<ol class="feed sbjump" id="sbfeed" aria-label="Moves to this position">${rows}</ol>` : ''}`;
 }
@@ -2922,21 +2912,18 @@ function sbFeed(){
 }
 function sbReport(){
   const D = S.drill, lid = D.line, L = lid ? lessonOf(lid) : null, C = L ? chapterOf(L) : null;
-  const n = D.slips.length, prob = D.choices.reduce((a, ch) => a * (N[ch.pick].q || 1), 1);
-  const chain = D.choices.map(ch => `<span class="chip">${pieceIcon(N[ch.pick].pc, N[ch.pick].w === 1)}${esc(N[ch.pick].l)} · ${pctTxt(N[ch.pick].q || 0)}</span>`).join('<span aria-hidden="true">›</span>');
+  const n = D.slips.length;
   const slipCards = D.slips.map(s => {
     const good = sbMyKids(s.at)[0], o = {coords: false, arrows: [s.tried.slice(0, 4) + 'r', N[good].u.slice(0, 4) + 'g']};
     if (N[s.at].u) o.last = [N[s.at].u.slice(0, 2), N[s.at].u.slice(2, 4)];
-    const after = N[s.at];
-    return `<div class="slipc">${thumb(s.at, o)}<div><b>${esc(N[good].l)}</b><p>${after.u ? `${OPP} had just played: ${esc(after.l)}. ` : ''}${s.warn !== undefined ? 'You played the move to avoid.' : 'Red: what you tried. Green: the move in your book.'}</p></div></div>`;
+    return `<div class="slipc">${thumb(s.at, o)}<div><b>${esc(N[good].l)}</b>${s.warn !== undefined ? '<p>You played the move to avoid.</p>' : ''}</div></div>`;
   }).join('');
   const r = lid ? Prog.rec(lid) : null, days = r ? INTERVALS[r.box] : 0;
   const CU = D.scope.startsWith('u:') ? UNIT[D.scope.slice(2)] : null, cs = CU ? (up(CU.id).spar || 0) : 0;
   return `<div class="donebox ${n ? 'bad' : ''}">
       <p class="kicker">${C ? esc(C.name) + ' · ' : ''}${L ? esc(L.title) : 'Line complete'}${lid && !LINES[lid].main ? ' · ' + esc(LINES[lid].title) : ''}</p>
-      <div class="bigstat"><b class="tnum">${n}</b><span>${n === 1 ? 'slip' : 'slips'} in this game · ${n ? 'this line is back in today\'s review' : `clean; it comes back in ${days} ${days === 1 ? 'day' : 'days'}`}</span></div>
+      <div class="bigstat"><b class="tnum">${n}</b><span>${n === 1 ? 'slip' : 'slips'}${n ? '' : ` · back in ${days} ${days === 1 ? 'day' : 'days'}`}</span></div>
       ${n ? `<div class="slips">${slipCards}</div>` : ''}
-      ${D.choices.length ? `<div><p class="kicker" style="margin-bottom:6px">${OPP}'s choices</p><div class="chain">${chain}</div>${prob < .67 ? `<p class="evaltext" style="text-align:left">${D.from ? 'From your position, this' : 'This'} exact line: ${oneIn(prob)}.</p>` : ''}</div>` : ''}
       <div class="lesson-actions"><button class="btn ${CU && cs >= SPAR ? '' : 'primary'}" id="sbAgain">Next game</button>${CU ? `<button class="btn ${cs >= SPAR ? 'primary' : ''}" data-unit="${CU.id}">Back to the ${uword(CU)}</button>` : ''}${lid ? `<button class="btn" data-line="${lid}">Study this line</button><button class="btn ghost" id="sbDrill">Drill it</button>` : ''}</div>${D.tour ? '' : '<div id="sbeng"></div>'}</div>
       ${lid && planOf(lid) ? planCardHTML(planOf(lid), planKick(lid)) : ''}`;
 }
@@ -2944,7 +2931,7 @@ function sbPanelHTML(){
   const D = S.drill;
   if (D && D.kind === 'sbset') return sbSetPanelHTML();
   if (!D){
-    return `<div class="dpanel sbintro"><p class="sbline">The other side answers with moves from your book until the line runs out.</p>
+    return `<div class="dpanel sbintro">
       <div class="lesson-actions"><button class="btn primary" id="sbGo">Start a game</button></div></div>`;
   }
   const last = D.choices[D.choices.length - 1];
@@ -2952,19 +2939,19 @@ function sbPanelHTML(){
   let status = D.state === 'done' ? '' : D.busy ? (myTurnAt(D.node) ? '' : `${OPP} is choosing…`) : 'Your move';
   const bnode = lastBlack ? N[lastBlack.pick] : null;
   const bmk = bnode ? markOf(lastBlack.pick) : null;
-  const black = bnode ? `<div class="mcard"><div class="who"><span class="side blk">${OPP}</span><span class="stepno">${pctTxt(bnode.q || 0)} of ${lastBlack.at === ODDS_ROOT ? 'your games' : 'players at your level'} go this way</span>${bmk ? markChip(bmk) : ''}</div>
-      <h3>${pieceIcon(bnode.pc, bnode.w === 1)}<span>${esc(bnode.l)}</span></h3>${bnode.t ? bullets(bnode.t, 'note') : ''}${(c => c ? `<div class="chips">${c}</div>` : '')(tagChips((bnode.g || []).filter(t => !(bmk && ['mistake', 'blunder'].includes(t)))))}
-      ${lastBlack.kids.length > 1 ? `<details class="xmore" id="sbElse" ${S.sbElse ? 'open' : ''}><summary class="kicker">What else ${OPP} could play here</summary><div style="margin-top:8px">${oddsRows(lastBlack)}</div></details>` : ''}</div>` : '';
+  const black = bnode ? `<div class="mcard"><div class="who"><span class="side blk">${OPP}</span><span class="stepno">${pctTxt(bnode.q || 0)}</span>${bmk ? markChip(bmk) : ''}</div>
+      <h3>${pieceIcon(bnode.pc, bnode.w === 1)}<span>${esc(bnode.l)}</span></h3>${bnode.t ? `<p class="note">${esc(noteLine(bnode.t))}</p>` : ''}${(c => c ? `<div class="chips">${c}</div>` : '')(tagChips((bnode.g || []).filter(t => !(bmk && ['mistake', 'blunder'].includes(t)))))}
+      ${lastBlack.kids.length > 1 ? `<details class="xmore" id="sbElse" ${S.sbElse ? 'open' : ''}><summary class="kicker">What else ${OPP} plays here</summary><div style="margin-top:8px">${oddsRows(lastBlack)}</div></details>` : ''}</div>` : '';
   const CU = D.scope.startsWith('u:') ? UNIT[D.scope.slice(2)] : null, cs = CU ? Math.min(up(CU.id).spar || 0, SPAR) : 0;
-  const strip = CU ? `<div class="sbcourse"><div><p class="kicker">${CU.deep ? `Deep dive · ${esc(DEEPOF[CU.deep].title)}` : 'Course'} · ${unitNo(CU)} · ${esc(CU.title)}</p>
-      <p class="sbcl"><span class="pdots" aria-hidden="true">${Array.from({length: SPAR}, (_, k) => `<i class="${k < cs ? 'on' : ''}"></i>`).join('')}</span>${cs} of ${SPAR} clean practice games${cs >= SPAR ? ': this step is done' : ''}</p></div>
+  const strip = CU ? `<div class="sbcourse"><div><p class="kicker">${unitNo(CU)} · ${esc(CU.title)}</p>
+      <p class="sbcl"><span class="pdots" aria-hidden="true">${Array.from({length: SPAR}, (_, k) => `<i class="${k < cs ? 'on' : ''}"></i>`).join('')}</span>${cs} of ${SPAR} clean</p></div>
       <button class="btn small" data-unit="${CU.id}">Back to the ${uword(CU)}</button></div>` : '';
   // while a game is on: the count so far; once it is over the report has the count, so the line only says where it started
-  const kick = D.state === 'done' ? (D.from ? 'A game from your position' : '') : `${D.from ? 'From your position · ' : ''}${D.slips.length} ${D.slips.length === 1 ? 'slip' : 'slips'} so far${CU ? ` · ${OPP} plays only this ${uword(CU)}'s moves` : ''}`;
+  const kick = D.state !== 'done' && D.slips.length ? `${D.slips.length} ${D.slips.length === 1 ? 'slip' : 'slips'}` : '';
   const head = `<div class="dpanel">${strip}${kick ? `<p class="kicker">${kick}</p>` : ''}
       ${opnHTML(Openings.ofNode(D.node), D.state !== 'done' && !!nameStart(D.node))}
       ${status ? `<div class="status ${D.busy ? 'wait' : ''} ${D.tries ? 'bad' : ''}"><span class="bub"></span>${status}</div>` : ''}
-      ${D.state === 'done' ? sbReport() : `<p class="feedback">${D.msg || (D.hist.length <= 2 ? 'Drag a piece or tap it, then tap where it goes.' : '&nbsp;')}</p>`}</div>`;
+      ${D.state === 'done' ? sbReport() : `<p class="feedback">${D.msg || '&nbsp;'}</p>`}</div>`;
   return head + (D.state === 'done' ? '' : black) + sbFeed();
 }
 function renderSbPanel(){
@@ -2989,8 +2976,7 @@ function wireSbPanel(){
 function sbFromHTML(){
   const D = S.drill; if ((D && D.kind === 'sbset') || (D && D.kind === 'sb' && D.scope.startsWith('u:'))) return '';
   const f = sbFrom(), fl = f && N[f].u ? [N[f].u.slice(0, 2), N[f].u.slice(2, 4)] : null;
-  return `<div class="sbwhere">${f ? `<div class="sbfpos">${thumb(f, {coords: false, last: fl})}<div><b>Games start after move ${moveNo(ply(f))}: ${esc(N[f].l)}</b></div></div>`
-      : '<div class="sbfpos one"><div><b>Games start from the first move</b></div></div>'}
+  return `<div class="sbwhere">${f ? `<div class="sbfpos">${thumb(f, {coords: false, last: fl})}<div><b>From move ${moveNo(ply(f))}: ${esc(N[f].l)}</b></div></div>` : ''}
     <div class="lesson-actions"><button class="btn small" id="sbSetUp" type="button">${f ? 'Change the position' : 'Set up a position'}</button>${f ? '<button class="btn small ghost" id="sbFromClear" type="button">Start from move one</button>' : ''}</div></div>`;
 }
 // every line a game can end on with these settings, over the colours in play: the lines through the start position, or
@@ -3009,16 +2995,15 @@ function sbSideHTML(){
   const oddsBtn = (val, label) => `<button data-sbf="odds:${val}" aria-pressed="${odds === val}">${label}</button>`;
   return `<div class="dpanel">
       ${f ? '' : `<div><p class="kicker" style="margin-bottom:6px">Openings</p><div class="seg"><button data-sbf="scope:all" aria-pressed="${every}">Everything</button></div>${row('w')}${row('b')}</div>`}
-      <div><p class="kicker" style="margin-bottom:6px">The other side plays</p><div class="seg">${oddsBtn('real', 'Like real games')}${oddsBtn('even', 'Even spread')}${oddsBtn('weak', 'My weak spots')}</div>
-      <p class="evaltext" style="text-align:left;margin-top:8px">${odds === 'real' ? 'Common replies come up often and rare ones rarely.' : odds === 'even' ? 'Every line in your book is equally likely.' : 'Lines you haven\'t played, are due, or slipped on come up more.'}</p>${sbPendingHTML()}</div>
-      <div class="queue"><div><b class="tnum">${ses ? ses.games : 0}</b><span>games this session</span></div><div><b class="tnum">${ses ? ses.slips : 0}</b><span>slips this session</span></div><div><b class="tnum">${seen}<small style="font-size:.5em;color:var(--muted)">/${pool.length}</small></b><span>${f ? 'of the lines from this position met' : `of your ${ss.length === 1 ? sideName(ss[0]) + ' ' : ''}lines met here`}</span></div></div>
+      <div><p class="kicker" style="margin-bottom:6px">The other side plays</p><div class="seg">${oddsBtn('real', 'Like real games')}${oddsBtn('even', 'Even spread')}${oddsBtn('weak', 'My weak spots')}</div>${sbPendingHTML()}</div>
+      <div class="queue"><div><b class="tnum">${ses ? ses.games : 0}</b><span>games</span></div><div><b class="tnum">${ses ? ses.slips : 0}</b><span>slips</span></div><div><b class="tnum">${seen}<small style="font-size:.5em;color:var(--muted)">/${pool.length}</small></b><span>lines met</span></div></div>
     </div>`;
 }
 // the settings changed while a game is on: it goes on as it started, and the change waits for the next one
 function sbPendingHTML(){
   const D = S.drill;
   if (!D || D.kind !== 'sb' || D.state !== 'play' || D.scope.startsWith('u:') || D.cfg === sbCfg()) return '';
-  return `<div class="sbpend" role="status"><span>This game goes on as it started. The change starts with the next one.</span><button class="btn small" id="sbNow">Start it now</button></div>`;
+  return `<div class="sbpend" role="status"><span>Applies from the next game.</span><button class="btn small" id="sbNow">Start it now</button></div>`;
 }
 function renderSbSide(){ const el = document.getElementById('sbside'), w = document.getElementById('sbwhere'); if (w) w.innerHTML = sbFromHTML(); if (el){ el.innerHTML = sbSideHTML(); wireSbSide(); } }
 function wireSbSide(){
@@ -3073,8 +3058,8 @@ function openTile(s, C, st, attr){
   const ls = chLines(s, C), known = ls.filter(lineClean).length, met = st && st.n;
   const pct = met ? Math.round((st.w + (st.d || 0) / 2) / st.n * 100) : 0;
   const rec = met ? `${st.w}–${st.l}${st.d ? '–' + st.d : ''}` : '';
-  return `<button class="otile" type="button" ${attr}>${chTileBoard(s, C)}<span class="otx"><b>${esc(C.name)}</b><span class="omove">${esc(C.move)}</span>
-    <span class="orec">${met ? `<span class="tnum">${st.n} ${st.n === 1 ? 'game' : 'games'}</span><span class="tnum ${pct >= 60 ? 'good' : pct < 50 ? 'bad' : ''}">${rec}</span>` : '<span>Not met yet</span>'}</span>
+  return `<button class="otile" type="button" ${attr}>${chTileBoard(s, C)}<span class="otx"><b>${esc(C.name)}</b>
+    ${met ? `<span class="orec"><span class="tnum ${pct >= 60 ? 'good' : pct < 50 ? 'bad' : ''}" title="Your record: ${st.n} ${st.n === 1 ? 'game' : 'games'}">${rec}</span></span>` : ''}
     <span class="oknow" title="Lines you have played from memory without a slip"><span class="obar" aria-hidden="true"><i style="width:${ls.length ? Math.round(known / ls.length * 100) : 0}%"></i></span><span class="tnum">${known} of ${ls.length} lines</span></span></span></button>`;
 }
 function shotTile(I){
@@ -3082,7 +3067,7 @@ function shotTile(I){
   if (I.puz !== undefined){ const P = DATA.puzzles[I.puz]; if (!P) return ''; idx = P.node; o.arrows = [P.ok[0] + 'g']; attr = `data-puz="${I.puz}"`; }
   else { const L = LINES[I.game]; if (!L) return ''; idx = L.n[I.at]; attr = `data-line="${I.game}" data-i="${I.at}"`; }
   const nd = N[idx]; if (nd.u) o.last = [nd.u.slice(0, 2), nd.u.slice(2, 4)];
-  return `<button class="mshot" type="button" ${attr}>${thumb(idx, o)}<span class="mtx"><span class="mbig tnum">${esc(I.big)}<small>${esc(I.unit || '')}</small></span><b>${esc(I.h)}</b><span class="mpara">${esc(I.p)}</span><span class="mgo">${I.puz !== undefined ? 'Practice the shots' : 'Replay the game'} ›</span></span></button>`;
+  return `<button class="mshot" type="button" ${attr}>${thumb(idx, o)}<span class="mtx"><span class="mbig tnum">${esc(I.big)}<small>${esc(I.unit || '')}</small></span><b>${esc(I.h)}</b><span class="mgo">${I.puz !== undefined ? 'Practice the shots' : 'Replay the game'} ›</span></span></button>`;
 }
 function gameRow(G){
   const main = LINES[G.lines[0]];
@@ -3112,7 +3097,7 @@ function renderGames(){
   const body = seg === 'last' ? Review.html() : seg === 'recap' ? Recap.html()
     : seg === 'shots' ? SD.map(s => part(s, shots[s].length ? `<div class="mshots">${shots[s].join('')}</div>` : '')).join('')
     : seg === 'games' ? SD.map(s => part(s, BOOKS[s].games.length ? `<div class="grevs">${withBook(s, () => DATA.games.map(gameRow).join(''))}</div>` : '')).join('')
-    : `<p class="legendline">The other side's move is highlighted. The green arrow is your answer.</p>${SD.map(s => part(s, `<div class="otiles">${BOOKS[s].chapters.map(C => openTile(s, C, C.stats, `data-ch="${C.id}"`)).join('')}</div>`)).join('')}`;
+    : `${SD.map(s => part(s, `<div class="otiles">${BOOKS[s].chapters.map(C => openTile(s, C, C.stats, `data-ch="${C.id}"`)).join('')}</div>`)).join('')}`;
   if (rc) segs[segs.length - 1][4] = Recap.fresh();      // after the body: opening a finished month marks it seen
   view.innerHTML = `${segHTML(segs, seg, 'gseg')}<div class="gbody">${body}</div>`;
   view.querySelectorAll('[data-gseg]').forEach(b => b.onclick = () => { S.gseg = b.dataset.gseg; renderGames(); });
@@ -3130,7 +3115,7 @@ function glanceCards(C){
 }
 function glanceHTML(C){
   const cs = glanceCards(C); if (!cs.length) return '';
-  return `<p class="legendline">${OPP}'s move is highlighted, the green arrow is your answer. Tap a card for its lesson.</p><div class="cgrid">${cs.map(c => {
+  return `<div class="cgrid">${cs.map(c => {
     const nd = N[c.node], o = {coords: false, arrows: [c.mv.slice(0, 4) + 'g']};
     if (nd.u) o.last = [nd.u.slice(0, 2), nd.u.slice(2, 4)];
     const lid = LESSONS[c.lesson].lines.find(id => LINES[id].n.includes(c.child)) || LESSONS[c.lesson].lines[0];
@@ -3183,6 +3168,7 @@ function bullets(t, cls = ''){
   if (xs.length === 1 && !Array.isArray(t)) return `<p class="bul1 ${cls}">${esc(xs[0])}</p>`;
   return `<ul class="bul ${cls}">${xs.map(x => `<li>${esc(String(x).replace(/\.$/, ''))}</li>`).join('')}</ul>`;
 }
+const firstOf = t => Array.isArray(t) ? t.slice(0, 1) : firstSentence(t || '');
 const listOf = U => U.deep ? DEEPOF[U.deep].units : COURSE;   // a unit's siblings: the course, or its deep dive's parts
 const unitNo = U => U.deep ? `Part ${U.k + 1}` : `Unit ${U.k + 1}`;
 const uword = U => U.deep ? 'part' : 'unit';
@@ -3295,12 +3281,12 @@ function renderCourse(){
     const steps = unitSteps(cur), nx = steps.find(s => !s.done), nn = nx && nx.key !== 'idea' ? unitNext(cur) : null;   // the same one step on as the unit page
     hero = `<section class="chero"><div class="board">${slideSVG(cur, cur.idea[0])}</div>
       <div><div class="chips">${sideChip(cur)}<span class="chip">Up next · ${unitNo(cur)} of ${COURSE.length}</span></div>
-        <h3>${esc(cur.title)}</h3>${bullets(cur.why, 'lede')}
+        <h3>${esc(cur.title)}</h3>
         <ol class="ministeps" aria-label="Steps in this unit">${steps.map(s => `<li class="${s.done ? 'done' : s === nx ? 'next' : ''}">${s.done ? ICON.check : ''}${esc(s.title)}</li>`).join('')}</ol>
-        <div class="cta"><button class="btn primary" id="cGo">${esc(nn ? nn.cta : stepCta(cur, nx))}</button><button class="btn" data-unit="${cur.id}">See the whole unit</button></div></div></section>`;
-  } else hero = `<section class="chero done"><div><p class="kicker">Every open unit passed</p><h3>Now keep it fresh.</h3>${bullets(['Lines you\'ve learned come back for review in the Drill tab', 'Every lesson can be played on with the engine', 'The practice sets are open any time'], 'lede')}</div></section>`;
+        <div class="cta"><button class="btn primary" id="cGo">${esc(nn ? nn.cta : stepCta(cur, nx))}</button></div></div></section>`;
+  } else hero = `<section class="chero done"><div><h3>Every unit passed</h3><div class="cta"><button class="btn primary" data-go="drill">Keep it fresh in Drill</button></div></div></section>`;
   const lib = gradAt() ? `<div class="crumbs"><button class="btn small" data-lib>← Library</button><span class="where">Your first course · finished ${new Date(gradAt()).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})}</span></div>` : '';
-  view.innerHTML = `${lib}<div class="nudge" id="nudge" hidden></div>${changedNote()}<div class="chead solo"><div class="cmeter"><div class="bar" aria-hidden="true">${bar}</div><span>${passedN} of ${open.length} units passed${COURSE.length > open.length ? ` · ${COURSE.length - open.length} coming soon` : ''}</span></div></div>
+  view.innerHTML = `${lib}<div class="nudge" id="nudge" hidden></div>${changedNote()}<div class="chead solo"><div class="cmeter"><div class="bar" aria-hidden="true">${bar}</div><span>${passedN} of ${open.length} units passed</span></div></div>
     ${hero}<ol class="path" aria-label="Course units">${COURSE.map(U => unitRow(U, cur)).join('')}</ol>`;
   const g = document.getElementById('cGo'); if (g) g.onclick = () => { const nx = unitSteps(cur).find(s => !s.done); if (!nx) return openUnit(cur.id); const m = nx.key !== 'idea' && unitNext(cur); if (m) m.go(); else doStep(cur, nx.key); };
   courseNotes();
@@ -3315,12 +3301,9 @@ function changedNote(){ return ''; }
 function unitRow(U, cur){
   const open = unitOpen(U), passed = unitPassed(U), isCur = U === cur, steps = U.soon ? [] : unitSteps(U), done = steps.filter(s => s.done).length, due = passed ? unitDue(U) : 0;
   const bub = U.soon ? `<span class="ubub soon">${U.k + 1}</span>` : passed ? `<span class="ubub pass" title="Passed">${ICON.check}</span>` : isCur ? `<span class="ubub cur">${U.k + 1}</span>` : open ? `<span class="ubub">${U.k + 1}</span>` : `<span class="ubub" title="Locked">${ICON.lock}</span>`;
-  const before = listOf(U).slice(0, U.k).reverse().find(V => !V.soon);
-  const status = U.soon ? '' : passed ? (done === steps.length ? 'Complete' : 'Passed') : open ? `${done} of ${steps.length} steps` : before ? `Opens after ${unitNo(before).toLowerCase()}` : 'Opens when your course is finished';
-  const pips = U.soon ? '' : `<span class="pips" aria-hidden="true">${steps.map(s => `<i class="${s.done ? 'on' : ''}"></i>`).join('')}</span>`;
-  const meta = U.soon ? '' : `<span class="ust">${pips}<span>${status}</span>${due ? `<span class="chip blunder">${due} to review</span>` : ''}</span>`;
-  const tail = U.kicker.split(' · ').slice(1).join(' · ') || U.kicker, sub = U.soon ? U.why : tail[0].toUpperCase() + tail.slice(1);
-  const inner = `${unitThumb(U)}<span class="ut"><span class="chips">${sideChip(U)}${U.soon ? '<span class="chip soon">Coming soon</span>' : ''}</span><b>${esc(U.title)}</b><span class="us">${esc(sub)}</span>${U.soon && U.chapter ? `<span><button class="linkish" data-soon="${U.id}">See the current lines</button></span>` : ''}</span>${meta}`;
+  const pips = U.soon || !open ? '' : `<span class="pips" aria-label="${done} of ${steps.length} steps">${steps.map(s => `<i class="${s.done ? 'on' : ''}"></i>`).join('')}</span>`;
+  const meta = U.soon || !open ? '' : `<span class="ust">${pips}${due ? `<span class="chip blunder">${due} to review</span>` : ''}</span>`;
+  const inner = `${unitThumb(U)}<span class="ut"><span class="chips">${sideChip(U)}${U.soon ? '<span class="chip soon">Coming soon</span>' : ''}</span><b>${esc(U.title)}</b>${U.soon && U.chapter ? `<span><button class="linkish" data-soon="${U.id}">See the current lines</button></span>` : ''}</span>${meta}`;
   const card = U.soon ? `<div class="ucard soon">${inner}</div>` : open ? `<button class="ucard ${isCur ? 'cur' : ''}" data-unit="${U.id}" aria-label="${esc(unitNo(U) + ': ' + U.title + (passed ? ', passed' : ''))}">${inner}</button>` : `<div class="ucard locked" aria-label="${esc(unitNo(U) + ': ' + U.title + ', locked')}">${inner}</div>`;
   return `<li class="urow"><div class="rail">${bub}</div>${card}</li>`;
 }
@@ -3328,32 +3311,32 @@ function unitRow(U, cur){
 /* a unit */
 function lessonRow(U, lid){
   const L = LIDX[U.side][lid], {idx, o} = lessonThumbOpts(L), seen = lessonSeen(U.side, lid);
-  return `<button class="lrow" data-ulesson="${lid}">${thumb(idx, o)}<span><b>${esc(L.title)}</b><span class="s">${esc(L.sub)}</span></span><span class="tick ${seen ? '' : 'no'}">${seen ? ICON.check + 'Played' : 'Not yet'}</span></button>`;
+  return `<button class="lrow" data-ulesson="${lid}">${thumb(idx, o)}<span><b>${esc(L.title)}</b></span><span class="tick ${seen ? '' : 'no'}">${seen ? ICON.check + 'Played' : ''}</span></button>`;
 }
 function drillRow(U, id){
-  const r = Prog.rec(id), L = lessonOf(id), now = Date.now(), st = !r ? ['no', 'Not yet'] : r.due <= now ? ['due', r.clean ? 'Review now' : 'Again today'] : r.clean ? ['', 'Clean'] : ['due', 'Again today'];
+  const r = Prog.rec(id), L = lessonOf(id), now = Date.now(), st = !r ? ['no', ''] : r.due <= now ? ['due', r.clean ? 'Review now' : 'Again today'] : r.clean ? ['', 'Clean'] : ['due', 'Again today'];
   return `<button class="mrow" data-udrill="${id}"><span>${esc(L.title)}</span><span class="pips">${[1,2,3,4,5].map(k => `<i class="${k <= ((r || {}).box || 0) ? 'on' : ''}"></i>`).join('')}</span><span class="tick ${st[0]}">${st[0] === '' ? ICON.check : ''}${st[1]}</span></button>`;
 }
 function stepHTML(U, s, k, nx, open){
   const isNext = open && s === nx, prim = isNext ? 'primary' : '', dis = open ? '' : 'disabled';
   const head = (t, cnt) => `<h3>${esc(t)}${cnt ? ` <span class="cnt">${cnt}</span>` : ''}</h3>`;
-  const best = s.best !== undefined ? `Best so far: ${s.best} of ${s.of}` : '';
+  // a step is its name, its count and what to tap: the count in the heading is the goal
   let body;
-  if (s.key === 'idea') body = head(U.kind === 'skill' ? 'The habit' : 'The idea') + bullets([`${U.idea.length} pictures on the board${U.kind === 'skill' ? ', each from one of your games' : ''}`, 'Step through them with the arrows under the board'], 'sp');
-  else if (s.key === 'learn') body = head('Play along', `${s.n}/${s.of}`) + bullets(['Play each lesson\'s moves yourself: the green arrow shows the move', 'The coach says why it\'s the move', 'Then the same line once from memory'], 'sp') + `<div class="sx"><div class="lrows">${U.lessons.map(l => lessonRow(U, l)).join('')}</div></div>`;
+  if (s.key === 'idea') body = head(U.kind === 'skill' ? 'The habit' : 'The idea');
+  else if (s.key === 'learn') body = head('Play along', `${s.n}/${s.of}`) + `<div class="sx"><div class="lrows">${U.lessons.map(l => lessonRow(U, l)).join('')}</div></div>`;
   else if (s.key === 'drill'){
     const nl = unitNextLine(U), due = unitDue(U);
-    body = head('Drill', `${s.n}/${s.of}`) + bullets(['Each main line once from memory without a slip', 'Clean lines come back later for review'], 'sp') + `<div class="sx"><div class="mtable">${U.lines.map(id => drillRow(U, id)).join('')}</div>
+    body = head('Drill', `${s.n}/${s.of}`) + `<div class="sx"><div class="mtable">${U.lines.map(id => drillRow(U, id)).join('')}</div>
       <div class="lesson-actions"><button class="btn ${prim}" data-ustep="drill" ${dis || (nl ? '' : 'disabled')}>${s.done ? (due ? `Review ${due} due ${due === 1 ? 'line' : 'lines'}` : 'Nothing due') : 'Drill the next line'}</button></div></div>`;
   }
-  else if (s.key === 'spar') body = head('Practice games', `${s.n}/${s.of}`) + bullets([`${SPAR} games in the Sandbox without a slip`, `Your opponent plays only this ${uword(U)}'s moves, the lines you know least first`, up(U.id).sparGames ? `${up(U.id).sparGames} played so far` : ''], 'sp') + `
+  else if (s.key === 'spar') body = head('Practice games', `${s.n}/${s.of}`) + `<p class="sp">Without a slip</p>
       <div class="sx"><div class="lesson-actions"><button class="btn ${prim}" data-ustep="spar" ${dis}>Play a practice game</button></div></div>`;
-  else if (s.key === 's1' || s.key === 's2') body = head(s.title, s.best !== undefined ? `${s.best}/${s.of}` : '') + bullets([`${s.of} ${skillOf(U).what}`, `${U.passSet} right on the first try clears the set`, best], 'sp') + `
+  else if (s.key === 's1' || s.key === 's2') body = head(s.title, s.best !== undefined ? `${s.best}/${s.of}` : '') + `<p class="sp">${U.passSet} of ${s.of} clears it</p>
       <div class="sx"><div class="lesson-actions"><button class="btn ${prim}" data-ustep="${s.key}" ${dis}>${s.best !== undefined ? 'Try it again' : 'Start the set'}</button></div></div>`;
   else {
     const n = s.of, need = U.kind === 'skill' ? U.passCheck : U.pass;
-    body = head('Checkpoint', s.best !== undefined ? `${s.best}/${n}` : '') + bullets([`${n} ${U.kind === 'skill' ? 'new positions from your games' : `positions from this ${uword(U)}`}`, `${need} right on the first try passes${nextUnitAfter(U) ? ` and opens the next ${uword(U)}` : ''}`, best], 'sp') + `
-      <div class="sx"><div class="lesson-actions"><button class="btn ${prim}" data-ustep="cp" ${dis}>${s.done ? 'Take it again' : 'Take the checkpoint'}</button></div>${!s.done && !isNext && open ? '<p class="sp">Already know this? You can take it now.</p>' : ''}</div>`;
+    body = head('Checkpoint', s.best !== undefined ? `${s.best}/${n}` : '') + `<p class="sp">${need} of ${n} to pass</p>
+      <div class="sx"><div class="lesson-actions"><button class="btn ${prim}" data-ustep="cp" ${dis}>${s.done ? 'Take it again' : 'Take the checkpoint'}</button></div></div>`;
   }
   return `<li class="step ${s.done ? 'done' : ''} ${isNext ? 'next' : ''}"><span class="sn">${s.done ? ICON.check : k + 1}</span><div>${body}</div></li>`;
 }
@@ -3368,17 +3351,17 @@ function renderUnit(){
   const crumbs = `<div class="crumbs">${back}<span class="where">${X ? 'Deep dive · ' : ''}${unitNo(U)} of ${L.length} · ${U.kind === 'skill' ? 'Skill' : U.side === 'w' ? 'White' : 'Black'}</span><span class="spacer"></span>
     ${prevOpen ? `<button class="btn small" data-unit="${prevOpen.id}" aria-label="Previous ${uword(U)}">‹<span class="navtxt"> ${unitNo(prevOpen)}</span></button>` : ''}${nextU && unitOpen(nextU) ? `<button class="btn small" data-unit="${nextU.id}" aria-label="Next ${uword(U)}"><span class="navtxt">${unitNo(nextU)} </span>›</button>` : ''}</div>`;
   const idea = `<div class="idea"><div class="board" id="ideaBoard">${slideSVG(U, s)}</div>
-    <div class="ideacap"><p class="kicker">${U.kind === 'skill' ? 'The habit' : 'The idea'} · ${S.slide + 1} of ${U.idea.length}${s.game ? ' · ' + esc(s.game) : ''}</p><h3>${esc(s.h)}</h3>${bullets(s.t)}
+    <div class="ideacap"><p class="kicker">${U.kind === 'skill' ? 'The habit' : 'The idea'} · ${S.slide + 1} of ${U.idea.length}${s.game ? ' · ' + esc(s.game) : ''}</p><h3>${esc(s.h)}</h3>${bullets(firstOf(s.t))}
       <div class="ideanav"><button class="ctl" id="iPrev" aria-label="Previous picture" ${S.slide === 0 ? 'disabled' : ''}>${ICON.prev}</button>
         <span class="dots" aria-hidden="true">${U.idea.map((_, k) => `<i class="${k === S.slide ? 'cur' : (seenIdea || k < S.slide) ? 'on' : ''}"></i>`).join('')}</span>
         <button class="ctl" id="iNext" aria-label="Next picture" ${S.slide >= U.idea.length - 1 ? 'disabled' : ''}>${ICON.next}</button></div></div></div>`;
   const lockN = L.slice(0, U.k).find(V => !V.soon && !unitPassed(V));
-  const lockTxt = !open ? (X && !gradAt() ? 'Deep dives open when you finish your first course.' : lockN ? `This ${uword(U)} opens when you pass the checkpoint in ${unitNo(lockN).toLowerCase()}, ${esc(lockN.title)}.` : '') : '';
+  const lockTxt = !open ? (X && !gradAt() ? 'Finish your first course to open this.' : lockN ? `Pass ${unitNo(lockN).toLowerCase()} to open this.` : '') : '';
   const XD = !X && gradAt() ? deepFor(U) : null;
-  const deeper = U.deeper && U.deeper.length ? `<section class="part" style="margin:14px 0 0"><div class="part-head"><div><p class="kicker">${XD ? 'Deep dive' : 'Optional'}</p><h3>Go deeper</h3></div><p>${XD ? `These lessons are a deep dive in your library now, with drills, practice games and a checkpoint for each part.` : 'More lines from the same openings. Not needed to pass; come back when the core feels easy.'}</p>${XD ? `<button class="btn small primary" data-deep="${XD.id}">Open the deep dive</button>` : `<span class="count tnum">${U.deeper.length} ${U.deeper.length === 1 ? 'lesson' : 'lessons'}</span>`}</div>
+  const deeper = U.deeper && U.deeper.length ? `<section class="part" style="margin:14px 0 0"><div class="part-head"><div><p class="kicker">${XD ? 'Deep dive' : 'Optional'}</p><h3>Go deeper</h3></div>${XD ? `<button class="btn small primary" data-deep="${XD.id}">Open the deep dive</button>` : `<span class="count tnum">${U.deeper.length} ${U.deeper.length === 1 ? 'lesson' : 'lessons'}</span>`}</div>
       <div class="cards">${U.deeper.map(l => lessonCard(LIDX[U.side][l])).join('')}</div></section>` : '';
   view.innerHTML = `${crumbs}<div class="ugrid"><div class="bcol">${idea}</div>
-    <div class="ucol"><header class="uhead"><div class="chips">${sideChip(U)}${X ? `<span class="chip deep">Deep dive · ${esc(X.title)}</span>` : ''}<span class="chip">${unitNo(U)} of ${L.length}</span>${passed ? '<span class="chip good">Passed</span>' : ''}</div><h2>${esc(U.title)}</h2>${bullets(U.why, 'lede')}
+    <div class="ucol"><header class="uhead">${passed ? '<div class="chips"><span class="chip good">Passed</span></div>' : ''}<h2>${esc(U.title)}</h2>
       ${open && nx ? `<div class="cta" style="margin-top:14px"><button class="btn primary" id="uGo">${nx.key === 'idea' ? 'Next picture' : esc(nn ? nn.cta : stepCta(U, nx))}</button></div>` : ''}</header>
       ${lockTxt ? `<p class="lockednote">${lockTxt}</p>` : ''}
       <ol class="steps">${steps.map((st, k) => stepHTML(U, st, k, nx, open)).join('')}</ol>
@@ -3395,18 +3378,18 @@ function renderUnit(){
 // what each kind of skill unit asks for. Positions in all three come from your own games, at the moment it went wrong.
 const goal = it => it.best === undefined ? 'keeps everything safe' : it.best >= 70 ? 'keeps the win' : it.best >= 35 ? 'holds the draw' : 'keeps you in the game';
 const SKILL = {
-  threats: {h: 'Find a safe move', what: 'positions from your games where the next move lost material. Find a safe move',
-    ask: () => 'In this game your next move lost material. Find one that keeps everything safe.',
-    ok: ['Safe.', 'Safe this time.'], look: 'Look again: what is attacked, and what would your move leave unguarded?',
-    legend: ['the danger', 'your move'], card: 'Red: the danger. Green: a safe move.'},
-  finish: {h: 'Keep the win', what: 'positions from your games where you were winning and the next move let it slip. Find a move that keeps the win',
-    ask: () => 'You are winning here. In the game your next move let most of it slip. Find a move that keeps you winning.',
-    ok: ['Still winning.', 'That keeps it.'], look: 'Look again: their checks and captures first, then the move that keeps everything guarded.',
-    legend: ['what came next', 'your move'], card: 'Red: what came next in the game. Green: a move that keeps the win.'},
-  endings: {h: 'Find the ending move', what: 'endgame positions from your games where one move decided the result. Find the move that keeps it',
-    ask: it => `An ending from your game. Your next move in the game ${it.best >= 70 ? 'gave the win away' : 'turned it into a loss'}. Find the move that ${goal(it)}.`,
-    ok: ['That\'s the one.', 'Found it.'], look: 'Look again: the king is a fighting piece now, and a passed pawn is worth more than it looks.',
-    legend: ['what came next', 'your move'], card: 'Red: what came next in the game. Green: the move that keeps the result.'}
+  threats: {h: 'Find a safe move',
+    ask: () => 'Your move here lost material.',
+    ok: ['Safe.', 'Safe this time.'],
+    legend: ['the danger', 'your move']},
+  finish: {h: 'Keep the win',
+    ask: () => 'You are winning here.',
+    ok: ['Still winning.', 'That keeps it.'],
+    legend: ['what came next', 'your move']},
+  endings: {h: 'Find the ending move',
+    ask: it => `An ending: find the move that ${goal(it)}.`,
+    ok: ['That\'s the one.', 'Found it.'],
+    legend: ['what came next', 'your move']}
 };
 const skillOf = U => SKILL[(U && U.skill) || 'threats'];
 const quizName = set => set === 'cp' ? 'Checkpoint' : set === 's1' ? 'Practice set 1' : 'Practice set 2';
@@ -3428,13 +3411,13 @@ function quizTry(u, to){
     const first = Q.tries === 0 && !Q.peeked; Q.res[Q.k] = first; Q.state = 'shown'; Q.flash = {sq: to, ok: true}; Q.hint = null;
     if (!threat){
       Q.view = applyMove(dFen(), u); Q.lastU = u; Q.arrows = null;
-      Q.msg = `<b>${first ? 'Right' : 'That\'s it'}: ${esc(it.rule)}.</b> ${esc(it.note || '')}`;
+      Q.msg = `<b>${esc(it.rule)}.</b> ${esc(firstSentence(it.note || ''))}`;
       renderDrillBoard();
     } else {
       const danger = it.threat || it.reply;
       Q.arrows = [u.slice(0, 4) + 'g'].concat(danger ? [danger.slice(0, 4) + 'r'] : []);
       const K = skillOf(UNIT[Q.unit]); Q.lastTry = u;
-      Q.msg = `<b>${K.ok[first ? 0 : 1]}</b> ${it.threat ? `The danger (red): ${esc(lc(it.threatLabel))}. ` : ''}${fine ? `Your move loses nothing. The engine's own choice was: ${esc(lc(wordsAt(it.ff, it.safe[0])))}. ` : ''}In the game ${PERSONA === 'house' ? 'you played' : 'the move was'} ${esc(lc(it.playedLabel))}, and ${esc(it.opp)} answered: ${esc(lc(it.replyLabel))}.`;
+      Q.msg = `<b>${K.ok[first ? 0 : 1]}</b> ${it.threat ? `The danger: ${esc(lc(it.threatLabel))}.` : `In the game: ${esc(lc(it.playedLabel))}, then ${esc(lc(it.replyLabel))}.`}${fine ? ` The engine's choice: ${esc(lc(wordsAt(it.ff, it.safe[0])))}.` : ''}`;
       renderDrillBoard();
     }
     renderQuizPanel(); return;
@@ -3443,7 +3426,7 @@ function quizTry(u, to){
   Q.tries++; Q.lastTry = u;
   if (!threat){
     Q.flash = {sq: to, ok: false};
-    Q.msg = Q.tries >= 2 ? 'Not that one. The arrow shows your move; play it to continue.' : 'Not your move here. Try again.';
+    Q.msg = Q.tries >= 2 ? 'Play the arrow\'s move.' : 'Not your move.';
     if (Q.tries >= 2) Q.hint = it.ans;
     renderDrillBoard(); renderQuizPanel();
     setTimeout(() => { if (S.drill === Q && Q.flash && !Q.flash.ok){ Q.flash = null; renderDrillBoard(); } }, 650);
@@ -3452,14 +3435,13 @@ function quizTry(u, to){
   // a threat position: play the move out and show the punishment, then let them try again
   const r = it.refute[u], after = applyMove(dFen(), u), game = u === it.played;
   Q.state = 'refuted'; Q.busy = !!r; Q.view = after; Q.lastU = u; Q.flash = {sq: to, ok: false}; Q.arrows = null; Q.hint = null;
-  Q.msg = game ? 'That\'s the move you played in the game.' : '';
+  Q.msg = game ? 'Your move in the game.' : '';
   renderDrillBoard(); renderQuizPanel();
   if (!r){ Q.busy = false; return; }
   setTimeout(() => {
     if (S.drill !== Q || Q.state !== 'refuted') return;
     Q.view = applyMove(after, r[0]); Q.lastU = r[0]; Q.flash = null; Q.arrows = [r[0].slice(0, 4) + 'r']; Q.busy = false;
-    const rw = (() => { try { return Ideas.reply(after, r[0], {me: it.me || SIDE})[0] || ''; } catch(e){ return ''; } })();
-    Q.msg = `<b>${esc(OPP)} answers: ${esc(lc(r[1]))}.</b> ${rw ? `<span class="rwhy">${esc(rw)}.</span> ` : ''}${game ? 'That\'s what happened in the game. ' : ''}${refuteWhy(it, u, r)}<span class="qlook">${skillOf(UNIT[Q.unit]).look}</span>`;
+    Q.msg = `<b>${esc(OPP)} answers: ${esc(lc(r[1]))}.</b> ${refuteWhy(it, u, r)}`;
     renderDrillBoard({u: r[0], meta: {}}); renderQuizPanel();
   }, 750);
 }
@@ -3470,12 +3452,13 @@ function fenAfter(fen, us){ const ch = new Chess(fen); for (const u of us) if (!
 function wordsAt(fen, u){ const ch = new Chess(fen), mv = ch.move(uciObj(u)); if (!mv) return ''; ch.undo(); return moveWords(ch, mv, null); }
 function refuteWhy(it, u, r){
   const tail = r[3] || [], lost = r[4] || 0, ei = r[5] !== undefined ? evalInfo(r[5]) : null, mated = /checkmate/.test(r[1]);
-  const verdict = ei && !mated ? ` The engine now calls it: <b>${esc(lc(ei.txt))}</b>.` : '';
-  const cost = mated ? '' : lost ? `That costs you ${LOSTW(lost)}.` : 'Nothing is lost on the board.';
-  if (!tail.length) return `${cost}${lost && skillOf(UNIT[S.quizState.unit]) === SKILL.threats ? '' : verdict} `;
+  // one thing: for a threat what it costs, for a won game or an ending what the engine makes of it now. The moves are
+  // listed only when the loss comes later.
+  const now = ei && !mated ? `Now: <b>${esc(lc(ei.txt))}</b>.` : '', lose = lost ? `That costs you ${LOSTW(lost)}.` : '';
+  const cost = mated ? '' : skillOf(UNIT[S.quizState.unit]) === SKILL.threats ? (lose || now) : (now || lose);
+  if (!tail.length || r[2] > 0) return `${cost} `;
   const ws = lineWords(fenAfter(it.ff, [u, r[0]]), tail, 7);
-  return `${r[2] > 0 ? 'And it goes on:' : lost ? 'Nothing falls at once. The point comes a few moves later:' : 'The line it expects:'}
-    <ol class="eline qline">${ws.map(w => `<li class="${w.white ? 'w' : 'b'}">${pieceIcon(w.pc, w.white)}<span>${esc(w.label)}</span></li>`).join('')}</ol>${cost}${verdict} `;
+  return `<ol class="eline qline">${ws.map(w => `<li class="${w.white ? 'w' : 'b'}">${pieceIcon(w.pc, w.white)}<span>${esc(w.label)}</span></li>`).join('')}</ol>${cost} `;
 }
 // play the wrong move, the reply and the rest of the line on the quiz board, one move at a time
 function quizPlayOut(){
@@ -3537,10 +3520,10 @@ function missCard(it){
   if (it.fen){
     const o = {mini: true, coords: false, flip: it.me === 'b', arrows: [it.safe[0].slice(0, 4) + 'g'].concat((it.threat || it.reply) ? [(it.threat || it.reply).slice(0, 4) + 'r'] : [])};
     if (it.last) o.last = [it.last.slice(0, 2), it.last.slice(2, 4)];
-    return `<div class="slipc"><div class="thumb">${boardSVG(it.fen, o)}</div><div><b>${esc(it.threat ? it.threatLabel : it.replyLabel)}</b><p>vs ${esc(it.opp)}. ${skillOf(UNIT[S.quizState.unit]).card}</p>${ex}</div></div>`;
+    return `<div class="slipc"><div class="thumb">${boardSVG(it.fen, o)}</div><div><b>${esc(it.threat ? it.threatLabel : it.replyLabel)}</b>${ex}</div></div>`;
   }
   const nd = N[it.node], o = {coords: false, arrows: [it.ans.slice(0, 4) + 'g']}; if (nd.u) o.last = [nd.u.slice(0, 2), nd.u.slice(2, 4)];
-  return `<div class="slipc">${thumb(it.node, o)}<div><b>${esc(it.rule)}</b><p>${esc(OPP)} had just played: ${esc(lc(nd.l))}. Green: your move.</p>${ex}</div></div>`;
+  return `<div class="slipc">${thumb(it.node, o)}<div><b>${esc(it.rule)}</b>${ex}</div></div>`;
 }
 function quizPanelHTML(){
   const Q = S.quizState, U = UNIT[Q.unit], n = Q.items.length, need = quizPass(U, Q.set), it = Q.items[Q.k], threat = !!it.fen;
@@ -3549,29 +3532,29 @@ function quizPanelHTML(){
     const score = Q.res.filter(Boolean).length, passed = score >= need, nxt = nextUnitAfter(U), opened = Q.set === 'cp' && passed && nxt && unitOpen(nxt);
     const misses = Q.items.filter((_, k) => !Q.res[k]);
     const fin = Q.set === 'cp' && passed && U.deep && deepDone(DEEPOF[U.deep]);   // the last part of a deep dive
-    const msg = passed ? (Q.set === 'cp' ? (opened ? `Passed. ${Q.unlockedNow ? 'New: ' : ''}${unitNo(nxt).toLowerCase()}, ${esc(nxt.title)}, is open.` : fin ? `Passed. That was the last part: you finished the deep dive into ${esc(DEEPOF[U.deep].title)}.` : !U.deep && gradAt() && Q.unlockedNow ? 'Passed. That was the last unit: your course is finished.' : 'Passed.') : 'Set cleared.') : `Not yet: ${need} needed. Look at the ones you missed, then go again.`;
-    return `<div class="dpanel"><p class="kicker">${esc(U.title)} · ${quizName(Q.set)}</p><div class="qhead">${dots}</div>
-      <div class="donebox ${passed ? '' : 'bad'}"><div class="bigstat"><b class="tnum">${score} of ${n}</b><span>right on the first try</span></div><p>${msg}</p>
+    const msg = passed ? (Q.set === 'cp' ? (opened ? `Passed. ${unitNo(nxt)} is open.` : fin ? 'Passed. Deep dive finished.' : !U.deep && gradAt() && Q.unlockedNow ? 'Passed. Course finished.' : 'Passed.') : 'Set cleared.') : `${need} to pass.`;
+    return `<div class="dpanel"><div class="qhead">${dots}</div>
+      <div class="donebox ${passed ? '' : 'bad'}"><div class="bigstat"><b class="tnum">${score} of ${n}</b><span>${msg}</span></div>
         ${typeof Coach !== 'undefined' && Coach.quizNote ? Coach.quizNote(Q, U) : ''}${misses.length ? `<div class="slips">${misses.map(missCard).join('')}</div>` : ''}
         <div class="lesson-actions">${opened ? `<button class="btn primary" data-unit="${nxt.id}">Go to ${unitNo(nxt).toLowerCase()}</button>` : fin ? '<button class="btn primary" data-lib>Back to the library</button>' : !U.deep && gradAt() && Q.unlockedNow ? '<button class="btn primary" data-grad>See your course complete</button>' : ''}<button class="btn ${passed ? '' : 'primary'}" id="qAgain">Try again</button><button class="btn ${passed && !opened && !fin ? 'primary' : 'ghost'}" data-unit="${U.id}">Back to the ${uword(U)}</button></div></div></div>`;
   }
   const K = skillOf(U);
   // the question in short lines: what was just played, then the task
   const askL = threat ? [it.lastLabel ? `${esc(OPP)} just played: <b>${esc(lc(it.lastLabel))}</b>` : '', ...sentences(K.ask(it)).map(x => esc(x.replace(/\.$/, '')))].filter(Boolean)
-    : [`${esc(OPP)} just played: <b>${esc(lc(N[it.node].l))}</b>`, 'What\'s your move?'];
+    : [`${esc(OPP)} just played: <b>${esc(lc(N[it.node].l))}</b>`];
   const ask = `<ul class="bul ask">${askL.map(x => `<li>${x}</li>`).join('')}</ul>`;
-  const status = Q.state === 'play' ? `<div class="status ${Q.tries ? 'bad' : ''}"><span class="bub"></span>${Q.tries ? 'Try again' : 'Your move'}</div>`
+  const status = Q.state === 'play' ? (Q.tries ? `<div class="status bad"><span class="bub"></span>Try again</div>` : '')
     : Q.state === 'shown' ? `<div class="status"><span class="bub"></span>${Q.res[Q.k] ? 'Right first time' : 'Solved'}</div>` : `<div class="status bad"><span class="bub"></span>${Q.busy ? `${esc(OPP)} replies…` : 'Not safe'}</div>`;
   const eng = threat && Q.set !== 'cp' && it.ff ? `<button class="btn ghost" id="qEngine" ${Q.busy ? 'disabled' : ''}>See it with the engine</button>` : '';
   const rr = threat && Q.state === 'refuted' && it.refute ? it.refute[Q.lastTry] : null;
   const act = Q.state === 'shown' ? `<div class="lesson-actions"><button class="btn primary" id="qNext">${Q.k < n - 1 ? 'Next position' : 'See your score'}</button>${eng}</div>`
     : Q.state === 'refuted' ? `<div class="lesson-actions"><button class="btn primary" id="qRetry" ${Q.busy ? 'disabled' : ''}>Try again</button>${rr && (rr[3] || []).length ? `<button class="btn" id="qPlay" ${Q.busy ? 'disabled' : ''}>Play it out on the board</button>` : ''}${eng}</div>`
     : threat && Q.state === 'play' && !Q.peeked && U.skill !== 'finish' && U.skill !== 'endings' && (it.threat || it.reply) ? `<div class="lesson-actions"><button class="btn ghost" id="qPeek">Show me the danger</button></div>` : '';
-  return `<div class="dpanel"><p class="kicker">${esc(U.title)} · ${quizName(Q.set)}${threat ? ` · vs ${esc(it.opp)}` : ''}</p>
+  return `<div class="dpanel">${threat ? `<p class="kicker">vs ${esc(it.opp)}</p>` : ''}
     <h3>${threat ? K.h : 'Find your move'}</h3>
-    <div class="qhead">${dots}<span class="evaltext">${Q.k + 1} of ${n} · ${need} right to pass</span></div>
+    <div class="qhead">${dots}<span class="evaltext">${Q.k + 1} of ${n}</span></div>
     ${ask}${status}
-    <div class="feedback">${Q.msg || (Q.state === 'play' && Q.k === 0 && !Q.tries ? 'Only your first try counts toward the score.' : '&nbsp;')}</div>${act}</div>`;
+    <div class="feedback">${Q.msg || '&nbsp;'}</div>${act}</div>`;
 }
 function renderQuizPanel(){ const el = document.getElementById('qpanel'); if (el){ el.innerHTML = quizPanelHTML(); wireQuizPanel(); } }
 function wireQuizPanel(){
@@ -3686,12 +3669,18 @@ const labelSays = (l, s) => { const r = IDEA_QUIET.find(([k]) => k.test(s)); ret
 function ideasBeyond(idx){ const nd = N[idx], xs = ideaOf(idx); return nd && nd.t ? xs.filter(x => IDEA_TACT.test(x) && !noteSays(nd.t, x)) : xs.filter(x => !labelSays(nd && nd.l, x)); }
 // a move's reasons in a line or two: the book's note first, then the board. A note that opens with a name ("The Italian
 // bishop.") keeps its next sentence with it when there is room for one line only.
+// the word on a move in a lesson: the note's first line (or what the board shows when there is no note), the rest of the note behind More
+function noteHTML(idx){
+  const nd = N[idx], first = nd.t ? noteLine(nd.t) : (ideasBeyond(idx)[0] || ''); if (!first) return '';
+  const xs = nd.t ? sentences(nd.t) : [], rest = xs.slice(first === xs[0] ? 1 : 2);
+  return `<p class="note">${esc(first)}</p>${rest.length ? `<details class="xmore notemore"><summary>More</summary>${bullets(rest, 'note')}</details>` : ''}`;
+}
 function noteLine(t){ const xs = sentences(t); if (!xs.length) return ''; return xs.length > 1 && xs[0].split(' ').length <= 4 ? xs[0] + ' ' + xs[1] : xs[0]; }
 function moveWhy(idx, max = 2){ const nd = N[idx]; const note = !nd || !nd.t ? [] : max === 1 ? [noteLine(nd.t)] : sentences(nd.t).slice(0, max); return note.concat(ideasBeyond(idx)).slice(0, max); }
 // the other side's best answer to a move, when it wins something: a mistake and its punishment, in words
 function punishOf(fen, u){ try { return Ideas.punish(fen, u, {me: SIDE, words: (f, x) => wordsAt(f, x)}); } catch(e){ return null; } }
 const TOOKW = n => ({1: 'a pawn', 3: 'a piece', 5: 'a rook', 9: 'a queen'})[n] || LOSTW(n);
-const punishHTML = p => `<span class="pun">${esc(p.lines[0])}${p.lines[1] ? ': ' + esc(lc(p.lines[1])) : ''}.${p.kind === 'mate' ? '' : ` That costs ${LOSTW(p.gain)}${p.took ? ` for ${TOOKW(p.took)}` : ''}.`}</span>`;
+const punishHTML = p => `<span class="pun">${esc(p.lines[0])}.${p.kind === 'mate' ? '' : ` That costs ${LOSTW(p.gain)}${p.took ? ` for ${TOOKW(p.took)}` : ''}.`}</span>`;
 const whyHTML = idx => { const w = moveWhy(idx, 1)[0]; return w ? `<span class="pwhy"><b>${esc(N[idx].l)}:</b> ${esc(lc(w))}</span>` : ''; };
 const scoreNum = s => typeof s === 'string' ? (parseInt(s.slice(1), 10) > 0 ? 1 : -1) * (100000 - 100 * Math.abs(parseInt(s.slice(1), 10))) : s;
 function evalShort(s){ // a candidate's value: the number from White's side, the colour (good or bad) from yours
@@ -3937,7 +3926,7 @@ const EngineUI = {
   }
 };
 function engineCardHTML(r, h){
-  const head = (right) => `<div class="ehead"><span class="kicker">Engine · Stockfish 19</span><span class="edepth">${right}</span></div>`;
+  const head = (right) => `<div class="ehead"><span class="kicker">Engine</span><span class="edepth">${right}</span></div>`;
   if (Engine.state === 'failed'){
     const where = Engine.why === 'file' ? 'The engine needs the page opened from the web, not from a file on your computer.' : 'The engine couldn\'t start in this window.';
     return `<div class="eng">${head('')}<p class="enote">${where}${HOME && location.href.indexOf(HOME) !== 0 ? ` It runs on the app's website: <a href="${esc(HOME)}" target="_blank" rel="noopener">open the app there</a>.` : ''}</p></div>`;
@@ -3954,21 +3943,22 @@ function engineCardHTML(r, h){
     ws.forEach((w, k) => { if (!w || extra[k]) return;
       const same = ws.map((x, i) => x && x.label === w.label ? i : -1).filter(i => i >= 0); if (same.length < 2) return;
       whereHints(same.map(i => ws[i].u), w.white).forEach((t, n) => { extra[same[n]] = ` <span class="ewhere">(${t})</span>`; }); });
-    h2 += `<p class="ewho">${yours ? 'Your best moves here' : `${stm}'s best moves here`}</p><ol class="ebest">${L.map((l, k) => {
+    h2 += `<p class="ewho">${yours ? 'Your best moves' : `${stm}'s best moves`}</p><ol class="ebest">${L.map((l, k) => {
       const w = ws[k], ev = evalShort(l.s); if (!w) return '';
       return `<li><button class="erow ${EngineUI.focus === k ? 'on' : ''}" type="button" data-ek="${k}"><span class="eno e${k + 1}">${k + 1}</span>${pieceIcon(w.pc, w.white)}<span class="el">${esc(w.label)}${extra[k]}</span><span class="ev tnum ${ev.good ? 'good' : 'bad'}">${esc(ev.t)}</span></button></li>`; }).join('')}</ol>`;
   }
   const th = r ? threatOf(r, h.fen) : null;
-  if (th) h2 += `<div class="ethreat ${th.real ? 'real' : ''}"><span class="chip ${th.real ? 'blunder' : ''}">${th.real ? (th.mate ? 'Mate threat' : 'Threat') : `${other}'s idea`}</span><span>If it were ${other}'s move: <b>${esc(lc(th.w.label))}</b>${th.mate && !/checkmate/.test(th.w.label) ? ', with a forced mate' : ''}${th.real ? '' : '. Nothing urgent.'}</span></div>`;
+  if (th) h2 += `<div class="ethreat ${th.real ? 'real' : ''}"><span class="chip ${th.real ? 'blunder' : ''}">${th.real ? (th.mate ? 'Mate threat' : 'Threat') : `${other}'s idea`}</span><span><b>${esc(th.w.label)}</b>${th.mate && !/checkmate/.test(th.w.label) ? ', with a forced mate' : ''}</span></div>`;
   else if (r && r.threat === null && ch.in_check()) h2 += `<div class="ethreat real"><span class="chip blunder">Check</span><span>${yours ? 'You are' : `${stm} is`} in check.</span></div>`;
   if (top && top.pv.length > 1){
     const ws = lineWords(h.fen, top.pv, 8);
-    h2 += `<div class="eplan"><p class="ewho">The line it expects</p><ol class="eline">${ws.map(w => `<li class="${w.white ? 'w' : 'b'}">${pieceIcon(w.pc, w.white)}<span>${esc(w.label)}</span></li>`).join('')}</ol></div>`;
+    h2 += `<details class="xmore eplan" ${S.eLine ? 'open' : ''}><summary class="ewho">The line it expects</summary><ol class="eline">${ws.map(w => `<li class="${w.white ? 'w' : 'b'}">${pieceIcon(w.pc, w.white)}<span>${esc(w.label)}</span></li>`).join('')}</ol></details>`;
   }
   const acts = (h.acts || []).filter(a => a.id !== 'eLine' || (top && top.pv.length > 1)).map(a => `<button class="btn small ${a.primary ? 'primary' : ''}" type="button" id="${a.id}">${esc(a.t)}</button>`).join('');
-  return `<div class="eng">${head(depth)}${h2}${acts ? `<div class="lesson-actions">${acts}</div>` : ''}${ei ? '<p class="ekey">Numbers are in pawns: plus means White is better, minus means Black is better.</p>' : ''}</div>`;
+  return `<div class="eng">${head(depth)}${h2}${acts ? `<div class="lesson-actions">${acts}</div>` : ''}</div>`;
 }
 function wireEngineCard(card, h){
+  const ep = card.querySelector('details.eplan'); if (ep) ep.ontoggle = () => { S.eLine = ep.open; };
   card.querySelectorAll('[data-ek]').forEach(b => {
     const k = +b.dataset.ek;
     b.onclick = () => { const l = EngineUI.r && EngineUI.r.lines[k]; if (l && l.pv[0] && h.pick) h.pick(l.pv[0], l.pv); };
@@ -3998,7 +3988,7 @@ function planRef(side, lineId){
 function planCardHTML(p, kick){
   if (!p) return '';
   return `<section class="plan" aria-label="Plan from here"><p class="kicker">${esc(kick || 'Plan from here')}</p>${p.h ? `<h4>${esc(p.h)}</h4>` : ''}
-    <ul>${p.b.map(([k, t]) => `<li><span class="pk ${k}">${esc(PLANK[k] || k)}</span><span>${esc(t)}</span></li>`).join('')}</ul></section>`;
+    <ul>${p.b.slice(0, 2).map(([k, t]) => `<li><span class="pk ${k}">${esc(PLANK[k] || k)}</span><span>${esc(firstSentence(t))}</span></li>`).join('')}</ul></section>`;
 }
 
 /* ------------------------------------------------------------------ EXPLORE: any position, moves for both sides, the engine alongside */
@@ -4114,16 +4104,15 @@ function renderExplore(){
       <p class="evaltext" id="xeval">&nbsp;</p>
     </div>
     <div class="ccol">
-      <div class="dpanel"><p class="kicker">Explore · moves for both sides</p><h3>Play on from here</h3>${opnHTML(Openings.ofMoves(X.moves.slice(0, X.i), X.start))}
+      <div class="dpanel">${opnHTML(Openings.ofMoves(X.moves.slice(0, X.i), X.start))}
         <div class="status ${X.busy || X.auto ? 'wait' : ''}"><span class="tomove ${turnW ? 'w' : 'b'}" aria-hidden="true"></span>${esc(status)}</div>
         ${(() => { if (!X.i || !words[X.i - 1]) return ''; let xs = []; try { xs = Ideas.of(exChess(X.i - 1).fen(), X.moves[X.i - 1], {me: X.side || SIDE}).lines; } catch(e){}
           return `<p class="xlast"><b>${words[X.i - 1].white ? 'White' : 'Black'}: ${esc(lc(words[X.i - 1].label))}.</b>${xs.length ? ' ' + esc(xs[0]) + '.' : ''}</p>`; })()}
-        <p class="feedback">Move any piece for the side to move. Purple arrows: the engine's best moves. Red dashes: what the other side wants. Step back to try something else.</p>
         <label class="xans"><input type="checkbox" id="exAns" ${X.answer ? 'checked' : ''}> <span>The engine answers my moves</span></label>
       </div>
       <div id="engcard"></div>
       ${planCardHTML(plan && plan.plan, plan ? `Plan from the end of “${plan.title}”` : '')}
-      ${n ? `<div><p class="kicker" style="margin-bottom:6px">Moves from the start position</p><ol class="timeline" aria-label="Explored moves">${rows}</ol></div>` : ''}
+      ${n ? `<div><ol class="timeline" aria-label="Explored moves">${rows}</ol></div>` : ''}
     </div></div>`;
   exBoard();
   if (X.anim){ const u = X.anim; X.anim = null; exAnimate(u, false); }

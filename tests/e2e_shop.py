@@ -132,7 +132,7 @@ with sync_playwright() as p:
     pg.click('.shopside [data-coachwho="rook"]'); pg.wait_for_timeout(300)
     assert pg.evaluate('SET.who') == 'rook' and pg.locator(f'.mannequin svg [data-g="{hat[0]}"]').count() == 1
     pg.evaluate('Coach.hush()'); pg.screenshot(path=out + 's_open.png', full_page=True)
-    assert 'Spent' not in pg.inner_text('.shopside') and 'week' not in pg.inner_text('.earn').lower(), 'no spent row and no week token'
+    assert 'Spent' not in pg.inner_text('.shopside') and pg.locator('.shopside .earn').count() == 0 and pg.locator('.shopside .bal[title]').count() == 1, 'the balance alone, where it came from on hover'
 
     # ---- the daily shop's rules: one shelf all day and the same on every device, another the next day, every piece
     #      taking its turn, nothing else for sale, and a piece that is owned or still needs its badge staying out
@@ -201,7 +201,7 @@ with sync_playwright() as p:
     pg.click('[data-crate]'); pg.wait_for_timeout(700)
     # bought: the tokens are spent and the piece is drawn, but nothing shows yet. The crate floats and waits for a tap
     wait = pg.evaluate("[!document.querySelector('#crateSheet .cratewait').hidden, document.querySelector('#crateSheet .reel').hidden, document.querySelector('#crateSheet .prize').hidden, Shop.balance(), document.querySelector('#crateSheet .cratehint').textContent, Sound.last]")
-    print('  a crate bought:', wait); assert wait[:3] == [True, True, True] and wait[3] == bal - crate[1] and 'Tap the crate' in wait[4]
+    print('  a crate bought:', wait); assert wait[:3] == [True, True, True] and wait[3] == bal - crate[1] and 'Tap to open' in wait[4]
     assert pg.evaluate("getComputedStyle(document.querySelector('.cratetap')).animationName") == 'crfloat'
     pg.screenshot(path=out + 's_crate_wait.png')
     pg.wait_for_timeout(1500); assert pg.evaluate("document.querySelector('#crateSheet .reel').hidden"), 'it waits for the tap'
@@ -221,7 +221,7 @@ with sync_playwright() as p:
     rest = pg.evaluate("(() => { const left = Shop.crateLeft(); for (const I of left.slice(1)) Prog.d.shop.own[I.id] = Date.now(); return [left[0].id, Shop.crateRoll().id, Shop.crateLeft().length]; })()")
     assert rest[0] == rest[1] and rest[2] == 1, rest
     pg.evaluate(f"Prog.d.shop.own['{rest[0]}'] = Date.now(); renderShop()"); pg.wait_for_timeout(200)
-    assert pg.evaluate('Shop.crateRoll()') is None and pg.locator('[data-crate]').count() == 0 and 'every piece' in pg.inner_text('.crateinfo')
+    assert pg.evaluate('Shop.crateRoll()') is None and pg.locator('[data-crate]').count() == 0 and 'All collected' in pg.inner_text('.crateinfo')
     assert pg.evaluate("mergeProg({shop: {own: {'a-nova': 9}, wear: {aura: ['a-nova', 9]}}}, {shop: {own: {'h-cap': 3}, wear: {}}}).shop") == {'own': {'a-nova': 9, 'h-cap': 3}, 'wear': {'aura': ['a-nova', 9]}}, 'crate pieces follow the player like the rest'
     pg.evaluate("for (const I of SHOP.filter(x => x.crate)) delete Prog.d.shop.own[I.id]; delete Prog.d.shop.wear.aura; Shop.off('skin'); renderShop()")
     pg.click('[data-shoptab="shop"]'); pg.wait_for_timeout(200)
