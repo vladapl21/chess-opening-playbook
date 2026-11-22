@@ -153,6 +153,8 @@ p{margin:0}
 /* board */
 .board{position:relative;width:100%;aspect-ratio:1/1;max-width:100%;border-radius:4px;overflow:hidden;box-shadow:var(--shadow);user-select:none;-webkit-user-select:none}
 .board svg,.thumb svg{display:block;width:100%;height:100%}
+/* a move's flair (fxRun): the ring and the sparks where a piece lands, the after-images behind it */
+g.fx,.fx-ghost{pointer-events:none} .fx-ring{fill:none;stroke:var(--accent);stroke-width:5} .fx-ring.cap{stroke:var(--oro);stroke-width:7} .fx-spark{fill:var(--oro)} .fx-spark.alt{fill:var(--accent)}
 .sq-l{fill:var(--sq-light)} .sq-d{fill:var(--sq-dark)}
 .coord{font-family:var(--f-body);font-weight:700;font-size:15px}
 .coord.on-l{fill:var(--sq-dark)} .coord.on-d{fill:var(--sq-light)}
@@ -3953,20 +3955,61 @@ function nodeBoardOpts(idx, extra = {}){
   if (nd.c) o.circles = nd.c.slice();
   return Object.assign(o, extra);
 }
-/* How a piece slides (Settings, Piece animations): three plain speeds, Natural (a longer move takes longer), Arcade (it
-   overshoots and springs back) and Dynamic (the piece lifts off the board on the way). dx, dy: where it comes from, in
-   board units (a square is 100); the keyframes end on the piece's own square. */
+/* How a piece moves (Settings, Piece animations). Three plain speeds, and three with more to them:
+   Natural: picked up, carried and put down. It grows a little as it leaves the board with a shadow under it, a longer
+     move takes longer, and it settles as it lands.
+   Arcade: a dash that shoots past its square and springs back, with after-images behind it and sparks where it lands.
+   Dynamic: thrown. It leaves the board in an arc, tilting the way it flies, comes down hard and squashes, and the
+     square ripples under it; a capture shakes the board.
+   dx, dy: where it comes from, in board units (a square is 100); the keyframes end on the piece's own square. `fx` is
+   what is drawn around the move (`fxRun`): after-images, a ring, sparks, a shake. */
 const ANIMS = [['slow', 'Slow'], ['medium', 'Medium'], ['fast', 'Fast'], ['natural', 'Natural'], ['arcade', 'Arcade'], ['dynamic', 'Dynamic']];
 function animSpec(dx, dy, kind){
-  const k = kind || SET.animk || 'medium', far = Math.hypot(dx, dy) / 100, at = (f, sc) => `translate(${(dx * f).toFixed(1)}px,${(dy * f).toFixed(1)}px)${sc ? ` scale(${sc})` : ''}`;
+  const k = kind || SET.animk || 'medium', far = Math.hypot(dx, dy) / 100, at = (f, more) => `translate(${(dx * f).toFixed(1)}px,${(dy * f).toFixed(1)}px)${more ? ' ' + more : ''}`;
+  const drop = (y, b) => `drop-shadow(0 ${y}px ${b}px ${tokenOf('--kn-drop') || 'transparent'})`;
   if (k === 'slow') return {frames: [{transform: at(1)}, {transform: at(0)}], opts: {duration: 460, easing: 'ease-in-out'}};
   if (k === 'fast') return {frames: [{transform: at(1)}, {transform: at(0)}], opts: {duration: 110, easing: 'ease-out'}};
-  if (k === 'natural') return {frames: [{transform: at(1)}, {transform: at(0)}], opts: {duration: Math.round(130 + 48 * far), easing: 'cubic-bezier(.45,.05,.25,1)'}};
-  if (k === 'arcade') return {frames: [{transform: at(1)}, {transform: at(0)}], opts: {duration: 330, easing: 'cubic-bezier(.34,1.56,.64,1)'}};
-  if (k === 'dynamic') return {frames: [{transform: at(1, 1)}, {transform: at(.45, 1.24), offset: .55}, {transform: at(0, 1)}], opts: {duration: 280, easing: 'cubic-bezier(.3,.7,.3,1)'}, lift: true};
+  if (k === 'natural') return {frames: [{transform: at(1, 'scale(1)'), filter: drop(0, 0), easing: 'ease-out'}, {transform: at(.94, 'scale(1.1)'), filter: drop(9, 5), offset: .14, easing: 'cubic-bezier(.45,.05,.3,1)'},
+      {transform: at(.03, 'scale(1.1)'), filter: drop(9, 5), offset: .84, easing: 'ease-in'}, {transform: at(0, 'scale(.97)'), filter: drop(0, 0), offset: .94}, {transform: at(0, 'scale(1)'), filter: drop(0, 0)}],
+    opts: {duration: Math.round(Math.min(560, 190 + 52 * far))}, lift: true};
+  if (k === 'arcade') return {frames: [{transform: at(1, 'scale(.92)'), easing: 'cubic-bezier(.2,.9,.3,1)'}, {transform: at(-.08, 'scale(1.16)'), offset: .62, easing: 'ease-in-out'}, {transform: at(.03, 'scale(.93)'), offset: .82, easing: 'ease-out'}, {transform: at(0, 'scale(1)')}],
+    opts: {duration: 300}, lift: true, fx: {trail: 3, ring: 1, sparks: 7, at: .62}};
+  if (k === 'dynamic'){ const up = -(26 + 9 * far), tilt = (dx < 0 ? 1 : dx > 0 ? -1 : 0) * Math.min(14, 5 + 2 * far);
+    return {frames: [{transform: at(1, 'scale(1) rotate(0deg)'), filter: drop(0, 0), easing: 'cubic-bezier(.3,.6,.4,1)'},
+        {transform: `translate(${(dx * .5).toFixed(1)}px,${(dy * .5 + up).toFixed(1)}px) scale(1.34) rotate(${tilt.toFixed(1)}deg)`, filter: drop(22, 9), offset: .5, easing: 'cubic-bezier(.6,0,.9,.5)'},
+        {transform: at(0, 'scale(1.1) rotate(0deg)'), filter: drop(2, 2), offset: .8, easing: 'ease-out'}, {transform: at(0, 'scale(1.12,.84) rotate(0deg)'), filter: drop(0, 0), offset: .87, easing: 'ease-out'},
+        {transform: at(0, 'scale(.97,1.05) rotate(0deg)'), filter: drop(0, 0), offset: .94}, {transform: at(0, 'scale(1) rotate(0deg)'), filter: drop(0, 0)}],
+      opts: {duration: Math.round(Math.min(520, 300 + 34 * far))}, lift: true, fx: {ring: 2, at: .8, shake: 1}}; }
   return {frames: [{transform: at(1)}, {transform: at(0)}], opts: {duration: 210, easing: 'cubic-bezier(.22,.8,.3,1)'}};
 }
-function slide(el, dx, dy, kind){ const a = animSpec(dx, dy, kind); if (a.lift){ el.style.transformBox = 'fill-box'; el.style.transformOrigin = 'center'; } return el.animate(a.frames, a.opts); }
+function tokenOf(name){ try { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); } catch(e){ return ''; } }
+/* What is drawn around a move that has flair: after-images along the way, and where the piece lands a ring, sparks (more
+   of both on a capture) and, for a capture thrown down, a shake of the board. Everything is taken off again when done. */
+const SVGNS = 'http://www.w3.org/2000/svg';
+function fxRun(svg, el, dx, dy, a, cap){
+  const f = a.fx; if (!f || !svg || reduced) return;
+  const w = +el.getAttribute('width') || 100, cx = +el.getAttribute('x') + w / 2, cy = +el.getAttribute('y') + w / 2, u = w / 100, dur = a.opts.duration;
+  const gone = (n, an) => { an.onfinish = an.oncancel = () => n.remove(); return an; }, mk = (tag, cls, at) => { const n = document.createElementNS(SVGNS, tag); n.setAttribute('class', cls); for (const k in at) n.setAttribute(k, at[k]); n.style.transformOrigin = `${at.cx}px ${at.cy}px`; return n; };
+  for (let i = 1; i <= (f.trail || 0); i++){ const c = el.cloneNode(false), fr = i / (f.trail + 1), tr = `translate(${(dx * fr).toFixed(1)}px,${(dy * fr).toFixed(1)}px)`; c.removeAttribute('data-sq'); c.setAttribute('class', 'fx-ghost'); el.before(c);
+    gone(c, c.animate([{transform: tr, opacity: 0}, {transform: tr, opacity: .4, offset: .02}, {transform: tr, opacity: 0}], {duration: dur * .8, delay: dur * f.at * (1 - fr) * .85, fill: 'both', easing: 'ease-out'})); }
+  setTimeout(() => { if (!svg.isConnected) return;
+    if (cap === undefined){ const b = _blast[(svg.parentElement || {}).id]; cap = !!(b && b.cap && Date.now() - b.t < 1500); }
+    let g = svg.querySelector('g.fx'); if (!g){ g = document.createElementNS(SVGNS, 'g'); g.setAttribute('class', 'fx'); svg.appendChild(g); }
+    const big = cap ? 1.4 : 1;
+    for (let i = 0; i < (f.ring || 0); i++){ const c = g.appendChild(mk('circle', 'fx-ring' + (cap ? ' cap' : ''), {cx, cy: cy + 14 * u, r: 30 * u}));
+      gone(c, c.animate([{transform: 'scale(.45)', opacity: .9}, {transform: `scale(${(1.6 + i * .5) * big})`, opacity: 0}], {duration: 420 + i * 120, delay: i * 70, fill: 'both', easing: 'cubic-bezier(.2,.7,.3,1)'})); }
+    const n = f.sparks ? f.sparks + (cap ? 6 : 0) : 0;
+    for (let i = 0; i < n; i++){ const ang = (i + Math.random() * .6) / n * Math.PI * 2, far = (44 + Math.random() * 34) * u * big, c = g.appendChild(mk('circle', 'fx-spark' + (i % 3 ? '' : ' alt'), {cx, cy, r: (3 + Math.random() * 3) * u}));
+      gone(c, c.animate([{transform: 'translate(0,0) scale(1)', opacity: 1}, {transform: `translate(${(Math.cos(ang) * far).toFixed(1)}px,${(Math.sin(ang) * far).toFixed(1)}px) scale(.2)`, opacity: 0}], {duration: 340 + Math.random() * 200, easing: 'cubic-bezier(.1,.7,.3,1)'})); }
+    if (f.shake && cap) svg.animate([{transform: 'translate(0,0)'}, {transform: 'translate(0,3px)'}, {transform: 'translate(0,-2px)'}, {transform: 'translate(0,0)'}], {duration: 170});
+  }, dur * (f.at || 1));
+}
+// cap: whether the move took something (true or false where the caller knows; else read from the board's last change)
+// The piece grows, tilts and squashes about the foot of its own square. The point is given in board units: on a `use`
+// element a box of its own (transform-box: fill-box) is measured from the corner of the whole board, not from the piece.
+function slide(el, dx, dy, kind, cap){ const a = animSpec(dx, dy, kind);
+  if (a.lift){ const w = +el.getAttribute('width') || 100; el.style.transformBox = 'view-box'; el.style.transformOrigin = `${+el.getAttribute('x') + w / 2}px ${+el.getAttribute('y') + w * .86}px`; }
+  fxRun(el.ownerSVGElement, el, dx, dy, a, cap); return el.animate(a.frames, a.opts); }
 function animateMove(svg, uci, meta, back){
   if (reduced || !svg || SET.anim === false) return;
   const from = uci.slice(0, 2), to = uci.slice(2, 4);
@@ -3977,40 +4020,111 @@ function animateMove(svg, uci, meta, back){
   else { go(to, from); if (meta && meta.x) go(meta.x.slice(2, 4), meta.x.slice(0, 2)); }
 }
 /* Sounds (Settings, Sounds): made in the browser, no files. A move, a capture, a check, castling, a wrong move, a line
-   finished, and the shop's own. Three themes. Nothing plays before the first tap or key (browsers don't allow it). */
-const SND_THEMES = [['wood', 'Wood'], ['soft', 'Soft'], ['arcade', 'Arcade']];
+   finished, and the shop's own. Three themes: Soft (a felt knock, the default), Wood (a piece put down on a board) and
+   Arcade (a clean chip). Each sound is worked out sample by sample once (`SND.render`: struck modes that ring and die
+   away, filtered noise for the touch, band-limited pulses for the chip, a small room on the wood) and brought to one
+   loudness (`SND.level`, a K-weighted measure of its loudest moment), so no theme and no sound is quieter than
+   another. Nothing plays before the first tap or key (browsers don't allow it). */
+const SND_THEMES = [['soft', 'Soft'], ['wood', 'Wood'], ['arcade', 'Arcade']];
+const SND = (() => {
+  const TAU = Math.PI * 2, rng = seed => () => (seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296;
+  // a struck mode: a sine that starts at once and dies away (decay: the time to fall to about a third)
+  const mode = (d, sr, t0, f, decay, amp, att = 0.0006, glide = 1) => { const i0 = Math.floor(t0 * sr), n = Math.min(d.length - i0, Math.ceil(decay * 8 * sr)); let ph = 0;
+    for (let i = 0; i < n; i++){ const t = i / sr; ph += TAU * (glide === 1 ? f : f * Math.pow(glide, Math.min(1, t / (decay * 3)))) / sr; d[i0 + i] += amp * Math.sin(ph) * Math.exp(-t / decay) * Math.min(1, t / att); } };
+  // a short burst of noise through a band-pass: the touch of a piece, a puff of felt, a shimmer
+  const burst = (d, sr, R, t0, dur, amp, fc, q) => { const i0 = Math.floor(t0 * sr), n = Math.min(d.length - i0, Math.ceil(dur * sr)), w = TAU * Math.min(fc, sr * 0.45) / sr, al = Math.sin(w) / (2 * q), a0 = 1 + al, b0 = al / a0, a1 = -2 * Math.cos(w) / a0, a2 = (1 - al) / a0;
+    let x1 = 0, x2 = 0, y1 = 0, y2 = 0; for (let i = 0; i < n; i++){ const t = i / sr, x = R() * 2 - 1, y = b0 * x - b0 * x2 - a1 * y1 - a2 * y2; x2 = x1; x1 = x; y2 = y1; y1 = y; d[i0 + i] += amp * 3 * y * Math.exp(-t / (dur / 3.5)) * Math.min(1, t / 0.0004); } };
+  // a pulse wave built from its harmonics (none above 6.5 kHz, so it has no hiss), from one pitch to another
+  const pulse = (d, sr, t0, f0, f1, dur, amp, duty = 0.25, decay = 0) => { const i0 = Math.floor(t0 * sr), n = Math.min(d.length - i0, Math.ceil(dur * sr)); let ph = 0;
+    for (let i = 0; i < n; i++){ const t = i / sr, f = f0 * Math.pow(f1 / f0, t / dur), H = Math.max(1, Math.min(24, Math.floor(6500 / f))); ph += TAU * f / sr; let v = 0;
+      for (let h = 1; h <= H; h++) v += (2 / (h * Math.PI)) * Math.sin(h * Math.PI * duty) * Math.cos(h * ph);
+      d[i0 + i] += amp * v * Math.min(1, t / 0.002) * Math.min(1, (dur - t) / 0.006) * (decay ? Math.exp(-t / decay) : 1); } };
+  // a small room: a few early echoes, duller than the sound itself
+  const room = (d, sr, taps) => { const w = new Float32Array(d.length), k = 1 - Math.exp(-TAU * 2600 / sr); let y = 0; for (let i = 0; i < d.length; i++){ y += k * (d[i] - y); w[i] = y; }
+    for (const [dt, g] of taps){ const o = Math.round(dt * sr); for (let i = o; i < d.length; i++) d[i] += g * w[i - o]; } };
+  // how loud the loudest 60 ms are, weighted the way the ear hears (highs count more, rumble doesn't)
+  const loud = (d, sr) => { const f = new Float32Array(d.length);
+    { const A = Math.pow(10, 4 / 40), w = TAU * 1500 / sr, c = Math.cos(w), al = Math.sin(w) / 2 * Math.SQRT2, q = 2 * Math.sqrt(A) * al, a0 = (A + 1) - (A - 1) * c + q;
+      const b0 = A * ((A + 1) + (A - 1) * c + q) / a0, b1 = -2 * A * ((A - 1) + (A + 1) * c) / a0, b2 = A * ((A + 1) + (A - 1) * c - q) / a0, a1 = 2 * ((A - 1) - (A + 1) * c) / a0, a2 = ((A + 1) - (A - 1) * c - q) / a0;
+      let x1 = 0, x2 = 0, y1 = 0, y2 = 0; for (let i = 0; i < d.length; i++){ const x = d[i], y = b0 * x + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2; x2 = x1; x1 = x; y2 = y1; y1 = y; f[i] = y; } }
+    { const k = Math.exp(-TAU * 60 / sr); let x1 = 0, y1 = 0; for (let i = 0; i < f.length; i++){ const x = f[i], y = k * (y1 + x - x1); x1 = x; y1 = y; f[i] = y; } }
+    const win = Math.max(1, Math.round(0.06 * sr)); let sum = 0, best = 0; for (let i = 0; i < f.length; i++){ sum += f[i] * f[i]; if (i >= win) sum -= f[i - win] * f[i - win]; if (sum > best) best = sum; }
+    return Math.sqrt(best / win); };
+  const LEVEL = {move: 0.135, capture: 0.145, castle: 0.135, check: 0.135, wrong: 0.12, done: 0.11, buy: 0.11, win: 0.11, tick: 0.07};
+  const level = (d, sr, name) => { let end = d.length; while (end > 1 && Math.abs(d[end - 1]) < 2e-4) end--; end = Math.min(d.length, end + Math.round(0.004 * sr)); const o = d.subarray(0, end), fade = Math.round(0.004 * sr);
+    for (let i = 0; i < fade && i < end; i++) o[end - 1 - i] *= i / fade;
+    let g = (LEVEL[name] || 0.1) / (loud(o, sr) || 1), pk = 0; for (let i = 0; i < end; i++) pk = Math.max(pk, Math.abs(o[i])); if (pk * g > 0.92) g = 0.92 / pk; for (let i = 0; i < end; i++) o[i] *= g; return o; };
+  // a mallet note for the tunes (a line finished, a piece bought, a crate's prize): the note and a quick bright partial
+  const note = (d, sr, t, f, len, amp, bright) => { mode(d, sr, t, f, len, amp, 0.003); mode(d, sr, t, f * 4, len * 0.22, amp * bright, 0.001); mode(d, sr, t, f * 2, len * 0.5, amp * 0.12, 0.002); };
+  const tune = (d, sr, R, name, lv, bright) => {
+    if (name === 'done') [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => note(d, sr, i * 0.085, f, 0.17, 1, bright));
+    else if (name === 'buy'){ [659.25, 783.99, 987.77, 1318.5].forEach((f, i) => note(d, sr, i * 0.06, f, 0.16, 1, bright)); burst(d, sr, R, 0.2, 0.28, 0.1, 6200, 0.5); }
+    else { const notes = [[523.25, 659.25], [523.25, 659.25, 783.99], [523.25, 659.25, 783.99, 1046.5], [392, 523.25, 659.25, 783.99, 1046.5, 1318.5]][lv] || [523.25, 659.25];
+      notes.forEach((f, i) => note(d, sr, i * 0.09, f, 0.2 + lv * 0.05, 1, bright)); if (lv >= 2) burst(d, sr, R, notes.length * 0.09, 0.5, 0.12, 7000, 0.5); }
+    room(d, sr, [[0.031, 0.16], [0.053, 0.1], [0.079, 0.06]]); };
+  const T = {
+    // Soft: felt under the piece. One round, low note that drops a little as it lands, and a puff of air.
+    soft(d, sr, R, name, lv){ const j = 0.975 + R() * 0.05;
+      const knock = (t, f, v) => { mode(d, sr, t, f * j, 0.046, v, 0.002, 0.93); mode(d, sr, t, f * j / 2, 0.052, v * 0.45, 0.003); mode(d, sr, t, f * j * 2.01, 0.016, v * 0.14, 0.001); burst(d, sr, R, t, 0.012, v * 0.2, 850, 0.7); };
+      if (name === 'move') knock(0, 392, 1);
+      else if (name === 'castle'){ knock(0, 392, 1); knock(0.115, 440, 0.9); }
+      else if (name === 'capture'){ knock(0, 494, 0.55); knock(0.04, 330, 1.1); }
+      else if (name === 'check'){ knock(0, 392, 1); mode(d, sr, 0.03, 1174.7, 0.16, 0.3, 0.004); mode(d, sr, 0.03, 1760, 0.1, 0.12, 0.004); }
+      else if (name === 'wrong'){ mode(d, sr, 0, 185, 0.05, 1, 0.004, 0.88); mode(d, sr, 0.13, 147, 0.07, 1, 0.004, 0.88); burst(d, sr, R, 0, 0.02, 0.2, 400, 0.7); burst(d, sr, R, 0.13, 0.02, 0.2, 350, 0.7); }
+      else if (name === 'tick'){ mode(d, sr, 0, 1046.5, 0.012, 1, 0.0006); mode(d, sr, 0, 2093, 0.006, 0.3); }
+      else tune(d, sr, R, name, lv, 0.14); },
+    // Wood: a piece put down on a board. The click of the touch, the board's own notes ringing for a moment, a little room.
+    wood(d, sr, R, name, lv){ const j = 0.97 + R() * 0.06;
+      const knock = (t, v, up = 1) => { [[212, 0.028, 0.55], [408, 0.034, 1], [655, 0.024, 0.5], [1080, 0.017, 0.36], [1710, 0.011, 0.24], [2590, 0.008, 0.13]].forEach(([f, dc, a]) => mode(d, sr, t, f * j * up * (0.99 + R() * 0.02), dc / Math.sqrt(up), v * a));
+        mode(d, sr, t, 98 * up, 0.03, v * 0.5, 0.002); burst(d, sr, R, t, 0.004, v * 0.5, 3200 * up, 0.6); };
+      if (name === 'move') knock(0, 1);
+      else if (name === 'castle'){ knock(0, 1); knock(0.12, 0.9, 1.06); }
+      else if (name === 'capture'){ knock(0, 0.7, 1.55); knock(0.045, 1.1); }
+      else if (name === 'check'){ knock(0, 1); mode(d, sr, 0.035, 1480, 0.05, 0.5); mode(d, sr, 0.035, 2230, 0.03, 0.24); }
+      else if (name === 'wrong'){ mode(d, sr, 0, 110, 0.05, 1, 0.003); mode(d, sr, 0, 165, 0.04, 0.5, 0.003); burst(d, sr, R, 0, 0.02, 0.4, 520, 0.7); }
+      else if (name === 'tick'){ mode(d, sr, 0, 1900, 0.006, 1); mode(d, sr, 0, 3100, 0.004, 0.5); burst(d, sr, R, 0, 0.003, 0.4, 4000, 0.7); }
+      else { tune(d, sr, R, name, lv, 0.3); return; }
+      room(d, sr, [[0.011, 0.24], [0.019, 0.15], [0.031, 0.09]]); },
+    // Arcade: a clean chip. Two quick notes for a move, a zap for a capture, an alarm for a check.
+    arcade(d, sr, R, name, lv){
+      const seq = (t, notes, len, duty) => notes.forEach((f, i) => pulse(d, sr, t + i * len, f, f, len * (i === notes.length - 1 ? 2.2 : 1), 1, duty, len * (i === notes.length - 1 ? 1.1 : 3)));
+      if (name === 'move') seq(0, [587.33, 880], 0.036);
+      else if (name === 'castle'){ seq(0, [587.33, 880], 0.036); seq(0.12, [880, 1318.5], 0.036); }
+      else if (name === 'capture'){ pulse(d, sr, 0, 660, 165, 0.11, 1, 0.25, 0.07); burst(d, sr, R, 0, 0.06, 0.3, 2600, 0.5); }
+      else if (name === 'check') seq(0, [987.77, 1318.5, 987.77, 1318.5], 0.045);
+      else if (name === 'wrong'){ pulse(d, sr, 0, 147, 147, 0.07, 1, 0.5); pulse(d, sr, 0.1, 147, 139, 0.1, 1, 0.5); }
+      else if (name === 'tick') pulse(d, sr, 0, 1760, 1760, 0.014, 1);
+      else if (name === 'done') seq(0, [659.25, 783.99, 1318.5, 1046.5, 1174.7, 1568], 0.07);
+      else if (name === 'buy') seq(0, [987.77, 1318.5], 0.07);
+      else { seq(0, [[523.25, 783.99], [523.25, 659.25, 1046.5], [523.25, 659.25, 783.99, 1046.5, 1318.5], [392, 523.25, 659.25, 783.99, 1046.5, 1318.5, 1568, 2093]][lv] || [523.25, 783.99], 0.075); if (lv >= 2) burst(d, sr, R, 0.4, 0.4, 0.1, 7000, 0.5); } },
+  };
+  return {loud, level,
+    // one sound as samples: theme, name, a crate prize's level (0 to 3), the sample rate, and which of its takes (0 to 2)
+    render(theme, name, lv, sr, take){ const d = new Float32Array(Math.ceil(sr * 1.6)); (T[theme] || T.soft)(d, sr, rng(977 + (take || 0) * 7919 + name.length * 131), name, lv || 0); return level(d, sr, name); }};
+})();
 const Sound = {
-  ctx: null, last: '', n: 0,
+  ctx: null, last: '', n: 0, bufs: {},
   ac(){ if (!this.ctx){ const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; try { this.ctx = new C(); } catch(e){ return null; } }
     if (this.ctx.state !== 'running'){ try { this.ctx.resume(); } catch(e){} } return this.ctx.state === 'running' ? this.ctx : null; },
-  tone(a, t, f, dur, type, vol, f2){ const o = a.createOscillator(), g = a.createGain(); o.type = type || 'sine'; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
-    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(g).connect(a.destination); o.start(t); o.stop(t + dur + 0.02); },
-  noise(a, t, dur, vol, freq, q){ const n = Math.max(1, Math.floor(a.sampleRate * dur)), buf = a.createBuffer(1, n, a.sampleRate), d = buf.getChannelData(0); for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
-    const src = a.createBufferSource(), bp = a.createBiquadFilter(), g = a.createGain(); src.buffer = buf; bp.type = 'bandpass'; bp.frequency.value = freq; bp.Q.value = q || 1.2; g.gain.value = vol; src.connect(bp).connect(g).connect(a.destination); src.start(t); },
   // name: move, capture, check, castle, wrong, done, buy, tick, win (a crate's prize; `level` 0 to 3 by rarity)
   play(name, o = {}){
     if (!o.force && !SET.snd) return; this.last = name; this.n++;
-    const a = this.ac(); if (!a) return; const t = a.currentTime + 0.004, k = o.theme || SET.sndk || 'wood', T = this.tone.bind(this, a), Z = this.noise.bind(this, a);
-    const knock = (at, v) => { if (k === 'wood'){ Z(at, 0.05, 0.5 * v, 1500, 1.4); T(at, 190, 0.07, 'sine', 0.35 * v, 120); } else if (k === 'soft') T(at, 520, 0.09, 'sine', 0.22 * v, 470); else T(at, 330, 0.06, 'square', 0.09 * v); };
-    if (name === 'move') knock(t, 1);
-    else if (name === 'castle'){ knock(t, 1); knock(t + 0.09, 0.8); }
-    else if (name === 'capture'){ knock(t, 1.25); if (k === 'wood') Z(t + 0.012, 0.07, 0.4, 2600, 0.9); else if (k === 'soft') T(t, 392, 0.12, 'sine', 0.2, 300); else T(t + 0.05, 220, 0.08, 'square', 0.09); }
-    else if (name === 'check'){ knock(t, 1); T(t + 0.03, k === 'arcade' ? 880 : 760, 0.16, k === 'arcade' ? 'square' : 'triangle', k === 'arcade' ? 0.07 : 0.16, k === 'arcade' ? 1320 : 1010); }
-    else if (name === 'wrong'){ T(t, 180, 0.16, k === 'arcade' ? 'square' : 'triangle', k === 'arcade' ? 0.08 : 0.2, 120); }
-    else if (name === 'done'){ [523, 659, 784].forEach((f, i) => T(t + i * 0.085, f, 0.2, k === 'arcade' ? 'square' : 'sine', k === 'arcade' ? 0.07 : 0.18)); }
-    else if (name === 'buy'){ [659, 784, 988, 1319].forEach((f, i) => T(t + i * 0.06, f, 0.22, 'triangle', 0.17)); Z(t + 0.2, 0.25, 0.12, 6000, 0.7); }
-    else if (name === 'tick') T(t, 1400, 0.025, 'square', 0.05);
-    else if (name === 'win'){ const lv = o.level || 0, notes = [[523, 659], [523, 659, 784], [523, 659, 784, 1047], [392, 523, 659, 784, 1047, 1319]][lv];
-      notes.forEach((f, i) => T(t + i * 0.09, f, 0.3 + lv * 0.08, 'triangle', 0.18)); if (lv >= 2) Z(t + notes.length * 0.09, 0.5, 0.14, 7000, 0.6); }
+    const a = this.ac(); if (!a) return;
+    // a move or a capture has three takes, so two in a row never sound stamped out
+    const k = o.theme || SET.sndk || 'soft', lv = o.level || 0, take = name === 'move' || name === 'capture' ? this.n % 3 : 0, key = [k, name, lv, take].join('|');
+    let b = this.bufs[key]; if (!b){ const d = SND.render(k, name, lv, a.sampleRate, take); b = this.bufs[key] = a.createBuffer(1, d.length, a.sampleRate); b.getChannelData(0).set(d); }
+    const src = a.createBufferSource(); src.buffer = b; src.connect(a.destination); src.start(a.currentTime + 0.004);
   }
 };
 document.addEventListener('pointerdown', () => { if (SET.snd) Sound.ac(); }, {once: true, capture: true});
 // A big board was drawn again. One move away from what was on it before (two to four squares differ): that move's sound.
-const _bpos = {};
+const _bpos = {}, _blast = {};
 function boardSound(id, fen){
-  const now = fen.split(' ')[0], was = _bpos[id]; _bpos[id] = now; if (!was || was === now || !SET.snd) return;
+  const now = fen.split(' ')[0], was = _bpos[id]; _bpos[id] = now; delete _blast[id]; if (!was || was === now) return;
   const a = fenArr(was), b = fenArr(now); let ch = 0, na = 0, nb = 0; for (let i = 0; i < 64; i++){ if (a[i] !== b[i]) ch++; if (a[i]) na++; if (b[i]) nb++; }
   if (ch < 2 || ch > 4) return;
+  _blast[id] = {cap: nb < na, t: Date.now()};   // for the move's flair (fxRun)
+  if (!SET.snd) return;
   let check = false; try { check = new Chess(now + ' w - - 0 1').in_check() || new Chess(now + ' b - - 0 1').in_check(); } catch(e){}
   Sound.play(check ? 'check' : nb < na ? 'capture' : ch === 4 ? 'castle' : 'move');
 }
@@ -4550,7 +4664,7 @@ function useSide(side){
 }
 /* ------------------------------------------------------------------ settings (kept on this device and with the progress) */
 const SET_KEY = 'playbook-settings', HOST_THEME = document.documentElement.dataset.theme || '';
-const SET_DEF = {theme: 'system', size: 'm', board: 'green', coords: true, coach: true, who: 'knight', nums: true, anim: true, animk: 'medium', snd: true, sndk: 'wood'};
+const SET_DEF = {theme: 'system', size: 'm', board: 'green', coords: true, coach: true, who: 'knight', nums: true, anim: true, animk: 'medium', snd: true, sndk: 'soft'};
 const SET = Object.assign({}, SET_DEF);
 try { Object.assign(SET, JSON.parse(localStorage.getItem(SET_KEY) || '{}')); } catch(e){}
 const SIZES = {s: .92, m: 1, l: 1.08, xl: 1.16};
@@ -4587,7 +4701,7 @@ let _animAt = 0;
 function animPreview(){
   const el = document.getElementById('animPc'); if (!el) return; const to = _animAt ? [200, 0] : [0, 200], from = _animAt ? [0, 200] : [200, 0]; _animAt = 1 - _animAt;
   el.setAttribute('x', to[0]); el.setAttribute('y', to[1]); if (reduced) return;
-  slide(el, from[0] - to[0], from[1] - to[1]); if (SET.snd) setTimeout(() => Sound.play('move'), Math.min(300, animSpec(200, 200).opts.duration));
+  slide(el, from[0] - to[0], from[1] - to[1], undefined, _animAt === 1); if (SET.snd) setTimeout(() => Sound.play(_animAt === 1 ? 'capture' : 'move'), Math.min(300, animSpec(200, 200).opts.duration * .8));
 }
 function sndPreview(){ Sound.play('move', {force: true}); setTimeout(() => Sound.play('capture', {force: true}), 420); setTimeout(() => Sound.play('check', {force: true}), 840); }
 const Settings = {
