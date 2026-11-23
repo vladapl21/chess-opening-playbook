@@ -421,7 +421,7 @@ const Product = {
     if (PERSONA !== 'house') depersonalise();
     if (PERSONA === 'ready' && this.me().P) applyProfile(this.me());
     if (!Prog.d.badges && PERSONA !== 'new'){ Badges.check(); Prog.saveLocal(); }
-    document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('lock', PERSONA === 'new' && b.dataset.view !== 'sandbox'));
+    document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('lock', PERSONA === 'new' && b.dataset.view !== 'sandbox' && b.dataset.view !== 'endings'));   // Endings is hidden for them
     syncPacks();
   },
   landing(h){ if (PERSONA === 'ready' && (this.me().picks || {}).depth === 'core' && S.dfilter){ DF_PRI = 'core'; S.dfilter.pri = 'core'; }   // drills start with the core lines
@@ -1174,6 +1174,7 @@ const Coach = {
   tip(){
     const T = {start: 'Connect your chess account and I\'ll build your course around your games.', setup: 'A username is the quickest way. I only read your public games.',
       sandbox: ['Practice games', 'The other side plays what club players play'],
+      endings: ['Pick the endings you want', 'Then win them against the engine'],
       course: 'The big button is always your next step.',
       learn: 'Tap a lesson to step through it.',
       drill: ['Five lines a day keep your streak', 'Miss twice and the arrow shows it'],
@@ -1204,7 +1205,7 @@ const Coach = {
     if (v === 'grad' || libOn()){ this.lastView = at; return this.hush(); }            // the coach is part of those pages
     if (Badges.queue.length && PERSONA !== 'new') return Badges.show();
     if (e.querySelector('.cbub') && this.lastView === at) return this.draw(e.querySelector('.cbub').outerHTML); this.lastView = at;
-    if (v === 'drill' && S.drill && (S.drill.unit || S.drill.guided)) return this.hush();  // a course line: its panel has the coach's word already
+    if ((v === 'drill' || v === 'endings') && S.drill && (S.drill.unit || S.drill.guided)) return this.hush();  // a course line: its panel has the coach's word already
     if (v === 'reading' || v === 'choices' || v === 'built' || v === 'findings') return this.hush(); // the coach is already on the page there
     if (PERSONA === 'new'){
       if (v === 'start') return this.hush();
@@ -1215,7 +1216,7 @@ const Coach = {
     }
     if (Recap.announce()) return;                                                      // a finished month's recap that hasn't been opened yet
     if (!(v === 'games' && S.gseg === 'last') && Review.announce()) return;            // a game that left the book: the line to drill
-    const tab = ['course', 'learn', 'drill', 'games', 'sandbox', 'shop', 'study', 'explore'].includes(v) ? v : null;
+    const tab = ['course', 'learn', 'drill', 'games', 'sandbox', 'endings', 'shop', 'study', 'explore'].includes(v) ? v : null;
     // a part of Your games has its own first word
     const part = v === 'games' && (S.gseg === 'last' || S.gseg === 'recap') ? 'games-' + S.gseg : tab;
     if (part && this.once('tab-' + part, this.tip())) return;

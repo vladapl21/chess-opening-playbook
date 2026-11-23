@@ -69,6 +69,15 @@ Facts that shape the design:
 - Settings and the account button moved out of the header into the corner of the screen; the header fits one row on an ordinary monitor and centres its rows when it has to wrap.
 - A lesson opened from a course unit has "Next lesson" at the top. The Sandbox has "Free play: pick openings" to leave a course practice game.
 
+## Phase 1.28: endings (first version built, November 23)
+
+The house player's games were scanned for endings (Stockfish on every position of every ending): 51 stood won and 10 of those were not won. That scan is what the endings are built around.
+
+- **An Endings tab**, a sandbox for endings: fifteen kinds in five groups, the house player's own nine among them, each won (or held) against the engine with every move judged before the other side answers. A move that throws it away is taken back with the answer that punishes it; stars for a clean win.
+- **Exact tables** for king and queen, king and rook, and king and pawn against a lone king, worked out backwards from the end and checked against python-chess on every position.
+- **An endings course** behind an Openings | Endings switch on the Course tab: seven units in the order the games need them, each with pictures, a line to play along, endings to win and a checkpoint.
+- **Next:** the same for every player. The scan runs in the page on their own games (the way the opening analysis does), and the units and their order come from what it finds, with the house player's units as the library they are picked from.
+
 ## Phase 1.27: the engine at the end of a drill (done, November 22)
 
 - **A finished drill keeps its board**, like a finished practice game: when a line (Play along too), a missed shot or a review drill ends, the engine comes on by itself, with the verdict under the board, the arrows on it and its card in the panel. A move for either side, or a tap on one of the engine's moves, plays on from there on the explore board. The Play on with the engine buttons are gone.

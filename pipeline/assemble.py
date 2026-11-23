@@ -138,11 +138,17 @@ def main():
     assert body.count("/*__OPENINGS__*/''") == 1
     body = body.replace("/*__OPENINGS__*/''", dump(NAMES.page_table()))
     # the game analysis, the move explainer and the product shell (welcome, games in, choices, the coach, the tour) live in their own files
-    for mark, name in (('/*__ANALYZE__*/', 'analyze.js'), ('/*__IDEAS__*/', 'ideas.js'), ('/*__PRODUCT_JS__*/', 'product.js'), ('/*__PRODUCT_CSS__*/', 'product.css')):
+    for mark, name in (('/*__ANALYZE__*/', 'analyze.js'), ('/*__IDEAS__*/', 'ideas.js'), ('/*__PRODUCT_JS__*/', 'product.js'), ('/*__PRODUCT_CSS__*/', 'product.css'),
+                       ('/*__ENDINGS_JS__*/', 'endings.js'), ('/*__ENDINGS_CSS__*/', 'endings.css')):
         assert body.count(mark) == 1, mark
         src = (paths.APP / name).read_text()
         for exp in ('Analyze', 'Ideas'): src = src.replace(f"if (typeof module !== 'undefined') module.exports = {exp};", '')
         body = body.replace(mark, src.replace('</', '<\\/'))
+    # the endings (pipeline/build_endings.py) and the exact tables for the three smallest (pipeline/endtables.mjs)
+    E = json.load(open(paths.BUILD / 'data_endings.json'))
+    T = json.load(open(paths.DATA / 'endings' / 'tables.json')); T.pop('meta', None)
+    assert body.count('/*__DATA_E__*/null') == 1 and body.count('/*__TABLES_E__*/null') == 1
+    body = body.replace('/*__DATA_E__*/null', dump(E)).replace('/*__TABLES_E__*/null', dump(T))
     assert '/*__DATA' not in body and '/*__CHESSJS__*/' not in body and '/*__HOME__*/' not in body and '/*__OPENINGS__*/' not in body
     (paths.BUILD / 'playbook.html').write_text(body)
     page = site_html(body, site)

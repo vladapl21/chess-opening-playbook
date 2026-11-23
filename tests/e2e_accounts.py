@@ -214,11 +214,20 @@ with sync_playwright() as p:
     bp.evaluate("document.dispatchEvent(new Event('visibilitychange'))"); bp.wait_for_timeout(900)
     got = bp.evaluate("Review.list().map(R => [R.opp, R.mk, R.d ? R.d.o : null])"); print('reviews on the other device:', got)
     assert got == [['four', None, None], ['three', None, None], ['two', None, [1, 1, 9]]] and len(S.rows[uid]['data']['rg']['g']) == 3, got
+    # the endings: each position's runs, clean runs and best stars, and each unit's steps, merged from both devices
+    bp.evaluate("Prog.d.end = {p: {'r-1': [2, 1, 1700000001000, 2]}, u: {'eg-r': {l: 1700000000500, a: {'eg-r-a1': 1700000000600}}}, n: [2, 1]}; Prog.save()"); bp.wait_for_timeout(1800)
+    a.evaluate("document.dispatchEvent(new Event('visibilitychange'))"); a.wait_for_timeout(900)
+    assert a.evaluate("Prog.d.end.p['r-1']") == [2, 1, 1700000001000, 2]
+    a.evaluate("Prog.d.end.p['r-1'] = [3, 1, 1700000002000, 3]; Prog.d.end.p['q-1'] = [1, 1, 1700000002500, 3]; Prog.d.end.u['eg-r'].q = [4, 5, 1700000003000]; Prog.save()"); a.wait_for_timeout(1800)
+    bp.evaluate("document.dispatchEvent(new Event('visibilitychange'))"); bp.wait_for_timeout(900)
+    got = bp.evaluate("[Prog.d.end.p['r-1'], Prog.d.end.p['q-1'], Prog.d.end.u['eg-r'].q, Prog.d.end.u['eg-r'].a['eg-r-a1']]"); print('endings on the other device:', got)
+    assert got == [[3, 1, 1700000002000, 3], [1, 1, 1700000002500, 3], [4, 5, 1700000003000], 1700000000600], got
+    assert S.rows[uid]['data']['end']['p']['q-1'][1] == 1
     # a page from an older version writes a smaller copy: the next save on any device writes everything back
-    row = S.rows[uid]['data']; S.rows[uid]['data'] = {k: v for k, v in row.items() if k not in ('days', 'prefs', 'set', 'shop', 'badges', 'lvl', 'recap', 'tour', 'rg')}
+    row = S.rows[uid]['data']; S.rows[uid]['data'] = {k: v for k, v in row.items() if k not in ('days', 'prefs', 'set', 'shop', 'badges', 'lvl', 'recap', 'tour', 'rg', 'end')}
     a.evaluate("Prog.save()"); a.wait_for_timeout(1800)
     row = S.rows[uid]['data']; print('after an older copy and one save:', sorted(row.keys()))
-    assert all(k in row for k in ('days', 'prefs', 'shop', 'badges', 'lvl', 'recap', 'tour', 'rg')) and row['prefs']['who'][0] == 'rook' and row['prefs']['board'][0] == 'plum'
+    assert all(k in row for k in ('days', 'prefs', 'shop', 'badges', 'lvl', 'recap', 'tour', 'rg', 'end')) and row['prefs']['who'][0] == 'rook' and row['prefs']['board'][0] == 'plum'
 
     # ---- the account copy can't be reached: the app says so, keeps working, and catches up later
     S.down = True

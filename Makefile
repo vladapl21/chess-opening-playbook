@@ -8,6 +8,7 @@ build:
 	$(PY) pipeline/build_black.py
 	$(PY) pipeline/build_course.py
 	$(PY) pipeline/plan_lines.py
+	$(PY) pipeline/build_endings.py
 	$(PY) pipeline/assemble.py
 
 # Browser tests against docs/index.html (needs Playwright + Chromium; the engine test serves the page over local HTTP)
@@ -31,6 +32,7 @@ test: build
 	$(PY) tests/e2e_tour.py
 	$(PY) tests/e2e_review.py
 	$(PY) tests/e2e_marks.py
+	$(PY) tests/e2e_endings.py
 	node tests/analyze_check.js
 	node tests/nudge_check.mjs
 	node tests/ideas_check.js
