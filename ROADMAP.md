@@ -72,7 +72,7 @@ Facts that shape the design:
 ## Phase 1.27: the engine at the end of a drill (done, November 22)
 
 - **A finished drill keeps its board**, like a finished practice game: when a line (Play along too), a missed shot or a review drill ends, the engine comes on by itself, with the verdict under the board, the arrows on it and its card in the panel. A move for either side, or a tap on one of the engine's moves, plays on from there on the explore board. The Play on with the engine buttons are gone.
-- **The site as it stands is kept** at /v1/ and as the `v1` release, with its own saved progress, so the playbook can grow from here while that copy stays as it was.
+- **The site as it stands is kept** at /v1/ and as the `v1` branch, with its own saved progress, so the playbook can grow from here while that copy stays as it was.
 
 ## Phase 1.26: less to read, and better sound and movement (done, November 21)
 
