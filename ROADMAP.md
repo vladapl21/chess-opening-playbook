@@ -69,6 +69,11 @@ Facts that shape the design:
 - Settings and the account button moved out of the header into the corner of the screen; the header fits one row on an ordinary monitor and centres its rows when it has to wrap.
 - A lesson opened from a course unit has "Next lesson" at the top. The Sandbox has "Free play: pick openings" to leave a course practice game.
 
+## Phase 1.27: the engine at the end of a drill (done, November 22)
+
+- **A finished drill keeps its board**, like a finished practice game: when a line (Play along too), a missed shot or a review drill ends, the engine comes on by itself, with the verdict under the board, the arrows on it and its card in the panel. A move for either side, or a tap on one of the engine's moves, plays on from there on the explore board. The Play on with the engine buttons are gone.
+- **The site as it stands is kept** at /v1/ and as the `v1` release, with its own saved progress, so the playbook can grow from here while that copy stays as it was.
+
 ## Phase 1.26: less to read, and better sound and movement (done, November 21)
 
 A friend's first try of it found too much reading and too much in the way before the first move. Every screen was gone over with one question for each line of text: does something on the same screen already say it, and would anyone miss it?
