@@ -22,7 +22,7 @@ The plan for the next phases is in [ROADMAP.md](ROADMAP.md). Read it first.
 
 - Work on a branch, push it, open a PR with `gh api` (GraphQL is blocked here), and merge it with `gh api -X PUT repos/vladapl21/chess-opening-playbook/pulls/<n>/merge`. GitHub Pages serves `main` → `/docs`.
 - The claude.ai artifact is https://claude.ai/artifact/5RHAUYcSDGBWjJa2QWPaxi. `data/build/playbook.html` has no document skeleton: wrap it (doctype, charset and viewport metas, the small reset the live page starts with) and publish the result as `index.html` of that artifact. Its two engine files (`engine/…`) and its capabilities (db, user) are kept when only `index.html` is sent.
-- `docs/v1/` is the site as it stood on 22 November 2026 (the `v1` release), made by `pipeline/freeze.py v1 "22 November 2026"` from that day's build. Never build it again or edit it: it is a snapshot with no accounts, and its storage shim keeps its keys apart from the live site's (`v1:` in front).
+- `docs/v1/` is the site as it stood on 22 November 2026 (also the `v1` branch), made by `pipeline/freeze.py v1 "22 November 2026"` from that day's build. Never build it again or edit it: it is a snapshot with no accounts, and its storage shim keeps its keys apart from the live site's (`v1:` in front).
 - The proxy blocks Supabase hosts from this environment. Account features are tested against `tests/fake_supabase.js`; the real project is checked in the browser.
 
 ## Where things live
