@@ -1782,7 +1782,7 @@ const Review = {
     const status = D.state === 'done' ? '' : D.busy ? `${OPP} is thinking…` : 'Your move';
     const clean = !D.mistakes;
     const doneBox = D.state !== 'done' ? '' : `<div class="donebox ${clean ? '' : 'bad'}"><h4>${clean ? 'Clean run' : plural(D.mistakes, 'slip')}</h4>
-      <div class="lesson-actions"><button class="btn ${clean ? '' : 'primary'}" id="rvAgain">Again</button><button class="btn ${clean ? 'primary' : ''}" id="rvBack">Back to your games</button><button class="btn ghost" id="rvEx">Play on with the engine</button></div></div>`;
+      <div class="lesson-actions"><button class="btn ${clean ? '' : 'primary'}" id="rvAgain">Again</button><button class="btn ${clean ? 'primary' : ''}" id="rvBack">Back to your games</button></div><div id="deng"></div></div>`;
     return `<div class="dpanel"><p class="kicker">Move ${D.no}</p><h3>${D.part === 'o' ? 'Find the answer' : 'Find the better move'}</h3>
       <div class="progressbar" aria-hidden="true"><i style="width:${pct}%"></i></div>
       ${status ? `<div class="status ${D.busy ? 'wait' : ''} ${D.tries ? 'bad' : ''}"><span class="bub"></span>${status}</div>` : ''}
@@ -1792,7 +1792,6 @@ const Review = {
     const D = S.drill; if (!D || D.kind !== 'rv') return;
     const a = document.getElementById('rvAgain'); if (a) a.onclick = () => this.drill(D.rid, D.part);
     const b = document.getElementById('rvBack'); if (b) b.onclick = () => this.back();
-    const x = document.getElementById('rvEx'); if (x) x.onclick = () => { const R = this.get(D.rid); exploreFrom(this.fen(D, D.moves.length), {pre: R ? R.u.slice(0, this.spot(R, D.part)).concat(D.moves) : [], title: `Your game against ${D.opp} · after the drill`}); };
   },
   back(){ S.drill = S.drillState = null; S.gseg = 'last'; go('games'); },
   // on the Drill page: the spots the last games left to drill, when there are any

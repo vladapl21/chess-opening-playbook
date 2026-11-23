@@ -3784,9 +3784,12 @@ function setPerspective(side){
 const isMine = nd => nd.w === ME;
 const isMyPiece = p => !!p && (ME === 1 ? p === p.toUpperCase() : p === p.toLowerCase());
 // the pieces a tap or a drag can pick up: your own, or on the Sandbox's set-up board those of the side to move
-function pickable(p){ const D = S.drill; if (D && (D.kind === 'sbset' || sbOver(D))){ const w = ply(dNode()) % 2 === 0; return !!p && (w ? p === p.toUpperCase() : p === p.toLowerCase()); } return isMyPiece(p); }
+function pickable(p){ const D = S.drill; if (D && (D.kind === 'sbset' || sbOver(D) || drillOver(D))){ const w = drillOver(D) ? drillEnd(D).fen.split(' ')[1] === 'w' : ply(dNode()) % 2 === 0; return !!p && (w ? p === p.toUpperCase() : p === p.toLowerCase()); } return isMyPiece(p); }
 // a Sandbox game that has ended: its board stays live (the engine, the steps through the game, a move to play on)
 const sbOver = D => !!D && D.kind === 'sb' && D.state === 'done' && !D.tour;
+// a line drill (Play along too), a missed shot or a review drill that has ended: like a finished game, the engine comes
+// on and a move for either side plays on from there on the explore board
+const drillOver = D => !!D && D.state === 'done' && !D.tour && (D.kind === 'line' || D.kind === 'puz' || D.kind === 'rv');
 const chapterOf = L => CHAPTERS[PARTS[L.part].ch];
 const pctTxt = q => q >= 0.995 ? '100%' : q >= 0.095 ? Math.round(q * 100) + '%' : q >= 0.01 ? (q * 100).toFixed(q >= 0.05 ? 0 : 1).replace(/\.0$/, '') + '%' : '<1%';
 function lessonOf(lineId){ const l = LINES[lineId]; return LESSONS[l.lesson] || null; }
@@ -4775,8 +4778,8 @@ function refresh(){ adoptSettings(); render(); }
 // new data from another device: show it, but never pull the board out from under a line being played
 function refreshSoon(){ if (S.drill && S.drill.state === 'play'){ adoptSettings(); renderChrome(); return; } refresh(); }
 function render(){
-  // the engine on a finished Sandbox game lets go as soon as anything else is on the page
-  if (EngineUI.host && EngineUI.host.board === 'db' && !(S.view === 'sandbox' && sbOver(S.sbState))) EngineUI.detach();
+  // the engine on a finished Sandbox game or drill lets go as soon as anything else is on the page
+  if (EngineUI.host && EngineUI.host.board === 'db' && !(S.view === 'sandbox' && sbOver(S.sbState)) && !(S.view === 'drill' && drillOver(S.drillState))) EngineUI.detach();
   const U = (S.view === 'unit' || S.view === 'quiz') && UNIT[S.unit];
   if (U && U.side && !U.soon && U.kind !== 'skill' && U.side !== SIDE) useSide(U.side);
   // a line or a game under way brings its own book with it, whichever one was open last
@@ -5222,6 +5225,7 @@ function dFen(){
   const D = S.drill;
   if (D.kind === 'q'){ if (D.view) return D.view; const it = D.items[D.k]; return it.fen || N[it.node].f; }
   if (D.kind === 'rv') return Review.fen(D).split(' ')[0];
+  if (D.kind === 'puz' && D.after) return D.after.fen;
   return N[dNode()].f;
 }
 // The opponent's move, or the end of the line. It can be asked for twice (the start of a line and a quick first move
@@ -5241,7 +5245,7 @@ function drillAdvance(){
   } else { D.busy = false; D.tries = 0; if (D.guided){ D.hint = nx.u; renderDrillBoard(); } renderDrillPanel(); }
 }
 function expectedMove(){ const D = S.drill; if (D.kind === 'rv') return [D.moves[D.i]]; if (D.kind === 'puz') return DATA.puzzles[D.k].ok; if (D.kind === 'q'){ const it = D.items[D.k]; return it.ok || it.safe; } if (D.kind === 'sb') return sbMyKids(D.node).map(c => N[c].u); return [N[LINES[D.id].n[D.i + 1]].u]; }
-function legalFor(){ const D = S.drill; if (sbOver(D)) return new Chess(nodeFen(dNode())).moves({verbose: true}).map(m => m.from + m.to + (m.promotion || '')); if (D.kind === 'rv') return Review.legal(D); if (D.kind === 'sbset') return sbLegal(D.node); if (D.kind === 'puz') return DATA.puzzles[D.k].legal; if (D.kind === 'q'){ const it = D.items[D.k]; return it.legal || DATA.legal[String(it.node)] || []; } return DATA.legal[String(dNode())] || []; }
+function legalFor(){ const D = S.drill; if (sbOver(D) || drillOver(D)) return new Chess(sbOver(D) ? nodeFen(dNode()) : drillEnd(D).fen).moves({verbose: true}).map(m => m.from + m.to + (m.promotion || '')); if (D.kind === 'rv') return Review.legal(D); if (D.kind === 'sbset') return sbLegal(D.node); if (D.kind === 'puz') return DATA.puzzles[D.k].legal; if (D.kind === 'q'){ const it = D.items[D.k]; return it.legal || DATA.legal[String(it.node)] || []; } return DATA.legal[String(dNode())] || []; }
 // how many of your moves later the line plays this move (0: it doesn't)
 function laterInLine(D, u){ const n = LINES[D.id].n; let c = 0; for (let k = D.i + 2; k < n.length; k++){ if (!isMine(N[n[k]])) continue; c++; if (N[n[k]].u === u) return c; } return 0; }
 const HOWMANY = ['', 'one move', 'two moves', 'three moves', 'four moves', 'five moves', 'six moves'];
@@ -5249,6 +5253,7 @@ const movesLater = c => HOWMANY[c] || `${c} moves`;
 const earlyHTML = c => `<b>That move comes ${movesLater(c)} later.</b>`;
 function tryMove(from, to){
   const D = S.drill; if (sbOver(D)) return sbEndTry(from, to);
+  if (drillOver(D)) return drillEndTry(from, to);
   if (!D || D.busy || D.state !== 'play') return;
   let u = from + to;
   const legal = legalFor();
@@ -5335,15 +5340,47 @@ function renderDrillBoard(anim){
   if (D.hint) o.hint = D.hint;
   o.aria = 'Drill board';
   el.innerHTML = boardSVG(fen, o); matUpdate(el, fen, FLIP);
-  if (EngineUI.host && EngineUI.host.board === 'db'){ if (sbOver(D)) EngineUI.arrows(); else EngineUI.detach(); }
+  if (drillOver(D)) drillEngine();
+  else if (EngineUI.host && EngineUI.host.board === 'db'){ if (sbOver(D)) EngineUI.arrows(); else EngineUI.detach(); }
   if (anim) animateMove(el.querySelector('svg'), anim.u, anim.meta, false);
+}
+// The end of a drill: its last position for the engine and the explore board (the moves that reach it, a title, the plan)
+function drillEnd(D){
+  if (D._end) return D._end;
+  let e;
+  if (D.kind === 'line'){ const line = LINES[D.id], L = lessonOf(D.id), idx = line.n[line.n.length - 1];
+    e = {fen: nodeFen(idx), pre: nodeUcis(idx), title: `${L ? L.title : line.title} · end of the ${line.main ? 'main line' : 'line'}`, plan: planOf(line.id) ? {side: SIDE, line: line.id} : null}; }
+  else if (D.kind === 'puz'){ const P = DATA.puzzles[D.k], m = D.after ? [D.after.u] : [];
+    e = {fen: fenAfter(nodeFen(P.node), m), pre: nodeUcis(P.node).concat(m), title: `Missed shot · ${P.title}`}; }
+  else { const R = Review.get(D.rid);
+    e = {fen: Review.fen(D, D.moves.length), pre: R ? R.u.slice(0, Review.spot(R, D.part)).concat(D.moves) : [], title: `Your game against ${D.opp} · after the drill`}; }
+  return (D._end = e);
+}
+function drillExplore(D, o){ const e = drillEnd(D); EngineUI.detach(); exploreFrom(e.fen, Object.assign({pre: e.pre, title: e.title, plan: e.plan || null}, o)); }
+// the engine on a finished drill's board: the verdict under it, the arrows on it, the card in the panel
+function drillEngine(){
+  const D = S.drill; if (S.view !== 'drill' || !drillOver(D) || !document.getElementById('db')) return;
+  const e = drillEnd(D), t = document.getElementById('deval'); if (t) t.hidden = false;
+  if (EngineUI.host && EngineUI.host.board === 'db' && EngineUI.host.fen === e.fen){ EngineUI.paint(); return; }
+  EngineUI.attach({fen: e.fen, card: 'deng', board: 'db', text: 'deval', flip: FLIP, pick: u => drillEndTry(u.slice(0, 2), u.slice(2, 4)),
+    acts: [{id: 'eLine', t: 'Play the line it expects', go: pv => drillExplore(D, {moves: pv.slice(0, 10), i: 0, auto: true})}]});
+}
+function drillEndTry(from, to){
+  const D = S.drill, legal = legalFor(), k = drillEnd(D).fen.split(' ')[1] === 'w' ? '1' : '8'; let u = from + to; D.sel = null;
+  if (!legal.includes(u)){
+    if (from === 'e' + k && to === 'h' + k && legal.includes('e' + k + 'g' + k)) u = 'e' + k + 'g' + k;
+    else if (from === 'e' + k && to === 'a' + k && legal.includes('e' + k + 'c' + k)) u = 'e' + k + 'c' + k;
+    else if (legal.includes(u + 'q')) u += 'q';
+    else { renderDrillBoard(); return; }
+  }
+  drillExplore(D, {moves: [u], land: true});
 }
 function drillPanelHTML(){
   const D = S.drill;
   if (!D) return '';
   if (D.kind === 'puz'){
     const P = DATA.puzzles[D.k], G = GAMES[P.game];
-    const doneBox = D.state === 'done' ? `<div class="donebox"><h4>${D.tries === 0 ? 'Found it.' : 'That\'s the one.'}</h4><p>${esc(firstSentence(P.t))}</p><div class="lesson-actions">${D.k < DATA.puzzles.length - 1 || (!D.wrapped && BOOKS[otherSide(SIDE)].puzzles.length) ? `<button class="btn primary" id="nextPuz">Next shot</button>` : ''}<button class="btn" data-line="${P.game}" data-i="${LINES[P.game].n.indexOf(P.node)}">See it in the game</button><button class="btn ghost" id="pExplore">Play on with the engine</button></div></div>` : '';
+    const doneBox = D.state === 'done' ? `<div class="donebox"><h4>${D.tries === 0 ? 'Found it.' : 'That\'s the one.'}</h4><p>${esc(firstSentence(P.t))}</p><div class="lesson-actions">${D.k < DATA.puzzles.length - 1 || (!D.wrapped && BOOKS[otherSide(SIDE)].puzzles.length) ? `<button class="btn primary" id="nextPuz">Next shot</button>` : ''}<button class="btn" data-line="${P.game}" data-i="${LINES[P.game].n.indexOf(P.node)}">See it in the game</button></div><div id="deng"></div></div>` : '';
     return `<div class="dpanel"><p class="kicker">Missed shot ${D.k + 1} of ${DATA.puzzles.length} · vs ${esc(G.opp)}</p><h3>${esc(P.title)}</h3>
       <div class="status ${D.state === 'done' ? '' : 'wait'}"><span class="bub"></span>${D.state === 'done' ? 'Solved' : esc(P.q || `${MYC} to move: find the best move`)}</div>
       ${D.state === 'done' ? '' : `<p class="feedback">${D.msg || '&nbsp;'}</p>`}${doneBox}</div>`;
@@ -5372,7 +5409,7 @@ function drillPanelHTML(){
     const cnote = D.daily && !left && !SET.coach ? `${Daily.streak()} ${Daily.streak() === 1 ? 'day' : 'days'} in a row` : '';
     doneBox = `<div class="donebox ${clean ? '' : 'bad'}"><h4>${clean ? 'Clean run' : `${D.mistakes} ${D.mistakes === 1 ? 'slip' : 'slips'}`}</h4>
       ${bullets([clean ? `Back in ${days} ${days === 1 ? 'day' : 'days'}` : '', cnote])}
-      ${D.note || ''}<div class="lesson-actions">${acts}<button class="btn ghost" id="dExplore">Play on with the engine</button></div></div>${clean && pl ? planCardHTML(pl, planKick(D.id)) : ''}`;
+      ${D.note || ''}<div class="lesson-actions">${acts}</div>${D.tour ? '' : '<div id="deng"></div>'}</div>${clean && pl ? planCardHTML(pl, planKick(D.id)) : ''}`;
   }
   return `<div class="dpanel"><p class="kicker">${esc(L.title)}${line.main ? '' : ' · ' + esc(line.title)}</p>${opnHTML(Openings.ofNode(dNode()), D.state === 'play' && !!nameStart(dNode())) || `<h3>${esc(line.main ? L.title : line.title)}</h3>`}
     <div class="progressbar" aria-hidden="true"><i style="width:${pct}%"></i></div>
@@ -5389,7 +5426,7 @@ function guidedPanelHTML(D){
   if (D.state === 'done'){
     return `<div class="dpanel">${head}<div class="progressbar" aria-hidden="true"><i style="width:100%"></i></div>
       <div class="donebox"><h4>Played along</h4>
-      <div class="lesson-actions"><button class="btn primary" id="gMem">Play it from memory</button><button class="btn" id="gAgain">Play along again</button><button class="btn ghost" data-line="${D.id}">Read the notes</button></div></div></div>`;
+      <div class="lesson-actions"><button class="btn primary" id="gMem">Play it from memory</button><button class="btn" id="gAgain">Play along again</button><button class="btn ghost" data-line="${D.id}">Read the notes</button></div>${D.tour ? '' : '<div id="deng"></div>'}</div></div>`;
   }
   const nx = N[n[D.i + 1]], my = nx && isMine(nx) && !D.busy, warn = D.flash && !D.flash.ok;
   // most of the other side's labels already start with "Black …" or "White …": those stand on their own
@@ -5400,7 +5437,7 @@ function guidedPanelHTML(D){
   return `<div class="dpanel">${head}<div class="progressbar" aria-hidden="true"><i style="width:${mine ? Math.round(done / mine * 100) : 100}%"></i></div>
     <div class="coachnote gcoach" role="status">${face(warn ? 'think' : 'cheer')}<div class="cntx">${who}${said}${guide}${warn ? `<p class="gwarn">${esc(D.msg)}</p>` : ''}</div></div></div>`;
 }
-function renderDrillPanel(){ const el = document.getElementById('dpanel'); if (el){ el.innerHTML = drillPanelHTML(); wireDrillPanel(); } }
+function renderDrillPanel(){ const el = document.getElementById('dpanel'); if (el){ el.innerHTML = drillPanelHTML(); wireDrillPanel(); if (drillOver(S.drill)) drillEngine(); } }
 function wireDrillPanel(){
   const D = S.drill;
   if (D && D.kind === 'rv') return Review.wirePanel();
@@ -5414,9 +5451,6 @@ function wireDrillPanel(){
   const gm = document.getElementById('gMem'); if (gm) gm.onclick = () => startDrillLine(D.id, '', D.unit, {from0: D.s0 === 0});
   const ga = document.getElementById('gAgain'); if (ga) ga.onclick = () => startGuided(D.id, D.unit);
   const np = document.getElementById('nextPuz'); if (np) np.onclick = () => { if (D.k + 1 < DATA.puzzles.length) return startPuzzle(D.k + 1, D.wrapped); useSide(otherSide(SIDE)); startPuzzle(0, true); };
-  const de = document.getElementById('dExplore'); if (de) de.onclick = () => { const line = LINES[D.id], L = lessonOf(D.id), idx = line.n[line.n.length - 1];
-    exploreNode(idx, {title: `${L.title} · end of the ${line.main ? 'main line' : 'line'}`, plan: planOf(line.id) ? {side: SIDE, line: line.id} : null}); };
-  const pe = document.getElementById('pExplore'); if (pe) pe.onclick = () => { const P = DATA.puzzles[D.k]; exploreNode(P.node, {moves: D.after ? [D.after.u] : [], title: `Missed shot · ${P.title}`}); };
 }
 // today's five: the next line, in whichever book it lives, played from move one
 function dailyGo(){
@@ -5470,8 +5504,8 @@ function renderDrill(){
     : D && D.rv ? `<div class="crumbs"><button class="btn small" id="rvCrumb">← Your last games</button></div>`
     : D && !D.guided && !D.tour ? `<div class="crumbs"><button class="btn small" id="dHome">← Drill</button></div>` : '';
   view.innerHTML = `${crumbs}<div class="sgrid ${D ? '' : 'idle'}">
-    <div class="bcol"><div class="mat top"></div><div class="board ${D && D.state === 'play' ? 'input' : ''} ${D && D.guided ? 'guided' : ''}" id="db">${boardHTML}</div><div class="mat bot"></div>
-      </div>
+    <div class="bcol"><div class="mat top"></div><div class="board ${D && (D.state === 'play' || drillOver(D)) ? 'input' : ''} ${D && D.guided ? 'guided' : ''}" id="db">${boardHTML}</div><div class="mat bot"></div>
+      <p class="evaltext" id="deval" ${drillOver(D) ? '' : 'hidden'}>Engine: thinking…</p></div>
     <div class="ccol">
       <div id="dpanel">${D ? drillPanelHTML() : ''}</div>
       ${D ? '<div hidden>' : ''}${todayHTML()}${!D && typeof Review !== 'undefined' ? Review.drillCard() : ''}
@@ -5507,7 +5541,7 @@ function wireBoardInput(){
   const el = document.getElementById('db'); if (!el || el.dataset.wired) return; el.dataset.wired = '1';
   let drag = null;
   el.addEventListener('pointerdown', e => {
-    const D = S.drill; if (!D || D.busy || (D.state !== 'play' && !sbOver(D))) return;
+    const D = S.drill; if (!D || D.busy || (D.state !== 'play' && !sbOver(D) && !drillOver(D))) return;
     const svg = el.querySelector('svg'); if (!svg) return;
     const sq = squareAt(svg, e); if (!sq) return;
     const a = fenArr(dFen()), p = a[sqi(sq)];
@@ -5732,7 +5766,7 @@ function sbEngine(){
   const D = S.drill; if (!sbOver(D) || !document.getElementById('db')) return;
   const idx = dNode(), fen = nodeFen(idx);
   if (EngineUI.host && EngineUI.host.board === 'db' && EngineUI.host.fen === fen){ EngineUI.paint(); return; }
-  EngineUI.attach({fen, card: 'sbeng', board: 'db', text: 'sbeval', flip: FLIP,
+  EngineUI.attach({fen, card: 'sbeng', board: 'db', text: 'sbeval', flip: FLIP, pick: u => sbEndTry(u.slice(0, 2), u.slice(2, 4)),
     acts: [{id: 'eLine', t: 'Play the line it expects', go: pv => exploreNode(idx, {title: sbEndTitle(D), plan: sbEndPlan(D), moves: pv.slice(0, 10), i: 0, auto: true})}]});
 }
 function sbEndPlan(D){ return D.line && planOf(D.line) ? {side: SIDE, line: D.line} : null; }
@@ -5924,7 +5958,7 @@ function wireSbSide(){
 function renderSandbox(){
   const D = S.drill;
   view.innerHTML = `  <div class="sgrid">
-    <div class="bcol"><div class="mat top"></div><div class="board ${D && D.state === 'play' ? 'input' : ''}" id="db">${D ? '' : boardSVG(N[0].f, {coords: true})}</div><div class="mat bot"></div>
+    <div class="bcol"><div class="mat top"></div><div class="board ${D && (D.state === 'play' || sbOver(D)) ? 'input' : ''}" id="db">${D ? '' : boardSVG(N[0].f, {coords: true})}</div><div class="mat bot"></div>
       <div id="sbctl">${sbCtlHTML()}</div><div id="sbwhere">${sbFromHTML()}</div>
       ${D && D.kind === 'sb' && D.scope.startsWith('u:') ? `<button class="btn freeplay" id="sbFree"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M4 12h16M4 18h7"/><circle cx="17" cy="6" r="2.2"/><circle cx="14" cy="18" r="2.2"/></svg>Free play: pick your own openings</button>` : ''}</div>
     <div class="ccol"><div id="sbpanel">${sbPanelHTML()}</div><div id="sbside">${sbSideHTML()}</div></div>
@@ -8859,7 +8893,7 @@ const Review = {
     const status = D.state === 'done' ? '' : D.busy ? `${OPP} is thinking…` : 'Your move';
     const clean = !D.mistakes;
     const doneBox = D.state !== 'done' ? '' : `<div class="donebox ${clean ? '' : 'bad'}"><h4>${clean ? 'Clean run' : plural(D.mistakes, 'slip')}<\/h4>
-      <div class="lesson-actions"><button class="btn ${clean ? '' : 'primary'}" id="rvAgain">Again<\/button><button class="btn ${clean ? 'primary' : ''}" id="rvBack">Back to your games<\/button><button class="btn ghost" id="rvEx">Play on with the engine<\/button><\/div><\/div>`;
+      <div class="lesson-actions"><button class="btn ${clean ? '' : 'primary'}" id="rvAgain">Again<\/button><button class="btn ${clean ? 'primary' : ''}" id="rvBack">Back to your games<\/button><\/div><div id="deng"><\/div><\/div>`;
     return `<div class="dpanel"><p class="kicker">Move ${D.no}<\/p><h3>${D.part === 'o' ? 'Find the answer' : 'Find the better move'}<\/h3>
       <div class="progressbar" aria-hidden="true"><i style="width:${pct}%"><\/i><\/div>
       ${status ? `<div class="status ${D.busy ? 'wait' : ''} ${D.tries ? 'bad' : ''}"><span class="bub"><\/span>${status}<\/div>` : ''}
@@ -8869,7 +8903,6 @@ const Review = {
     const D = S.drill; if (!D || D.kind !== 'rv') return;
     const a = document.getElementById('rvAgain'); if (a) a.onclick = () => this.drill(D.rid, D.part);
     const b = document.getElementById('rvBack'); if (b) b.onclick = () => this.back();
-    const x = document.getElementById('rvEx'); if (x) x.onclick = () => { const R = this.get(D.rid); exploreFrom(this.fen(D, D.moves.length), {pre: R ? R.u.slice(0, this.spot(R, D.part)).concat(D.moves) : [], title: `Your game against ${D.opp} · after the drill`}); };
   },
   back(){ S.drill = S.drillState = null; S.gseg = 'last'; go('games'); },
   // on the Drill page: the spots the last games left to drill, when there are any

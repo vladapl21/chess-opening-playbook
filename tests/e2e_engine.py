@@ -162,14 +162,41 @@ try:
             if st['state'] == 'done': break
             if st['busy']: pg.wait_for_timeout(200); continue
             u = pg.evaluate('N[LINES[S.drill.id].n[S.drill.i + 1]].u'); pg.evaluate(f"tryMove('{u[:2]}', '{u[2:4]}')"); pg.wait_for_timeout(800)
-        assert pg.evaluate('Engine.state') != 'busy' or pg.evaluate('EngineUI.host') is None
         assert pg.locator('.plan').count() == 1, 'a finished main line shows its plan'
-        pg.click('#dExplore'); pg.wait_for_timeout(500)
+        # the line over, the engine comes on by itself, as on a finished practice game: the verdict under the board,
+        # its arrows on it and its card in the panel, on the line's last position
         last = pg.evaluate("nodeFen(LINES['setup'].n[LINES['setup'].n.length - 1])")
-        assert pg.evaluate('S.view') == 'explore' and pg.evaluate('S.ex.start') == pg.evaluate('START_FEN') and pg.evaluate('S.ex.i') == pg.evaluate('S.ex.base') > 0 and pg.evaluate('exChess().fen()') == last
+        assert pg.evaluate("EngineUI.host && EngineUI.host.board") == 'db' and pg.evaluate('EngineUI.host.fen') == last
+        assert wait_depth(pg, 10), pg.evaluate('[Engine.state, Engine.why]')
+        assert pg.locator('#deval').is_visible() and 'Engine, depth' in pg.inner_text('#deval')
+        assert pg.locator('#db svg g.eng path, #db svg g.eng line, #db svg g.eng polygon').count() > 0, 'the engine draws its arrows on the drill board'
+        assert pg.locator('#deng .ebest li').count() >= 1 and not notation(pg.inner_text('#deng')), pg.inner_text('#deng')
+        assert pg.locator('#dExplore').count() == 0, 'no button: the engine is already on'
+        pg.screenshot(path=out + 'engine_drill_end.png', full_page=True)
+        # a move for either side plays on from there on the explore board, with the plan
+        u = pg.evaluate('legalFor()[0]'); pg.evaluate(f"tryMove('{u[:2]}', '{u[2:4]}')"); pg.wait_for_timeout(500)
+        assert pg.evaluate('S.view') == 'explore' and pg.evaluate('S.ex.start') == pg.evaluate('START_FEN')
+        assert pg.evaluate('S.ex.base') > 0 and pg.evaluate('S.ex.moves[S.ex.base]') == u and pg.evaluate('S.ex.i') == pg.evaluate('S.ex.base') + 1
+        assert pg.evaluate('exChess(S.ex.base).fen()') == last
         assert 'PLAN FROM THE END' in pg.inner_text('.plan').upper(), 'the plan comes along to the explore board'
-        pg.click('#exBack'); pg.wait_for_timeout(300)
+        pg.click('#exBack'); pg.wait_for_timeout(400)
         assert pg.evaluate('S.view') == 'drill' and pg.evaluate('S.drill.state') == 'done'
+        assert pg.evaluate("EngineUI.host && EngineUI.host.board") == 'db', 'back on the finished drill, the engine is on again'
+        # its line: the explore board plays it out
+        assert wait_depth(pg, 8); pg.click('#eLine'); pg.wait_for_timeout(400)
+        assert pg.evaluate('S.view') == 'explore' and pg.evaluate('S.ex.moves.length') > pg.evaluate('S.ex.base') + 1
+        pg.click('#exBack'); pg.wait_for_timeout(400)
+        # a line drill under way never has it, nor does the next line
+        pg.click('#dAgain'); pg.wait_for_timeout(400)
+        assert pg.evaluate('S.drill.state') == 'play' and pg.evaluate('EngineUI.host') is None and pg.locator('#deval').is_hidden()
+
+        # ---- a missed shot found: the engine on the position after it
+        pg.evaluate('startPuzzle(0)'); pg.wait_for_timeout(400)
+        assert pg.evaluate('EngineUI.host') is None
+        u = pg.evaluate('expectedMove()[0]'); pg.evaluate(f"tryMove('{u[:2]}', '{u[2:4]}')"); pg.wait_for_timeout(500)
+        assert pg.evaluate('S.drill.state') == 'done' and pg.evaluate("EngineUI.host && EngineUI.host.board") == 'db'
+        assert pg.evaluate('EngineUI.host.fen') == pg.evaluate('fenAfter(nodeFen(DATA.puzzles[S.drill.k].node), [S.drill.after.u])')
+        assert wait_depth(pg, 8) and pg.locator('#deng .eng').count() == 1 and pg.locator('#pExplore').count() == 0
 
         # ---- Black book, phone width, dark: the board faces Black and nothing scrolls sideways
         ph = b.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True, color_scheme='dark')
