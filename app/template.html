@@ -771,6 +771,7 @@ footer.foot .fcopy{margin-left:auto}
 }
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 /*__PRODUCT_CSS__*/
+/*__ENDINGS_CSS__*/
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><!--__PIECES__--></defs></svg>
@@ -791,6 +792,7 @@ footer.foot .fcopy{margin-left:auto}
     </div>
     <nav class="tabs" role="tablist" aria-label="Sections">
       <button role="tab" data-view="sandbox" aria-selected="false">Sandbox</button>
+      <button role="tab" data-view="endings" aria-selected="false" hidden>Endings</button>
       <button role="tab" data-view="course" aria-selected="true">Course</button>
       <button role="tab" data-view="drill" aria-selected="false">Drill<span class="todo" id="drillDot" hidden title="Today's five lines are not done yet">!</span></button>
       <button role="tab" data-view="games" aria-selected="false"><span class="lg">Your games</span><span class="sm">Games</span></button>
@@ -882,7 +884,7 @@ function pickable(p){ const D = S.drill; if (D && (D.kind === 'sbset' || sbOver(
 const sbOver = D => !!D && D.kind === 'sb' && D.state === 'done' && !D.tour;
 // a line drill (Play along too), a missed shot or a review drill that has ended: like a finished game, the engine comes
 // on and a move for either side plays on from there on the explore board
-const drillOver = D => !!D && D.state === 'done' && !D.tour && (D.kind === 'line' || D.kind === 'puz' || D.kind === 'rv');
+const drillOver = D => !!D && D.state === 'done' && !D.tour && (D.kind === 'line' || D.kind === 'puz' || D.kind === 'rv' || D.kind === 'eg');
 const chapterOf = L => CHAPTERS[PARTS[L.part].ch];
 const pctTxt = q => q >= 0.995 ? '100%' : q >= 0.095 ? Math.round(q * 100) + '%' : q >= 0.01 ? (q * 100).toFixed(q >= 0.05 ? 0 : 1).replace(/\.0$/, '') + '%' : '<1%';
 function lessonOf(lineId){ const l = LINES[lineId]; return LESSONS[l.lesson] || null; }
@@ -1226,22 +1228,23 @@ function pieceIcon(pc, white){ return `<svg class="pico ${white ? 'w' : 'b'}" vi
 /* material beside a big board: the pieces each side has taken, and +N on the side that is ahead (1, 3, 3, 5, 9).
    Two thin rows, above and below the board, made on the board's first drawing and filled on every one after. */
 const MAT_V = {p: 1, n: 3, b: 3, r: 5, q: 9}, MAT_0 = {p: 8, n: 2, b: 2, r: 2, q: 1};
-function materialOf(fen){
+function materialOf(fen, rel){
   const c = {w: {p: 0, n: 0, b: 0, r: 0, q: 0}, b: {p: 0, n: 0, b: 0, r: 0, q: 0}};
   for (const ch of fen.split(' ')[0]){ const l = ch.toLowerCase(); if (c.w[l] !== undefined) c[ch === l ? 'b' : 'w'][l]++; }
   const val = sd => 'pnbrq'.split('').reduce((a, k) => a + c[sd][k] * MAT_V[k], 0);
-  const took = sd => 'qrbnp'.split('').flatMap(k => Array(Math.max(0, MAT_0[k] - c[sd === 'w' ? 'b' : 'w'][k])).fill(k));
+  // rel: what one side has more of than the other (an ending that didn't start from the first move); else what it took
+  const took = sd => 'qrbnp'.split('').flatMap(k => Array(Math.max(0, rel ? c[sd][k] - c[sd === 'w' ? 'b' : 'w'][k] : MAT_0[k] - c[sd === 'w' ? 'b' : 'w'][k])).fill(k));
   return {diff: val('w') - val('b'), w: took('w'), b: took('b')};
 }
-function matUpdate(el, fen, flip){
+function matUpdate(el, fen, flip, rel){
   if (!el) return;
   boardSound(el.id, fen);
-  const host = el.closest('.board-wrap') || el, m = materialOf(fen), topSide = flip ? 'w' : 'b';
+  const host = el.closest('.board-wrap') || el, m = materialOf(fen, rel), topSide = flip ? 'w' : 'b';
   const row = (where, sd) => {
     let r = where === 'top' ? host.previousElementSibling : host.nextElementSibling;
     if (!r || !r.classList.contains('mat')){ r = document.createElement('div'); r.className = 'mat ' + where + (host === el ? '' : ' in'); host[where === 'top' ? 'before' : 'after'](r); }
     const lead = sd === 'w' ? m.diff : -m.diff, who = sd === 'w' ? 'White' : 'Black';
-    r.innerHTML = m[sd].map(k => pieceIcon(k, sd !== 'w')).join('') + (lead > 0 ? `<b class="tnum">+${lead}</b>` : '');
+    r.innerHTML = m[sd].map(k => pieceIcon(k, rel ? sd === 'w' : sd !== 'w')).join('') + (lead > 0 ? `<b class="tnum">+${lead}</b>` : '');   // in an ending: its own extra pieces
     r.setAttribute('aria-label', m[sd].length || lead > 0 ? `${who} has taken ${m[sd].length} ${m[sd].length === 1 ? 'piece' : 'pieces'}${lead > 0 ? ` and is ${lead} ahead` : ''}` : '');
   };
   row('top', topSide); row('bot', topSide === 'w' ? 'b' : 'w');
@@ -1409,7 +1412,7 @@ const Level = {
     for (const id in (c.u || {})) if (c.u[id].pass) x += XP.pass;
     x += ((d.sb || {}).games || 0) * XP.game;
     for (const k in (d.days || {})){ const v = d.days[k]; if ((Array.isArray(v) ? v.length : v || 0) >= DAILY) x += XP.day; }
-    return x + (d.xpb || 0);
+    return x + egXP(d) + (d.xpb || 0);
   },
   step: n => 30 + 15 * n,
   of(x = this.xp()){ let n = 1, base = 0; while (x >= base + this.step(n)){ base += this.step(n); n++; } return {n, into: x - base, need: this.step(n), xp: x}; },
@@ -1451,7 +1454,7 @@ const SITE = /*__SITE__*/null;
 const canon = o => JSON.stringify(o, (k, v) => v && typeof v === 'object' && !Array.isArray(v) ? Object.keys(v).sort().reduce((a, x) => (a[x] = v[x], a), {}) : v);
 const newer = (x, y) => !x ? y : !y ? x : (y.v || 1) !== (x.v || 1) ? ((y.v || 1) > (x.v || 1) ? y : x) : (y.last || 0) > (x.last || 0) ? y : x;
 // two copies of the progress object -> one: newest record per line and puzzle, best of everything else
-const KNOWN = new Set(['lines', 'puz', 'sb', 'course', 'days', 'updated', 'packs', 'set', 'prefs', 'mail', 'badges', 'tz', 'me', 'owner', 'shop', 'lvl', 'recap', 'tour', 'rg', 'reset']);
+const KNOWN = new Set(['lines', 'puz', 'sb', 'course', 'days', 'updated', 'packs', 'set', 'prefs', 'mail', 'badges', 'tz', 'me', 'owner', 'shop', 'lvl', 'recap', 'tour', 'rg', 'reset', 'end']);
 function mergeProg(a, b){
   // an account that was reset (Settings, Advanced settings): the copy with the later reset stands whole, and what an
   // older copy still holds from before it is gone
@@ -1500,6 +1503,7 @@ function mergeProg(a, b){
     o.rg = {g: Object.values(by).sort((a, b) => (b.added || 0) - (a.added || 0) || b.t - a.t).slice(0, 3)};
     for (const f of ['chk', 'seen']){ const m = Math.max(x[f] || 0, y[f] || 0); if (m) o.rg[f] = m; } }
   if (r.tour && r.tour.done) o.tour = {done: o.tour && o.tour.done ? Math.min(o.tour.done, r.tour.done) : r.tour.done};   // the tour (app/product.js): taken once, anywhere
+  egMerge(o, r);                                         // the endings (app/endings.js)
   for (const k in r) if (!KNOWN.has(k) && (!(k in o) || (r.updated || 0) > (a.updated || 0))) o[k] = r[k];
   const me = mergeMe(a, r); if (me) o.me = JSON.parse(JSON.stringify(me)); else delete o.me;   // whose playbook this is (app/product.js)
   return o;
@@ -1736,6 +1740,7 @@ function renderChrome(){
   const lb = document.getElementById('lvBtn'), L = Level.of();
   if (lb){ lb.hidden = np; const c = document.getElementById('lvN'); c.textContent = L.n; c.style.setProperty('--p', Math.round(L.into / L.need * 100));
     lb.setAttribute('aria-label', `Level ${L.n}: ${L.into} of ${L.need} points to level ${L.n + 1}`); }
+  const et = document.querySelector('.tabs [data-view="endings"]'); if (et) et.hidden = !egOn();
   document.getElementById('foot').innerHTML = `${FOOT ? `<span class="fmine">${esc(FOOT)}</span>` : ''}<span class="fcopy">© ${new Date().getFullYear()} The Opening Playbook</span>`;
 }
 // one line about whose playbook this is (app/product.js writes it for a personal playbook), then the copyright
@@ -1838,17 +1843,17 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && !document.
 applySettings();
 
 const view = document.getElementById('view');
-const VIEWS = ['sandbox', 'course', 'drill', 'games', 'shop'];
-const CVIEWS = ['course', 'unit', 'quiz', 'grad'];
+const VIEWS = ['sandbox', 'endings', 'course', 'drill', 'games', 'shop'];
+const CVIEWS = ['course', 'unit', 'quiz', 'grad', 'egunit'];
 const tabOf = (v, from) => CVIEWS.includes(v) || (v === 'study' && from === 'unit') ? 'course' : v === 'study' ? tabOf(from || 'learn') : v === 'learn' ? 'games' : VIEWS.includes(v) ? v : 'course';
 function setTab(v){
   const b = v === 'explore' && S.ex && S.ex.back; if (b){ v = b.view === 'explore' ? 'course' : b.view; }
   const from = b ? b.studyFrom : S.studyFrom;
-  const t = v === 'drill' && S.drill && (S.drill.unit || S.drill.guided) ? 'course' : tabOf(v, from);   // a course's drills and play-alongs stay under Course
+  const t = (v === 'drill' || v === 'endings') && S.drill && (S.drill.unit || S.drill.guided) ? 'course' : tabOf(v, from);   // a course's drills and play-alongs stay under Course
   document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.view === t)));
 }
 function setHash(){
-  const h = S.view === 'course' ? (S.deep ? 'deep.' + S.deep : S.coursePath && gradAt() ? 'course.path' : 'course') : S.view === 'grad' ? 'grad' : S.view === 'explore' ? 'explore' : (S.view === 'unit' || S.view === 'quiz') && S.unit ? 'unit.' + S.unit
+  const h = S.view === 'endings' ? 'endings' : S.view === 'egunit' ? 'egunit.' + S.egUnit : S.view === 'course' && S.cseg === 'end' && egOn() ? 'egcourse' : S.view === 'course' ? (S.deep ? 'deep.' + S.deep : S.coursePath && gradAt() ? 'course.path' : 'course') : S.view === 'grad' ? 'grad' : S.view === 'explore' ? 'explore' : (S.view === 'unit' || S.view === 'quiz') && S.unit ? 'unit.' + S.unit
     : (SIDE === 'b' ? 'b.' : '') + (S.view === 'study' && S.line ? 'line.' + S.line : S.view === 'learn' && S.chapter !== DATA.chapters[0].id ? 'learn.' + S.chapter : S.view);
   try { history.replaceState(null, '', '#' + h); } catch(e){}
 }
@@ -1872,7 +1877,7 @@ function refresh(){ adoptSettings(); render(); }
 function refreshSoon(){ if (S.drill && S.drill.state === 'play'){ adoptSettings(); renderChrome(); return; } refresh(); }
 function render(){
   // the engine on a finished Sandbox game or drill lets go as soon as anything else is on the page
-  if (EngineUI.host && EngineUI.host.board === 'db' && !(S.view === 'sandbox' && sbOver(S.sbState)) && !(S.view === 'drill' && drillOver(S.drillState))) EngineUI.detach();
+  if (EngineUI.host && EngineUI.host.board === 'db' && !(S.view === 'sandbox' && sbOver(S.sbState)) && !(S.view === 'drill' && drillOver(S.drillState)) && !(S.view === 'endings' && drillOver(S.egState))) EngineUI.detach();
   const U = (S.view === 'unit' || S.view === 'quiz') && UNIT[S.unit];
   if (U && U.side && !U.soon && U.kind !== 'skill' && U.side !== SIDE) useSide(U.side);
   // a line or a game under way brings its own book with it, whichever one was open last
@@ -1882,10 +1887,16 @@ function render(){
   setPerspective(viewSide());
   setTab(S.view); renderChrome();
   const b = document.getElementById('drillDot'); b.hidden = Daily.done(0) || (typeof PERSONA !== 'undefined' && PERSONA === 'new');
-  if (S.view === 'drill') S.drill = S.drillState; else if (S.view === 'sandbox') S.drill = S.sbState; else if (S.view === 'quiz') S.drill = S.quizState; else S.drill = null;
+  if (S.view === 'drill') S.drill = S.drillState; else if (S.view === 'sandbox') S.drill = S.sbState; else if (S.view === 'quiz') S.drill = S.quizState; else if (S.view === 'endings') S.drill = S.egState; else S.drill = null;
   if (S.view !== 'study' && S.view !== 'explore') EngineUI.detach(); // the engine only runs where it's shown
   if (S.view !== 'explore') exStopAuto();
-  if (S.view === 'course') renderCourse();
+  if (S.view === 'course'){
+    // the house player's Course tab holds two courses: the openings and the endings
+    if (egOn() && S.cseg === 'end') EG.renderCourse();
+    else { renderCourse(); if (egOn() && S.view === 'course'){ view.insertAdjacentHTML('afterbegin', EG.seg()); EG.wireSeg(); } }
+  }
+  else if (S.view === 'endings') EG.render();
+  else if (S.view === 'egunit') EG.renderUnit();
   else if (S.view === 'unit') renderUnit();
   else if (S.view === 'quiz') renderQuiz();
   else if (S.view === 'learn') renderLearn();
@@ -2318,6 +2329,7 @@ function dFen(){
   const D = S.drill;
   if (D.kind === 'q'){ if (D.view) return D.view; const it = D.items[D.k]; return it.fen || N[it.node].f; }
   if (D.kind === 'rv') return Review.fen(D).split(' ')[0];
+  if (D.kind === 'eg' || D.kind === 'egq') return EG.fen(D).split(' ')[0];
   if (D.kind === 'puz' && D.after) return D.after.fen;
   return N[dNode()].f;
 }
@@ -2338,7 +2350,7 @@ function drillAdvance(){
   } else { D.busy = false; D.tries = 0; if (D.guided){ D.hint = nx.u; renderDrillBoard(); } renderDrillPanel(); }
 }
 function expectedMove(){ const D = S.drill; if (D.kind === 'rv') return [D.moves[D.i]]; if (D.kind === 'puz') return DATA.puzzles[D.k].ok; if (D.kind === 'q'){ const it = D.items[D.k]; return it.ok || it.safe; } if (D.kind === 'sb') return sbMyKids(D.node).map(c => N[c].u); return [N[LINES[D.id].n[D.i + 1]].u]; }
-function legalFor(){ const D = S.drill; if (sbOver(D) || drillOver(D)) return new Chess(sbOver(D) ? nodeFen(dNode()) : drillEnd(D).fen).moves({verbose: true}).map(m => m.from + m.to + (m.promotion || '')); if (D.kind === 'rv') return Review.legal(D); if (D.kind === 'sbset') return sbLegal(D.node); if (D.kind === 'puz') return DATA.puzzles[D.k].legal; if (D.kind === 'q'){ const it = D.items[D.k]; return it.legal || DATA.legal[String(it.node)] || []; } return DATA.legal[String(dNode())] || []; }
+function legalFor(){ const D = S.drill; if (sbOver(D) || drillOver(D)) return new Chess(sbOver(D) ? nodeFen(dNode()) : drillEnd(D).fen).moves({verbose: true}).map(m => m.from + m.to + (m.promotion || '')); if (D.kind === 'rv') return Review.legal(D); if (D.kind === 'eg' || D.kind === 'egq') return EG.legal(D); if (D.kind === 'sbset') return sbLegal(D.node); if (D.kind === 'puz') return DATA.puzzles[D.k].legal; if (D.kind === 'q'){ const it = D.items[D.k]; return it.legal || DATA.legal[String(it.node)] || []; } return DATA.legal[String(dNode())] || []; }
 // how many of your moves later the line plays this move (0: it doesn't)
 function laterInLine(D, u){ const n = LINES[D.id].n; let c = 0; for (let k = D.i + 2; k < n.length; k++){ if (!isMine(N[n[k]])) continue; c++; if (N[n[k]].u === u) return c; } return 0; }
 const HOWMANY = ['', 'one move', 'two moves', 'three moves', 'four moves', 'five moves', 'six moves'];
@@ -2360,6 +2372,7 @@ function tryMove(from, to){
   if (D.kind === 'sb'){ sbTry(u, to); return; }
   if (D.kind === 'sbset'){ sbSetTry(u, to); return; }
   if (D.kind === 'rv'){ Review.tryRv(u, to); return; }
+  if (D.kind === 'eg' || D.kind === 'egq'){ EG.tryMove(u, to); return; }
   if (D.kind === 'q'){ quizTry(u, to); return; }
   const exp = expectedMove();
   D.sel = null;
@@ -2425,6 +2438,7 @@ function renderDrillBoard(anim){
   }
   else if (D.kind === 'puz' && D.after){ fen = D.after.fen; o = {coords: true, last: [D.after.u.slice(0,2), D.after.u.slice(2,4)]}; }
   else if (D.kind === 'rv'){ fen = dFen(); o = {coords: true}; const lu = Review.lastU(D); if (lu) o.last = [lu.slice(0, 2), lu.slice(2, 4)]; }
+  else if (D.kind === 'eg' || D.kind === 'egq'){ fen = EG.fen(D); o = {coords: true}; const lu = EG.lastU(D); if (lu) o.last = [lu.slice(0, 2), lu.slice(2, 4)]; if (D.arrows) o.arrows = D.arrows.slice(); }
   else { const idx = dNode(); fen = N[idx].f; o = {coords: true}; if (N[idx].u) o.last = [N[idx].u.slice(0, 2), N[idx].u.slice(2, 4)];
     // the word comes with the move and goes again: a board drawn a second time for the same move (a piece picked up) has the signs only
     if (D.kind === 'sb' || D.kind === 'line'){ o.marks = liveMarks(idx, D.mkAt !== idx); D.mkAt = idx; } }
@@ -2432,7 +2446,7 @@ function renderDrillBoard(anim){
   if (D.sel){ o.sel = D.sel; o.dots = legalFor().filter(m => m.startsWith(D.sel)).map(m => m.slice(2, 4)); }
   if (D.hint) o.hint = D.hint;
   o.aria = 'Drill board';
-  el.innerHTML = boardSVG(fen, o); matUpdate(el, fen, FLIP);
+  el.innerHTML = boardSVG(fen.split(' ')[0], o); matUpdate(el, fen, FLIP, D.kind === 'eg' || D.kind === 'egq');
   if (drillOver(D)) drillEngine();
   else if (EngineUI.host && EngineUI.host.board === 'db'){ if (sbOver(D)) EngineUI.arrows(); else EngineUI.detach(); }
   if (anim) animateMove(el.querySelector('svg'), anim.u, anim.meta, false);
@@ -2445,14 +2459,15 @@ function drillEnd(D){
     e = {fen: nodeFen(idx), pre: nodeUcis(idx), title: `${L ? L.title : line.title} · end of the ${line.main ? 'main line' : 'line'}`, plan: planOf(line.id) ? {side: SIDE, line: line.id} : null}; }
   else if (D.kind === 'puz'){ const P = DATA.puzzles[D.k], m = D.after ? [D.after.u] : [];
     e = {fen: fenAfter(nodeFen(P.node), m), pre: nodeUcis(P.node).concat(m), title: `Missed shot · ${P.title}`}; }
+  else if (D.kind === 'eg') e = {fen: EG.fen(D), pre: [], title: D.k.name};
   else { const R = Review.get(D.rid);
     e = {fen: Review.fen(D, D.moves.length), pre: R ? R.u.slice(0, Review.spot(R, D.part)).concat(D.moves) : [], title: `Your game against ${D.opp} · after the drill`}; }
   return (D._end = e);
 }
-function drillExplore(D, o){ const e = drillEnd(D); EngineUI.detach(); exploreFrom(e.fen, Object.assign({pre: e.pre, title: e.title, plan: e.plan || null}, o)); }
+function drillExplore(D, o){ const e = drillEnd(D); EngineUI.detach(); exploreFrom(e.fen, Object.assign({pre: e.pre, title: e.title, plan: e.plan || null, rel: D.kind === 'eg'}, o)); }
 // the engine on a finished drill's board: the verdict under it, the arrows on it, the card in the panel
 function drillEngine(){
-  const D = S.drill; if (S.view !== 'drill' || !drillOver(D) || !document.getElementById('db')) return;
+  const D = S.drill; if ((S.view !== 'drill' && S.view !== 'endings') || !drillOver(D) || !document.getElementById('db')) return;
   const e = drillEnd(D), t = document.getElementById('deval'); if (t) t.hidden = false;
   if (EngineUI.host && EngineUI.host.board === 'db' && EngineUI.host.fen === e.fen){ EngineUI.paint(); return; }
   EngineUI.attach({fen: e.fen, card: 'deng', board: 'db', text: 'deval', flip: FLIP, pick: u => drillEndTry(u.slice(0, 2), u.slice(2, 4)),
@@ -2478,6 +2493,7 @@ function drillPanelHTML(){
       <div class="status ${D.state === 'done' ? '' : 'wait'}"><span class="bub"></span>${D.state === 'done' ? 'Solved' : esc(P.q || `${MYC} to move: find the best move`)}</div>
       ${D.state === 'done' ? '' : `<p class="feedback">${D.msg || '&nbsp;'}</p>`}${doneBox}</div>`;
   }
+  if (D.kind === 'eg' || D.kind === 'egq') return EG.panelHTML(D);
   if (D.guided) return guidedPanelHTML(D);
   if (D.kind === 'rv') return Review.panelHTML(D);
   const line = LINES[D.id], L = lessonOf(D.id), n = line.n;
@@ -2534,6 +2550,7 @@ function renderDrillPanel(){ const el = document.getElementById('dpanel'); if (e
 function wireDrillPanel(){
   const D = S.drill;
   if (D && D.kind === 'rv') return Review.wirePanel();
+  if (D && (D.kind === 'eg' || D.kind === 'egq')) return EG.wirePanel();
   const nx = document.getElementById('dNext'); if (nx) nx.onclick = () => startSmart(nextSmart(D.id));
   const rb = document.getElementById('dRvBack'); if (rb) rb.onclick = () => Review.back();
   const ag = document.getElementById('dAgain'); if (ag) ag.onclick = () => startDrillLine(D.id, '', D.unit, {from0: D.s0 === 0, daily: D.daily, rv: D.rv});
@@ -3428,7 +3445,7 @@ const SKILL = {
 const skillOf = U => SKILL[(U && U.skill) || 'threats'];
 const quizName = set => set === 'cp' ? 'Checkpoint' : set === 's1' ? 'Practice set 1' : 'Practice set 2';
 const quizPass = (U, set) => U.kind === 'skill' ? (set === 'cp' ? U.passCheck : U.passSet) : U.pass;
-function viewSide(){ if (S.view === 'explore' && S.ex) return S.ex.side || SIDE; const Q = S.view === 'quiz' && S.quizState; if (Q){ const it = Q.items[Q.k]; if (it && it.me) return it.me; } return SIDE; }
+function viewSide(){ if (S.view === 'explore' && S.ex) return S.ex.side || SIDE; if (S.view === 'endings' && S.egState) return S.egState.me; const Q = S.view === 'quiz' && S.quizState; if (Q){ const it = Q.items[Q.k]; if (it && it.me) return it.me; } return SIDE; }
 function startQuiz(uid, set){
   const U = UNIT[uid]; if (!U) return;
   if (U.kind !== 'skill') useSide(U.side);
@@ -3957,6 +3974,7 @@ const EngineUI = {
     if (f && ei) f.style.height = (h.flip ? 100 - ei.pct : ei.pct).toFixed(1) + '%';
     const t = h.text && document.getElementById(h.text);
     if (t && ei) t.innerHTML = `Engine, depth ${this.r.d}: <b>${esc(ei.txt)}</b>${ei.num ? ` <span class="tnum" title="${NUMHINT}">(${ei.num})</span>` : ''}`;
+    else if (t && this.r && this.r.over) t.innerHTML = `<b>${this.r.over === 'mate' ? 'Checkmate' : this.r.over === 'stalemate' ? 'Stalemate: a draw' : 'A draw'}</b>`;   // a game over has no line
   }
 };
 function engineCardHTML(r, h){
@@ -4035,11 +4053,11 @@ function exploreFrom(fen, o = {}){
   stopPlay(); exStopAuto();
   const pre = (o.pre || []).slice(), own = (o.moves || []).slice(), ms = pre.concat(own);
   S.ex = {start: pre.length ? START_FEN : fen, base: pre.length, moves: ms, i: pre.length + (o.i !== undefined ? o.i : own.length), flip: o.flip !== undefined ? o.flip : FLIP, side: o.side || viewSide(), back: o.back || backHere(),
-    title: o.title || '', plan: o.plan || null, answer: false, sel: null, busy: false, auto: null, anim: o.i === undefined && own.length && !o.land ? ms[ms.length - 1] : null};
+    title: o.title || '', plan: o.plan || null, rel: !!o.rel, answer: false, sel: null, busy: false, auto: null, anim: o.i === undefined && own.length && !o.land ? ms[ms.length - 1] : null};
   exSave(); S.view = 'explore'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
   if (o.auto) exAutoPlay();
 }
-function exSave(){ const X = S.ex; if (!X) return; try { sessionStorage.setItem(EXK, JSON.stringify({start: X.start, base: X.base || 0, moves: X.moves, i: X.i, flip: X.flip, side: X.side, back: X.back, title: X.title, plan: X.plan})); } catch(e){} }
+function exSave(){ const X = S.ex; if (!X) return; try { sessionStorage.setItem(EXK, JSON.stringify({start: X.start, base: X.base || 0, moves: X.moves, i: X.i, flip: X.flip, side: X.side, back: X.back, title: X.title, plan: X.plan, rel: X.rel})); } catch(e){} }
 function exLoad(){ try { const v = JSON.parse(sessionStorage.getItem(EXK) || 'null'); if (v && v.start && new Chess().validate_fen(v.start).valid){ S.ex = Object.assign({answer: false, sel: null, busy: false, auto: null, anim: null, base: 0}, v); return true; } } catch(e){} return false; }
 function exChess(upto){ const X = S.ex, ch = new Chess(X.start); for (const u of X.moves.slice(0, upto === undefined ? X.i : upto)) if (!ch.move(uciObj(u))) break; return ch; }
 const _exw = {key: '', words: []};
@@ -4103,7 +4121,7 @@ function exBoard(){
   const ch = exChess(), last = X.i > 0 ? X.moves[X.i - 1] : null, o = {coords: true, flip: X.flip, aria: 'Explore board'};
   if (last) o.last = [last.slice(0, 2), last.slice(2, 4)];
   if (X.sel){ o.sel = X.sel; o.dots = ch.moves({square: X.sel, verbose: true}).map(m => m.to); }
-  el.innerHTML = boardSVG(ch.fen().split(' ')[0], o); matUpdate(el, ch.fen(), !!X.flip);
+  el.innerHTML = boardSVG(ch.fen().split(' ')[0], o); matUpdate(el, ch.fen(), !!X.flip, !!X.rel);
   if (EngineUI.host && EngineUI.host.board === 'xb') EngineUI.arrows();
 }
 const ICO = {
@@ -4204,6 +4222,8 @@ function wireExInput(){
 
 /*__PRODUCT_JS__*/
 
+/*__ENDINGS_JS__*/
+
 /* ------------------------------------------------------------------ boot */
 function start(saved){
   Prog.load(); adoptSettings(); Cloud.init(); Product.boot();
@@ -4232,6 +4252,8 @@ function start(saved){
   else if (h === 'grad') S.view = gradAt() || baseDone() ? 'grad' : 'course';
   else if (h.startsWith('line.') && LINES[h.slice(5)]){ S.line = h.slice(5); S.i = lineStart(S.line); S.view = 'study'; }
   else if (h.startsWith('learn.') && CHAPTERS[h.slice(6)]){ S.chapter = h.slice(6); S.view = 'learn'; }
+  else if (h.startsWith('egunit.') && EG.unit(h.slice(7))){ S.egUnit = h.slice(7); S.view = 'egunit'; }
+  else if (h === 'egcourse'){ S.cseg = 'end'; S.view = 'course'; }
   else if (h === 'explore' && exLoad()){ if (S.ex.side && BOOKS[S.ex.side] && S.ex.side !== SIDE){ loadBook(S.ex.side); S.chapter = savedChapter(SIDE); } S.view = 'explore'; }
   else if (VIEWS.includes(h) || h === 'learn') S.view = h;   // #learn: the openings, now under Your games
   else if (h === 'cheat'){ S.view = 'learn'; S.lview = 'glance'; }   // the old cheat sheet: an opening's page, at a glance

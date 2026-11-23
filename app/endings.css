@@ -1,0 +1,13 @@
+/* the Endings tab and the endings course (app/endings.js): everything else is the drill board's and the course's own */
+.egcount{margin:2px 0 10px;color:var(--muted);font-size:13px;font-family:var(--f-mono)}
+.egstars{display:flex;gap:4px;margin:6px 0 2px}
+.egstars svg{width:26px;height:26px;fill:var(--line)}
+.egstars svg.on{fill:var(--gold)}
+.egsub{margin:4px 0 0;color:var(--muted);font-size:14px}
+.egwhy{margin:6px 0 0;color:var(--muted);font-size:14px;line-height:1.45}
+.ucard .egwhy{display:block;font-size:13px;margin-top:3px}
+.feedback.good{color:var(--accent)}
+.feedback.bad{color:var(--rosso)}
+/* six tabs on a phone (the house player's: Endings is one of them): each as wide as its name, sharing what is left */
+@media (max-width:640px){ .tabs button{flex:1 1 auto;padding-left:3px;padding-right:3px} }
+@media (max-width:400px){ .tabs button{font-size:13px} .tabs button .todo{margin-left:3px} }

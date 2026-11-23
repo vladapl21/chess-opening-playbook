@@ -127,6 +127,12 @@ with sync_playwright() as p:
     a.evaluate("Review.get('g1').mk = 0; Review.get('g2').d = {o: [1, 1, 9]}; Prog.d.rg.g.push({id: 'g3', t: 1700000003000, added: 1700000003000, src: 'acct', me: 'w', opp: 'three', oe: 900, r: 0, url: '', u: ['e2e4', 'e7e5', 'g1f3', 'b8c6', 'f1c4', 'g8f6', 'f3e5'], at: 6, by: 'me', w: 0}, {id: 'g4', t: 1700000004000, added: 1700000004000, src: 'acct', me: 'w', opp: 'four', oe: 900, r: 0, url: '', u: ['e2e4', 'e7e5', 'g1f3', 'b8c6', 'f1c4', 'g8f6', 'f3e5'], at: 6, by: 'me', w: 0}); Prog.save()"); a.wait_for_timeout(1200)
     got = bp.evaluate("Review.list().map(R => [R.opp, R.mk, R.d ? R.d.o : null])"); print('reviews on the other device:', got)
     assert got == [['four', None, None], ['three', None, None], ['two', None, [1, 1, 9]]] and len(stored()['rg']['g']) == 3, got
+    # ---- the endings: each position's runs, clean runs and best stars, and each unit's steps, merged from both devices
+    bp.evaluate("Prog.d.end = {p: {'r-1': [2, 1, 1700000001000, 2]}, u: {'eg-r': {l: 1700000000500, a: {'eg-r-a1': 1700000000600}}}, n: [2, 1]}; Prog.save()"); bp.wait_for_timeout(1200)
+    assert a.evaluate("Prog.d.end.p['r-1']") == [2, 1, 1700000001000, 2]
+    a.evaluate("Prog.d.end.p['r-1'] = [3, 1, 1700000002000, 3]; Prog.d.end.p['q-1'] = [1, 1, 1700000002500, 3]; Prog.d.end.u['eg-r'].q = [4, 5, 1700000003000]; Prog.save()"); a.wait_for_timeout(1200)
+    got = bp.evaluate("[Prog.d.end.p['r-1'], Prog.d.end.p['q-1'], Prog.d.end.u['eg-r'].q, Prog.d.end.u['eg-r'].a['eg-r-a1']]"); print('endings on the other device:', got)
+    assert got == [[3, 1, 1700000002000, 3], [1, 1, 1700000002500, 3], [4, 5, 1700000003000], 1700000000600] and stored()['end']['p']['q-1'][1] == 1, got
 
     # ---- the artifact's owner has a switch nobody else has: it works on a copy that is never written to the database,
     # while what other devices write keeps arriving underneath and is there when the switch goes off
@@ -148,11 +154,11 @@ with sync_playwright() as p:
     c.context.close()
 
     # ---- a page from an older version writes a smaller copy: the next save on either device puts everything back
-    d = stored(); old = {k: v for k, v in d.items() if k not in ('days', 'prefs', 'set', 'badges', 'shop', 'lvl', 'recap', 'tour', 'rg')}; old['someday'] = {'x': 1}
+    d = stored(); old = {k: v for k, v in d.items() if k not in ('days', 'prefs', 'set', 'badges', 'shop', 'lvl', 'recap', 'tour', 'rg', 'end')}; old['someday'] = {'x': 1}
     DB['data/users/viewer-1/italian-progress'] = json.dumps(old); a.wait_for_timeout(700)
     a.evaluate("Prog.save()"); a.wait_for_timeout(900)
     d = stored(); print('after a smaller copy and one save:', sorted(d.keys()))
-    assert all(k in d for k in ('days', 'prefs', 'badges', 'shop', 'lvl', 'recap', 'tour', 'rg', 'someday')) and d['prefs']['who'][0] == 'pawn'
+    assert all(k in d for k in ('days', 'prefs', 'badges', 'shop', 'lvl', 'recap', 'tour', 'rg', 'end', 'someday')) and d['prefs']['who'][0] == 'pawn'
     assert a.evaluate("Prog.d.someday && Prog.d.someday.x") == 1, 'a field this version does not know is kept'
 
     # ---- the explore screen is not disturbed by another device: no re-render while a line is being played

@@ -20,7 +20,8 @@ with sync_playwright() as p:
     ctx = b.new_context(viewport={'width': 1280, 'height': 900})
     pg = ctx.new_page(); hook(pg); pg.goto(URL); pg.wait_for_timeout(1000)
     tabs = [t.split('\n')[0].strip() for t in pg.locator('.tabs button').all_inner_texts()]
-    print('tabs:', tabs); assert tabs[:2] == ['Sandbox', 'Course'] and tabs[2].startswith('Drill') and tabs[3] == 'Your games' and tabs[4] == 'Shop' and len(tabs) == 5
+    # the house player's: six, Endings beside the Sandbox
+    print('tabs:', tabs); assert tabs[:3] == ['Sandbox', 'Endings', 'Course'] and tabs[3].startswith('Drill') and tabs[4] == 'Your games' and tabs[5] == 'Shop' and len(tabs) == 6
 
     # no colour switch: the header is the brand and the player's corner, and every tab holds both books
     assert pg.locator('.top .sidesw, #brandKick, [data-side]').count() == 0, 'no White/Black switch'

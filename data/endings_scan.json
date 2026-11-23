@@ -1,0 +1,1080 @@
+{
+ "summary": {
+  "games": 150,
+  "endings": 68,
+  "won": 51,
+  "converted": 41,
+  "by_kind": {
+   "bare": {
+    "won": 2,
+    "kept": 2
+   },
+   "minor": {
+    "won": 2,
+    "kept": 1
+   },
+   "mixed": {
+    "won": 31,
+    "kept": 24
+   },
+   "queen": {
+    "won": 10,
+    "kept": 9
+   },
+   "rook": {
+    "won": 6,
+    "kept": 5
+   }
+  },
+  "slips": {
+   "bare": 2,
+   "queen": 1,
+   "mixed": 4,
+   "rook": 1,
+   "minor": 1
+  },
+  "how": {
+   "timeout": 4,
+   "won": 41,
+   "resigned": 4,
+   "mated": 2
+  }
+ },
+ "games": [
+  {
+   "opp": "MrGaurav547",
+   "date": "2026.10.13",
+   "tc": "60",
+   "me": "b",
+   "res": "timeout",
+   "term": "MrGaurav547 won on time",
+   "plies": 71,
+   "won": {
+    "fen": "r3k2r/1p3p1p/1p2p1p1/4B3/1P6/PP6/5PPP/4R1K1 b kq - 0 24",
+    "kind": "mixed",
+    "ply": 47,
+    "v": 318
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "andohuiba",
+   "date": "2026.10.13",
+   "tc": "180+2",
+   "me": "b",
+   "res": "won",
+   "term": "aqua_alpaca won by checkmate",
+   "plies": 92,
+   "won": {
+    "fen": "6k1/ppp5/3pp2p/1P2p1q1/2P1P3/3P3P/P4bP1/1R4K1 w - - 0 20",
+    "kind": "queen",
+    "ply": 38,
+    "v": 579
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "maopfar",
+   "date": "2026.10.14",
+   "tc": "180+2",
+   "me": "b",
+   "res": "won",
+   "term": "aqua_alpaca won on time",
+   "plies": 104,
+   "won": {
+    "fen": "8/2p2kpp/1r1pbp2/4P3/1R6/4P1P1/6P1/2R3K1 b - - 0 31",
+    "kind": "mixed",
+    "ply": 61,
+    "v": 470
+   },
+   "slip": null,
+   "bare": {
+    "fen": "8/8/6p1/6k1/3K4/7b/6r1/7q w - - 0 50",
+    "kind": "mate-2",
+    "ply": 98,
+    "left": 3
+   }
+  },
+  {
+   "opp": "alfii_man",
+   "date": "2026.10.14",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "aqua_alpaca won by resignation",
+   "plies": 61,
+   "won": {
+    "fen": "6k1/5p1p/6p1/p7/3R4/P6P/1P3PP1/2Q3K1 b - - 0 31",
+    "kind": "bare",
+    "ply": 61,
+    "v": 975
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "marouen7rezgui7doussa",
+   "date": "2026.10.14",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "aqua_alpaca won on time",
+   "plies": 85,
+   "won": {
+    "fen": "6k1/2p2ppp/r1Pp4/3PN3/1p2P1b1/1P2P3/1PQ3PP/6K1 b - - 0 29",
+    "kind": "queen",
+    "ply": 57,
+    "v": 382
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "Eschoir",
+   "date": "2026.10.14",
+   "tc": "180+2",
+   "me": "b",
+   "res": "resigned",
+   "term": "Eschoir won by resignation",
+   "plies": 99,
+   "won": {
+    "fen": "1r6/p1p2p1p/2p1k3/5p2/8/1R3PK1/P1P2P1P/8 b - - 8 26",
+    "kind": "rook",
+    "ply": 51,
+    "v": 357
+   },
+   "slip": {
+    "fen": "8/2p2p2/8/p1pk3p/5p1P/1PK2P2/P4P2/8 b - - 1 32",
+    "move": "f7f5",
+    "best": "d5c6",
+    "before": 508,
+    "after": 18,
+    "kind": "bare",
+    "ply": 63
+   },
+   "bare": null
+  },
+  {
+   "opp": "junior607",
+   "date": "2026.10.14",
+   "tc": "180+2",
+   "me": "b",
+   "res": "won",
+   "term": "aqua_alpaca won on time",
+   "plies": 80,
+   "won": {
+    "fen": "1R6/1pp5/p1kr2P1/4p3/8/8/PP6/6K1 w - - 1 31",
+    "kind": "rook",
+    "ply": 60,
+    "v": 304
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "Sudhansu_06",
+   "date": "2026.10.14",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "aqua_alpaca won - game abandoned",
+   "plies": 107,
+   "won": {
+    "fen": "8/8/8/6k1/6p1/6P1/r4R2/6K1 w - - 1 54",
+    "kind": "rook",
+    "ply": 106,
+    "v": 614
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "Pong_02",
+   "date": "2026.10.14",
+   "tc": "180+2",
+   "me": "b",
+   "res": "won",
+   "term": "aqua_alpaca won by resignation",
+   "plies": 52,
+   "won": {
+    "fen": "r4rk1/b1p3pp/p1p5/3p1B2/1P6/P1P5/5PPP/4R1K1 b - - 0 21",
+    "kind": "mixed",
+    "ply": 41,
+    "v": 699
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "Hareesh_T",
+   "date": "2026.10.14",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "aqua_alpaca won by resignation",
+   "plies": 65,
+   "won": {
+    "fen": "3r2k1/p4pbp/bp4p1/5p2/PP6/5P2/6PP/1N1R3K w - - 0 26",
+    "kind": "mixed",
+    "ply": 50,
+    "v": 409
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "centxries",
+   "date": "2026.10.14",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "aqua_alpaca won by resignation",
+   "plies": 55,
+   "won": {
+    "fen": "8/6k1/5r2/6pp/4P3/6B1/PPP2PPP/5RK1 w - - 0 28",
+    "kind": "mixed",
+    "ply": 54,
+    "v": 823
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "abood_almuss",
+   "date": "2026.10.14",
+   "tc": "180+2",
+   "me": "w",
+   "res": "timeout",
+   "term": "abood_almuss won on time",
+   "plies": 74,
+   "won": {
+    "fen": "Q5k1/5p1p/4p1p1/1p2PqB1/1P3P2/2p5/5PKP/8 b - - 0 35",
+    "kind": "queen",
+    "ply": 69,
+    "v": 678
+   },
+   "slip": {
+    "fen": "Q7/5p1p/4pBpk/1p2Pq2/1P3P2/2p5/5PKP/8 w - - 3 37",
+    "move": "a8f8",
+    "best": "f6g5",
+    "before": 685,
+    "after": 0,
+    "kind": "queen",
+    "ply": 72
+   },
+   "bare": null
+  },
+  {
+   "opp": "ramjo08",
+   "date": "2026.10.14",
+   "tc": "180+2",
+   "me": "b",
+   "res": "won",
+   "term": "aqua_alpaca won by resignation",
+   "plies": 88,
+   "won": {
+    "fen": "8/7p/3Rk1p1/5p2/5P2/5K2/7P/8 b - - 0 37",
+    "kind": "mixed",
+    "ply": 73,
+    "v": 506
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "jackhanma1337",
+   "date": "2026.10.14",
+   "tc": "180+2",
+   "me": "b",
+   "res": "won",
+   "term": "aqua_alpaca won by checkmate",
+   "plies": 104,
+   "won": {
+    "fen": "r5k1/1pp2pp1/1p1p3p/4p3/2P3RK/7P/1q3P2/8 b - - 0 30",
+    "kind": "queen",
+    "ply": 59,
+    "v": 9995
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "FossilizedEyes",
+   "date": "2026.10.14",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "aqua_alpaca won by resignation",
+   "plies": 55,
+   "won": {
+    "fen": "R6n/p2bbk2/3p4/1pp5/4PP2/3P4/PPP4P/2K4R b - - 0 28",
+    "kind": "mixed",
+    "ply": 55,
+    "v": 524
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "Mahm00dsaad",
+   "date": "2026.10.14",
+   "tc": "180+2",
+   "me": "b",
+   "res": "won",
+   "term": "aqua_alpaca won by resignation",
+   "plies": 126,
+   "won": {
+    "fen": "1RB1r3/2p1kp2/p1p3p1/P1Pp3p/2bP1P1P/5P1K/8/8 b - - 2 35",
+    "kind": "mixed",
+    "ply": 69,
+    "v": 374
+   },
+   "slip": {
+    "fen": "1RB1r3/2p1kp2/p1p3p1/P1Pp3p/2bP1P1P/5P1K/8/8 b - - 2 35",
+    "move": "c4e2",
+    "best": "c4d3",
+    "before": 374,
+    "after": 0,
+    "kind": "mixed",
+    "ply": 69
+   },
+   "bare": null
+  },
+  {
+   "opp": "dkasham",
+   "date": "2026.10.15",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "aqua_alpaca won by checkmate",
+   "plies": 99,
+   "won": {
+    "fen": "6k1/p5p1/3N1p1p/2r5/6b1/1P1P2P1/P1P1R1PP/2R3K1 b - - 0 26",
+    "kind": "mixed",
+    "ply": 51,
+    "v": 525
+   },
+   "slip": {
+    "fen": "6k1/p5p1/3N1p1p/2r5/8/1P1b2P1/P1P2KPP/2R5 w - - 0 28",
+    "move": "d6c4",
+    "best": "c2c4",
+    "before": 403,
+    "after": 23,
+    "kind": "mixed",
+    "ply": 54
+   },
+   "bare": null
+  },
+  {
+   "opp": "CH3SSPLAYER_77777",
+   "date": "2026.10.15",
+   "tc": "180+2",
+   "me": "b",
+   "res": "won",
+   "term": "aqua_alpaca won by checkmate",
+   "plies": 90,
+   "won": {
+    "fen": "5rk1/pp6/3p2P1/4bR2/2Pp4/8/P3P3/2R3K1 b - - 0 30",
+    "kind": "mixed",
+    "ply": 59,
+    "v": 491
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "FlachaBiceps",
+   "date": "2026.07.12",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "vladapl won by checkmate",
+   "plies": 91,
+   "won": {
+    "fen": "7k/p6p/1p1P4/2pQ4/8/1N4P1/PqP4P/6K1 b - - 0 34",
+    "kind": "queen",
+    "ply": 67,
+    "v": 593
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "lacasito_superman",
+   "date": "2026.07.12",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "vladapl won by resignation",
+   "plies": 99,
+   "won": {
+    "fen": "2r2N2/ppp5/2npk3/4p3/4p2P/6R1/PPP2PP1/2K4R b - - 0 21",
+    "kind": "mixed",
+    "ply": 41,
+    "v": 371
+   },
+   "slip": null,
+   "bare": {
+    "fen": "8/8/8/2k5/R7/1PPK4/8/8 b - - 0 44",
+    "kind": "mate-r",
+    "ply": 87,
+    "left": 6
+   }
+  },
+  {
+   "opp": "daniel125555",
+   "date": "2026.07.12",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "vladapl won by resignation",
+   "plies": 123,
+   "won": {
+    "fen": "3R1rk1/pp3p1p/2p1p2b/4P3/4N3/6p1/PPP4P/3R2K1 b - - 0 22",
+    "kind": "mixed",
+    "ply": 43,
+    "v": 548
+   },
+   "slip": {
+    "fen": "8/8/2p2b2/ppk5/4K3/2P1N3/PP6/3R4 w - - 0 38",
+    "move": "d1d8",
+    "best": "e3g4",
+    "before": 551,
+    "after": 4,
+    "kind": "mixed",
+    "ply": 74
+   },
+   "bare": null
+  },
+  {
+   "opp": "soussoubenaza",
+   "date": "2026.07.12",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "vladapl won by resignation",
+   "plies": 55,
+   "won": {
+    "fen": "5rk1/1b3pp1/7p/1pR1p3/8/8/PN3PPP/5RK1 b - - 0 23",
+    "kind": "mixed",
+    "ply": 45,
+    "v": 473
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "ocdubs228",
+   "date": "2026.07.12",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "vladapl won by checkmate",
+   "plies": 131,
+   "won": {
+    "fen": "8/ppk3p1/2p1p2p/4P3/1KPq4/1P2Br2/P4Pp1/6R1 w - - 0 43",
+    "kind": "queen",
+    "ply": 84,
+    "v": 384
+   },
+   "slip": null,
+   "bare": {
+    "fen": "1k3R2/8/1KP5/P7/1P6/8/8/8 b - - 0 66",
+    "kind": "mate-r",
+    "ply": 131,
+    "left": 0
+   }
+  },
+  {
+   "opp": "zz_ny",
+   "date": "2026.07.12",
+   "tc": "180+2",
+   "me": "w",
+   "res": "resigned",
+   "term": "zz_ny won by resignation",
+   "plies": 102,
+   "won": {
+    "fen": "8/7p/5n2/1p3K2/3k4/PP6/2P5/8 w - - 0 41",
+    "kind": "minor",
+    "ply": 80,
+    "v": 302
+   },
+   "slip": {
+    "fen": "8/7p/5K2/1p6/8/PPk5/2P5/8 w - - 1 42",
+    "move": "a3a4",
+    "best": "f6g5",
+    "before": 329,
+    "after": 9,
+    "kind": "bare",
+    "ply": 82
+   },
+   "bare": null
+  },
+  {
+   "opp": "kfa_033",
+   "date": "2026.07.13",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "vladapl won by checkmate",
+   "plies": 61,
+   "won": {
+    "fen": "r7/pp2B1kp/2p3b1/8/2B3P1/P4P2/1PPn3P/2KR4 w - - 0 27",
+    "kind": "mixed",
+    "ply": 52,
+    "v": 639
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "Datmo",
+   "date": "2026.07.13",
+   "tc": "180+2",
+   "me": "b",
+   "res": "resigned",
+   "term": "Datmo won by resignation",
+   "plies": 59,
+   "won": {
+    "fen": "r4rk1/1p3ppp/4p3/p2pB3/1b1P4/1P2P2P/5PP1/2R4K b - - 0 23",
+    "kind": "mixed",
+    "ply": 45,
+    "v": 670
+   },
+   "slip": {
+    "fen": "3r2k1/1RB2ppp/1p2p3/b2p4/3P4/4P2P/5PPK/r7 b - - 7 29",
+    "move": "d8d7",
+    "best": "d8a8",
+    "before": 542,
+    "after": -9998,
+    "kind": "mixed",
+    "ply": 57
+   },
+   "bare": null
+  },
+  {
+   "opp": "0GG0123",
+   "date": "2026.07.13",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "vladapl won by resignation",
+   "plies": 99,
+   "won": {
+    "fen": "8/1Nk5/p4bbp/1p1pPp2/3P1P2/8/RP3KP1/7R w - - 0 45",
+    "kind": "mixed",
+    "ply": 88,
+    "v": 836
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "ctdawizard",
+   "date": "2026.07.13",
+   "tc": "180+2",
+   "me": "b",
+   "res": "won",
+   "term": "vladapl won on time",
+   "plies": 78,
+   "won": {
+    "fen": "8/pp6/1b1p1kP1/3R4/5p2/2P2r2/PPK5/6R1 b - - 1 30",
+    "kind": "mixed",
+    "ply": 59,
+    "v": 464
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "ctdawizard",
+   "date": "2026.07.13",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "vladapl won on time",
+   "plies": 67,
+   "won": {
+    "fen": "2b5/p2N1kp1/1r3p2/1p6/4Q3/8/PP3PPP/6K1 b - - 0 30",
+    "kind": "queen",
+    "ply": 59,
+    "v": 449
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "raph_57",
+   "date": "2026.07.13",
+   "tc": "180+2",
+   "me": "b",
+   "res": "won",
+   "term": "vladapl won by checkmate",
+   "plies": 148,
+   "won": {
+    "fen": "r5k1/p3r1pp/2p5/1b1p4/P7/1PP2P2/6PP/3R3K w - - 0 25",
+    "kind": "mixed",
+    "ply": 48,
+    "v": 591
+   },
+   "slip": null,
+   "bare": {
+    "fen": "5k2/6pp/8/3K1r2/8/5r1r/8/8 w - - 0 48",
+    "kind": "mate-2",
+    "ply": 94,
+    "left": 27
+   }
+  },
+  {
+   "opp": "JorgeGart",
+   "date": "2026.07.13",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "vladapl won by resignation",
+   "plies": 59,
+   "won": {
+    "fen": "5k2/1p2q2p/pQ2p1p1/3pN3/3P2P1/4K3/PP5P/8 w - - 0 29",
+    "kind": "queen",
+    "ply": 56,
+    "v": 522
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "Mathzombie10",
+   "date": "2026.07.13",
+   "tc": "180+2",
+   "me": "b",
+   "res": "won",
+   "term": "vladapl won by checkmate",
+   "plies": 136,
+   "won": {
+    "fen": "1k3b1r/ppNb4/3p4/3B3p/4PKpP/8/PP4P1/2R5 w - - 0 23",
+    "kind": "mixed",
+    "ply": 44,
+    "v": 348
+   },
+   "slip": {
+    "fen": "3r4/1R1bk3/2Bp4/7p/P3P1pP/6K1/1b4P1/8 b - - 1 30",
+    "move": "e7e6",
+    "best": "b2e5",
+    "before": 409,
+    "after": -76,
+    "kind": "mixed",
+    "ply": 59
+   },
+   "bare": {
+    "fen": "8/7q/8/5k1K/8/8/8/8 w - - 0 69",
+    "kind": "mate-q",
+    "ply": 136,
+    "left": 0
+   }
+  },
+  {
+   "opp": "Alla79_Albag",
+   "date": "2026.07.18",
+   "tc": "180+2",
+   "me": "b",
+   "res": "won",
+   "term": "vladapl won by checkmate",
+   "plies": 138,
+   "won": {
+    "fen": "7k/5ppp/1b2p3/1pN5/2rP4/P4P1P/1P4P1/3R2K1 b - - 2 28",
+    "kind": "mixed",
+    "ply": 55,
+    "v": 505
+   },
+   "slip": {
+    "fen": "7k/5ppp/1b2p3/1pN5/2rP4/P4P1P/1P4P1/3R2K1 b - - 2 28",
+    "move": "b6c5",
+    "best": "c4d4",
+    "before": 505,
+    "after": -339,
+    "kind": "mixed",
+    "ply": 55
+   },
+   "bare": {
+    "fen": "8/8/5p2/6p1/8/4K2q/k7/8 w - - 0 56",
+    "kind": "mate-q",
+    "ply": 110,
+    "left": 14
+   }
+  },
+  {
+   "opp": "Colby_1",
+   "date": "2026.07.18",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "vladapl won by resignation",
+   "plies": 65,
+   "won": {
+    "fen": "8/p5rp/8/1p6/1P4k1/2P5/P1K5/3R4 w - - 0 33",
+    "kind": "rook",
+    "ply": 64,
+    "v": 635
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "gpokerman",
+   "date": "2026.07.23",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "vladapl won by resignation",
+   "plies": 123,
+   "won": {
+    "fen": "8/5p1p/4p1p1/8/5k2/K4P1P/P5P1/8 w - - 1 46",
+    "kind": "bare",
+    "ply": 90,
+    "v": 404
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "Shiv515355",
+   "date": "2026.10.08",
+   "tc": "180+2",
+   "me": "b",
+   "res": "won",
+   "term": "vladapl won - game abandoned",
+   "plies": 82,
+   "won": {
+    "fen": "6k1/ppp3pp/2p5/4p3/1Pq5/P3P2P/6P1/3R1rK1 w - - 0 25",
+    "kind": "queen",
+    "ply": 48,
+    "v": 640
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "butcherbio",
+   "date": "2026.10.08",
+   "tc": "180+2",
+   "me": "b",
+   "res": "won",
+   "term": "vladapl won by resignation",
+   "plies": 156,
+   "won": {
+    "fen": "2r5/2R2kpp/1R2p3/p2pPp2/Pb1P4/1P6/1B4PP/5K2 b - - 0 31",
+    "kind": "mixed",
+    "ply": 61,
+    "v": 405
+   },
+   "slip": {
+    "fen": "2r5/2k3pp/4p3/pR1pPp2/Pb1P4/1P4KP/1B4P1/8 b - - 6 36",
+    "move": "c8b8",
+    "best": "c7d8",
+    "before": 308,
+    "after": -1,
+    "kind": "mixed",
+    "ply": 71
+   },
+   "bare": null
+  },
+  {
+   "opp": "Alvonei",
+   "date": "2026.07.09",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "vladapl won by checkmate",
+   "plies": 131,
+   "won": {
+    "fen": "1r5k/2R4p/8/3p4/3P4/P2P1N2/5PPP/2r3K1 w - - 0 32",
+    "kind": "mixed",
+    "ply": 62,
+    "v": 694
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "qie00",
+   "date": "2026.07.09",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "vladapl won by resignation",
+   "plies": 57,
+   "won": {
+    "fen": "4r2k/7p/pn1p2p1/1pp5/4P3/2P3P1/PP3QP1/3R2K1 w - - 0 26",
+    "kind": "queen",
+    "ply": 50,
+    "v": 752
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "gfrasti",
+   "date": "2026.07.09",
+   "tc": "180+2",
+   "me": "w",
+   "res": "mated",
+   "term": "gfrasti won by checkmate",
+   "plies": 114,
+   "won": {
+    "fen": "4r2k/p4ppp/1pp2n2/2B5/1P6/P1P2P2/6PP/R4RK1 w - - 0 26",
+    "kind": "mixed",
+    "ply": 50,
+    "v": 621
+   },
+   "slip": {
+    "fen": "8/p2R4/1p3p1p/2p5/1P1R2P1/4kPK1/2r4P/8 w - - 0 40",
+    "move": "d7e7",
+    "best": "d4e4",
+    "before": 9999,
+    "after": -6,
+    "kind": "rook",
+    "ply": 78
+   },
+   "bare": null
+  },
+  {
+   "opp": "TheLuisGambit25",
+   "date": "2026.07.09",
+   "tc": "180+2",
+   "me": "w",
+   "res": "resigned",
+   "term": "TheLuisGambit25 won by resignation",
+   "plies": 172,
+   "won": {
+    "fen": "8/8/4b2R/p1r2k2/K7/1P6/P7/8 w - - 7 78",
+    "kind": "mixed",
+    "ply": 154,
+    "v": 578
+   },
+   "slip": {
+    "fen": "8/8/4b2R/p1r2k2/K7/1P6/P7/8 w - - 7 78",
+    "move": "h6h8",
+    "best": "h6h5",
+    "before": 578,
+    "after": -22,
+    "kind": "mixed",
+    "ply": 154
+   },
+   "bare": null
+  },
+  {
+   "opp": "DianaParpar",
+   "date": "2026.07.09",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "vladapl won by resignation",
+   "plies": 59,
+   "won": {
+    "fen": "3b1r2/p5pp/1pp1k3/4P3/1N6/1P3P2/P1P3KP/4R3 w - - 4 27",
+    "kind": "mixed",
+    "ply": 52,
+    "v": 348
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "TiepiMT",
+   "date": "2026.07.09",
+   "tc": "180+2",
+   "me": "b",
+   "res": "timeout",
+   "term": "TiepiMT won on time",
+   "plies": 69,
+   "won": {
+    "fen": "r2r2k1/pp3ppp/4b3/8/2P2B2/1PK5/P5PP/4R3 b - - 0 24",
+    "kind": "mixed",
+    "ply": 47,
+    "v": 555
+   },
+   "slip": {
+    "fen": "3r2k1/5p2/R3bBp1/7p/1KP4P/1P4P1/8/1r6 b - - 1 34",
+    "move": "d8d3",
+    "best": "d8c8",
+    "before": 531,
+    "after": -9996,
+    "kind": "mixed",
+    "ply": 67
+   },
+   "bare": null
+  },
+  {
+   "opp": "Leam01",
+   "date": "2026.07.09",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "vladapl won by resignation",
+   "plies": 87,
+   "won": {
+    "fen": "8/5b2/p7/1p1p1p2/3P3k/P1PNKP2/1P6/8 w - - 4 44",
+    "kind": "minor",
+    "ply": 86,
+    "v": 445
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "Jaydenh625",
+   "date": "2026.07.09",
+   "tc": "180+2",
+   "me": "b",
+   "res": "won",
+   "term": "vladapl won by checkmate",
+   "plies": 150,
+   "won": {
+    "fen": "8/8/R5p1/7P/6P1/8/pk3PK1/1r6 b - - 0 50",
+    "kind": "rook",
+    "ply": 99,
+    "v": 302
+   },
+   "slip": {
+    "fen": "8/8/R5p1/7P/6P1/8/pk3PK1/1r6 b - - 0 50",
+    "move": "a2a1q",
+    "best": "g6h5",
+    "before": 302,
+    "after": 0,
+    "kind": "rook",
+    "ply": 99
+   },
+   "bare": {
+    "fen": "8/8/5Kp1/5r2/8/8/1k6/8 w - - 0 61",
+    "kind": "mate-r",
+    "ply": 120,
+    "left": 15
+   }
+  },
+  {
+   "opp": "H7008",
+   "date": "2026.07.10",
+   "tc": "180+2",
+   "me": "b",
+   "res": "won",
+   "term": "vladapl won by checkmate",
+   "plies": 96,
+   "won": {
+    "fen": "8/1r6/8/8/5k1K/5P1P/5R2/8 b - - 5 48",
+    "kind": "rook",
+    "ply": 95,
+    "v": 9999
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "mtreb",
+   "date": "2026.07.10",
+   "tc": "180+2",
+   "me": "b",
+   "res": "won",
+   "term": "vladapl won by checkmate",
+   "plies": 54,
+   "won": {
+    "fen": "4r1k1/p4ppp/2bp4/p1b2R1P/8/1PN3N1/P4PP1/5K2 b - - 1 26",
+    "kind": "mixed",
+    "ply": 51,
+    "v": 309
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "MemoHerdezElChile",
+   "date": "2026.07.10",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "vladapl won by checkmate",
+   "plies": 45,
+   "won": {
+    "fen": "r3Rk2/1p4pp/2pN4/p7/5n2/8/PPP3PP/2K1R3 b - - 0 22",
+    "kind": "mixed",
+    "ply": 43,
+    "v": 9999
+   },
+   "slip": null,
+   "bare": null
+  },
+  {
+   "opp": "steny35",
+   "date": "2026.07.10",
+   "tc": "180+2",
+   "me": "w",
+   "res": "mated",
+   "term": "steny35 won by checkmate",
+   "plies": 108,
+   "won": {
+    "fen": "8/p1k3p1/p4p1p/4rp1P/3N4/b1PK4/P1P2PP1/1R6 w - - 6 30",
+    "kind": "mixed",
+    "ply": 58,
+    "v": 301
+   },
+   "slip": {
+    "fen": "8/p1k3p1/p4p1p/4rp1P/3N4/b1PK4/P1P2PP1/1R6 w - - 6 30",
+    "move": "f2f3",
+    "best": "f2f4",
+    "before": 301,
+    "after": 52,
+    "kind": "mixed",
+    "ply": 58
+   },
+   "bare": null
+  },
+  {
+   "opp": "Laradrak",
+   "date": "2026.07.11",
+   "tc": "180+2",
+   "me": "w",
+   "res": "won",
+   "term": "vladapl won by checkmate",
+   "plies": 113,
+   "won": {
+    "fen": "3k3r/5pp1/1pr4p/3Bp3/4P3/8/P4PPP/5RK1 w - - 0 24",
+    "kind": "mixed",
+    "ply": 46,
+    "v": 548
+   },
+   "slip": null,
+   "bare": {
+    "fen": "4QR2/8/7k/8/3K4/8/8/7B b - - 0 54",
+    "kind": "mate-2",
+    "ply": 107,
+    "left": 3
+   }
+  },
+  {
+   "opp": "quzibek",
+   "date": "2026.07.11",
+   "tc": "180+2",
+   "me": "b",
+   "res": "timeout",
+   "term": "quzibek won on time",
+   "plies": 93,
+   "won": {
+    "fen": "2k5/p4ppp/1pp5/4P3/P3N1b1/6P1/1Pr4P/4R1K1 w - - 0 27",
+    "kind": "mixed",
+    "ply": 52,
+    "v": 322
+   },
+   "slip": {
+    "fen": "8/p3k1pp/1pN5/8/P7/1b4P1/5K1P/8 b - - 0 34",
+    "move": "e7e6",
+    "best": "e7d7",
+    "before": 487,
+    "after": -16,
+    "kind": "minor",
+    "ply": 67
+   },
+   "bare": null
+  }
+ ]
+}

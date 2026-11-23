@@ -15,7 +15,7 @@
 ![Maia](https://img.shields.io/badge/opponent%20odds-Maia%201300%2F1500-2f6b52)
 ![Single file](https://img.shields.io/badge/app-one%20HTML%20file-2f6b52)
 ![Engine in the browser](https://img.shields.io/badge/in%20the%20browser-Stockfish.js%2019-2f6b52)
-![Tests](https://img.shields.io/badge/browser%20tests-19%20suites-2f6b52)
+![Tests](https://img.shields.io/badge/browser%20tests-20%20suites-2f6b52)
 ![License: MIT](https://img.shields.io/badge/license-MIT-2f6b52)
 
 <picture>
@@ -113,11 +113,13 @@ Those are the numbers for my own playbook. The library behind it also holds the 
 
 ## Using it: where everything is
 
-Everything is reached from the header: five tabs (**Sandbox**, **Course**, **Drill**, **Your games**, **Shop**) and, in the corner, the level ring, the streak flame, **Settings** (the gear) and the account. There is no switch between White and Black: every tab holds both books, and the board turns to the colour of the line on it. The coach sits at the bottom right.
+Everything is reached from the header: five tabs (**Sandbox**, **Course**, **Drill**, **Your games**, **Shop**), a sixth for the hand-built playbook (**Endings**), and, in the corner, the level ring, the streak flame, **Settings** (the gear) and the account. There is no switch between White and Black: every tab holds both books, and the board turns to the colour of the line on it. The coach sits at the bottom right.
 
 | To… | Go to | What happens |
 | --- | --- | --- |
 | practise White and Black in one sitting | **Sandbox** | With **Everything** picked, games come with White and with Black in turn. Pick a colour, or openings from either book, to narrow it. |
+| win the endings that got away | **Endings** | Pick kinds of ending (mates, pawn, rook and queen endings, your own) and win them against the engine. A move that throws the win away is taken back with the answer that punishes it; a second miss shows the arrow. Stars for a clean win, and for a mate within two moves of the quickest. The hand-built playbook only, for now. |
+| learn the endings your games need | **Course → Endings** | Seven units in the order your games need them, each with its pictures, a line to play along, endings to win and a checkpoint. |
 | learn the next thing | **Course** | The big button on the current unit always goes to the next step. |
 | see the move to make, and why | **Play along**, a unit's second step | The move is a green arrow. The coach's card says what the other side just played, what it is after, and why the move is the move. |
 | practise from memory | **Drill** | Today's five, or any line of either book under **Pick lines yourself**, an opening at a time. A slip shows the answer that punishes it, and a move of the line played too early is named as that. |
@@ -337,6 +339,40 @@ A move that leaves the book is answered on the spot with the reply that punishes
 A finished game stays on the board with the engine on it: the verdict in words and the number under the board, the engine's arrows on it, and buttons (or the arrow keys) to step back through the game. Move a piece for either side and the explore board opens with that move made. **Next game** leaves all of it behind.
 
 Your own move lands the moment you let go of the piece, here and in every drill, checkpoint and on the explore board; only the other side's reply slides in. **What else Black plays here** folds away behind its arrow and stays the way you left it. The count beside the session numbers (*12 / 343 lines met*) is every line a game can end on with the openings picked, or from the position set up, counted from the book on the page.
+
+### Endings: the ones that got away
+
+<img src="docs/img/endings.png" alt="A rook mate won on the Endings tab: the board with the rook's mating check, the panel saying Mate in 13 with three gold stars and Clean, Next ending and Again, and the engine's card under them" width="100%">
+
+The hand-built playbook has a sixth tab, **Endings**, and a second course beside the openings. Both come from a scan of the games ([`pipeline/scan_endings.py`](pipeline/scan_endings.py)): every position of every ending was scored by Stockfish, and of the 51 endings that stood won, 10 were not won. Four ran out of time, two let a mate in on the back row, one missed a mate in one with a rook, one let a perpetual check in, one missed a rook skewer, one walked into a knight fork, and two were pawn endings where a pawn moved when the king had to.
+
+**The tab** works like the Sandbox. Pick kinds of ending (or **Everything**), press **Start an ending**, and win it against the engine:
+
+| Group | Kinds |
+| --- | --- |
+| Mates | Queen mate, Rook mate, Two rooks, Two bishops, Bishop and knight, Back rank |
+| Pawn endings | King and pawn, Stop the pawn (hold the draw), Races, Breakthrough |
+| Rook endings | Lucena, Philidor (hold the draw), King cut off |
+| Queen endings | Queen against a pawn |
+| From your games | The nine positions where a won ending of yours slipped, with your side to move |
+
+Each kind has its goal: mate them, queen the pawn and keep the win, win it, or hold the draw for ten moves. A move that throws the goal away is taken back at once with the answer that punishes it (*Black: king takes the queen. That lets the win go.*); the second miss shows the arrow. The other side always plays its best defence. A win without a slip earns three stars, or for the mates, three for a mate within two moves of the quickest, two within six, one after that. When the ending is over the engine comes on, and a move on the board plays on from there.
+
+**The judges.** King and queen, king and rook, and king and pawn against a lone king are judged by exact tables, worked out backwards from every mate by [`pipeline/endtables.mjs`](pipeline/endtables.mjs) (about 300 KB packed, and every value checked against python-chess's rules by [`pipeline/check_tables.py`](pipeline/check_tables.py)). Against a lone king with two pieces, only a stalemate or a piece left to be taken throws the win away. Everything else is judged by Stockfish in the browser, which also plays the other side.
+
+<img src="docs/img/endings-course.png" alt="The Course tab with its Openings and Endings switch on Endings: seven units passed none of, the first, The rook mate, up next with its board and its four steps, and the path of units each with the line from the games that put it there" width="100%">
+
+**The endings course** sits on the Course tab behind an **Openings | Endings** switch: seven units in the order the games need them. Each says which of the games put it there.
+
+1. **The rook mate:** cut the king off, check when the kings face each other, wait when they don't, and the mate on the edge. Your game where a rook check mated and another check was played.
+2. **Your back rank:** give your king air before a rook leaves the back row, check their checks, and use the back row against them.
+3. **King and pawn:** the key squares, the opposition, king first, the edge pawn and the square of the pawn.
+4. **Pawn races:** count the race, the outside passed pawn, the king leads, the breakthrough.
+5. **Checks, forks and skewers:** the perpetual check, the skewer and the knight fork from the games; its endings to win are the nine from the games.
+6. **The queen mate:** box the king, stop at two squares, bring your king, mate, and the stalemate trap.
+7. **Rook endings:** cut the king off, the Lucena bridge, the Philidor defence, rooks behind passed pawns.
+
+A unit is its pictures (each a board with one line), a line to play along with the green arrow (the mates and the king and pawn line are worked out from the exact tables with the method a person would use), three endings of its kinds won without a slip, and a checkpoint of three to five positions where every legal move is judged in advance: the right answer, and for every other move the reply that punishes it.
 
 ### Your games: the record and the reviews
 
@@ -585,7 +621,8 @@ The whole app is one HTML file built from plain Python and JavaScript. Each part
 - **Progress and accounts.** Progress is always saved in the browser first. On the website, an account (email and password through [Supabase](https://supabase.com)) keeps a copy in the cloud, so the same progress shows up on every device. Sync pulls and merges on sign-in, on load and whenever the tab comes back into view: the newest record wins for each drill line and puzzle (for a line whose moves have changed, the record made on the current moves wins over a newer one made on the old moves), course steps keep the best result, the days of the streak add up across devices, badges keep the date they were first earned, bought items stay bought, each month's recap keeps its newest summary, and each setting and each worn item takes its newest value on its own (a board colour changed on the phone never undoes a coach picked on the laptop). Every save reads the account's copy first and merges, so two devices never write over each other, and a field the page doesn't know is carried along untouched. The claude.ai copy does the same through its own database, and hears the other devices while it is open. The project URL and publishable key live in [`app/site.json`](app/site.json), the tables and row-level security in [`supabase/schema.sql`](supabase/schema.sql). When the page runs as a Claude artifact, it syncs to the artifact's own per-user storage instead.
 - **Reminder emails.** Off unless the player turns them on (a box at sign-up, a switch in the profile). A Supabase Edge Function ([`supabase/functions/nudge`](supabase/functions/nudge)) runs every hour and sends at most one email a week: in the player's early evening, when today's five are not done, either because a streak of three days or more ends at midnight or because lines they slipped on have waited three days. Every email has a link that turns them off. Setup is under [Reminder emails](#for-developers).
 - **A kept copy.** [`docs/v1`](docs/v1) is the site as it stood on 22 November 2026, served at [/v1/](https://vladapl21.github.io/chess-opening-playbook/v1/) and kept as the `v1` branch. [`pipeline/freeze.py`](pipeline/freeze.py) made it from that day's build: no accounts, and its own saved progress in the browser (every key it writes gets `v1:` in front; it starts from what the live site had saved there). It is never built again.
-- **Deep links.** `#course` and `#unit.<unit-id>` open the course and a unit (a unit brings its own book). `#sandbox`, `#drill`, `#games`, `#shop`, `#learn.<chapter>` (an opening's page) and `#line.<line-id>` open the matching view; an old `#cheat` link opens an opening's page at a glance. Add a `b.` prefix for the Black book, for example [`#b.learn.london`](https://vladapl21.github.io/chess-opening-playbook/#b.learn.london) or [`#b.line.bs-classical`](https://vladapl21.github.io/chess-opening-playbook/#b.line.bs-classical).
+- **Endings.** [`content/endings.py`](content/endings.py) has the kinds, the positions given by hand, the house player's own and the course; [`pipeline/build_endings.py`](pipeline/build_endings.py) makes the rest at random from fixed seeds and keeps only those the tables or Stockfish agree with, works out the lines to play along and judges every legal move of every checkpoint (`data/build/data_endings.json`; Stockfish's answers are cached, so a rebuild needs no engine). [`app/endings.js`](app/endings.js) plays them on the drill board.
+- **Deep links.** `#course` and `#unit.<unit-id>` open the course and a unit (a unit brings its own book). `#sandbox`, `#drill`, `#games`, `#shop`, `#endings`, `#egcourse` (the endings course), `#egunit.<unit-id>`, `#learn.<chapter>` (an opening's page) and `#line.<line-id>` open the matching view; an old `#cheat` link opens an opening's page at a glance. Add a `b.` prefix for the Black book, for example [`#b.learn.london`](https://vladapl21.github.io/chess-opening-playbook/#b.learn.london) or [`#b.line.bs-classical`](https://vladapl21.github.io/chess-opening-playbook/#b.line.bs-classical).
 
 <details>
 <summary><b>Data model</b></summary>

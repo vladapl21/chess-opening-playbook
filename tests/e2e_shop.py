@@ -27,7 +27,7 @@ with sync_playwright() as p:
     assert lv == [1, '1', False], 'the chip is in the corner from the start'
 
     # ---- a tab of its own, locked until level 5; tokens wait
-    tabs = pg.locator('.tabs [role=tab]').all_inner_texts(); print('tabs:', tabs); assert tabs[-1] == 'Shop' and len(tabs) == 5
+    tabs = pg.locator('.tabs [role=tab]').all_inner_texts(); print('tabs:', tabs); assert tabs[-1] == 'Shop' and len(tabs) == 6   # the house player's six: Endings is one
     pg.click('.tabs [data-view="shop"]'); pg.wait_for_timeout(400)
     assert pg.locator('.wlock').count() == 1 and pg.locator('[data-buy]').count() == 0, 'nothing to buy before level 5'
     assert 'level 5' in pg.inner_text('.wlock') and pg.locator('.wlock .wlv i').count() == 5
