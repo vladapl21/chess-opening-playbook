@@ -69,6 +69,15 @@ Facts that shape the design:
 - Settings and the account button moved out of the header into the corner of the screen; the header fits one row on an ordinary monitor and centres its rows when it has to wrap.
 - A lesson opened from a course unit has "Next lesson" at the top. The Sandbox has "Free play: pick openings" to leave a course practice game.
 
+## Phase 1.30: endings as a manual, at your level (done, November 23)
+
+- **Every back button works**: a unit's ← Course had stopped answering in the endings course (a local name hid the one it calls). The suite now walks every way back.
+- **At your level**: every position has a rating on the lichess puzzle scale, and the player's level is their rating moved onto it (1510 for the hand-built playbook). Everything deals only the kinds with positions near it, a unit's endings to win are picked near it, and a checkpoint question holds a position from each band and asks the nearest. Easier and Harder move it, and the setting follows the account.
+- **Positions from real games**: 287 endings and mates from the lichess puzzle database (CC0), picked for being well liked and much played in six bands of ratings and kept only when Stockfish agrees: the right king move and the right pawn move in pawn endings, rook, minor piece and queen endings, and eight of the named mates with the dovetail mate added. One is solved by playing its solution through, against the real game's replies, and then says what it was about.
+- **A manual**: every kind's idea is the plan, each step on its own board, and what to watch for (the queen mate in seven pictures, king and pawn in five). The pawn races from the house player's games were read again with the engine: the king had to come back for its pawns, not go after theirs.
+- **Show me how** plays a position's line to par, the arrow on each move with why it is played (shrink the box, take the opposition, onto a key square), Play it for each move, and Try it yourself after. The queen and rook mates now play the quickest mate with the method breaking the ties, so following the line is par.
+- **The basics for everyone with a playbook**: the tab and the eleven units of the basics, at their own level.
+
 ## Phase 1.29: every basic ending, and the named mates (done, November 23)
 
 - **The Endings tab holds the basics**: 48 kinds in eight groups (the mates, seventeen named mating patterns, pawn endings with the opposition, the edge pawn, triangulation and the Réti, passed pawns, rook endings with the Vančura and the short side, minor pieces, queen endings, and the house player's own). Each has its idea, a picture or two with one line, shown before a game; the kinds fold by group.

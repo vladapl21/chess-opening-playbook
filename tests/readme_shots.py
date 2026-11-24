@@ -39,7 +39,11 @@ def local_fonts(ctx):
     ctx.route('https://fonts.gstatic.com/local/*', font)
 
 
+ONLY = set(filter(None, os.environ.get('ONLY', '').split(',')))     # ONLY=endings.png,endings-show.png writes just those
+
+
 def save(png, name, width=1600, crop=None):
+    if ONLY and name not in ONLY: return
     im = Image.open(io.BytesIO(png)).convert('RGB')
     if crop: im = im.crop(crop)
     if width and im.width > width: im = im.resize((width, round(im.height * width / im.width)), Image.LANCZOS)
@@ -361,19 +365,25 @@ with sync_playwright() as p:
         save(full, 'sandbox.png', crop=(0, 0, w, min(h, round(bottom * 2))))
         c.close()
 
-        # Endings: the idea of a named mate on the tab, with the kinds folded by group; then the endings course where
-        # the units from the games end and the basics begin
+        # Endings: the tab with the next ending (a pawn ending from a real game, near the house player's level), the
+        # kinds folded by group and the level they are picked at; Show me how at the opposition; a unit's manual
         c = b.new_context(viewport={'width': 1280, 'height': 860}, device_scale_factor=2); local_fonts(c)
         q = c.new_page(); q.on('pageerror', lambda e: errors.append(str(e))); q.goto(app + '#endings'); q.wait_for_timeout(900)
-        q.evaluate("EG.pick = ['bod']; EG.peek = null; S.egOpen = new Set(['Mating patterns']); EG.render()"); q.wait_for_timeout(300)
-        q.click('#egIdea'); q.wait_for_timeout(300)
+        q.evaluate("EG.pick = ['pzz']; EG.peek = null; S.egOpen = new Set(['Pawn endings']); EG.render()"); q.wait_for_timeout(300)
         q.evaluate("window.scrollTo(0, 0); Coach.hush()"); settle(q, 500)
         bottom = q.evaluate("Math.max(document.getElementById('egside').getBoundingClientRect().bottom, document.getElementById('db').parentElement.getBoundingClientRect().bottom) + scrollY + 28")
         full = q.screenshot(full_page=True); w, h = Image.open(io.BytesIO(full)).size
         save(full, 'endings.png', crop=(0, 0, w, min(h, round(bottom * 2))))
-        q.evaluate("EG.pick = null; EG.savePick(); S.egIdea = null; S.drill = S.egState = null; S.cseg = 'end'; go('course')"); q.wait_for_timeout(600)
-        q.evaluate("window.scrollTo(0, document.querySelector('.eglib').getBoundingClientRect().top + scrollY - 260); Coach.hush()"); settle(q, 400)
-        save(q.screenshot(), 'endings-course.png')
+        q.evaluate("EG.pick = null; EG.savePick(); EG.show('opp-1')"); q.wait_for_timeout(700)
+        q.evaluate("window.scrollTo(0, 0); Coach.hush()"); settle(q, 500)
+        bottom = q.evaluate("Math.max(document.getElementById('dpanel').getBoundingClientRect().bottom, document.getElementById('db').parentElement.getBoundingClientRect().bottom) + scrollY + 28")
+        full = q.screenshot(full_page=True); w, h = Image.open(io.BytesIO(full)).size
+        save(full, 'endings-show.png', crop=(0, 0, w, min(h, round(bottom * 2))))
+        q.evaluate("S.drill = S.egState = null; EG.openUnit('eg-kp'); S.egSlide = 2; EG.renderUnit()"); q.wait_for_timeout(500)
+        q.evaluate("window.scrollTo(0, 0); Coach.hush()"); settle(q, 400)
+        bottom = q.evaluate("Math.max(document.querySelector('.ideacap').getBoundingClientRect().bottom, document.querySelector('ol.steps').getBoundingClientRect().bottom) + scrollY + 28")
+        full = q.screenshot(full_page=True); w, h = Image.open(io.BytesIO(full)).size
+        save(full, 'endings-course.png', crop=(0, 0, w, min(h, round(bottom * 2))))
         c.close()
     finally:
         site.stop()
