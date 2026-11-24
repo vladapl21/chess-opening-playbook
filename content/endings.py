@@ -59,7 +59,7 @@ FIXED = {
 # Positions from the house player's own games (pipeline/scan_endings.py), the position before the move that let the
 # win go, with the house player to move. key: date and opponent. why: one line about what happened.
 MINE = [
-  dict(key='2026.07.09 gfrasti', fen='8/p2R4/1p3p1p/2p5/1P1R2P1/4kPK1/2r4P/8 w - - 0 40', why='A rook check mated here.'),
+  dict(key='2026.07.09 gfrasti', fen='8/p2R4/1p3p1p/2p5/1P1R2P1/4kPK1/2r4P/8 w - - 0 40', why='The other rook gave check and the king took the rook that had the mate.'),
   dict(key='2026.07.13 Datmo', fen='3r2k1/1RB2ppp/1p2p3/b2p4/3P4/4P2P/5PPK/r7 b - - 7 29', why='One rook move let a mate in on your back row.'),
   dict(key='2026.07.09 TiepiMT', fen='3r2k1/5p2/R3bBp1/7p/1KP4P/1P4P1/8/1r6 b - - 1 34', why='One rook move let a mate in on your back row.'),
   dict(key='2026.10.14 abood_almuss', fen='Q7/5p1p/4pBpk/1p2Pq2/1P3P2/2p5/5PKP/8 w - - 3 37', why='A queen check let the other queen check forever.'),
@@ -67,7 +67,7 @@ MINE = [
   dict(key='2026.07.11 quzibek', fen='8/p3k1pp/1pN5/8/P7/1b4P1/5K1P/8 b - - 0 34', why='The king stepped into a knight fork.'),
   dict(key='2026.07.12 zz_ny', fen='8/7p/5K2/1p6/8/PPk5/2P5/8 w - - 1 42', why='A pawn push let the black king back. The king had to race.'),
   dict(key='2026.10.14 Eschoir', fen='8/2p2p2/8/p1pk3p/5p1P/1PK2P2/P4P2/8 b - - 1 32', why='A pawn step instead of a king step threw the win away.'),
-  dict(key='2026.07.10 steny35', fen='8/p1k3p1/p4p1p/4rp1P/3N4/b1PK4/P1P2PP1/1R6 w - - 6 30', why='The wrong pawn moved and the edge was gone.'),
+  dict(key='2026.07.10 steny35', fen='8/p1k3p1/p4p1p/4rp1P/3N4/b1PK4/P1P2PP1/1R6 w - - 6 30', why='The pawn took one step where two would have hit the rook.'),
 ]
 
 # The course, in the order this player needs it. Each unit: slides to learn from (a board, a heading, one line),

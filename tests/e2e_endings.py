@@ -135,7 +135,7 @@ try:
         assert 'vs gfrasti' in pg.inner_text('#dpanel').lower() or 'VS GFRASTI' in pg.inner_text('#dpanel')
         pg.evaluate("tryMove('d4', 'e4')"); pg.wait_for_timeout(600)
         assert pg.evaluate('[S.drill.state, S.drill.res]') == ['done', 'won']
-        assert 'In the game: a rook check mated here.' in pg.inner_text('#dpanel')
+        assert 'In the game: the other rook gave check and the king took the rook that had the mate.' in pg.inner_text('#dpanel')
         pg.screenshot(path=out + 'eg_mine.png'); clean(pg, 'mine')
 
         # ---- the course: a switch on the Course tab, the units, one unit all the way through
