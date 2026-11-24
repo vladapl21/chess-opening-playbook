@@ -104,8 +104,9 @@ def box(b, strong):
 
 
 def method_move(b, strong, seen):
-    """The move a person plays: mate when there is one, else shrink the box, else bring the king; always one that keeps
-    the win, and never back to a position the line has had."""
+    """The move a person plays, as quick as the table's: mate when there is one; else among the moves that mate
+    soonest, one that shrinks the box, else a king move, else the rest (the smallest box, then the kings closest);
+    never back to a position the line has had. Following it gives the quickest mate, so its length is par."""
     a0 = box(b, strong); best = None
     for m in b.legal_moves:
         r = endtb.after(b, m)
@@ -114,7 +115,7 @@ def method_move(b, strong, seen):
         b.push(m); k = b.board_fen() + str(b.turn); a = box(b, strong); d = dist(b.king(strong), b.king(not strong)); b.pop()
         if k in seen: continue
         king = b.piece_type_at(m.from_square) == chess.KING
-        key = (a0, 0, d, r[1]) if king else (a, 0, 0, r[1]) if a < a0 else (a0, 1, d, r[1])
+        key = (r[1], 0 if a < a0 else 1 if king else 2, a, d)
         if best is None or key < best[0]: best = (key, m)
     if best: return best[1]
     return min((m for m in b.legal_moves if (endtb.after(b, m) or (0,))[0] == 1), key=lambda m: endtb.after(b, m)[1])
@@ -611,10 +612,179 @@ def kinds():
         it = item('mine', i, b, src=g['key'], why=g['why'])
         it['v'] = pov(sf(b)[0][0], b.turn)
         items.append(it)
+    items += gen_puzzles()
     for it in items:
         k = K[it['k']]
-        if k.get('hold'): it['hold'] = k['hold']
+        if k.get('hold') and it.get('goal', k['goal']) == 'hold': it['hold'] = k['hold']
+        add_line(it, k)
+        # how hard it is, on the lichess puzzle scale: a position from the database has its own rating; the others take
+        # their kind's, and a mate takes more for every move it needs
+        if 'r' not in it: it['r'] = k.get('r', 1200) + (250 * (it['par'] - 1) if k['how'] == 'mate' and it.get('par') else 0)
     return items
+
+
+# ---------------------------------------------------------------- positions from the lichess puzzle database
+PUZ = paths.ROOT / 'data' / 'endings' / 'puzzles.json'
+KEEP = {'pzz': 6, 'pzr': 6, 'pzk': 5, 'pzm': 4, 'pzq': 4}      # in each band of ratings, after the checks; a mate kind: 3
+BANDS = [(400, 900), (900, 1200), (1200, 1500), (1500, 1800), (1800, 2100), (2100, 2500)]
+
+
+def gen_puzzles():
+    """The positions pipeline/lichess_endings.py picked, kept when Stockfish agrees: a mate in exactly the moves of the
+    solution with one first move; a win where the solution's first move keeps it; a hold (the ones the database calls
+    equal) where it keeps the draw, some moves throw it away, and a shallow search judges every move as a deep one
+    does. A game from one ends when the solution has been played through (pz), its replies the game's own while the
+    player follows it; pt is what the position is about, from its themes."""
+    out = []; per = {}
+    for x in json.load(open(PUZ)):
+        k, band = x['k'], x['band']
+        if per.get((k, band), 0) >= KEEP.get(k, 3): continue
+        b = chess.Board(x['fen']); b.push_uci(x['moves'][0]); sol = x['moves'][1:]
+        if not b.is_valid() or b.is_game_over(): continue
+        mine = (len(sol) + 1) // 2
+        if k in KEEP:
+            goal = 'hold' if 'equality' in x['themes'] else 'win'
+            if goal == 'hold':
+                if not meaningful(b, goal, -60, 60, shallow=12) or not sfall(b, 18).get(sol[0], -MATE) >= -199: continue
+                it = dict(goal='hold', hold=8)
+            else:
+                v0 = pov(sf(b, 20)[0][0], b.turn); bb = b.copy(); bb.push_uci(sol[0]); v1 = pov(sf(bb, 18)[0][0], b.turn)
+                if v0 < 250 or v1 < max(200, min(v0, 2000) / 2): continue
+                it = dict(v=v0)
+        else:
+            n, sols = solve(b)
+            if n != mine or sols != [sol[0]]: continue
+            it = dict(goal='mate', how='mate')
+        per[(k, band)] = per.get((k, band), 0) + 1
+        it.update(id=f"{k}-l{x['id']}", k=k, fen=b.fen(), me='w' if b.turn == chess.WHITE else 'b', r=x['r'], par=mine, sol=sol, pz=1)
+        pt = point(x['themes'], k)
+        if pt: it['pt'] = pt
+        out.append(it)
+    short = sorted((k, i) for k in sorted({x['k'] for x in json.load(open(PUZ))}) for i in range(len(BANDS)) if per.get((k, i), 0) < KEEP.get(k, 3))
+    if short: print('  puzzles short of their count in', short)
+    return out
+
+
+def add_line(it, K):
+    """The line Show me how plays, where the build can work it out, and the par it sets: the method a person uses for
+    the queen and rook mates (so par is reachable by following it), the quickest promotion for king and pawn, the
+    holding moves for a draw, Stockfish's line to the mate against a lone king and for a named mate. A position from
+    the database has its solution. ex: why each move of yours in the line is played, a letter each (E.WHY)."""
+    if 'sol' in it: return
+    how, goal = it.get('how', K['how']), it.get('goal', K['goal'])
+    b = chess.Board(it['fen'])
+    if how in ('kqk', 'krk') or (how == 'kpk' and goal == 'queen'):
+        line = table_line(it['fen']); it['sol'] = line; it['par'] = (len(line) + 1) // 2
+    elif how == 'kpk' and goal == 'hold':
+        it['sol'] = hold_line(it['fen'], it.get('hold') or K.get('hold') or 8)
+    elif how == 'bare':
+        try: line = sf_line(it['fen'])
+        except AssertionError: return
+        it['sol'] = line; it['par'] = max(it.get('par') or 0, (len(line) + 1) // 2)
+    elif how == 'mate' and it.get('par'):
+        line = sf(b)[0][1][:2 * it['par'] - 1]; bb = b.copy()
+        for u in line: bb.push_uci(u)
+        if bb.is_checkmate(): it['sol'] = line
+    if 'sol' in it and how in ('kqk', 'krk', 'kpk', 'bare'): it['ex'] = why_codes(it['fen'], it['sol'], how)
+
+
+# ---------------------------------------------------------------- why each move of a line is played
+def key_squares(p, color):
+    """The squares that win for the stronger king, whoever is to move: two rows in front of a pawn on its own half,
+    the two rows in front from the fifth row on; for an edge pawn, the two squares beside its last two."""
+    f, r = chess.square_file(p), chess.square_rank(p)
+    if color == chess.BLACK: r = 7 - r
+    if f in (0, 7): rows, files = (6, 7), [1 if f == 0 else 6]
+    else: rows, files = ((r + 2,) if r <= 3 else (r + 1, r + 2)), [f - 1, f, f + 1]
+    out = set()
+    for rr in rows:
+        if rr > 7: continue
+        for ff in files: out.add(sq(ff, rr if color == chess.WHITE else 7 - rr))
+    return out
+
+
+def opposed(b):
+    """Do the kings face each other on a file or a row, an odd number of squares between them, with the side to move to
+    give way?"""
+    a, c = b.king(chess.WHITE), b.king(chess.BLACK)
+    fa, ra, fc, rc = chess.square_file(a), chess.square_rank(a), chess.square_file(c), chess.square_rank(c)
+    return (fa == fc and abs(ra - rc) in (2, 4, 6)) or (ra == rc and abs(fa - fc) in (2, 4, 6))
+
+
+def why_one(b, m, how, me):
+    b.push(m); mate, check = b.is_checkmate(), b.is_check(); after = b.copy(); b.pop()
+    if mate: return 'm'
+    king = b.piece_type_at(m.from_square) == chess.KING
+    if how in ('kqk', 'krk'):
+        a0, a1 = box(b, me), box(after, me)
+        if king:
+            t = b.copy(); t.turn = not me; t.ep_square = None
+            return 'z' if t.legal_moves.count() <= 1 and edge(b.king(not me)) else 'k'
+        return 'c' if check else 'b' if a1 < a0 else 'w'
+    if how == 'bare':
+        return 'c' if check else 'k' if king else 'B'
+    # king and pawn
+    pawns = list(b.pieces(chess.PAWN, me))
+    if pawns:                                                      # the side with the pawn
+        p = pawns[0]
+        if m.promotion: return 'Q'
+        if not king:
+            q = m.to_square; mk, tk = after.king(me), after.king(not me)
+            last = sq(chess.square_file(q), 7 if me == chess.WHITE else 0)
+            if chess.square_distance(tk, last) > abs(chess.square_rank(last) - chess.square_rank(q)): return 'r'   # outside the square
+            if chess.square_distance(mk, q) == 1: return 'g'
+            ahead = (chess.square_rank(mk) - chess.square_rank(q)) * (1 if me == chess.WHITE else -1) >= 1 and abs(chess.square_file(mk) - chess.square_file(q)) <= 1
+            return 'p' if ahead else 'P'
+        if m.to_square in key_squares(p, me): return 'y'
+        if opposed(after): return 'o'
+        if (chess.square_rank(m.to_square) - chess.square_rank(p)) * (1 if me == chess.WHITE else -1) >= 1: return 'f'
+        return 'k'
+    if b.is_capture(m): return 'X'                                  # the defender
+    p = next(iter(b.pieces(chess.PAWN, not me)), None)
+    if p is None: return 'K'
+    if opposed(after): return 'O'
+    if chess.square_file(m.to_square) == chess.square_file(p) and (chess.square_rank(m.to_square) - chess.square_rank(p)) * (1 if me == chess.BLACK else -1) > 0: return 'F'
+    if chess.square_file(p) in (0, 7):
+        corner = sq(chess.square_file(p), 7 if me == chess.BLACK else 0)
+        if chess.square_distance(m.to_square, corner) < chess.square_distance(m.from_square, corner): return 'C'
+    return 'K'
+
+
+def why_codes(fen, line, how):
+    """One letter for each move of yours in the line (the side to move at the start): why it is played."""
+    b = chess.Board(fen); me = b.turn; out = []
+    for u in line:
+        m = chess.Move.from_uci(u)
+        if b.turn == me: out.append(why_one(b, m, how, me))
+        b.push(m)
+    return ''.join(out)
+
+
+def point(themes, k):
+    """What a position from the database is about: the first of its themes E.THEMES has words for, else the kind's."""
+    for t, words in E.THEMES:
+        if t in themes: return words
+    return E.POINT.get(k)
+
+
+def hold_line(fen, n):
+    """Holding a king and pawn draw for n moves: the drawing move that keeps the king nearest the square in front of
+    the pawn (then the corner it runs to); for the other side, the move that leaves the fewest drawing answers."""
+    b = chess.Board(fen); me = b.turn; out = []
+    while not b.is_game_over() and len(out) < 2 * n:
+        ms = list(b.legal_moves)
+        if b.turn == me:
+            p = next(iter(b.pieces(chess.PAWN, not me)), None)
+            front = None if p is None else chess.square(chess.square_file(p), min(7, max(0, chess.square_rank(p) + (1 if not me else -1))))
+            draws = [m for m in ms if (endtb.after(b, m) or (None,))[0] == 0]
+            if not draws: break
+            m = min(draws, key=lambda m: (dist(m.to_square, front) if front is not None else 0, m.uci()))
+        else:
+            def left(m):
+                b.push(m); k = sum(1 for x in b.legal_moves if (endtb.after(b, x) or (None,))[0] == 0); b.pop(); return k
+            m = min(ms, key=lambda m: (left(m), m.uci()))
+        out.append(m.uci()); b.push(m)
+    return out
 
 
 # ---------------------------------------------------------------- the checkpoint: every legal move judged
@@ -630,7 +800,7 @@ def outcome(b, m, me):
             reply = defend_move(b) if r[0] == -1 else best_table(b)
             v = -r[0]
         else:
-            L = sf(b, 16)
+            L = sf(b, 18)
             reply = chess.Move.from_uci(L[0][1][0]) if L[0][1] else None
             s = pov(L[0][0], me)
             v = 1 if s >= WIN else -1 if s <= -WIN else 0
@@ -751,14 +921,34 @@ def gen_checks(gen, n, seed):
 
 
 ASK = {1: 'Find the mate.', 2: 'Find the mate in two.', 3: 'Find the mate in three.', 4: 'Find the mate in four.'}
+ASKED = set()      # the positions the questions with `band` have taken, over every unit: none asked twice
 
 
 def unit_checks(U, made=()):
     """made: the positions of the kinds; a question with `kind` takes the last one of that kind (with that `par`) not
-    already asked, since practice games start from the first ones."""
+    already asked, since practice games start from the first ones. With `band`, the question holds one position of
+    the kind from each band of ratings (alts, each with its rating r), and the page asks the one nearest the player's
+    level. why: a line on the answer, shown once it is given (the question's own, the position's point, or the first
+    line of its kind's idea)."""
+    K = {k['id']: k for k in E.KINDS}
     items = []; asked = set()
     for c in U['check']:
-        if 'kind' in c:
+        if c.get('band'):
+            alts = []
+            for lo, hi in BANDS:
+                pool = [it for it in made if it['k'] == c['kind'] and lo <= it['r'] < hi and it['fen'] not in ASKED]
+                if not pool: continue
+                it = pool[-1]; ASKED.add(it['fen'])
+                goal = it.get('goal', K[c['kind']]['goal']); mate = goal == 'mate' or K[c['kind']]['how'] == 'mate'
+                ask = c.get('ask') or (ASK.get(it['par'], 'Find the first move of the mate.') if mate else
+                                       'Find the move that holds the draw.' if goal == 'hold' else 'Find the move that wins.')
+                j = judge(it['fen'], ask, hold=goal == 'hold')
+                j['r'] = it['r']; why = c.get('why') or it.get('pt') or first_line(K[c['kind']])
+                if why: j['why'] = why
+                alts.append(j)
+            assert alts, ('no position for the question', U['id'], c)
+            items.append(dict(alts=alts))
+        elif 'kind' in c:
             pool = [it for it in made if it['k'] == c['kind'] and (c.get('par') is None or it.get('par') == c['par']) and it['fen'] not in asked]
             assert pool, ('no position for the question', U['id'], c)
             it = pool[-1]; asked.add(it['fen'])
@@ -773,15 +963,27 @@ def unit_checks(U, made=()):
                         if b.piece_type_at(m.from_square) == chess.ROOK and rr and rr[0] == 1:
                             b.push(m); vals[m] = box(b, chess.WHITE); b.pop()
                     lo = min(vals.values()); ok = [m for m, a in vals.items() if a == lo]
-                    items.append(dict(fen=b.fen(), me='w', ask=c['ask'], ok=[m.uci() for m in ok],
+                    items.append(dict(fen=b.fen(), me='w', ask=c['ask'], ok=[m.uci() for m in ok], why=E.WHY['b'],
                                       bad={m.uci(): outcome(b, m, chess.WHITE) for m in b.legal_moves if m not in ok}))
                 else:
                     items.append(judge(b.fen(), c['ask'], hold=c['gen'] in ('kpk-hold', 'kpk-edge')))
+                    if c['gen'].startswith('kpk') and len(items[-1]['ok']) == 1:
+                        items[-1]['why'] = E.WHY[why_one(b, chess.Move.from_uci(items[-1]['ok'][0]), 'kpk', b.turn)]
         else:
             hold = 'holds the draw' in c['ask']
             items.append(judge(c['fen'], c['ask'], hold=hold, only=c.get('ok')))
-    for k, it in enumerate(items): it['id'] = f"{U['id']}-c{k + 1}"
+            if c.get('why'): items[-1]['why'] = c['why']
+    for k, it in enumerate(items):
+        it['id'] = f"{U['id']}-c{k + 1}"
+        for j, a in enumerate(it.get('alts', [])): a['id'] = f"{U['id']}-c{k + 1}-{j + 1}"
     return items
+
+
+def first_line(K):
+    """The first sentence of a kind's first idea picture."""
+    t = (K.get('idea') or [{}])[0].get('t', '')
+    m = re.match(r'(.+?[.!?])(\s|$)', t)
+    return m.group(1) if m else t
 
 
 def unit_lines(U):
@@ -790,8 +992,9 @@ def unit_lines(U):
         fen = a.get('fen')
         if a.get('gen') == 'kpk-demo': fen = '8/8/8/4k3/8/3K4/4P3/8 w - - 0 1'
         b = chess.Board(fen); assert b.is_valid(), fen
-        if a.get('method'): moves = table_line(fen)
-        elif a.get('sfline'): moves = sf_line(fen)
+        how = None
+        if a.get('method'): moves = table_line(fen); how = (endtb.which(b) or ('',))[0]
+        elif a.get('sfline'): moves = sf_line(fen); how = 'bare' if len(b.piece_map()) <= 4 else None
         elif a.get('pv'): moves = sf(b, 24)[0][1][:a['pv']]
         else:
             moves = a['moves'].split()
@@ -800,6 +1003,7 @@ def unit_lines(U):
             v = pov(sf(bb)[0][0], b.turn)
             assert v >= WIN, ('the line given by hand is not won at its end', fen, v)
         out.append(dict(id=f"{U['id']}-a{k + 1}", fen=b.fen(), me='w' if b.turn == chess.WHITE else 'b', moves=moves))
+        if how in ('kqk', 'krk', 'kpk', 'bare'): out[-1]['ex'] = why_codes(b.fen(), moves, how)
     return out
 
 
@@ -822,13 +1026,13 @@ def sf_line(fen, plies=140):
 
 def good_move(b, m):
     """Is m as good as the position allows: the same result by the tables, or by Stockfish (a mate kept, a win kept
-    within 2, a draw kept)?"""
+    within 2 or at +5 and more, a draw kept)?"""
     if endtb.which(b):
         res = lambda x: (endtb.after(b, x) or (0,))[0]
         return res(m) == max(res(x) for x in b.legal_moves)
     a = sfall(b, 18); v = a[m.uci()]; top = max(a.values())
     if top > MATE - 5000: return v > MATE - 5000
-    if top >= WIN: return v >= WIN and v >= top - 200
+    if top >= WIN: return v >= WIN and (v >= top - 200 or v >= 500)       # a win kept: within 2 of the best, or +5 at least
     if top >= -DRAWN: return v >= -DRAWN
     return v >= top - 100
 
@@ -864,7 +1068,7 @@ def main():
         k = {x: v for x, v in K.items() if x not in ('n', 'idea')}
         if ideas[K['id']]: k['idea'] = ideas[K['id']]
         kinds_out.append(k)
-    data = dict(kinds=kinds_out, items=items, units=units)
+    data = dict(kinds=kinds_out, items=items, units=units, why=E.WHY)
     OUT.write_text(json.dumps(data, separators=(',', ':')))
     global FULL
     FULL = True

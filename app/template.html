@@ -1771,7 +1771,7 @@ function useSide(side){
 }
 /* ------------------------------------------------------------------ settings (kept on this device and with the progress) */
 const SET_KEY = 'playbook-settings', HOST_THEME = document.documentElement.dataset.theme || '';
-const SET_DEF = {theme: 'system', size: 'm', board: 'green', coords: true, coach: true, who: 'knight', nums: true, anim: true, animk: 'medium', snd: true, sndk: 'soft'};
+const SET_DEF = {theme: 'system', size: 'm', board: 'green', coords: true, coach: true, who: 'knight', nums: true, anim: true, animk: 'medium', snd: true, sndk: 'soft', egl: 0};
 const SET = Object.assign({}, SET_DEF);
 try { Object.assign(SET, JSON.parse(localStorage.getItem(SET_KEY) || '{}')); } catch(e){}
 const SIZES = {s: .92, m: 1, l: 1.08, xl: 1.16};
@@ -1787,7 +1787,7 @@ function applySettings(){
 // the phone never undoes a coach picked on the laptop. A choice made before times were kept counts as very old (time 1)
 // but still beats a device that never chose (time 0). d.set keeps the older one-time-for-all form for pages still open
 // on an earlier version.
-const SET_KEYS = ['theme', 'size', 'board', 'coords', 'coach', 'who', 'nums', 'anim', 'animk', 'snd', 'sndk'];
+const SET_KEYS = ['theme', 'size', 'board', 'coords', 'coach', 'who', 'nums', 'anim', 'animk', 'snd', 'sndk', 'egl'];
 const SET_BOOL = new Set(['coords', 'coach', 'anim', 'snd']);
 SET.ts = SET.ts || {};
 for (const k of SET_KEYS) if (SET.ts[k] === undefined) SET.ts[k] = SET.t || (SET[k] !== SET_DEF[k] ? 1 : 0);
@@ -1857,7 +1857,7 @@ const tabOf = (v, from) => CVIEWS.includes(v) || (v === 'study' && from === 'uni
 function setTab(v){
   const b = v === 'explore' && S.ex && S.ex.back; if (b){ v = b.view === 'explore' ? 'course' : b.view; }
   const from = b ? b.studyFrom : S.studyFrom;
-  const t = (v === 'drill' || v === 'endings') && S.drill && (S.drill.unit || S.drill.guided) ? 'course' : tabOf(v, from);   // a course's drills and play-alongs stay under Course
+  const t = (v === 'drill' || v === 'endings') && S.drill && (S.drill.unit || (S.drill.guided && !S.drill.show)) ? 'course' : tabOf(v, from);   // a course's drills and play-alongs stay under Course (an ending's Show me how is the tab's own)
   document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.view === t)));
 }
 function setHash(){

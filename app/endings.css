@@ -27,3 +27,7 @@ details.egg > .seg{padding:0 12px 12px}
 .eglib h3{font-family:var(--f-display);font-size:26px;font-weight:700;line-height:1.1}
 .eglib span{font-size:13px;color:var(--muted)}
 
+/* the level the positions are picked at, with Easier and Harder */
+.eglv{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px;font-size:14px;color:var(--muted)}
+.eglv b{color:var(--ink);font-family:var(--f-mono);font-weight:600}
+.eglv .seg button{padding:5px 12px}

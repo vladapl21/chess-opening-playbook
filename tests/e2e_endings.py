@@ -5,7 +5,13 @@ ending and opens its idea picture by picture; a named mate takes back a move tha
 record, the points, the engine on the board afterwards); a queen move that throws the win away is taken back with the
 answer that punishes it, and the second miss shows the arrow; a king and pawn draw is held against the table's trickiest
 tries; a Lucena position is won and a Philidor position held against the engine; a bishop left to be taken is a slip;
-one of the house player's own endings is won and says what happened in the game. The course: the Openings | Endings
+one of the house player's own endings is won and says what happened in the game. The level: the house player's
+rating on the puzzle scale picks the positions (Everything leaves out the kinds too easy for it), Easier and Harder
+move it; a unit's practice is near it and never a checkpoint's position; a position from a real game is solved by
+playing its solution through, with the game's own replies. Show me how plays a line with why each move is played,
+to par, and Try it yourself starts the game; with no line it plays the engine's moves. Every way back works (a unit's
+← Course, the units either side, a unit game's crumb, ← Endings), and a player with a playbook of their own gets the
+basics at their level and none of the house player's own. The course: the Openings | Endings
 switch on the Course tab, a unit's pictures, its line to play along, its endings to win and its checkpoint (a wrong
 answer shows both arrows), until the unit is passed; a unit of the basics with its line and checkpoint. Then the phone at 390px in the dark, the deep links, the merge of
 two copies of the record, and no notation anywhere the player reads."""
@@ -173,8 +179,86 @@ try:
         assert 'In the game: the other rook gave check and the king took the rook that had the mate.' in pg.inner_text('#dpanel')
         pg.screenshot(path=out + 'eg_mine.png'); clean(pg, 'mine')
 
+        # ---- the level: the house player's rating on the puzzle scale; Everything leaves out the kinds too easy for it,
+        # every position offered is in the window or the nearest its kind has; Easier and Harder move it (a setting)
+        pg.evaluate("S.drill = S.egState = null; EG.pick = null; EG.peek = null; EG.render()"); pg.wait_for_timeout(200)
+        lv = pg.evaluate('EG.level()'); ks = pg.evaluate("[...new Set(EG.pool().map(i => i.k))]"); print('level', lv, 'kinds offered', ks)
+        assert lv == 1510 and 'Rated about 1510' in pg.inner_text('.eglv')
+        assert 'q' not in ks and 'kp' not in ks and 'pzz' in ks and 'luc' in ks, ks
+        assert pg.evaluate("(() => { const P = EG.pool(); return [...new Set(P.map(i => i.k))].every(k => P.some(i => i.k === k && EG.dist(i) === 0)); })()"), 'Everything: only kinds with positions at the level'
+        for _ in range(3):
+            pg.click('[data-eglv="-1"]'); pg.wait_for_timeout(150)
+        ks = pg.evaluate("[...new Set(EG.pool().map(i => i.k))]")
+        assert pg.evaluate('[SET.egl, EG.level()]') == [-3, 1060] and pg.locator('[data-eglv="-1"]').is_disabled() and 'kp' in ks and 'luc' not in ks, ks
+        pg.click('[data-egk="all"]'); pg.wait_for_timeout(100)
+        pg.evaluate("setSetting('egl', 0); EG.render()"); pg.wait_for_timeout(150)
+        # a kind picked by hand keeps its positions, nearest the level first
+        assert pg.evaluate("EG.pick = ['q']; EG.pool().length") == pg.evaluate("EGD.items.filter(i => i.k === 'q').length")
+        pg.evaluate("EG.pick = null")
+
+        # ---- a unit's practice: positions near the level, none its checkpoints ask
+        pool = pg.evaluate("EG.pool('eg-kp').map(i => [i.k, i.r, EG.asked().has(i.fen)])"); print('practice in the unit:', pool)
+        assert len(pool) >= 3 and all(k == 'pzz' and not a and 1260 <= r <= 1810 for k, r, a in pool), pool
+
+        # ---- a position from a real game: its solution played through, the game's own replies, solved
+        pid = pg.evaluate("EG.pool('eg-kp')[0].id")
+        pg.evaluate(f"EG.start('{pid}', {{unit: 'eg-kp'}})"); pg.wait_for_timeout(500)
+        assert 'Win it' in pg.inner_text('#dpanel') and pg.evaluate('S.drill.it.pz') == 1
+        st = play(pg, 'S.drill.it.sol[S.drill.moves.length]', 12); print('a pawn ending from a real game:', st)
+        assert st[1] == 'won' and st[3] == 0 and st[2] == pg.evaluate('S.drill.it.par') and pg.evaluate("S.drill.moves.join(' ') === S.drill.it.sol.join(' ')")
+        assert pg.evaluate('S.drill.it.pt') in pg.inner_text('#dpanel'), 'what the position was about'
+        pg.screenshot(path=out + 'eg_real.png'); clean(pg, 'real game')
+
+        # ---- Show me how: the method's line, why each move is played, Play it; par; then Try it yourself
+        pg.evaluate("EG.show('q-2')"); pg.wait_for_timeout(500)
+        assert pg.evaluate('[S.drill.show, S.drill.guided, !!S.drill.hint]') == [True, True, True]
+        why0 = pg.evaluate('EGD.why[S.drill.ex[0]]'); assert why0 and why0 in pg.inner_text('#dpanel'), why0
+        pg.screenshot(path=out + 'eg_show.png'); clean(pg, 'show me how')
+        for _ in range(40):
+            if pg.evaluate('S.drill.state') == 'done': break
+            idle(pg); pg.click('#egPlayIt'); pg.wait_for_timeout(560)
+        idle(pg)
+        assert pg.evaluate('S.drill.state') == 'done' and "That's par" in pg.inner_text('#dpanel') and pg.evaluate("S.drill.mine === EG.item('q-2').par")
+        assert pg.evaluate("(EG.rd().p['q-2'] || [0])[0]") == 0, 'Show me how records nothing'
+        pg.click('#egTry'); pg.wait_for_timeout(400)
+        assert pg.evaluate('[S.drill.id, !!S.drill.show, S.drill.state]') == ['q-2', False, 'play']
+        # with no line worked out, the engine's move each turn, and what the board shows it does
+        pg.evaluate("EG.show('race-1')"); pg.wait_for_timeout(300); assert idle(pg) and pg.evaluate('!!S.drill.hint && S.drill.live')
+        pg.click('#egPlayIt'); pg.wait_for_timeout(400); assert idle(pg) and pg.evaluate('S.drill.moves.length') == 2 and pg.evaluate('!!S.drill.hint')
+        clean(pg, 'show me how, the engine')
+        # the card before a game offers it too
+        pg.evaluate("S.drill = S.egState = null; EG.peek = null; EG.render()"); pg.wait_for_timeout(200)
+        assert pg.locator('#egShowTop').count() == 1
+
+        # ---- every way back: a unit's ← Course (the player's own and the basics), the units either side, a unit game's
+        # crumb, the tab's ← Endings
+        for uid in ('eg-kp', 'eg-opp'):
+            pg.evaluate(f"EG.openUnit('{uid}')"); pg.wait_for_timeout(300)
+            pg.click('#egBack'); pg.wait_for_timeout(400)
+            assert pg.evaluate('[S.view, S.cseg]') == ['course', 'end'] and 'egcourse' in pg.url and pg.locator('.path .urow').count() > 7, uid
+        pg.evaluate("EG.openUnit('eg-race')"); pg.wait_for_timeout(300)
+        pg.click('[aria-label="Next unit"]'); pg.wait_for_timeout(300); nxt = pg.evaluate('S.egUnit'); assert nxt != 'eg-race'
+        pg.click('[aria-label="Previous unit"]'); pg.wait_for_timeout(300); assert pg.evaluate('S.egUnit') == 'eg-race'
+        pg.evaluate("EG.start('race-1', {unit: 'eg-race'})"); pg.wait_for_timeout(400)
+        pg.click('.crumbs [data-egunit]'); pg.wait_for_timeout(300)
+        assert pg.evaluate('[S.view, S.egUnit, S.drill]') == ['egunit', 'eg-race', None]
+        pg.evaluate("EG.start('race-1')"); pg.wait_for_timeout(400)
+        pg.click('#egHome'); pg.wait_for_timeout(300)
+        assert pg.evaluate('[S.view, S.drill]') == ['endings', None]
+
+        # ---- a player with a playbook of their own: the basics at their level, none of the house player's own
+        got = pg.evaluate("""(() => { const keep = [PERSONA, Prog.d.me]; PERSONA = 'ready'; Prog.d.me = {state: 'ready', P: {rating: 900, tc: 'blitz'}, src: {site: 'chess.com', user: 'someone'}};
+          const r = [egOn(), EG.level(), EG.mineU().length, EG.kindsOn().some(k => k.id === 'mine'), EG.cur().lib === true];
+          S.drill = S.egState = null; S.view = 'course'; S.cseg = 'end'; render();
+          r.push(document.querySelectorAll('.path .urow').length, !!document.querySelector('.eglib'), !document.querySelector('.tabs [data-view="endings"]').hidden);
+          EG.openUnit('eg-r'); r.push(S.view);
+          [PERSONA, Prog.d.me] = keep; return r; })()""")
+        print('another player:', got)
+        assert got == [True, 1250, 0, False, True, pg.evaluate('EG.libU().length'), False, True, 'course'], got
+        pg.evaluate("S.view = 'endings'; render()"); pg.wait_for_timeout(300)
+
         # ---- the course: a switch on the Course tab, the units, one unit all the way through
-        pg.evaluate("S.drill = S.egState = null"); pg.click('.tabs [data-view="course"]'); pg.wait_for_timeout(500)
+        pg.evaluate("S.drill = S.egState = null; S.cseg = 'open'"); pg.click('.tabs [data-view="course"]'); pg.wait_for_timeout(500)
         assert pg.locator('[data-cseg]').count() == 2 and pg.locator('[data-cseg="open"][aria-selected="true"]').count() == 1
         pg.click('[data-cseg="end"]'); pg.wait_for_timeout(500)
         nlib = pg.evaluate('EG.libU().length')
@@ -183,7 +267,7 @@ try:
         pg.screenshot(path=out + 'eg_course.png', full_page=True); clean(pg, 'course')
         pg.click('[data-egunit="eg-r"]'); pg.wait_for_timeout(400)
         assert pg.evaluate('S.view') == 'egunit' and pg.evaluate("EG.steps(EG.unit('eg-r')).map(s => s.done)") == [False, False, False, False]
-        for _ in range(6):
+        for _ in range(12):
             if pg.locator('#iNext').is_disabled(): break
             pg.click('#iNext'); pg.wait_for_timeout(120)
         assert pg.evaluate("EG.steps(EG.unit('eg-r'))[0].done")

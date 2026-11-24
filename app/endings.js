@@ -1,15 +1,21 @@
 /* ------------------------------------------------------------------ ENDINGS
-   The Endings tab and the endings course (app/endings.js, inlined by assemble.py after product.js). Both are the house
-   player's for now (egOn): the course comes from a scan of their games (pipeline/scan_endings.py), and every position,
-   line and checkpoint answer is built by pipeline/build_endings.py (EGD). King and queen, king and rook, and king and
-   pawn against a lone king are judged by exact tables (EGT, pipeline/endtables.mjs); a lone king against two pieces by
-   the rule that only a stalemate or a piece left to be taken throws the win away; everything else by the engine, which
-   also plays the other side. Progress is Prog.d.end (merged in mergeProg by egMerge): p, each position played as
-   [runs, clean, last time, best stars]; u, each unit: l when its pictures were seen, a the lines played along (time
-   each), q the checkpoint's best [score, of, time]. */
+   The Endings tab and the endings course (app/endings.js, inlined by assemble.py after product.js), for the house
+   player and for a player with a playbook of their own (egOn). The house player's course starts with units from a scan
+   of their games (pipeline/scan_endings.py) and their own endings (kind `mine`); everyone gets the basics. Every
+   position, line and checkpoint answer is built by pipeline/build_endings.py (EGD). Each position has a rating on the
+   lichess puzzle scale (r), and the player gets the ones near their level (EG.level: their rating moved to that scale,
+   with the Easier and Harder setting egl). King and queen, king and rook, and king and pawn against a lone king are
+   judged by exact tables (EGT, pipeline/endtables.mjs); a lone king against two pieces by the rule that only a
+   stalemate or a piece left to be taken throws the win away; everything else by the engine, which also plays the
+   other side. Show me how plays a position's line (sol: the method's moves, the table's, Stockfish's or the solution
+   of a position from a real game; else the engine's move by move) with the reason for each move (ex, EGD.why, or what
+   the board shows). Progress is Prog.d.end (merged in mergeProg by egMerge): p, each position played as [runs, clean,
+   last time, best stars]; u, each unit: l when its pictures were seen, a the lines played along (time each), q the
+   checkpoint's best [score, of, time]. */
 const EGD = /*__DATA_E__*/null, EGT = /*__TABLES_E__*/null;
 const EG_MATE = 99000;
-function egOn(){ return !!EGD && typeof PERSONA !== 'undefined' && PERSONA === 'house'; }
+const EG_HOUSE = 1160;      // the house player's chess.com blitz rating (their main account): the level their endings start from
+function egOn(){ return !!EGD && typeof PERSONA !== 'undefined' && (PERSONA === 'house' || PERSONA === 'ready'); }
 const egKey = fen => fen.split(' ').slice(0, 4).join(' ');
 const egUci = m => m.from + m.to + (m.promotion || '');
 
@@ -81,13 +87,42 @@ const EG = {
   up(uid){ const u = this.st().u; return u[uid] || (u[uid] = {}); },
   pr(id){ return this.rd().p[id] || [0, 0, 0, 0]; },
   savePick(){ try { localStorage.setItem('playbook-endings', JSON.stringify(this.pick)); } catch(e){} },
-  engineKind: K => K.how === 'engine',
+  engineKind: K => K.how === 'engine' || K.how === 'mate',
   canPlay(K){ return !this.engineKind(K) || Engine.state !== 'failed'; },
-  chosen(){ return this.pick && this.pick.length ? this.pick : null; },
-  // the positions a game can start from: the kinds picked (or a unit's), each position once
+  chosen(){ const ks = this.kindsOn().map(k => k.id), p = (this.pick || []).filter(k => ks.includes(k)); return p.length ? p : null; },
+  // the kinds this player has: the house player's own endings are theirs alone
+  kindsOn(){ return EGD.kinds.filter(k => k.id !== 'mine' || PERSONA === 'house'); },
+  // a position's kind, with what the position itself says about its goal (a position from a real game may be a mate
+  // to find, or a draw to hold, in a kind that is about winning)
+  kindFor(it){ const K = this.kind(it.k); return it.goal || it.how ? Object.assign({}, K, it.goal ? {goal: it.goal} : {}, it.how ? {how: it.how} : {}) : K; },
+  // the player's level on the lichess puzzle scale: the house player's rating, or what the player's own games show,
+  // moved to that scale (chess.com ratings sit about 350 under it, lichess's about 50), and 150 a step for Easier and
+  // Harder (the setting egl, from -3 to 3)
+  level(){
+    const me = typeof meOf === 'function' ? meOf(Prog.d) : null, P = me && me.P;
+    const lich = ((me && me.src) || {}).site === 'lichess' || (P && P.site === 'lichess');
+    const base = PERSONA !== 'house' && P && P.rating ? P.rating + (lich ? 50 : 350) : PERSONA === 'house' ? EG_HOUSE + 350 : 1300;
+    return Math.round((base + 150 * (+SET.egl || 0)) / 10) * 10;
+  },
+  // the positions near the level: 250 under it to 300 over; where fewer than n are, the nearest ones (all of a kind
+  // whose positions share one rating)
+  dist(it){ const lo = this.level() - 250, hi = lo + 550; return it.r < lo ? lo - it.r : it.r > hi ? it.r - hi : 0; },
+  near(list, n = 3){
+    if (list.length <= n) return list;
+    const cut = list.map(it => this.dist(it)).sort((a, b) => a - b)[n - 1];
+    return list.filter(it => this.dist(it) <= cut);
+  },
+  // the positions the units' checkpoints ask, kept out of practice games
+  asked(){ return this._asked || (this._asked = new Set(EGD.units.flatMap(U => U.check.flatMap(c => (c.alts || [c]).map(a => a.fen))))); },
+  // the positions a game can start from, each once, near the player's level: a unit's kinds; the kinds picked, each
+  // with its positions nearest the level; or for Everything, the kinds that have positions at that level
   pool(uid){
-    const U = uid && this.unit(uid), ks = U ? U.kinds : this.chosen() || EGD.kinds.map(k => k.id), seen = new Set();
-    return EGD.items.filter(it => ks.includes(it.k) && this.canPlay(this.kind(it.k)) && !seen.has(it.fen) && seen.add(it.fen));
+    const U = uid && this.unit(uid), pick = !U && this.chosen(), ks = U ? U.kinds : pick || this.kindsOn().map(k => k.id), seen = new Set(), skip = U && this.asked();
+    const all = EGD.items.filter(it => ks.includes(it.k) && this.canPlay(this.kindFor(it)) && !(skip && skip.has(it.fen)) && !seen.has(it.fen) && seen.add(it.fen));
+    if (U) return this.near(all);
+    const by = {}; for (const it of all) (by[it.k] = by[it.k] || []).push(it);
+    const fit = Object.keys(by).filter(k => by[k].some(it => !this.dist(it))), keep = pick || !fit.length ? Object.keys(by) : fit;
+    return keep.flatMap(k => this.near(by[k]));
   },
   // the next position: a kind at random among those picked (each as likely as any other), and in it a position never
   // played, else the one played longest ago; never the one just played
@@ -101,14 +136,19 @@ const EG = {
   lastU(D){ return D.kind === 'egq' ? D.lastU : D.moves.length ? D.moves[D.moves.length - 1] : null; },
   cap(D){ return D.k.cap || (D.it.par ? D.it.par + 12 : 40); },
   goalText(D){ return this.goalOf(D.k, D.it); },
-  goalOf(K, it){ return K.goal === 'mate' && K.how === 'mate' && it.par ? `Mate in ${it.par}` : {mate: 'Mate them', queen: 'Queen the pawn', hold: 'Hold the draw', win: 'Win it'}[K.goal]; },
+  goalOf(K, it){ K = it ? Object.assign({}, K, it.goal ? {goal: it.goal} : {}, it.how ? {how: it.how} : {}) : K;
+    return K.goal === 'mate' && K.how === 'mate' && it.par ? `Mate in ${it.par}` : {mate: 'Mate them', queen: 'Queen the pawn', hold: 'Hold the draw', win: 'Win it'}[K.goal]; },
+  // the line Show me how plays from the start, when the build worked one out; and while a game follows a real game's
+  // solution, that game's reply
+  solOf(it){ return it.sol && it.sol.length ? it.sol : null; },
+  onSol(D){ const s = D.it.pz && this.solOf(D.it); return !!s && D.moves.every((u, k) => s[k] === u); },
 
   // ---- a game against the engine (and Play along, the same board with the green arrow)
   async start(id, o = {}){
     await EGTB.load();
     const it = this.item(id); if (!it) return;
-    const K = this.kind(it.k);
-    if (K.how !== 'engine' && K.how !== 'bare' && !EGTB.t){ toast('This ending needs a newer browser.'); return; }
+    const K = this.kindFor(it);
+    if (['kqk', 'krk', 'kpk'].includes(K.how) && !EGTB.t){ toast('This ending needs a newer browser.'); return; }
     this.last = id;
     S.egState = {kind: 'eg', id, it, k: K, me: it.me, hist: [it.fen], moves: [], keys: [egKey(it.fen)], state: 'play', busy: false, sel: null, flash: null,
       hint: null, msg: '', feed: '', tries: 0, slips: 0, mine: 0, unit: o.unit || null, tick: 0};
@@ -119,9 +159,35 @@ const EG = {
     await EGTB.load();
     const U = this.unit(uid), L = U && U.along[k]; if (!L) return;
     const it = {id: L.id, fen: L.fen, me: L.me, k: U.kinds[0]};
-    S.egState = {kind: 'eg', guided: true, id: L.id, it, k: Object.assign({}, this.kind(U.kinds[0]), {goal: 'along'}), me: L.me, line: L.moves, hist: [L.fen], moves: [],
+    S.egState = {kind: 'eg', guided: true, id: L.id, it, k: Object.assign({}, this.kind(U.kinds[0]), {goal: 'along'}), me: L.me, line: L.moves, ex: L.ex || '', hist: [L.fen], moves: [],
       keys: [egKey(L.fen)], state: 'play', busy: false, sel: null, flash: null, hint: L.moves[0], msg: '', feed: '', tries: 0, slips: 0, mine: 0, unit: uid, tick: 0};
     S.view = 'endings'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
+  },
+  // Show me how: a position's line on the same board, the arrow showing each of your moves with why it is played (Play
+  // it makes the move for you) and the other side's coming by themselves; where the build worked out no line, the
+  // engine's move each turn. Nothing is recorded: Try it yourself starts the game.
+  async show(id, o = {}){
+    await EGTB.load();
+    const it = this.item(id); if (!it) return;
+    const K = this.kindFor(it), line = this.solOf(it);
+    if (!line && Engine.state === 'failed'){ toast('Show me how needs the engine, and it couldn\'t start here.'); return; }
+    this.last = id;
+    S.egState = {kind: 'eg', guided: true, show: true, live: !line, id, it, k: K, me: it.me, line, ex: line ? it.ex || '' : '', hist: [it.fen], moves: [], keys: [egKey(it.fen)],
+      state: 'play', busy: false, sel: null, flash: null, hint: line ? line[0] : null, msg: '', feed: '', tries: 0, slips: 0, mine: 0, unit: o.unit || null, tick: 0};
+    S.view = 'endings'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
+    if (!line) this.liveHint(S.egState);
+  },
+  // the engine's move for you, where there is no line (the tables' where they know)
+  liveHint(D){
+    const t = ++D.tick, fen = this.fen(D), tb = EGTB.probe(fen); D.busy = true; D.hint = null; renderDrillPanel();
+    const got = u => { if (S.drill !== D || D.tick !== t) return; D.busy = false; D.hint = u || null; if (!u) return this.finish(D, 'along'); renderDrillBoard(); renderDrillPanel(); };
+    if (tb) return got(EGTB.best(fen));
+    egSearch(fen, r => got(r && r.pv[0]), 18, 1500);
+  },
+  // why a move of yours is played: the build's reason for the line's move, else what the board shows it does
+  whyOf(D, fen, u, k){
+    const c = D.ex && D.ex[k], w = c && EGD.why && EGD.why[c]; if (w) return w;
+    try { const x = typeof Ideas !== 'undefined' && Ideas.of(fen, u, {me: D.me}); return (x && x.lines && x.lines[0]) || ''; } catch(e){ return ''; }
   },
   tryMove(u, to){
     const D = S.drill; if (!D || D.busy || D.state !== 'play') return;
@@ -142,6 +208,8 @@ const EG = {
     if (ch.insufficient_material()) return cb(hold ? {ok: true, done: 'held'} : {ok: false, why: 'nomat'});
     if (D.keys.filter(k => k === K).length >= 3) return cb(hold ? {ok: true, done: 'held'} : {ok: false, why: 'rep'});
     const queened = mv.flags.includes('p');
+    // a position from a real game, its solution followed: the known answer, and the game's own reply
+    if (D.it.pz && this.onSol(D)) return cb({ok: true, reply: D.it.sol[D.moves.length] || null});
     if (D.k.how === 'mate'){
       // a mate to find: the move has to keep a mate within the moves it should take (two more for a long one)
       return egSearch(fen1, r => {
@@ -178,8 +246,10 @@ const EG = {
     D.tries = 0; D.mine++;
     if (v.done) return this.finish(D, v.done);
     if (D.k.goal === 'hold' && D.mine >= (D.it.hold || 10)) return this.finish(D, 'held');
+    // a position from a real game is solved once its solution's moves are played, each one good
+    if (D.it.pz && D.k.how !== 'mate' && D.mine >= Math.ceil(D.it.sol.length / 2)) return this.finish(D, 'won');
     if (D.mine >= this.cap(D)) return this.finish(D, 'slow');
-    this.reply(D, fen1, v.reply, t);
+    this.reply(D, fen1, this.onSol(D) ? D.it.sol[D.moves.length] || v.reply : v.reply, t);
   },
   // their move, after a moment, sliding in
   reply(D, fen1, r, t){
@@ -192,6 +262,7 @@ const EG = {
       const hold = D.k.goal === 'hold';
       if (ch.in_checkmate()) return this.finish(D, 'lost', {u: r});
       if (ch.in_stalemate() || ch.insufficient_material() || D.keys.filter(k => k === egKey(fen2)).length >= 3) return this.finish(D, hold ? 'held' : 'drawn', {u: r});
+      if (D.live){ renderDrillBoard({u: r, meta: {}}); return this.liveHint(D); }
       if (D.guided){ D.hint = D.line[D.moves.length] || null; if (!D.hint) return this.finish(D, 'along', {u: r}); }
       renderDrillBoard({u: r, meta: {}}); renderDrillPanel();
     }, D.guided ? 420 : 280);
@@ -219,22 +290,33 @@ const EG = {
     return map[v.why] || '';
   },
   guidedTry(D, u, to){
-    const want = D.line[D.moves.length];
-    if (u !== want){ D.flash = {sq: to, ok: false}; D.msg = 'Follow the green arrow.'; renderDrillBoard(); renderDrillPanel();
+    const want = D.live ? D.hint : D.line[D.moves.length];
+    if (!want || u !== want){ D.flash = {sq: to, ok: false}; D.msg = 'Follow the green arrow.'; renderDrillBoard(); renderDrillPanel();
       setTimeout(() => { if (S.drill === D && D.flash && !D.flash.ok){ D.flash = null; D.msg = ''; renderDrillBoard(); renderDrillPanel(); } }, 700); return; }
-    const fen0 = this.fen(D), ch = new Chess(fen0); ch.move(uciObj(u)); const fen1 = ch.fen(), t = ++D.tick;
+    const fen0 = this.fen(D), ch = new Chess(fen0), mv = ch.move(uciObj(u)); const fen1 = ch.fen(), t = ++D.tick;
     D.hist.push(fen1); D.moves.push(u); D.keys.push(egKey(fen1)); D.flash = null; D.msg = ''; D.mine++;
     D.said = lc(wordsAt(fen0, u));
+    if (D.live){
+      // the engine's way: over when the ending is won (or held), else their reply and your next move
+      D.busy = true; D.hint = null; renderDrillBoard(); renderDrillPanel();
+      return this.judge(D, fen1, mv, v => { if (S.drill !== D || D.tick !== t) return;
+        if (v.done || !v.reply || D.mine >= 30 || (D.k.goal === 'hold' && D.mine >= (D.it.hold || 10))) return this.finish(D, 'along');
+        this.reply(D, fen1, v.reply, t); });
+    }
     const r = D.line[D.moves.length];
     if (!r){ renderDrillBoard(); return this.finish(D, 'along'); }
     D.busy = true; D.hint = null; renderDrillBoard(); renderDrillPanel();
     this.reply(D, fen1, r, t);
   },
+  // Play it: the arrow's move made for you
+  playIt(D){ if (!D || !D.guided || D.busy || D.state !== 'play' || !D.hint) return; const u = D.hint; this.guidedTry(D, u, u.slice(2, 4)); },
   finish(D, res, last){
+    if (D.show) res = 'along';                                       // Show me how records nothing
     D.state = 'done'; D.busy = false; D.res = res; D.hint = null;
     const won = res === 'won' || res === 'held', par = D.it.par;
     D.stars = !won ? 0 : D.slips ? (D.slips === 1 ? 2 : 1) : par ? (D.mine <= par + 2 ? 3 : D.mine <= par + 6 ? 2 : 1) : 3;
-    if (res === 'along'){ const u = this.up(D.unit), a = u.a || (u.a = {}); a[D.id] = Date.now(); Prog.save(); }
+    if (res === 'along' && D.show){}
+    else if (res === 'along'){ const u = this.up(D.unit), a = u.a || (u.a = {}); a[D.id] = Date.now(); Prog.save(); }
     else if (!D.tour){
       const p = this.st().p, r = p[D.id] || [0, 0, 0, 0];
       p[D.id] = [r[0] + 1, r[1] + (won && !D.slips ? 1 : 0), Date.now(), Math.max(r[3] || 0, D.stars)];
@@ -251,11 +333,19 @@ const EG = {
     if (D.kind === 'egq') return this.quizPanelHTML(D);
     const K = D.k, U = D.unit && this.unit(D.unit);
     if (D.guided){
-      const n = D.line.length, mine = Math.ceil(n / 2), done = Math.ceil(D.moves.length / 2);
-      const head = `<p class="kicker">Play along</p><h3>${esc(U ? U.title : K.name)}</h3><div class="progressbar" aria-hidden="true"><i style="width:${D.state === 'done' ? 100 : Math.round(done / mine * 100)}%"></i></div>`;
-      if (D.state === 'done') return `<div class="dpanel">${head}<div class="donebox"><h4>Played along</h4><div class="lesson-actions">${this.nextBtn(D)}<button class="btn" id="egAgain">Again</button></div><div id="deng"></div></div></div>`;
-      const my = !D.busy, said = D.feed ? `<p class="gsaid">${esc(D.feed)}</p>` : '';
-      return `<div class="dpanel">${head}<div class="coachnote gcoach" role="status"><div class="cntx">${said}${my && D.hint ? `<p class="gmove">${esc(wordsAt(this.fen(D), D.hint))}</p>` : `<p class="gmove wait">${OPP} is thinking…</p>`}${D.msg ? `<p class="gwarn">${esc(D.msg)}</p>` : ''}</div></div></div>`;
+      const mine = D.line ? Math.ceil(D.line.length / 2) : 0, par = D.it.par;
+      const bar = mine ? `<div class="progressbar" aria-hidden="true"><i style="width:${D.state === 'done' ? 100 : Math.round(D.mine / mine * 100)}%"></i></div>` : '';
+      const head = `<p class="kicker">${D.show ? 'Show me how' : 'Play along'}</p><h3>${esc(D.show ? this.goalOf(K, D.it) : U ? U.title : K.name)}</h3>${bar}`
+        + (D.show ? `<p class="egcount tnum">${plural(D.mine, 'move')}${par ? ` · par ${par}` : ''}</p>` : '');
+      if (D.state === 'done'){
+        if (D.show) return `<div class="dpanel">${head}<div class="donebox"><h4>${par && D.mine <= par ? 'That\'s par' : 'That\'s how'}</h4>
+          <div class="lesson-actions"><button class="btn primary" id="egTry">Try it yourself</button><button class="btn" id="egAgain">Again</button></div><div id="deng"></div></div></div>`;
+        return `<div class="dpanel">${head}<div class="donebox"><h4>Played along</h4><div class="lesson-actions">${this.nextBtn(D)}<button class="btn" id="egAgain">Again</button></div><div id="deng"></div></div></div>`;
+      }
+      const my = !D.busy && D.hint, fen = this.fen(D), said = D.feed ? `<p class="gsaid">${esc(D.feed)}</p>` : '';
+      const why = my ? this.whyOf(D, fen, D.hint, D.mine) : '', point = D.show && !D.moves.length && D.it.pt ? `<p class="gsaid">${esc(D.it.pt)}</p>` : '';
+      return `<div class="dpanel">${head}<div class="coachnote gcoach" role="status"><div class="cntx">${point}${said}${my ? `<p class="gmove">${esc(wordsAt(fen, D.hint))}</p>${why ? `<p class="gwhy">${esc(why)}</p>` : ''}` : `<p class="gmove wait">${OPP} is thinking…</p>`}${D.msg ? `<p class="gwarn">${esc(D.msg)}</p>` : ''}</div></div>
+        ${D.show && my ? '<div class="lesson-actions"><button class="btn" id="egPlayIt">Play it</button></div>' : ''}</div>`;
     }
     const par = D.it.par, cnt = K.goal === 'hold' ? `<div class="progressbar" aria-hidden="true"><i style="width:${Math.round(Math.min(1, D.mine / (D.it.hold || 10)) * 100)}%"></i></div><p class="egcount tnum">${D.mine} of ${D.it.hold || 10} moves held</p>`
       : K.how === 'mate' ? '' : `<p class="egcount tnum">${D.mine} ${D.mine === 1 ? 'move' : 'moves'}${par ? ` · par ${par}` : ''}</p>`;
@@ -270,8 +360,12 @@ const EG = {
     const won = D.res === 'won' || D.res === 'held';
     const h = {won: D.k.how === 'mate' ? 'Mate' : D.k.goal === 'mate' ? `Mate in ${D.mine}` : D.k.goal === 'queen' ? 'Queened' : 'Won', held: 'Held', slow: 'Too slow', lost: 'Mated', drawn: 'A draw'}[D.res];
     const sub = won ? (D.slips ? plural(D.slips, 'slip') : 'Clean') : D.res === 'slow' ? `${D.k.goal === 'mate' ? 'No mate' : 'Not won'} in ${this.cap(D)} moves` : '';
-    return `<div class="donebox ${won && !D.slips ? '' : 'bad'}"><h4>${h}</h4>${won ? this.starsHTML(D.stars) : ''}${sub ? `<p class="egsub">${esc(sub)}</p>` : ''}${D.it.why ? `<p class="egsub">In the game: ${esc(lc(D.it.why))}</p>` : ''}
-      <div class="lesson-actions">${this.nextBtn(D)}<button class="btn" id="egAgain">Again</button></div><div id="deng"></div></div>`;
+    const showme = this.canShow(D.it) && !(won && !D.slips && D.stars === 3) ? '<button class="btn" id="egShow">Show me how</button>' : '';
+    return `<div class="donebox ${won && !D.slips ? '' : 'bad'}"><h4>${h}</h4>${won ? this.starsHTML(D.stars) : ''}${sub ? `<p class="egsub">${esc(sub)}</p>` : ''}${D.it.why ? `<p class="egsub">In the game: ${esc(lc(D.it.why))}</p>` : D.it.pt ? `<p class="egsub">${esc(D.it.pt)}</p>` : ''}
+      <div class="lesson-actions">${this.nextBtn(D)}<button class="btn" id="egAgain">Again</button>${showme}</div><div id="deng"></div></div>`;
+  },
+  // Show me how can play a position when it has a line, or when the engine is there to play one
+  canShow(it){ return !!(it && (this.solOf(it) || Engine.state !== 'failed'));
   },
   nextBtn(D){
     if (D.unit){ const U = this.unit(D.unit), nx = this.unitNext(U);
@@ -282,7 +376,10 @@ const EG = {
     const D = S.drill, p = document.getElementById('dpanel'); if (!p || !D) return;
     const b = id => document.getElementById(id);
     if (b('egNext')) b('egNext').onclick = () => { const it = this.next(); this.peek = null; if (it) this.start(it.id); };
-    if (b('egAgain')) b('egAgain').onclick = () => D.kind === 'egq' ? this.quiz(D.unit) : D.guided ? this.along(D.unit, this.unit(D.unit).along.findIndex(l => l.id === D.id)) : this.start(D.id, {unit: D.unit});
+    if (b('egAgain')) b('egAgain').onclick = () => D.kind === 'egq' ? this.quiz(D.unit) : D.show ? this.show(D.id, {unit: D.unit}) : D.guided ? this.along(D.unit, this.unit(D.unit).along.findIndex(l => l.id === D.id)) : this.start(D.id, {unit: D.unit});
+    if (b('egShow')) b('egShow').onclick = () => this.show(D.id, {unit: D.unit});
+    if (b('egTry')) b('egTry').onclick = () => this.start(D.id, {unit: D.unit});
+    if (b('egPlayIt')) b('egPlayIt').onclick = () => this.playIt(D);
     if (b('egUnitNext')) b('egUnitNext').onclick = () => { const nx = this.unitNext(this.unit(D.unit)); if (nx) nx.go(); };
     if (b('egQNext')) b('egQNext').onclick = () => this.quizNext(D);
     p.querySelectorAll('[data-egunit]').forEach(x => x.onclick = () => this.openUnit(x.dataset.egunit));
@@ -291,10 +388,13 @@ const EG = {
   // ---- the checkpoint: one position at a time, one try each
   quiz(uid){
     const U = this.unit(uid); if (!U) return;
-    S.egState = {kind: 'egq', unit: uid, items: U.check, k: 0, res: [], state: 'play', sel: null, flash: null, msg: '', view: null, lastU: null, arrows: null, me: U.check[0].me, busy: false, answered: null};
+    const items = U.check.map(c => c.alts ? this.pickAlt(c.alts) : c);
+    S.egState = {kind: 'egq', unit: uid, items, k: 0, res: [], state: 'play', sel: null, flash: null, msg: '', view: null, lastU: null, arrows: null, me: items[0].me, busy: false, answered: null};
     S.view = 'endings'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'});
   },
   need: n => n <= 3 ? n - 1 : Math.ceil(n * .8),
+  // a question with a position for each band of ratings: the one nearest the player's level
+  pickAlt(alts){ const t = this.level(); return alts.slice().sort((a, b) => this.dist(a) - this.dist(b) || Math.abs(a.r - t) - Math.abs(b.r - t))[0]; },
   answer(D, u, to){
     if (D.answered) return;
     const it = D.items[D.k], ok = it.ok.includes(u);
@@ -325,7 +425,7 @@ const EG = {
     const it = D.items[D.k];
     return `<div class="dpanel"><p class="kicker">Checkpoint · ${D.k + 1} of ${n}</p><h3>${esc(it.ask)}</h3>
       <div class="progressbar" aria-hidden="true"><i style="width:${Math.round(D.k / n * 100)}%"></i></div>
-      ${D.answered ? `<p class="feedback ${D.answered === 'ok' ? 'good' : 'bad'}">${esc(D.msg)}</p><div class="lesson-actions"><button class="btn primary" id="egQNext">${D.k + 1 < n ? 'Next' : 'See how you did'}</button></div>`
+      ${D.answered ? `<p class="feedback ${D.answered === 'ok' ? 'good' : 'bad'}">${esc(D.msg)}${it.why ? `<span class="pwhy">${esc(it.why)}</span>` : ''}</p><div class="lesson-actions"><button class="btn primary" id="egQNext">${D.k + 1 < n ? 'Next' : 'See how you did'}</button></div>`
         : `<div class="status"><span class="bub"></span>${MYC} to move</div>`}</div>`;
   },
 
@@ -341,7 +441,7 @@ const EG = {
   // the endings of a unit's kinds won without a slip, each position once
   won(U){ const p = this.rd().p; return EGD.items.filter(it => U.kinds.includes(it.k) && p[it.id] && p[it.id][1] > 0).length; },
   passed(U){ return this.steps(U).every(s => s.done); },
-  mineU(){ return EGD.units.filter(U => !U.lib); },
+  mineU(){ return PERSONA === 'house' ? EGD.units.filter(U => !U.lib) : []; },
   libU(){ return EGD.units.filter(U => U.lib); },
   listOf(U){ return U.lib ? this.libU() : this.mineU(); },
   // the unit up next: the first of the player's own not passed, then the first of the basics
@@ -355,20 +455,21 @@ const EG = {
     if (s.key === 'prac') return {cta: 'Win an ending', go: () => { const it = this.next(U.id); if (it) this.start(it.id, {unit: U.id}); }};
     return {cta: 'Take the checkpoint', go: () => this.quiz(U.id)};
   },
-  openUnit(id){ S.egUnit = id; S.egSlide = 0; S.drill = S.egState = null; S.view = 'egunit'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'}); },
+  openUnit(id){ const U = this.unit(id); if (!U || (!U.lib && PERSONA !== 'house')){ S.cseg = 'end'; return go('course'); }
+    S.egUnit = id; S.egSlide = 0; S.drill = S.egState = null; S.view = 'egunit'; render(); setHash(); window.scrollTo({top: 0, behavior: reduced ? 'auto' : 'smooth'}); },
   slideBoard(s, mini){ return boardSVG(s.fen.split(' ')[0], {coords: !mini, mini, flip: s.me === 'b', arrows: (s.arrows || []).slice(), circles: (s.circles || []).slice(), aria: s.h}); },
   seg(){ return segHTML([['open', 'Openings'], ['end', 'Endings']], S.cseg === 'end' ? 'end' : 'open', 'cseg'); },
   wireSeg(){ view.querySelectorAll('[data-cseg]').forEach(b => b.onclick = () => { S.cseg = b.dataset.cseg; S.deep = null; render(); setHash(); }); },
   renderCourse(){
-    const units = this.mineU(), lib = this.libU(), cur = this.cur(), passedN = units.filter(U => this.passed(U)).length;
+    const own = this.mineU(), lib = this.libU(), cur = this.cur(), units = own.length ? own : lib, passedN = units.filter(U => this.passed(U)).length;
     const bar = units.map(U => `<i class="${this.passed(U) ? 'on' : ''}" title="${esc(U.title)}"></i>`).join('');
     let hero;
     if (cur){
-      const st = this.steps(cur), nx = st.find(s => !s.done), go = this.unitNext(cur), list = this.listOf(cur);
-      hero = `<section class="chero"><div class="board">${this.slideBoard(cur.slides[0], true)}</div><div><div class="chips"><span class="chip">Up next · ${cur.lib ? 'The basics · ' : ''}Unit ${list.indexOf(cur) + 1} of ${list.length}</span></div>
+      const st = this.steps(cur), nx = st.find(s => !s.done), act = this.unitNext(cur), list = this.listOf(cur);
+      hero = `<section class="chero"><div class="board">${this.slideBoard(cur.slides[0], true)}</div><div><div class="chips"><span class="chip">Up next · ${cur.lib && own.length ? 'The basics · ' : ''}Unit ${list.indexOf(cur) + 1} of ${list.length}</span></div>
         <h3>${esc(cur.title)}</h3><p class="egwhy">${esc(cur.why)}</p>
         <ol class="ministeps" aria-label="Steps in this unit">${st.map(s => `<li class="${s.done ? 'done' : s === nx ? 'next' : ''}">${s.done ? ICON.check : ''}${esc(s.title)}</li>`).join('')}</ol>
-        <div class="cta"><button class="btn primary" id="egGo">${esc(go ? go.cta : 'Open the unit')}</button></div></div></section>`;
+        <div class="cta"><button class="btn primary" id="egGo">${esc(act ? act.cta : 'Open the unit')}</button></div></div></section>`;
     } else hero = `<section class="chero done"><div><h3>Every endings unit passed</h3><div class="cta"><button class="btn primary" data-go="endings">Play more endings</button></div></div></section>`;
     const row = (U, k) => { const pass = this.passed(U), st = this.steps(U), done = st.filter(s => s.done).length, isCur = U === cur;
       return `<li class="urow"><div class="rail">${pass ? `<span class="ubub pass" title="Passed">${ICON.check}</span>` : `<span class="ubub ${isCur ? 'cur' : ''}">${k + 1}</span>`}</div>
@@ -376,18 +477,19 @@ const EG = {
           <span class="ut"><b>${esc(U.title)}</b><span class="egwhy">${esc(U.why)}</span></span><span class="ust"><span class="pips" aria-label="${done} of ${st.length} steps">${st.map(s => `<i class="${s.done ? 'on' : ''}"></i>`).join('')}</span></span></button></li>`; };
     const libN = lib.filter(U => this.passed(U)).length;
     view.innerHTML = `${this.seg()}<div class="chead solo"><div class="cmeter"><div class="bar" aria-hidden="true">${bar}</div><span>${passedN} of ${units.length} units passed</span></div></div>
-      ${hero}<ol class="path" aria-label="Endings units">${units.map(row).join('')}</ol>
-      ${lib.length ? `<div class="eglib"><h3>The basics</h3><span class="tnum">${libN} of ${lib.length} passed</span></div><ol class="path" aria-label="The basics">${lib.map(row).join('')}</ol>` : ''}`;
+      ${hero}<ol class="path" aria-label="${own.length ? 'Endings units' : 'The basics'}">${units.map(row).join('')}</ol>
+      ${own.length && lib.length ? `<div class="eglib"><h3>The basics</h3><span class="tnum">${libN} of ${lib.length} passed</span></div><ol class="path" aria-label="The basics">${lib.map(row).join('')}</ol>` : ''}`;
     this.wireSeg();
     const g = document.getElementById('egGo'); if (g) g.onclick = () => { const m = this.unitNext(cur); if (m) m.go(); else this.openUnit(cur.id); };
     view.querySelectorAll('[data-egunit]').forEach(b => b.onclick = () => this.openUnit(b.dataset.egunit));
     view.querySelectorAll('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
   },
   renderUnit(){
-    const U = this.unit(S.egUnit); if (!U){ S.view = 'course'; S.cseg = 'end'; return render(); }
+    const U = this.unit(S.egUnit); if (!U || (!U.lib && PERSONA !== 'house')){ S.view = 'course'; S.cseg = 'end'; return render(); }
     const list = this.listOf(U), k = list.indexOf(U), n = U.slides.length; S.egSlide = Math.max(0, Math.min(S.egSlide || 0, n - 1));
     if (S.egSlide === n - 1 && !(this.rd().u[U.id] || {}).l){ this.up(U.id).l = Date.now(); Prog.save(); }
-    const s = U.slides[S.egSlide], u = this.rd().u[U.id] || {}, a = u.a || {}, st = this.steps(U), nx = st.find(x => !x.done), go = this.unitNext(U);
+    // (the unit's next action is `act`: a local `go` would hide the global one, and ← Course calls that)
+    const s = U.slides[S.egSlide], u = this.rd().u[U.id] || {}, a = u.a || {}, st = this.steps(U), nx = st.find(x => !x.done), act = this.unitNext(U);
     const idea = `<div class="idea"><div class="board" id="ideaBoard">${this.slideBoard(s)}</div>
       <div class="ideacap"><p class="kicker">The idea · ${S.egSlide + 1} of ${n}</p><h3>${esc(s.h)}</h3>${bullets(s.t)}
         <div class="ideanav"><button class="ctl" id="iPrev" aria-label="Previous picture" ${S.egSlide === 0 ? 'disabled' : ''}>${ICON.prev}</button>
@@ -404,10 +506,10 @@ const EG = {
       return `<li class="step ${x.done ? 'done' : ''} ${x === nx ? 'next' : ''}"><span class="sn">${x.done ? ICON.check : j + 1}</span><div>${body}</div></li>`;
     };
     const prev = list[k - 1], next = list[k + 1];
-    view.innerHTML = `<div class="crumbs"><button class="btn small" id="egBack">← Course</button><span class="where">${U.lib ? 'The basics · ' : ''}Unit ${k + 1} of ${list.length}</span><span class="spacer"></span>
+    view.innerHTML = `<div class="crumbs"><button class="btn small" id="egBack">← Course</button><span class="where">${U.lib && this.mineU().length ? 'The basics · ' : ''}Unit ${k + 1} of ${list.length}</span><span class="spacer"></span>
         ${prev ? `<button class="btn small" data-egunit="${prev.id}" aria-label="Previous unit">‹<span class="navtxt"> Unit ${k}</span></button>` : ''}${next ? `<button class="btn small" data-egunit="${next.id}" aria-label="Next unit"><span class="navtxt">Unit ${k + 2} </span>›</button>` : ''}</div>
       <div class="ugrid"><div class="bcol">${idea}</div><div class="ucol"><header class="uhead">${this.passed(U) ? '<div class="chips"><span class="chip good">Passed</span></div>' : ''}<h2>${esc(U.title)}</h2><p class="egwhy">${esc(U.why)}</p>
-        ${nx ? `<div class="cta" style="margin-top:14px"><button class="btn primary" id="uGo">${nx.key === 'idea' ? 'Next picture' : esc(go.cta)}</button></div>` : ''}</header>
+        ${nx ? `<div class="cta" style="margin-top:14px"><button class="btn primary" id="uGo">${nx.key === 'idea' ? 'Next picture' : esc(act.cta)}</button></div>` : ''}</header>
         <ol class="steps">${st.map(step).join('')}</ol></div></div>`;
     const slide = d => { S.egSlide = Math.max(0, Math.min(n - 1, S.egSlide + d)); this.renderUnit(); };
     document.getElementById('iPrev').onclick = () => slide(-1);
@@ -431,21 +533,22 @@ const EG = {
     }
     const who = it.src ? 'vs ' + it.src.split(' ').slice(1).join(' ') : K.name;
     return `<div class="dpanel egtop"><p class="kicker">${esc(K.group)} · ${esc(who)}</p><h3>${esc(this.goalOf(K, it))}</h3>
-      <div class="lesson-actions"><button class="btn primary" id="egStart">Start</button>${K.idea ? '<button class="btn" id="egIdea">The idea</button>' : ''}</div></div>`;
+      <div class="lesson-actions"><button class="btn primary" id="egStart">Start</button>${this.canShow(it) ? '<button class="btn" id="egShowTop">Show me how</button>' : ''}${K.idea ? '<button class="btn" id="egIdea">The idea</button>' : ''}</div></div>`;
   },
   sideHTML(){
     const D = S.drill; if (D && D.state === 'play') return '';
-    const pick = this.chosen(), groups = [...new Set(EGD.kinds.map(k => k.group))], p = this.rd().p, open = S.egOpen || (S.egOpen = new Set());
+    const pick = this.chosen(), kinds = this.kindsOn(), groups = [...new Set(kinds.map(k => k.group))], p = this.rd().p, open = S.egOpen || (S.egOpen = new Set());
     const chip = (K, label) => `<button data-egk="${K.id}" aria-pressed="${!!pick && pick.includes(K.id)}" ${this.canPlay(K) ? '' : 'disabled'}>${esc(label || K.name)}</button>`;
     const played = Object.values(p).reduce((a, r) => a + r[0], 0), clean = Object.values(p).reduce((a, r) => a + r[1], 0), stars = Object.values(p).reduce((a, r) => a + (r[3] || 0), 0);
     // a group of one is a single chip; the others fold, with the number picked beside the name
-    const grp = g => { const ks = EGD.kinds.filter(k => k.group === g), n = pick ? ks.filter(k => pick.includes(k.id)).length : 0;
+    const grp = g => { const ks = kinds.filter(k => k.group === g), n = pick ? ks.filter(k => pick.includes(k.id)).length : 0;
       if (ks.length === 1) return `<div class="seg egone">${chip(ks[0], g)}</div>`;
       return `<details class="egg" data-eggrp="${esc(g)}" ${open.has(g) ? 'open' : ''}><summary><b>${esc(g)}</b><span class="egn tnum">${n ? `${n} of ${ks.length}` : ks.length}</span></summary>
         <div class="seg"><button class="sbcol" data-egg="${esc(g)}" aria-pressed="${n === ks.length}">All ${esc(lc(g))}</button>${ks.map(K => chip(K)).join('')}</div></details>`; };
     return `<div class="dpanel">
       <div class="eggroups"><div class="seg"><button data-egk="all" aria-pressed="${!pick}">Everything</button></div>
         ${groups.map(grp).join('')}</div>
+      <div class="eglv"><span>Rated about <b class="tnum">${this.level()}</b></span><div class="seg"><button data-eglv="-1" ${(+SET.egl || 0) <= -3 ? 'disabled' : ''}>Easier</button><button data-eglv="1" ${(+SET.egl || 0) >= 3 ? 'disabled' : ''}>Harder</button></div></div>
       ${Engine.state === 'failed' ? `<p class="lockednote">${Engine.why === 'file' ? 'Most endings need the engine, and the engine needs the page opened from the web.' : 'The engine couldn\'t start here, so only the endings it isn\'t needed for are on.'}</p>` : ''}
       <div class="queue"><div><b class="tnum">${played}</b><span>played</span></div><div><b class="tnum">${clean}</b><span>clean</span></div><div><b class="tnum">${stars}</b><span>stars</span></div></div>
     </div>`;
@@ -456,7 +559,8 @@ const EG = {
       if (id === 'all') this.pick = null;
       else { const p = new Set(this.pick || []); p.has(id) ? p.delete(id) : p.add(id); this.pick = p.size ? [...p] : null; }
       S.egIdea = null; this.savePick(); this.render(); });
-    view.querySelectorAll('[data-egg]').forEach(b => b.onclick = () => { const ks = EGD.kinds.filter(k => k.group === b.dataset.egg).map(k => k.id), p = new Set(this.pick || []);
+    view.querySelectorAll('[data-eglv]').forEach(b => b.onclick = () => { setSetting('egl', Math.max(-3, Math.min(3, (+SET.egl || 0) + +b.dataset.eglv))); this.peek = null; S.egIdea = null; this.render(); });
+    view.querySelectorAll('[data-egg]').forEach(b => b.onclick = () => { const ks = this.kindsOn().filter(k => k.group === b.dataset.egg).map(k => k.id), p = new Set(this.pick || []);
       const all = ks.every(k => p.has(k)); ks.forEach(k => all ? p.delete(k) : p.add(k)); this.pick = p.size ? [...p] : null; this.peek = null; S.egIdea = null; this.savePick(); this.render(); });
     view.querySelectorAll('details.egg').forEach(d => d.ontoggle = () => { const g = d.dataset.eggrp; d.open ? S.egOpen.add(g) : S.egOpen.delete(g); });
   },
@@ -480,6 +584,7 @@ const EG = {
     const st = document.getElementById('egStart'); if (st) st.onclick = () => { const it = this.peek || this.next(); this.peek = null; S.egIdea = null; if (it) this.start(it.id); };
     const ib = id => document.getElementById(id);
     if (ib('egIdea')) ib('egIdea').onclick = () => { S.egIdea = {k: prev.k, i: 0}; this.render(); };
+    if (ib('egShowTop')) ib('egShowTop').onclick = () => { const it = this.peek; this.peek = null; S.egIdea = null; if (it) this.show(it.id); };
     if (ib('eiBack')) ib('eiBack').onclick = () => { S.egIdea = null; this.render(); };
     if (ib('eiPrev')) ib('eiPrev').onclick = () => { S.egIdea.i--; this.render(); };
     if (ib('eiNext')) ib('eiNext').onclick = () => { S.egIdea.i++; this.render(); };
