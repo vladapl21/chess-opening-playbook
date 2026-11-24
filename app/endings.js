@@ -89,17 +89,19 @@ const EG = {
     const U = uid && this.unit(uid), ks = U ? U.kinds : this.chosen() || EGD.kinds.map(k => k.id), seen = new Set();
     return EGD.items.filter(it => ks.includes(it.k) && this.canPlay(this.kind(it.k)) && !seen.has(it.fen) && seen.add(it.fen));
   },
-  // the next position: one never played first, then the one played longest ago; never the one just played
+  // the next position: a kind at random among those picked (each as likely as any other), and in it a position never
+  // played, else the one played longest ago; never the one just played
   next(uid){
     const pool = this.pool(uid).filter(it => it.id !== this.last); if (!pool.length) return this.pool(uid)[0] || null;
-    const by = pool.map(it => ({it, r: this.pr(it.id)})).sort((a, b) => (a.r[0] ? 1 : 0) - (b.r[0] ? 1 : 0) || a.r[2] - b.r[2]);
-    const top = by.slice(0, Math.min(3, by.length)); return top[Math.floor(Math.random() * top.length)].it;
+    const ks = [...new Set(pool.map(it => it.k))], k = ks[Math.floor(Math.random() * ks.length)];
+    return pool.filter(it => it.k === k).map(it => ({it, r: this.pr(it.id)})).sort((a, b) => (a.r[0] ? 1 : 0) - (b.r[0] ? 1 : 0) || a.r[2] - b.r[2])[0].it;
   },
   fen(D){ return D.kind === 'egq' ? (D.view || D.items[D.k].fen) : D.hist[D.hist.length - 1]; },
   legal(D){ const fen = this.fen(D); return new Chess(fen).moves({verbose: true}).map(egUci); },
   lastU(D){ return D.kind === 'egq' ? D.lastU : D.moves.length ? D.moves[D.moves.length - 1] : null; },
   cap(D){ return D.k.cap || (D.it.par ? D.it.par + 12 : 40); },
-  goalText(D){ return {mate: 'Mate them', queen: 'Queen the pawn', hold: 'Hold the draw', win: 'Win it'}[D.k.goal]; },
+  goalText(D){ return this.goalOf(D.k, D.it); },
+  goalOf(K, it){ return K.goal === 'mate' && K.how === 'mate' && it.par ? `Mate in ${it.par}` : {mate: 'Mate them', queen: 'Queen the pawn', hold: 'Hold the draw', win: 'Win it'}[K.goal]; },
 
   // ---- a game against the engine (and Play along, the same board with the green arrow)
   async start(id, o = {}){
@@ -140,6 +142,16 @@ const EG = {
     if (ch.insufficient_material()) return cb(hold ? {ok: true, done: 'held'} : {ok: false, why: 'nomat'});
     if (D.keys.filter(k => k === K).length >= 3) return cb(hold ? {ok: true, done: 'held'} : {ok: false, why: 'rep'});
     const queened = mv.flags.includes('p');
+    if (D.k.how === 'mate'){
+      // a mate to find: the move has to keep a mate within the moves it should take (two more for a long one)
+      return egSearch(fen1, r => {
+        if (!r) return cb(Engine.state === 'failed' ? {ok: false, why: 'noeng'} : {ok: true, reply: egMid(fen1)});
+        const s = -r.s, left = s >= EG_MATE ? Math.round((100000 - s) / 100) : null, par = D.it.par || 3;
+        if (left === null) return cb({ok: false, why: 'nomate', reply: r.pv[0]});
+        if (D.mine + 1 + left > par + (par > 3 ? 2 : 0)) return cb({ok: false, why: 'slower'});
+        cb({ok: true, reply: r.pv[0]});
+      }, 20, 1500);
+    }
     if (D.k.how === 'bare'){
       const take = ch.moves({verbose: true}).find(m => m.captured);
       if (take) return cb({ok: false, why: 'drop', reply: egUci(take)});
@@ -156,7 +168,9 @@ const EG = {
       if (!r) return cb(Engine.state === 'failed' ? {ok: false, why: 'noeng'} : {ok: true, reply: egMid(fen1)});
       const s = -r.s, keep = Math.min(200, (D.it.v || 400) / 2);    // from your side
       if (hold ? s <= -200 : s < keep) return cb({ok: false, why: s <= -EG_MATE ? 'mated' : s <= -200 ? 'lose' : 'draw', reply: r.pv[0]});
-      if ((goal === 'queen' && queened) || (goal === 'win' && s >= 900)) return cb({ok: true, done: 'won'});
+      // won: a pawn queened, their king left alone, or for an ending that started short of +8, the engine at +9
+      const bare = !fen1.split(' ')[0].split('').some(c => D.me === 'w' ? 'pnbrq'.includes(c) : 'PNBRQ'.includes(c));
+      if ((goal === 'queen' && queened) || (goal === 'win' && (queened || bare || ((D.it.v || 0) < 800 && s >= 900)))) return cb({ok: true, done: 'won'});
       cb({ok: true, reply: r.pv[0]});
     });
   },
@@ -200,7 +214,8 @@ const EG = {
   whyText(v, fen1){
     const said = v.reply ? `${OPP}: ${lc(wordsAt(fen1, v.reply))}` : '';
     const map = {noeng: 'This ending needs the engine, and it couldn\'t start here.', stale: 'Stalemate: a draw.', nomat: 'Nothing left to mate with: a draw.', rep: 'Third time in this position: a draw.',
-      drop: `${said}. That throws the win away.`, draw: `${said}. That lets the win go.`, lose: `${said}. That loses.`, mated: `${said}, with mate to follow.`};
+      drop: `${said}. That throws the win away.`, draw: `${said}. That lets the win go.`, lose: `${said}. That loses.`, mated: `${said}, with mate to follow.`,
+      nomate: `${said}. The mate is gone.`, slower: 'Still a mate, but a slower one.'};
     return map[v.why] || '';
   },
   guidedTry(D, u, to){
@@ -243,7 +258,7 @@ const EG = {
       return `<div class="dpanel">${head}<div class="coachnote gcoach" role="status"><div class="cntx">${said}${my && D.hint ? `<p class="gmove">${esc(wordsAt(this.fen(D), D.hint))}</p>` : `<p class="gmove wait">${OPP} is thinking…</p>`}${D.msg ? `<p class="gwarn">${esc(D.msg)}</p>` : ''}</div></div></div>`;
     }
     const par = D.it.par, cnt = K.goal === 'hold' ? `<div class="progressbar" aria-hidden="true"><i style="width:${Math.round(Math.min(1, D.mine / (D.it.hold || 10)) * 100)}%"></i></div><p class="egcount tnum">${D.mine} of ${D.it.hold || 10} moves held</p>`
-      : `<p class="egcount tnum">${D.mine} ${D.mine === 1 ? 'move' : 'moves'}${par ? ` · par ${par}` : ''}</p>`;
+      : K.how === 'mate' ? '' : `<p class="egcount tnum">${D.mine} ${D.mine === 1 ? 'move' : 'moves'}${par ? ` · par ${par}` : ''}</p>`;
     const head = `<p class="kicker">${esc(K.name)}${D.it.src ? ' · vs ' + esc(D.it.src.split(' ').slice(1).join(' ')) : U ? ' · ' + esc(U.title) : ''}</p><h3>${this.goalText(D)}</h3>${cnt}`;
     if (D.state === 'done') return `<div class="dpanel">${head}${this.doneBox(D)}</div>`;
     const status = D.busy ? `${OPP} is thinking…` : 'Your move';
@@ -253,7 +268,7 @@ const EG = {
   starsHTML(n){ return `<span class="egstars" aria-label="${n} of 3 stars">${[1, 2, 3].map(k => `<svg viewBox="0 0 24 24" class="${k <= n ? 'on' : ''}" aria-hidden="true"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4L2.8 9.5l6.4-.8z"/></svg>`).join('')}</span>`; },
   doneBox(D){
     const won = D.res === 'won' || D.res === 'held';
-    const h = {won: D.k.goal === 'mate' ? `Mate in ${D.mine}` : D.k.goal === 'queen' ? 'Queened' : 'Won', held: 'Held', slow: 'Too slow', lost: 'Mated', drawn: 'A draw'}[D.res];
+    const h = {won: D.k.how === 'mate' ? 'Mate' : D.k.goal === 'mate' ? `Mate in ${D.mine}` : D.k.goal === 'queen' ? 'Queened' : 'Won', held: 'Held', slow: 'Too slow', lost: 'Mated', drawn: 'A draw'}[D.res];
     const sub = won ? (D.slips ? plural(D.slips, 'slip') : 'Clean') : D.res === 'slow' ? `${D.k.goal === 'mate' ? 'No mate' : 'Not won'} in ${this.cap(D)} moves` : '';
     return `<div class="donebox ${won && !D.slips ? '' : 'bad'}"><h4>${h}</h4>${won ? this.starsHTML(D.stars) : ''}${sub ? `<p class="egsub">${esc(sub)}</p>` : ''}${D.it.why ? `<p class="egsub">In the game: ${esc(lc(D.it.why))}</p>` : ''}
       <div class="lesson-actions">${this.nextBtn(D)}<button class="btn" id="egAgain">Again</button></div><div id="deng"></div></div>`;
@@ -326,7 +341,11 @@ const EG = {
   // the endings of a unit's kinds won without a slip, each position once
   won(U){ const p = this.rd().p; return EGD.items.filter(it => U.kinds.includes(it.k) && p[it.id] && p[it.id][1] > 0).length; },
   passed(U){ return this.steps(U).every(s => s.done); },
-  cur(){ return EGD.units.find(U => !this.passed(U)) || null; },
+  mineU(){ return EGD.units.filter(U => !U.lib); },
+  libU(){ return EGD.units.filter(U => U.lib); },
+  listOf(U){ return U.lib ? this.libU() : this.mineU(); },
+  // the unit up next: the first of the player's own not passed, then the first of the basics
+  cur(){ return this.mineU().find(U => !this.passed(U)) || this.libU().find(U => !this.passed(U)) || null; },
   // the one thing that leads on in a unit
   unitNext(U){
     const s = this.steps(U).find(x => !x.done); if (!s) return null;
@@ -341,12 +360,12 @@ const EG = {
   seg(){ return segHTML([['open', 'Openings'], ['end', 'Endings']], S.cseg === 'end' ? 'end' : 'open', 'cseg'); },
   wireSeg(){ view.querySelectorAll('[data-cseg]').forEach(b => b.onclick = () => { S.cseg = b.dataset.cseg; S.deep = null; render(); setHash(); }); },
   renderCourse(){
-    const units = EGD.units, cur = this.cur(), passedN = units.filter(U => this.passed(U)).length;
+    const units = this.mineU(), lib = this.libU(), cur = this.cur(), passedN = units.filter(U => this.passed(U)).length;
     const bar = units.map(U => `<i class="${this.passed(U) ? 'on' : ''}" title="${esc(U.title)}"></i>`).join('');
     let hero;
     if (cur){
-      const st = this.steps(cur), nx = st.find(s => !s.done), go = this.unitNext(cur);
-      hero = `<section class="chero"><div class="board">${this.slideBoard(cur.slides[0], true)}</div><div><div class="chips"><span class="chip">Up next · Unit ${units.indexOf(cur) + 1} of ${units.length}</span></div>
+      const st = this.steps(cur), nx = st.find(s => !s.done), go = this.unitNext(cur), list = this.listOf(cur);
+      hero = `<section class="chero"><div class="board">${this.slideBoard(cur.slides[0], true)}</div><div><div class="chips"><span class="chip">Up next · ${cur.lib ? 'The basics · ' : ''}Unit ${list.indexOf(cur) + 1} of ${list.length}</span></div>
         <h3>${esc(cur.title)}</h3><p class="egwhy">${esc(cur.why)}</p>
         <ol class="ministeps" aria-label="Steps in this unit">${st.map(s => `<li class="${s.done ? 'done' : s === nx ? 'next' : ''}">${s.done ? ICON.check : ''}${esc(s.title)}</li>`).join('')}</ol>
         <div class="cta"><button class="btn primary" id="egGo">${esc(go ? go.cta : 'Open the unit')}</button></div></div></section>`;
@@ -355,8 +374,10 @@ const EG = {
       return `<li class="urow"><div class="rail">${pass ? `<span class="ubub pass" title="Passed">${ICON.check}</span>` : `<span class="ubub ${isCur ? 'cur' : ''}">${k + 1}</span>`}</div>
         <button class="ucard ${isCur ? 'cur' : ''}" data-egunit="${U.id}" aria-label="${esc(`Unit ${k + 1}: ${U.title}${pass ? ', passed' : ''}`)}"><div class="thumb">${this.slideBoard(U.slides[0], true)}</div>
           <span class="ut"><b>${esc(U.title)}</b><span class="egwhy">${esc(U.why)}</span></span><span class="ust"><span class="pips" aria-label="${done} of ${st.length} steps">${st.map(s => `<i class="${s.done ? 'on' : ''}"></i>`).join('')}</span></span></button></li>`; };
+    const libN = lib.filter(U => this.passed(U)).length;
     view.innerHTML = `${this.seg()}<div class="chead solo"><div class="cmeter"><div class="bar" aria-hidden="true">${bar}</div><span>${passedN} of ${units.length} units passed</span></div></div>
-      ${hero}<ol class="path" aria-label="Endings units">${units.map(row).join('')}</ol>`;
+      ${hero}<ol class="path" aria-label="Endings units">${units.map(row).join('')}</ol>
+      ${lib.length ? `<div class="eglib"><h3>The basics</h3><span class="tnum">${libN} of ${lib.length} passed</span></div><ol class="path" aria-label="The basics">${lib.map(row).join('')}</ol>` : ''}`;
     this.wireSeg();
     const g = document.getElementById('egGo'); if (g) g.onclick = () => { const m = this.unitNext(cur); if (m) m.go(); else this.openUnit(cur.id); };
     view.querySelectorAll('[data-egunit]').forEach(b => b.onclick = () => this.openUnit(b.dataset.egunit));
@@ -364,7 +385,7 @@ const EG = {
   },
   renderUnit(){
     const U = this.unit(S.egUnit); if (!U){ S.view = 'course'; S.cseg = 'end'; return render(); }
-    const k = EGD.units.indexOf(U), n = U.slides.length; S.egSlide = Math.max(0, Math.min(S.egSlide || 0, n - 1));
+    const list = this.listOf(U), k = list.indexOf(U), n = U.slides.length; S.egSlide = Math.max(0, Math.min(S.egSlide || 0, n - 1));
     if (S.egSlide === n - 1 && !(this.rd().u[U.id] || {}).l){ this.up(U.id).l = Date.now(); Prog.save(); }
     const s = U.slides[S.egSlide], u = this.rd().u[U.id] || {}, a = u.a || {}, st = this.steps(U), nx = st.find(x => !x.done), go = this.unitNext(U);
     const idea = `<div class="idea"><div class="board" id="ideaBoard">${this.slideBoard(s)}</div>
@@ -382,8 +403,8 @@ const EG = {
       else body = head('Checkpoint', x.best !== undefined ? `${x.best}/${x.of}` : '') + `<p class="sp">${this.need(x.of)} of ${x.of} to pass</p><div class="sx"><div class="lesson-actions"><button class="btn ${prim}" data-egstep="cp">${x.done ? 'Take it again' : 'Take the checkpoint'}</button></div></div>`;
       return `<li class="step ${x.done ? 'done' : ''} ${x === nx ? 'next' : ''}"><span class="sn">${x.done ? ICON.check : j + 1}</span><div>${body}</div></li>`;
     };
-    const prev = EGD.units[k - 1], next = EGD.units[k + 1];
-    view.innerHTML = `<div class="crumbs"><button class="btn small" id="egBack">← Course</button><span class="where">Unit ${k + 1} of ${EGD.units.length}</span><span class="spacer"></span>
+    const prev = list[k - 1], next = list[k + 1];
+    view.innerHTML = `<div class="crumbs"><button class="btn small" id="egBack">← Course</button><span class="where">${U.lib ? 'The basics · ' : ''}Unit ${k + 1} of ${list.length}</span><span class="spacer"></span>
         ${prev ? `<button class="btn small" data-egunit="${prev.id}" aria-label="Previous unit">‹<span class="navtxt"> Unit ${k}</span></button>` : ''}${next ? `<button class="btn small" data-egunit="${next.id}" aria-label="Next unit"><span class="navtxt">Unit ${k + 2} </span>›</button>` : ''}</div>
       <div class="ugrid"><div class="bcol">${idea}</div><div class="ucol"><header class="uhead">${this.passed(U) ? '<div class="chips"><span class="chip good">Passed</span></div>' : ''}<h2>${esc(U.title)}</h2><p class="egwhy">${esc(U.why)}</p>
         ${nx ? `<div class="cta" style="margin-top:14px"><button class="btn primary" id="uGo">${nx.key === 'idea' ? 'Next picture' : esc(go.cta)}</button></div>` : ''}</header>
@@ -399,15 +420,32 @@ const EG = {
   },
 
   // ---- the Endings tab: pick the kinds, start, play; the course's games and checkpoints play on the same page
+  // the card above the kinds: what the next ending is, with its idea to look at first; or the idea, picture by picture
+  topHTML(it){
+    const K = this.kind(it.k), I = S.egIdea && S.egIdea.k === K.id && K.idea ? K.idea : null;
+    if (I){
+      const i = S.egIdea.i = Math.max(0, Math.min(S.egIdea.i || 0, I.length - 1)), sl = I[i];
+      return `<div class="dpanel egtop"><p class="kicker">${esc(K.name)} · The idea</p><h3>${esc(sl.h)}</h3>${bullets(sl.t)}
+        ${I.length > 1 ? `<div class="ideanav"><button class="ctl" id="eiPrev" aria-label="Previous picture" ${i === 0 ? 'disabled' : ''}>${ICON.prev}</button><span class="dots" aria-hidden="true">${I.map((_, j) => `<i class="${j === i ? 'cur' : j < i ? 'on' : ''}"></i>`).join('')}</span><button class="ctl" id="eiNext" aria-label="Next picture" ${i >= I.length - 1 ? 'disabled' : ''}>${ICON.next}</button></div>` : ''}
+        <div class="lesson-actions"><button class="btn primary" id="egStart">Start</button><button class="btn" id="eiBack">Back</button></div></div>`;
+    }
+    const who = it.src ? 'vs ' + it.src.split(' ').slice(1).join(' ') : K.name;
+    return `<div class="dpanel egtop"><p class="kicker">${esc(K.group)} · ${esc(who)}</p><h3>${esc(this.goalOf(K, it))}</h3>
+      <div class="lesson-actions"><button class="btn primary" id="egStart">Start</button>${K.idea ? '<button class="btn" id="egIdea">The idea</button>' : ''}</div></div>`;
+  },
   sideHTML(){
     const D = S.drill; if (D && D.state === 'play') return '';
-    const pick = this.chosen(), groups = [...new Set(EGD.kinds.map(k => k.group))], p = this.rd().p;
-    const on = id => !pick || pick.includes(id);
-    const chip = K => `<button data-egk="${K.id}" aria-pressed="${!!pick && pick.includes(K.id)}" ${this.canPlay(K) ? '' : 'disabled'}>${esc(K.name)}</button>`;
+    const pick = this.chosen(), groups = [...new Set(EGD.kinds.map(k => k.group))], p = this.rd().p, open = S.egOpen || (S.egOpen = new Set());
+    const chip = (K, label) => `<button data-egk="${K.id}" aria-pressed="${!!pick && pick.includes(K.id)}" ${this.canPlay(K) ? '' : 'disabled'}>${esc(label || K.name)}</button>`;
     const played = Object.values(p).reduce((a, r) => a + r[0], 0), clean = Object.values(p).reduce((a, r) => a + r[1], 0), stars = Object.values(p).reduce((a, r) => a + (r[3] || 0), 0);
+    // a group of one is a single chip; the others fold, with the number picked beside the name
+    const grp = g => { const ks = EGD.kinds.filter(k => k.group === g), n = pick ? ks.filter(k => pick.includes(k.id)).length : 0;
+      if (ks.length === 1) return `<div class="seg egone">${chip(ks[0], g)}</div>`;
+      return `<details class="egg" data-eggrp="${esc(g)}" ${open.has(g) ? 'open' : ''}><summary><b>${esc(g)}</b><span class="egn tnum">${n ? `${n} of ${ks.length}` : ks.length}</span></summary>
+        <div class="seg"><button class="sbcol" data-egg="${esc(g)}" aria-pressed="${n === ks.length}">All ${esc(lc(g))}</button>${ks.map(K => chip(K)).join('')}</div></details>`; };
     return `<div class="dpanel">
-      <div><div class="seg"><button data-egk="all" aria-pressed="${!pick}">Everything</button></div>
-        ${groups.map(g => { const ks = EGD.kinds.filter(k => k.group === g); return `<div class="seg sbrow"><button class="sbcol" data-egg="${esc(g)}" aria-pressed="${!!pick && ks.every(k => pick.includes(k.id))}">${esc(g)}</button>${g === 'From your games' ? '' : ks.map(chip).join('')}</div>`; }).join('')}</div>
+      <div class="eggroups"><div class="seg"><button data-egk="all" aria-pressed="${!pick}">Everything</button></div>
+        ${groups.map(grp).join('')}</div>
       ${Engine.state === 'failed' ? `<p class="lockednote">${Engine.why === 'file' ? 'Most endings need the engine, and the engine needs the page opened from the web.' : 'The engine couldn\'t start here, so only the endings it isn\'t needed for are on.'}</p>` : ''}
       <div class="queue"><div><b class="tnum">${played}</b><span>played</span></div><div><b class="tnum">${clean}</b><span>clean</span></div><div><b class="tnum">${stars}</b><span>stars</span></div></div>
     </div>`;
@@ -417,9 +455,10 @@ const EG = {
       this.peek = null;
       if (id === 'all') this.pick = null;
       else { const p = new Set(this.pick || []); p.has(id) ? p.delete(id) : p.add(id); this.pick = p.size ? [...p] : null; }
-      this.savePick(); this.render(); });
+      S.egIdea = null; this.savePick(); this.render(); });
     view.querySelectorAll('[data-egg]').forEach(b => b.onclick = () => { const ks = EGD.kinds.filter(k => k.group === b.dataset.egg).map(k => k.id), p = new Set(this.pick || []);
-      const all = ks.every(k => p.has(k)); ks.forEach(k => all ? p.delete(k) : p.add(k)); this.pick = p.size ? [...p] : null; this.peek = null; this.savePick(); this.render(); });
+      const all = ks.every(k => p.has(k)); ks.forEach(k => all ? p.delete(k) : p.add(k)); this.pick = p.size ? [...p] : null; this.peek = null; S.egIdea = null; this.savePick(); this.render(); });
+    view.querySelectorAll('details.egg').forEach(d => d.ontoggle = () => { const g = d.dataset.eggrp; d.open ? S.egOpen.add(g) : S.egOpen.delete(g); });
   },
   render(){
     if (!egOn()){ S.view = 'course'; return render(); }
@@ -427,16 +466,23 @@ const EG = {
     const D = S.drill, U = D && D.unit && this.unit(D.unit);
     const crumbs = U ? `<div class="crumbs"><button class="btn small" data-egunit="${U.id}">← ${esc(U.title)}</button></div>` : D ? '<div class="crumbs"><button class="btn small" id="egHome">← Endings</button></div>' : '';
     const pool = this.pool();
-    if (!D && (!this.peek || !pool.includes(this.peek))) this.peek = this.next() || EGD.items[0];
-    const prev = !D && this.peek;
+    if (!D && (!this.peek || !pool.includes(this.peek))){ this.peek = this.next() || EGD.items[0]; S.egIdea = null; }
+    const prev = !D && this.peek, K0 = prev && this.kind(prev.k), I = prev && S.egIdea && K0.idea ? K0.idea[S.egIdea.i || 0] : null;
+    // before a game the board shows the next ending, or a picture of its idea
+    const shown = I ? this.slideBoard(I) : prev ? boardSVG(prev.fen.split(' ')[0], {coords: true, flip: prev.me === 'b'}) : '';
     view.innerHTML = `${crumbs}<div class="sgrid">
-      <div class="bcol"><div class="mat top"></div><div class="board ${D && (D.state === 'play' || drillOver(D)) ? 'input' : ''} ${D && D.guided ? 'guided' : ''}" id="db">${D ? '' : boardSVG(prev.fen.split(' ')[0], {coords: true, flip: prev.me === 'b'})}</div><div class="mat bot"></div>
+      <div class="bcol"><div class="mat top"></div><div class="board ${D && (D.state === 'play' || drillOver(D)) ? 'input' : ''} ${D && D.guided ? 'guided' : ''}" id="db">${D ? '' : shown}</div><div class="mat bot"></div>
         <p class="evaltext" id="deval" ${drillOver(D) ? '' : 'hidden'}>Engine: thinking…</p></div>
-      <div class="ccol"><div id="dpanel">${D ? this.panelHTML(D) : `<div class="dpanel"><div class="lesson-actions"><button class="btn primary" id="egStart">Start an ending</button></div></div>`}</div>
+      <div class="ccol"><div id="dpanel">${D ? this.panelHTML(D) : this.topHTML(prev)}</div>
         <div id="egside">${U ? '' : this.sideHTML()}</div></div></div>`;
-    if (D) renderDrillBoard(); else { const el = document.getElementById('db'); matUpdate(el, prev.fen, prev.me === 'b', true); }
+    if (D) renderDrillBoard(); else { const el = document.getElementById('db'); matUpdate(el, I ? I.fen : prev.fen, I ? I.me === 'b' : prev.me === 'b', true); }
     wireBoardInput(); this.wirePanel(); this.wireSide();
-    const st = document.getElementById('egStart'); if (st) st.onclick = () => { const it = this.peek || this.next(); this.peek = null; if (it) this.start(it.id); };
+    const st = document.getElementById('egStart'); if (st) st.onclick = () => { const it = this.peek || this.next(); this.peek = null; S.egIdea = null; if (it) this.start(it.id); };
+    const ib = id => document.getElementById(id);
+    if (ib('egIdea')) ib('egIdea').onclick = () => { S.egIdea = {k: prev.k, i: 0}; this.render(); };
+    if (ib('eiBack')) ib('eiBack').onclick = () => { S.egIdea = null; this.render(); };
+    if (ib('eiPrev')) ib('eiPrev').onclick = () => { S.egIdea.i--; this.render(); };
+    if (ib('eiNext')) ib('eiNext').onclick = () => { S.egIdea.i++; this.render(); };
     const h = document.getElementById('egHome'); if (h) h.onclick = () => { S.drill = S.egState = null; this.render(); };
     view.querySelectorAll('.crumbs [data-egunit]').forEach(b => b.onclick = () => this.openUnit(b.dataset.egunit));
   },

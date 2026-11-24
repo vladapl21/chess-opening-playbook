@@ -10,7 +10,7 @@ From content/endings.py:
     legal move judged: the moves that answer the question, and for each other move the reply that punishes it).
 Stockfish's results are kept in data/cache/end_build_cache.json, so a second run needs no engine (STOCKFISH otherwise).
 """
-import json, math, os, random, sys
+import json, math, os, random, re, sys
 import paths
 import chess, chess.engine
 import endtb
@@ -19,6 +19,7 @@ import endings as E
 CACHE = paths.CACHE / 'end_build_cache.json'
 OUT = paths.BUILD / 'data_endings.json'
 _c = json.load(open(CACHE)) if CACHE.exists() else {}
+_used = set()      # the keys this run read: a full build writes back only those
 _eng = None
 MATE = 100000
 WIN = 300          # a position counts as won from +3 for the player
@@ -43,6 +44,7 @@ def num(s):
 def sf(b, depth=20, multipv=1):
     """Stockfish's lines for the position: [[score from White's side, [moves]], ...], best first (cached)."""
     key = f'{b.epd()}|{depth}|{multipv}'
+    _used.add(key)
     if key not in _c:
         if b.is_game_over():
             v = (-MATE if b.turn == chess.WHITE else MATE) if b.is_checkmate() else 0
@@ -54,7 +56,25 @@ def sf(b, depth=20, multipv=1):
     return _c[key]
 
 
-def save(): json.dump(_c, open(CACHE, 'w'))
+def sfall(b, depth=18):
+    """Every legal move scored: {move: score for the side to move} (cached; a mate as +-(100000 - 100 n))."""
+    key = f'{b.epd()}|{depth}|all'
+    _used.add(key)
+    if key not in _c:
+        n = b.legal_moves.count()
+        if not n: return {}
+        infos = engine().analyse(b, chess.engine.Limit(depth=depth), multipv=n)
+        _c[key] = {i['pv'][0].uci(): pov(num(i['score']), b.turn) for i in infos if i.get('pv')}
+        if len(_c) % 50 == 0: save()
+    return _c[key]
+
+
+def save(full=False):
+    """Write the cache (to a new file first, so an interrupted write never empties it); after a whole build, only
+    the entries it used, so the file holds what the build needs."""
+    tmp = CACHE.with_suffix('.tmp')
+    json.dump({k: v for k, v in _c.items() if k in _used} if full else _c, open(tmp, 'w'))
+    os.replace(tmp, CACHE)
 
 
 def pov(v, color): return v if color == chess.WHITE else -v
@@ -264,6 +284,269 @@ def make_qp(rnd):
     return board([(sq(f, 1), 'p'), (bk, 'k'), (wq, 'Q'), (wk, 'K')], chess.WHITE)
 
 
+# ---------------------------------------------------------------- named mating patterns
+def mate_n(v): return (MATE - v) // 100 if v > MATE - 5000 else None
+
+
+def solve(b, depth=18):
+    """(n, the moves that mate in n) for the quickest mate Stockfish finds, or (None, []): the best move, then a
+    second search without it (a second move that mates as quickly is all that matters, not which)."""
+    key = f'{b.epd()}|{depth}|solve'
+    _used.add(key)
+    if key not in _c:
+        i1 = engine().analyse(b, chess.engine.Limit(depth=depth))
+        n = mate_n(pov(num(i1['score']), b.turn)); sols = []
+        if n:
+            first = i1['pv'][0]; sols = [first.uci()]
+            rest = [m for m in b.legal_moves if m != first]
+            if rest:
+                i2 = engine().analyse(b, chess.engine.Limit(depth=depth), root_moves=rest)
+                if mate_n(pov(num(i2['score']), b.turn)) == n: sols.append(i2['pv'][0].uci())
+        _c[key] = [n, sorted(sols)]
+        if len(_c) % 50 == 0: save()
+    return tuple(_c[key])
+
+
+def turned(b):
+    """The position, mirrored left to right, with the colours swapped, and both."""
+    h = b.transform(chess.flip_horizontal)
+    return [b.copy(), h, b.mirror(), h.mirror()]
+
+
+def noise(b, rnd):
+    """One to three pawns for each side on the ranks pawns stand on, three files or more from the king being mated."""
+    k = b.king(not b.turn); kf = chess.square_file(k); bb = b.copy()
+    for color in (chess.WHITE, chess.BLACK):
+        ranks = (1, 2) if color == chess.WHITE else (6, 5)
+        want = rnd.randint(1, 3)
+        for _ in range(40):
+            if not want: break
+            f = rnd.randrange(8)
+            if abs(f - kf) < 3: continue
+            s = sq(f, rnd.choice(ranks))
+            if bb.piece_at(s) or any(bb.piece_at(sq(f, r)) == chess.Piece(chess.PAWN, color) for r in range(8)): continue
+            bb.set_piece_at(s, chess.Piece(chess.PAWN, color)); want -= 1
+    return bb if bb.is_valid() and not bb.is_check() else None
+
+
+def gen_pattern(kind, bases, n, seed):
+    """From each base (a mate in one to three with one quickest first move): the base turned four ways, and two of each
+    with pawns added, kept while Stockfish finds the same mate with the same one first move; then taken in turn, so
+    the first n mix the bases and the turns."""
+    rnd = random.Random(seed); lanes = []
+    for fen in bases:
+        b0 = chess.Board(fen); n0, s0 = solve(b0)
+        assert b0.is_valid() and n0 and len(s0) == 1, (kind, fen, n0, s0)
+        for b in turned(b0):
+            lane = []
+            for x in [b] + [noise(b, rnd) for _ in range(2)]:
+                if x is None or any(o.epd() == x.epd() for l in lanes for o in l) or any(o.epd() == x.epd() for o in lane): continue
+                nn, ss = solve(x)
+                if nn == n0 and len(ss) == 1: lane.append(x)
+            lanes.append(lane)
+    out = []
+    for k in range(max(len(l) for l in lanes)):
+        out += [l[k] for l in lanes if k < len(l)]
+    if len(out) < n: print(f'  {kind}: only {len(out)} of {n}')
+    return out[:n]
+
+
+# ---------------------------------------------------------------- the other new endings, checked move by move
+def meaningful(b, goal, lo, hi, depth=18, shallow=None):
+    """The best move's value is in [lo, hi] (for the player), some moves throw it away and some don't; for an ending to
+    hold, a shallow search (what the page runs) agrees with the deep one about every move."""
+    v0 = pov(sf(b, 12)[0][0], b.turn)
+    if not lo - 150 <= v0 <= hi + 150: return False
+    a = sfall(b, depth)
+    if not a or not lo <= max(a.values()) <= hi: return False
+    good = lambda v: v > -200 if goal == 'hold' else v >= 200
+    ok = {u: good(v) for u, v in a.items()}
+    if all(ok.values()) or not any(ok.values()): return False
+    if shallow:
+        a2 = sfall(b, shallow)
+        if any(good(a2.get(u, -MATE)) != ok[u] for u in ok): return False
+    return True
+
+
+VAL = {chess.PAWN: 1, chess.KNIGHT: 3, chess.BISHOP: 3, chess.ROOK: 5, chess.QUEEN: 9, chess.KING: 100}
+
+
+def calm(b, pawns=True):
+    """No check, and nothing of theirs to take for free or for less (a loose pawn too, unless pawns=False, where
+    taking pawns is what the ending is about): the exercise is the ending, not a piece left hanging."""
+    if b.is_check(): return False
+    for m in b.legal_moves:
+        v = b.piece_at(m.to_square)
+        if v is None or (v.piece_type == chess.PAWN and not pawns): continue
+        if not b.is_attacked_by(not b.turn, m.to_square) or VAL[v.piece_type] > VAL[b.piece_type_at(m.from_square)]: return False
+    return True
+
+
+def gen_moves(kind, n, seed, make, goal, lo, hi, shallow=None, tries=1500, pawns=True):
+    rnd = random.Random(seed); out = []; t = 0
+    while len(out) < n and t < tries:
+        t += 1
+        b = make(rnd)
+        if not b or b.is_game_over() or not calm(b, pawns) or any(x.epd() == b.epd() for x in out): continue
+        if meaningful(b, goal, lo, hi, shallow=shallow): out.append(b.mirror() if len(out) % 3 == 2 else b)
+    if len(out) < n: print(f'  {kind}: only {len(out)} of {n} after {t} tries')
+    return out
+
+
+def make_van(rnd):
+    # your rook to place: theirs in front of its edge pawn on the sixth, their king near; yours on the far side
+    wk = sq(rnd.randrange(1, 4), rnd.randrange(2, 6)); bk = sq(rnd.randrange(5, 8), rnd.randrange(5, 8))
+    return board([(sq(0, 5), 'P'), (sq(0, 7), 'R'), (wk, 'K'), (bk, 'k'), (sq(rnd.randrange(2, 8), rnd.randrange(0, 8)), 'r')], chess.BLACK)
+
+
+def make_ssd(rnd):
+    # their pawn on the fifth or sixth with its king beside it; your king near the corner on the short side
+    f = rnd.randrange(2, 6); r = rnd.choice([4, 5]); short = 1 if f >= 4 else -1
+    wk = sq(f + rnd.choice([-1, 0, 1]), min(7, r + 1))
+    bk = sq(min(7, max(0, f + short * rnd.choice([1, 2]))), rnd.choice([6, 7])); br = sq(0 if short > 0 else 7, rnd.randrange(0, 8))
+    return board([(sq(f, r), 'P'), (wk, 'K'), (rnd.randrange(64), 'R'), (bk, 'k'), (br, 'r')], chess.BLACK)
+
+
+def make_rp(rnd):
+    f = rnd.randrange(1, 7); pr = rnd.randrange(1, 4)
+    bk = sq(min(7, max(0, f + rnd.choice([-1, 0, 1]))), min(7, pr + rnd.choice([0, 1])))
+    return board([(sq(f, pr), 'p'), (bk, 'k'), (rnd.randrange(64), 'R'), (rnd.randrange(64), 'K')], chess.WHITE)
+
+
+def make_r7(rnd):
+    wr = sq(rnd.randrange(0, 5), 6); br = sq(rnd.randrange(0, 8), rnd.choice([0, 1, 2, 7]))
+    mine = [sq(f, rnd.choice([1, 2])) for f in (5, 6, 7)] + ([sq(0, rnd.choice([1, 2, 3]))] if rnd.random() < .5 else [])
+    theirs = [sq(f, rnd.choice([5, 6])) for f in (5, 6, 7)] + ([sq(0, rnd.choice([5, 6]))] if rnd.random() < .5 else [])
+    wk = sq(rnd.randrange(4, 8), rnd.randrange(0, 2)); bk = sq(rnd.randrange(4, 8), 7)
+    return board([(wk, 'K'), (bk, 'k'), (wr, 'R'), (br, 'r')] + [(x, 'P') for x in mine] + [(x, 'p') for x in theirs], chess.WHITE)
+
+
+def make_wb(rnd):
+    # an edge pawn and the bishop that doesn't cover its corner; you to move with the lone king
+    a = rnd.choice([0, 7]); p = sq(a, rnd.randrange(3, 6)); corner = sq(a, 7)
+    light = lambda x: (chess.square_file(x) + chess.square_rank(x)) % 2 == 1
+    bs = rnd.choice([x for x in range(64) if light(x) != light(corner) and x != p])
+    return board([(p, 'P'), (bs, 'B'), (rnd.randrange(64), 'K'), (sq(rnd.randrange(8), rnd.randrange(4, 8)), 'k')], chess.BLACK)
+
+
+def make_np(rnd):
+    f = rnd.randrange(1, 7); pr = rnd.randrange(1, 3)
+    bk = sq(min(7, max(0, f + rnd.choice([-1, 0, 1]))), pr + rnd.choice([0, 1, 2]))
+    return board([(sq(f, pr), 'p'), (bk, 'k'), (rnd.randrange(64), 'N'), (rnd.randrange(64), 'K')], chess.WHITE)
+
+
+def make_qpd(rnd):
+    f = rnd.choice([0, 2, 5, 7]); bk = sq(min(7, max(0, f + rnd.choice([-1, 0, 1]))), rnd.randrange(0, 3))
+    return board([(sq(f, 1), 'p'), (bk, 'k'), (rnd.randrange(64), 'Q'), (rnd.randrange(64), 'K')], chess.BLACK)
+
+
+def make_qr(rnd):
+    wk, wq, bk, br = rnd.sample(range(64), 4)
+    if dist(wk, bk) > 3 or dist(br, bk) > 2: return None
+    return board([(wk, 'K'), (wq, 'Q'), (bk, 'k'), (br, 'r')], chess.WHITE)
+
+
+def make_con(rnd):
+    f = rnd.randrange(1, 6); r = rnd.choice([4, 5])
+    return board([(sq(f, r), 'P'), (sq(f + 1, r), 'P'), (rnd.randrange(64), 'K'), (rnd.randrange(64), 'k'), (rnd.randrange(64), 'r')], chess.WHITE)
+
+
+def make_stm(rnd):
+    a = rnd.choice([0, 7]); pr = rnd.randrange(1, 4)
+    bk = sq(a + (1 if a == 0 else -1) * rnd.choice([0, 1]), rnd.randrange(0, pr + 1))
+    return board([(sq(a, pr), 'p'), (bk, 'k'), (rnd.randrange(64), 'K'), (rnd.randrange(64), 'N')], chess.WHITE)
+
+
+def make_pro(rnd):
+    # your protected passed pawn on one wing; their extra pawn on the other
+    f = rnd.choice([1, 2]); r = rnd.choice([3, 4]); pf = f + rnd.choice([-1, 1])
+    mine = [sq(f, r), sq(pf, r - 1)] + [sq(x, rnd.choice([1, 2])) for x in rnd.sample([5, 6, 7], 2)]
+    theirs = [sq(x, rnd.choice([5, 6])) for x in (5, 6, 7)]
+    wk = sq(rnd.randrange(3, 8), rnd.randrange(0, 4)); bk = sq(rnd.randrange(0, 5), rnd.randrange(4, 8))
+    return board([(wk, 'K'), (bk, 'k')] + [(x, 'P') for x in mine] + [(x, 'p') for x in theirs], chess.WHITE)
+
+
+def make_tar(rnd):
+    # your rook behind your passed edge pawn, theirs in front of it or on its back row; three pawns each on the other wing
+    pr = rnd.choice([3, 4, 5]); wr = sq(0, rnd.randrange(0, pr)); br = sq(0, rnd.randrange(pr + 1, 8)) if rnd.random() < .7 else sq(rnd.randrange(1, 8), 7)
+    mine = [sq(0, pr)] + [sq(f, rnd.choice([1, 2])) for f in (5, 6, 7)]
+    theirs = [sq(f, rnd.choice([5, 6])) for f in (5, 6, 7)]
+    wk = sq(rnd.randrange(4, 8), rnd.randrange(0, 3)); bk = sq(rnd.randrange(3, 8), rnd.randrange(5, 8))
+    return board([(wk, 'K'), (bk, 'k'), (wr, 'R'), (br, 'r')] + [(x, 'P') for x in mine] + [(x, 'p') for x in theirs], chess.WHITE)
+
+
+def gen_won(kind, n, seed, make, lo):
+    """Positions Stockfish calls won (from lo, short of a mate it already sees), with no check on single moves."""
+    rnd = random.Random(seed); out = []; t = 0
+    while len(out) < n and t < 600:
+        t += 1
+        b = make(rnd)
+        if not b or b.is_game_over() or not calm(b, pawns=False) or any(x.epd() == b.epd() for x in out): continue
+        v = pov(sf(b, 12)[0][0], b.turn)
+        if not lo - 150 <= v < 2000: continue
+        v = pov(sf(b, 20)[0][0], b.turn)
+        if lo <= v < MATE - 3000: out.append(b.mirror() if len(out) % 3 == 2 else b)
+    if len(out) < n: print(f'  {kind}: only {len(out)} of {n}')
+    return out
+
+
+def gen_classic(kind, fens, n, goal, lo, hi, shift=0):
+    """A few classic positions, turned four ways (and moved up to `shift` files along the board), kept while Stockfish
+    agrees: the result in [lo, hi] for the player and some moves that throw it away."""
+    out = []
+    for fen in fens:
+        b0 = chess.Board(fen)
+        for d in range(shift + 1):
+            pm = b0.piece_map()
+            if any(chess.square_file(x) + d > 7 for x in pm): continue
+            b = chess.Board(None)
+            for x, p in pm.items(): b.set_piece_at(sq(chess.square_file(x) + d, chess.square_rank(x)), p)
+            b.turn = b0.turn
+            for x in turned(b):
+                if x.is_valid() and not any(o.epd() == x.epd() for o in out) and meaningful(x, goal, lo, hi): out.append(x)
+    if len(out) < n: print(f'  {kind}: only {len(out)} of {n}')
+    return out[:n]
+
+
+def gen_kpk_opp(n, seed):
+    """King and pawn: the one winning move is a king move that takes the opposition, face to face or from afar."""
+    rnd = random.Random(seed); out = []; t = 0
+    while len(out) < n and t < 600000:
+        t += 1
+        wk, bk = rnd.sample(range(64), 2); p = sq(rnd.randrange(1, 7), rnd.randrange(1, 5))
+        if p in (wk, bk): continue
+        b = board([(wk, 'K'), (p, 'P'), (bk, 'k')], chess.WHITE)
+        if not b: continue
+        r = endtb.probe(b)
+        if not r or r[0] != 1 or r[1] < 9 or b.legal_moves.count() < 5: continue
+        wins = [m for m in b.legal_moves if (endtb.after(b, m) or (0,))[0] == 1]
+        if len(wins) != 1 or b.piece_type_at(wins[0].from_square) != chess.KING: continue
+        b.push(wins[0]); k1, k2 = b.king(chess.WHITE), b.king(chess.BLACK); b.pop()
+        df, dr = abs(chess.square_file(k1) - chess.square_file(k2)), abs(chess.square_rank(k1) - chess.square_rank(k2))
+        if not ((df == 0 and dr % 2 == 0) or (dr == 0 and df % 2 == 0)) or any(o.epd() == b.epd() for o in out): continue
+        out.append(b.mirror() if len(out) % 3 == 2 else b)
+    assert len(out) == n, ('opp', len(out))
+    return out
+
+
+def gen_kpk_edge(n, seed, one=False):
+    """An edge pawn, you to move with the lone king: the draw is there, with one or two moves that keep it."""
+    rnd = random.Random(seed); out = []; t = 0
+    while len(out) < n and t < 600000:
+        t += 1
+        wk, bk = rnd.sample(range(64), 2); p = sq(rnd.choice([0, 7]), rnd.randrange(1, 6))
+        if p in (wk, bk): continue
+        b = board([(wk, 'K'), (p, 'P'), (bk, 'k')], chess.BLACK)
+        if not b: continue
+        r = endtb.probe(b)
+        if not r or r[0] != 0 or b.legal_moves.count() < 5: continue
+        keep = [m for m in b.legal_moves if (endtb.after(b, m) or (None,))[0] == 0]
+        if not 1 <= len(keep) <= (1 if one else 2) or any(o.epd() == b.epd() for o in out): continue
+        out.append(b.mirror() if len(out) % 3 == 2 else b)
+    assert len(out) == n, ('edge', len(out))
+    return out
+
+
 def item(kind, i, b, **x):
     return dict(id=f'{kind}-{i + 1}', k=kind, fen=b.fen(), me='w' if b.turn == chess.WHITE else 'b', **x)
 
@@ -271,10 +554,12 @@ def item(kind, i, b, **x):
 def kinds():
     K = {k['id']: k for k in E.KINDS}
     items = []; count = {}
-    def add(kind, boards, **x):
+    def add(kind, boards, v=False, **x):
+        start = v
         for b in boards:
             i = count[kind] = count.get(kind, 0) + 1
             it = item(kind, i - 1, b, **x)
+            if start: it['v'] = pov(sf(b)[0][0], b.turn)      # the value it starts from: the page lets a move drop to half of it
             if K[kind]['how'] in ('kqk', 'krk'):
                 it['par'] = (endtb.probe(b)[1] + 1) // 2
             elif K[kind]['goal'] == 'mate':
@@ -283,9 +568,9 @@ def kinds():
             items.append(it)
     add('q', gen_kxk('q', 'Q', 13, 19, 12, 11))
     add('r', gen_kxk('r', 'R', 21, 31, 12, 12))
-    add('rr', gen_engine('rr', 6, 13, make_rr, lambda v, L: v > MATE - 2000))
-    add('bb', gen_bare(4, 14, make_bb))
-    add('bn', gen_bare(4, 15, make_bn))
+    add('rr', gen_engine('rr', K['rr']['n'], 13, make_rr, lambda v, L: v > MATE - 2000))
+    add('bb', gen_bare(K['bb']['n'], 14, make_bb))
+    add('bn', gen_bare(K['bn']['n'], 15, make_bn))
     add('race', gen_engine('race', 4, 22, make_outside, lambda v, L: 400 <= v < MATE - 3000))
     add('kp', gen_kpk(12, 16))
     add('kpd', gen_kpk(10, 17, hold=True))
@@ -293,6 +578,26 @@ def kinds():
     add('phi', gen_engine('phi', 6, 19, make_phi, lambda v, L: abs(v) <= 60, depth=22))
     add('cut', gen_engine('cut', 6, 20, make_cut, lambda v, L: v >= 400))
     add('qp', gen_engine('qp', 6, 21, make_qp, lambda v, L: 500 <= v < MATE - 3000))
+    # the kinds added later: named mates, then endings checked move by move (a later kind never shifts an earlier one)
+    for kind, bases in E.PATTERNS.items():
+        add(kind, gen_pattern(kind, bases, K[kind]['n'], 100 + sum(map(ord, kind))))
+    add('opp', gen_kpk_opp(K['opp']['n'], 41))
+    add('rpk', gen_kpk_edge(K['rpk']['n'], 42))
+    add('tri', gen_classic('tri', E.VARIANTS['tri'], K['tri']['n'], 'win', 400, MATE, shift=4), v=True)
+    add('reti', gen_classic('reti', E.VARIANTS['reti'], K['reti']['n'], 'hold', -60, 60))
+    add('out', gen_won('out', K['out']['n'], 31, make_outside, 400), v=True)
+    add('pro', gen_moves('pro', K['pro']['n'], 32, make_pro, 'win', 350, 2000, pawns=False), v=True)
+    add('con', gen_moves('con', K['con']['n'], 33, make_con, 'queen', 400, MATE), v=True)
+    add('tar', gen_moves('tar', K['tar']['n'], 34, make_tar, 'win', 250, 2000, pawns=False), v=True)
+    add('van', gen_moves('van', K['van']['n'], 35, make_van, 'hold', -60, 60, shallow=12))
+    add('ssd', gen_moves('ssd', K['ssd']['n'], 36, make_ssd, 'hold', -60, 60, shallow=12))
+    add('rp', gen_moves('rp', K['rp']['n'], 37, make_rp, 'win', 400, 2000, tries=3000), v=True)
+    add('r7', gen_moves('r7', K['r7']['n'], 38, make_r7, 'win', 250, 2000, pawns=False), v=True)
+    add('wb', gen_moves('wb', K['wb']['n'], 39, make_wb, 'hold', -60, 60, shallow=12))
+    add('np', gen_moves('np', K['np']['n'], 40, make_np, 'hold', -60, 60, shallow=12))
+    add('stm', gen_moves('stm', K['stm']['n'], 43, make_stm, 'win', MATE - 900, MATE, tries=3000))
+    add('qpd', gen_moves('qpd', K['qpd']['n'], 44, make_qpd, 'hold', -60, 60, shallow=12))
+    add('qr', gen_moves('qr', K['qr']['n'], 45, make_qr, 'win', 400, MATE), v=True)
     for kind, fens in E.FIXED.items():
         keep = []
         for fen in fens:
@@ -351,8 +656,10 @@ def judge(fen, ask, hold=False, only=None):
     """The moves that answer the question, and what every other legal move runs into. only: the answers narrowed by
     hand to the move the question is about (the others that still win count as 'less')."""
     b = chess.Board(fen); me = b.turn; ok = []; vals = {}
-    mate2 = 'mate in two' in ask
-    mate1 = 'Find the mate' in ask and not mate2
+    mn = re.search(r'mate in (two|three|four)', ask)
+    mateN = {'two': 2, 'three': 3, 'four': 4}[mn.group(1)] if mn else None
+    mate1 = 'Find the mate' in ask and not mateN
+    first = 'first move of the mate' in ask
     r0 = endtb.probe(b)
     for m in b.legal_moves:
         b.push(m); mate = b.is_checkmate(); b.pop()
@@ -365,7 +672,8 @@ def judge(fen, ask, hold=False, only=None):
             vals[m] = pov(L[0][0], me)
     top = max(vals.values())
     if mate1: ok = [m for m, v in vals.items() if v == MATE]
-    elif mate2: ok = [m for m, v in vals.items() if v >= MATE - 100]
+    elif mateN: ok = [m for m, v in vals.items() if v >= MATE - 100 * (mateN - 1)]
+    elif first: ok = [m for m, v in vals.items() if v >= top > MATE - 5000]
     elif hold: ok = [m for m, v in vals.items() if v >= -DRAWN]
     elif r0 is not None: ok = [m for m, v in vals.items() if v > 0]
     else: ok = [m for m, v in vals.items() if v >= WIN and v >= top - (150 if top < MATE - 10000 else 10 ** 9)]
@@ -379,8 +687,20 @@ def gen_checks(gen, n, seed):
     """Checkpoint positions from the tables, by kind of question."""
     rnd = random.Random(seed); out = []; tries = 0
     piece = {'krk': 'R', 'kqk': 'Q'}.get(gen.split('-')[0])
+    if gen == 'kpk-edge': return gen_kpk_edge(n, seed, one=True)
     while len(out) < n and tries < 300000:
         tries += 1
+        if gen in ('kbbk-mate1', 'kbnk-mate1'):
+            wk, x1, x2, bk = rnd.sample(range(64), 4)
+            light = lambda s: (chess.square_file(s) + chess.square_rank(s)) % 2
+            if gen == 'kbbk-mate1' and light(x1) == light(x2): continue
+            b = board([(wk, 'K'), (x1, 'B'), (x2, 'B' if gen == 'kbbk-mate1' else 'N'), (bk, 'k')], chess.WHITE)
+            if not b or not edge(bk): continue
+            mates = [m for m in b.legal_moves if b.gives_check(m) and (b.push(m) or True) and (b.is_checkmate(), b.pop())[0]]
+            if len(mates) != 1 or sum(1 for m in b.legal_moves if b.gives_check(m)) < 3: continue
+            if any(b.is_attacked_by(chess.BLACK, s) and not b.is_attacked_by(chess.WHITE, s) for s in (x1, x2)): continue
+            if any(o.epd() == b.epd() for o in out): continue
+            out.append(b); continue
         if gen.startswith('kpk'):
             hold = gen == 'kpk-hold'
             wk, bk = rnd.sample(range(64), 2); p = sq(rnd.randrange(1, 7), rnd.randrange(1, 5))
@@ -430,10 +750,21 @@ def gen_checks(gen, n, seed):
     return out
 
 
-def unit_checks(U):
-    items = []
+ASK = {1: 'Find the mate.', 2: 'Find the mate in two.', 3: 'Find the mate in three.', 4: 'Find the mate in four.'}
+
+
+def unit_checks(U, made=()):
+    """made: the positions of the kinds; a question with `kind` takes the last one of that kind (with that `par`) not
+    already asked, since practice games start from the first ones."""
+    items = []; asked = set()
     for c in U['check']:
-        if 'gen' in c:
+        if 'kind' in c:
+            pool = [it for it in made if it['k'] == c['kind'] and (c.get('par') is None or it.get('par') == c['par']) and it['fen'] not in asked]
+            assert pool, ('no position for the question', U['id'], c)
+            it = pool[-1]; asked.add(it['fen'])
+            ask = c.get('ask') or ASK[it['par']]
+            items.append(judge(it['fen'], ask, hold='holds the draw' in ask))
+        elif 'gen' in c:
             for b in gen_checks(c['gen'], c['n'], sum(map(ord, c['gen']))):
                 if c['gen'] == 'krk-box':
                     a0 = box(b, chess.WHITE); vals = {}
@@ -445,7 +776,7 @@ def unit_checks(U):
                     items.append(dict(fen=b.fen(), me='w', ask=c['ask'], ok=[m.uci() for m in ok],
                                       bad={m.uci(): outcome(b, m, chess.WHITE) for m in b.legal_moves if m not in ok}))
                 else:
-                    items.append(judge(b.fen(), c['ask'], hold=c['gen'] == 'kpk-hold'))
+                    items.append(judge(b.fen(), c['ask'], hold=c['gen'] in ('kpk-hold', 'kpk-edge')))
         else:
             hold = 'holds the draw' in c['ask']
             items.append(judge(c['fen'], c['ask'], hold=hold, only=c.get('ok')))
@@ -460,6 +791,7 @@ def unit_lines(U):
         if a.get('gen') == 'kpk-demo': fen = '8/8/8/4k3/8/3K4/4P3/8 w - - 0 1'
         b = chess.Board(fen); assert b.is_valid(), fen
         if a.get('method'): moves = table_line(fen)
+        elif a.get('sfline'): moves = sf_line(fen)
         elif a.get('pv'): moves = sf(b, 24)[0][1][:a['pv']]
         else:
             moves = a['moves'].split()
@@ -471,30 +803,84 @@ def unit_lines(U):
     return out
 
 
-def unit_slides(U):
+def sf_line(fen, plies=140):
+    """Stockfish's line for both sides to the mate (the tables once only three pieces are left). The side that mates
+    never goes back to a position the line has had: of Stockfish's four best moves, the first that doesn't."""
+    b = chess.Board(fen); out = []; me = b.turn; seen = {b.board_fen() + str(b.turn)}
+    while not b.is_game_over() and len(out) < plies:
+        r = endtb.probe(b)
+        if r is not None: m = best_table(b) if r[0] >= 0 else defend_move(b)
+        elif b.turn == me:
+            for _, pv in sf(b, 20, 4):
+                m = chess.Move.from_uci(pv[0]); b.push(m); k = b.board_fen() + str(b.turn); b.pop()
+                if k not in seen: break
+        else: m = chess.Move.from_uci(sf(b, 20)[0][1][0])
+        out.append(m.uci()); b.push(m); seen.add(b.board_fen() + str(b.turn))
+    assert b.is_checkmate(), ('the line did not mate', fen, len(out))
+    return out
+
+
+def good_move(b, m):
+    """Is m as good as the position allows: the same result by the tables, or by Stockfish (a mate kept, a win kept
+    within 2, a draw kept)?"""
+    if endtb.which(b):
+        res = lambda x: (endtb.after(b, x) or (0,))[0]
+        return res(m) == max(res(x) for x in b.legal_moves)
+    a = sfall(b, 18); v = a[m.uci()]; top = max(a.values())
+    if top > MATE - 5000: return v > MATE - 5000
+    if top >= WIN: return v >= WIN and v >= top - 200
+    if top >= -DRAWN: return v >= -DRAWN
+    return v >= top - 100
+
+
+def slide(s):
+    """A picture to learn from, checked: a legal position, squares and colours, and the first green arrow, when it is a
+    move for the side to move, one that keeps what the position has."""
+    b = chess.Board(s['fen']); assert b.is_valid(), s['fen']
+    for a in s.get('arrows', []) + s.get('circles', []):
+        chess.parse_square(a[:2]); assert a[-1] in 'grby', a
+    g = [a for a in s.get('arrows', []) if a[-1] == 'g']
+    if g:
+        m = chess.Move.from_uci(g[0][:4])
+        if m in b.legal_moves: assert good_move(b, m), ('a green arrow that throws something away', s['fen'], g[0])
+    return dict(fen=s['fen'], me=s.get('me', 'w'), arrows=s.get('arrows', []), circles=s.get('circles', []), h=s['h'], t=s['t'])
+
+
+def unit_slides(U, ideas=None):
+    """A unit's pictures: its own, or a kind's idea pictures where it names a kind."""
     out = []
     for s in U['slides']:
-        b = chess.Board(s['fen']); assert b.is_valid(), s['fen']
-        for a in s.get('arrows', []) + s.get('circles', []):
-            chess.parse_square(a[:2]); assert a[-1] in 'grby', a
-        out.append(dict(fen=s['fen'], me=s.get('me', 'w'), arrows=s.get('arrows', []), circles=s.get('circles', []), h=s['h'], t=s['t']))
+        out += ideas[s] if isinstance(s, str) else [slide(s)]
     return out
 
 
 def main():
     items = kinds()
-    units = [dict(id=U['id'], title=U['title'], why=U['why'], kinds=U['kinds'], need=U['need'], slides=unit_slides(U),
-                  along=unit_lines(U), check=unit_checks(U)) for U in E.UNITS]
-    data = dict(kinds=[{k: v for k, v in K.items() if k not in ('n',)} for K in E.KINDS], items=items, units=units)
+    ideas = {K['id']: [slide(x) for x in K.get('idea', [])] for K in E.KINDS}
+    units = [dict(id=U['id'], title=U['title'], why=U['why'], kinds=U['kinds'], need=U['need'], slides=unit_slides(U, ideas),
+                  along=unit_lines(U), check=unit_checks(U, items), **({'lib': True} if U in E.LIB else {})) for U in E.UNITS + E.LIB]
+    kinds_out = []
+    for K in E.KINDS:
+        k = {x: v for x, v in K.items() if x not in ('n', 'idea')}
+        if ideas[K['id']]: k['idea'] = ideas[K['id']]
+        kinds_out.append(k)
+    data = dict(kinds=kinds_out, items=items, units=units)
     OUT.write_text(json.dumps(data, separators=(',', ':')))
+    global FULL
+    FULL = True
     from collections import Counter
     print('items', dict(Counter(i['k'] for i in items)), '| units', len(units), '| checks', sum(len(u['check']) for u in units),
           '| lines', sum(len(u['along']) for u in units), '|', len(OUT.read_text()), 'bytes')
 
 
+FULL = False
+
 if __name__ == '__main__':
+    code = 0
     try: main()
+    except BaseException:
+        import traceback; traceback.print_exc(); code = 1     # os._exit below would swallow it otherwise
     finally:
-        save()
+        save(full=FULL)
         if _eng: _eng.quit()
-        os._exit(0)
+        os._exit(code)

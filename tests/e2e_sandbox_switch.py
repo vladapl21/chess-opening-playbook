@@ -125,8 +125,8 @@ with sync_playwright() as p:
     allc = pg.evaluate("[document.querySelector('#sbside .queue div:nth-child(3) small').innerText, DRILLABLE.length, DATA.lines.filter(l => LESSONS[l.lesson] && !l.n.some(i => (N[i].g || []).includes('warn') && isMine(N[i]))).length, SIDE]")
     print('every White opening:', allc); assert allc[0] == '/' + str(allc[1]) and allc[1] == allc[2] and allc[1] > 300 and allc[3] == 'w', 'every drillable line of the book in play'
     # the start position has its place under the board, not at the bottom of the side column
-    where = pg.evaluate("(() => { const b = document.getElementById('db').getBoundingClientRect(), w = document.getElementById('sbwhere').getBoundingClientRect(), s = document.getElementById('sbside').getBoundingClientRect(); return [w.top >= b.bottom, Math.abs(w.left - b.left) < 30, w.right <= s.left + 2, document.getElementById('sbwhere').innerText]; })()")
-    print('under the board:', where[:3], ' '.join(where[3].split())[:90]); assert where[:3] == [True, True, True] and 'Set up a position' in where[3] and pg.locator('#sbwhere .thumb').count() == 0, where
+    where = pg.evaluate("(() => { const b = document.getElementById('db').getBoundingClientRect(), w = document.getElementById('sbwhere').getBoundingClientRect(), s = document.getElementById('sbside').getBoundingClientRect(), u = document.getElementById('sbSetUp').getBoundingClientRect(); return [w.top >= b.bottom, Math.abs(w.left - b.left) < 30, w.right <= s.left + 2, Math.abs((u.left + u.right) / 2 - (b.left + b.right) / 2) < 3, document.getElementById('sbwhere').innerText]; })()")
+    print('under the board, centred:', where[:4], ' '.join(where[4].split())[:90]); assert where[:4] == [True, True, True, True] and 'Set up a position' in where[4] and pg.locator('#sbwhere .thumb').count() == 0, where
 
     # ---- practice from a chosen position: set it up with the book's moves for both sides, by the board or the chips
     pg.click('#sbSetUp'); pg.wait_for_timeout(400)
