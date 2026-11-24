@@ -247,12 +247,18 @@ with sync_playwright() as p:
 
     # ---- material beside the board: what each side has taken, and the lead on the side that is ahead
     pg.evaluate("useSide('w'); openLine('fried-liver', 11)"); pg.wait_for_timeout(500)
-    mat = pg.evaluate("""(() => { const rows = [...document.querySelectorAll('.sgrid .mat')].map(r => [r.className, r.querySelectorAll('.pico').length, (r.querySelector('b') || {}).textContent || '']);
+    mat = pg.evaluate("""(() => { const rows = [...document.querySelectorAll('.sgrid .mat')].map(r => [r.className, r.querySelectorAll('.mpc').length, (r.querySelector('.madv') || {}).textContent || '']);
         const m = materialOf('r1bqkb1r/ppp2Npp/2n5/3np3/2B5/8/PPPP1PPP/RNBQK2R b KQkq - 0 6'); return [rows, m.diff, m.w.join(''), m.b.join('')]; })()""")
     print('material at the knight sacrifice:', mat)
     assert mat[1:] == [1, 'pp', 'p'] and mat[0] == [['mat top in', 1, ''], ['mat bot in', 2, '+1']], mat
     pg.evaluate("startDrillLine('fried-liver')"); pg.wait_for_timeout(700)
     assert pg.evaluate("document.querySelectorAll('.bcol .mat').length") == 2 and pg.evaluate("document.querySelector('#db').getBoundingClientRect().top - document.querySelector('.bcol .mat.top').getBoundingClientRect().bottom") >= 0
+    # a list with no gaps: the most valuable piece first, the same pieces stacked, the lead right beside them
+    row = pg.evaluate("""(() => { matUpdate(document.getElementById('db'), 'r1bqkb1r/pppp1ppp/2n5/8/4n3/8/PPPP1PPP/RNBQKB1R w KQkq - 0 5', true);
+        const r = document.querySelector('.bcol .mat.bot'), ic = [...r.querySelectorAll('.mpc')].map(e => e.getBoundingClientRect()), b = r.querySelector('.madv').getBoundingClientRect();
+        return {kinds: [...r.querySelectorAll('.mpc use')].map(u => u.getAttribute('href').slice(-1)).join(''), gaps: ic.slice(1).map((x, i) => Math.round(x.left - ic[i].right)), lead: Math.round(b.left - ic[ic.length - 1].right), txt: r.querySelector('.madv').textContent}; })()""")
+    print('material row:', row)
+    assert row['kinds'] == 'np' and all(g <= 1 for g in row['gaps']) and 0 <= row['lead'] <= 6 and row['txt'] == '+3', row
     pg.evaluate("S.drill = S.drillState = null; go('games')"); pg.wait_for_timeout(300)
 
     # ---- a line the build played on: the list of moves says where the added moves begin, the plan written for the lesson

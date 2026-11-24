@@ -24,7 +24,7 @@
   --f-display:"Barlow Condensed","Arial Narrow","Roboto Condensed",Impact,sans-serif;
   --f-body:"Barlow","Segoe UI",system-ui,-apple-system,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
-  --r:5px; --pico-b:none; --scrim:rgba(18,32,26,.45);
+  --r:5px; --pico-b:none; --mpc-w:drop-shadow(0 0 .5px rgba(16,32,24,.75)); --scrim:rgba(18,32,26,.45);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0D1411; --surface:#151F1A; --surface-2:#1C2822; --ink:#E4EDE8; --muted:#97ACA2; --line:#2A3832;
@@ -41,7 +41,7 @@
   --rar-common:#A3B0AA; --rar-rare:#6DAEFF; --rar-epic:#BE93FF; --rar-legendary:#F2C445; --rar-common-soft:#242C28; --rar-rare-soft:#16283F; --rar-epic-soft:#2A1F40; --rar-legendary-soft:#3A2F10;
   --sk-mid:#6E8FDA; --sk-mid-2:#2A3A5E; --sk-ruby:#E2605A; --sk-ruby-2:#4A2422; --sk-plum:#A78BF5; --sk-plum-2:#3A2E52; --sk-tang:#FF9A57; --sk-tang-2:#4A2E1C; --sk-gold:#E2B54C; --sk-gold-2:#4A3A12; --sk-mint:#5FD0AA; --sk-mint-2:#173B30; --sk-ocean:#5DB4DD; --sk-ocean-2:#16323F; --sk-rose:#F08AB0; --sk-rose-2:#47202F; --sk-slate:#A6B1C6; --sk-slate-2:#272D38; --sk-sand:#DDB874; --sk-sand-2:#3F3320;
   --gold:#E2B54C; --gold-2:#F7DF92; --silver:#A9B6BF; --silver-2:#E2E8EC; --bronze:#C9864F; --bronze-2:#EFC29C; --ribbon-1:#5F8BE0; --ribbon-2:#E2614F; --locked:#55665D; --locked-2:#1F2A25;
-  --shadow:0 0 0 1px var(--line),0 2px 0 rgba(0,0,0,.35); --pico-b:drop-shadow(0 0 1px rgba(214,226,219,.95)) drop-shadow(0 0 .6px rgba(214,226,219,.95)); --scrim:rgba(0,0,0,.62); color-scheme:dark}}
+  --shadow:0 0 0 1px var(--line),0 2px 0 rgba(0,0,0,.35); --pico-b:drop-shadow(0 0 1px rgba(214,226,219,.95)) drop-shadow(0 0 .6px rgba(214,226,219,.95)); --mpc-w:none; --scrim:rgba(0,0,0,.62); color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0D1411; --surface:#151F1A; --surface-2:#1C2822; --ink:#E4EDE8; --muted:#97ACA2; --line:#2A3832;
   --accent:#43C08F; --accent-ink:#06231A; --accent-soft:#173A2D;
@@ -57,7 +57,7 @@
   --rar-common:#A3B0AA; --rar-rare:#6DAEFF; --rar-epic:#BE93FF; --rar-legendary:#F2C445; --rar-common-soft:#242C28; --rar-rare-soft:#16283F; --rar-epic-soft:#2A1F40; --rar-legendary-soft:#3A2F10;
   --sk-mid:#6E8FDA; --sk-mid-2:#2A3A5E; --sk-ruby:#E2605A; --sk-ruby-2:#4A2422; --sk-plum:#A78BF5; --sk-plum-2:#3A2E52; --sk-tang:#FF9A57; --sk-tang-2:#4A2E1C; --sk-gold:#E2B54C; --sk-gold-2:#4A3A12; --sk-mint:#5FD0AA; --sk-mint-2:#173B30; --sk-ocean:#5DB4DD; --sk-ocean-2:#16323F; --sk-rose:#F08AB0; --sk-rose-2:#47202F; --sk-slate:#A6B1C6; --sk-slate-2:#272D38; --sk-sand:#DDB874; --sk-sand-2:#3F3320;
   --gold:#E2B54C; --gold-2:#F7DF92; --silver:#A9B6BF; --silver-2:#E2E8EC; --bronze:#C9864F; --bronze-2:#EFC29C; --ribbon-1:#5F8BE0; --ribbon-2:#E2614F; --locked:#55665D; --locked-2:#1F2A25;
-  --shadow:0 0 0 1px var(--line),0 2px 0 rgba(0,0,0,.35); --pico-b:drop-shadow(0 0 1px rgba(214,226,219,.95)) drop-shadow(0 0 .6px rgba(214,226,219,.95)); --scrim:rgba(0,0,0,.62); color-scheme:dark}
+  --shadow:0 0 0 1px var(--line),0 2px 0 rgba(0,0,0,.35); --pico-b:drop-shadow(0 0 1px rgba(214,226,219,.95)) drop-shadow(0 0 .6px rgba(214,226,219,.95)); --mpc-w:none; --scrim:rgba(0,0,0,.62); color-scheme:dark}
 /* board colours (Settings): each palette has its own light and dark values */
 :root[data-board="wood"]{--sq-light:#F0DDBD;--sq-dark:#B98B63}
 :root[data-board="blue"]{--sq-light:#E3EAF1;--sq-dark:#7C9CBF}
@@ -175,8 +175,10 @@ g.fx,.fx-ghost{pointer-events:none} .fx-ring{fill:none;stroke:var(--accent);stro
 .board.input{touch-action:none;cursor:pointer}
 .board .ghost{pointer-events:none}
 .board-wrap{display:grid;grid-template-columns:12px minmax(0,1fr);gap:8px;align-items:stretch}
-.mat{display:flex;align-items:center;height:20px;margin:2px 0;font-size:12.5px;color:var(--muted)} .mat.in{padding-left:20px}
-.mat .pico{width:17px;height:17px;flex:none;margin-right:-5px} .mat b{margin-left:11px;font-weight:700;color:var(--ink)}
+.mat{display:flex;align-items:center;gap:1px;height:22px;margin:2px 0} .mat.in{padding-left:20px}
+.mat .mg{display:flex;align-items:center} .mat .mpc{height:19px;flex:none} .mat .mpc + .mpc{margin-left:-7px}
+.mat .mpc.w{filter:var(--mpc-w)} .mat .mpc.b{filter:var(--pico-b)}
+.mat .madv{margin-left:3px;font:600 13px/1 var(--f-body);color:var(--muted);letter-spacing:.01em}
 .evalbar{position:relative;border-radius:3px;overflow:hidden;background:#2B312E;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
 .evalbar .fill{position:absolute;left:0;right:0;bottom:0;background:#F4F1E8;transition:height .35s ease}
 .evalbar .mid{position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(128,128,128,.6)}
@@ -476,9 +478,10 @@ g.fx,.fx-ghost{pointer-events:none} .fx-ring{fill:none;stroke:var(--accent);stro
 .sbks{display:flex;flex-wrap:wrap;gap:6px}
 .sbks .sbk{cursor:pointer;display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:13.5px;padding:6px 10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px}
 .sbks .sbk:hover{border-color:var(--accent)} .sbks .sbk svg{width:18px;height:18px}
-.sbwhere{display:flex;align-items:center;justify-content:space-between;gap:10px 14px;flex-wrap:wrap;margin-top:12px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)} .sbwhere .lesson-actions{margin:0}
-.sbfpos{display:grid;grid-template-columns:60px minmax(0,1fr);gap:12px;align-items:center;flex:1 1 230px;min-width:0} .sbfpos.one{grid-template-columns:minmax(0,1fr)}
-.sbfpos b{display:block;font-size:14px} .sbfpos span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+.sbwhere{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:14px} .sbwhere .lesson-actions{margin:0;justify-content:center}
+.sbsetbtn{display:inline-flex;align-items:center;gap:7px} .sbsetbtn svg{width:15px;height:15px;flex:none}
+.sbfpos{display:flex;align-items:center;justify-content:center;gap:10px;min-width:0;max-width:100%} .sbfpos .thumb{width:42px;flex:none}
+.sbfpos b{font-size:14px;min-width:0}
 .slips{display:grid;gap:10px}
 .slipc{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;align-items:center;background:var(--surface);border-radius:4px;padding:8px}
 .slipc b{display:block;font-size:14.5px}
@@ -1236,6 +1239,9 @@ function materialOf(fen, rel){
   const took = sd => 'qrbnp'.split('').flatMap(k => Array(Math.max(0, rel ? c[sd][k] - c[sd === 'w' ? 'b' : 'w'][k] : MAT_0[k] - c[sd === 'w' ? 'b' : 'w'][k])).fill(k));
   return {diff: val('w') - val('b'), w: took('w'), b: took('b')};
 }
+// a piece of the material rows: the drawing cut to its own width (the symbols are 45 wide with room on both sides), 19px high
+const MAT_BOX = {q: [6.2, 32.6], r: [8.6, 27.8], b: [9.5, 26], n: [7.8, 27.7], p: [9.5, 26]};
+function matIcon(k, white){ const [x, w] = MAT_BOX[k]; return `<svg class="mpc ${white ? 'w' : 'b'}" viewBox="${x} 3.5 ${w} 38" style="width:${(w / 2).toFixed(1)}px" aria-hidden="true"><use href="#p-${white ? 'w' : 'b'}${k}" width="45" height="45"/></svg>`; }
 function matUpdate(el, fen, flip, rel){
   if (!el) return;
   boardSound(el.id, fen);
@@ -1244,7 +1250,9 @@ function matUpdate(el, fen, flip, rel){
     let r = where === 'top' ? host.previousElementSibling : host.nextElementSibling;
     if (!r || !r.classList.contains('mat')){ r = document.createElement('div'); r.className = 'mat ' + where + (host === el ? '' : ' in'); host[where === 'top' ? 'before' : 'after'](r); }
     const lead = sd === 'w' ? m.diff : -m.diff, who = sd === 'w' ? 'White' : 'Black';
-    r.innerHTML = m[sd].map(k => pieceIcon(k, rel ? sd === 'w' : sd !== 'w')).join('') + (lead > 0 ? `<b class="tnum">+${lead}</b>` : '');   // in an ending: its own extra pieces
+    // in an ending: its own extra pieces. Queen first, the same pieces stacked, the lead right after them.
+    const white = rel ? sd === 'w' : sd !== 'w', groups = 'qrbnp'.split('').map(k => m[sd].filter(x => x === k)).filter(g => g.length);
+    r.innerHTML = groups.map(g => `<span class="mg">${g.map(k => matIcon(k, white)).join('')}</span>`).join('') + (lead > 0 ? `<b class="madv tnum">+${lead}</b>` : '');
     r.setAttribute('aria-label', m[sd].length || lead > 0 ? `${who} has taken ${m[sd].length} ${m[sd].length === 1 ? 'piece' : 'pieces'}${lead > 0 ? ` and is ${lead} ahead` : ''}` : '');
   };
   row('top', topSide); row('bot', topSide === 'w' ? 'b' : 'w');
@@ -3027,8 +3035,9 @@ function wireSbPanel(){
 function sbFromHTML(){
   const D = S.drill; if ((D && D.kind === 'sbset') || (D && D.kind === 'sb' && D.scope.startsWith('u:'))) return '';
   const f = sbFrom(), fl = f && N[f].u ? [N[f].u.slice(0, 2), N[f].u.slice(2, 4)] : null;
-  return `<div class="sbwhere">${f ? `<div class="sbfpos">${thumb(f, {coords: false, last: fl})}<div><b>From move ${moveNo(ply(f))}: ${esc(N[f].l)}</b></div></div>` : ''}
-    <div class="lesson-actions"><button class="btn small" id="sbSetUp" type="button">${f ? 'Change the position' : 'Set up a position'}</button>${f ? '<button class="btn small ghost" id="sbFromClear" type="button">Start from move one</button>' : ''}</div></div>`;
+  // centred under the board, no box: one button, or the position games start from with its two buttons
+  return `<div class="sbwhere">${f ? `<div class="sbfpos">${thumb(f, {coords: false, last: fl})}<b>From move ${moveNo(ply(f))}: ${esc(N[f].l)}</b></div>` : ''}
+    <div class="lesson-actions"><button class="btn small sbsetbtn" id="sbSetUp" type="button">${f ? 'Change the position' : `<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.75" y="1.75" width="12.5" height="12.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 2.5h5.5v5.5h-5.5zM8 8h5.5v5.5h-5.5z" fill="currentColor" opacity=".45"/></svg>Set up a position`}</button>${f ? '<button class="btn small ghost" id="sbFromClear" type="button">Start from move one</button>' : ''}</div></div>`;
 }
 // every line a game can end on with these settings, over the colours in play: the lines through the start position, or
 // the lines of the openings picked

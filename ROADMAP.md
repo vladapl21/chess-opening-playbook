@@ -69,6 +69,13 @@ Facts that shape the design:
 - Settings and the account button moved out of the header into the corner of the screen; the header fits one row on an ordinary monitor and centres its rows when it has to wrap.
 - A lesson opened from a course unit has "Next lesson" at the top. The Sandbox has "Free play: pick openings" to leave a course practice game.
 
+## Phase 1.29: every basic ending, and the named mates (done, November 23)
+
+- **The Endings tab holds the basics**: 48 kinds in eight groups (the mates, seventeen named mating patterns, pawn endings with the opposition, the edge pawn, triangulation and the Réti, passed pawns, rook endings with the Vančura and the short side, minor pieces, queen endings, and the house player's own). Each has its idea, a picture or two with one line, shown before a game; the kinds fold by group.
+- **Named mates are found, not stumbled into**: a move counts only while the mate is still there in time.
+- **The basics in the course**: eleven units after the seven from the games, built from the same kinds.
+- **The material beside the board** is one tight list, the queen first, with the lead right beside it; **Set up a position** sits centred under the Sandbox's board, with no box around it.
+
 ## Phase 1.28: endings (first version built, November 23)
 
 The house player's games were scanned for endings (Stockfish on every position of every ending): 51 stood won and 10 of those were not won. That scan is what the endings are built around.

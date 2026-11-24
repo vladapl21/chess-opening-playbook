@@ -1,12 +1,13 @@
 """End-to-end checks for the Endings tab and the endings course (app/endings.js), over local HTTP with the real engine.
 
-The house player sees the tab; a new visitor doesn't. A rook mate is won with the exact table's moves (stars, the
+The house player sees the tab; a new visitor doesn't. The kinds fold by group; the card above them names the next
+ending and opens its idea picture by picture; a named mate takes back a move that lets the mate go. A rook mate is won with the exact table's moves (stars, the
 record, the points, the engine on the board afterwards); a queen move that throws the win away is taken back with the
 answer that punishes it, and the second miss shows the arrow; a king and pawn draw is held against the table's trickiest
 tries; a Lucena position is won and a Philidor position held against the engine; a bishop left to be taken is a slip;
 one of the house player's own endings is won and says what happened in the game. The course: the Openings | Endings
 switch on the Course tab, a unit's pictures, its line to play along, its endings to win and its checkpoint (a wrong
-answer shows both arrows), until the unit is passed. Then the phone at 390px in the dark, the deep links, the merge of
+answer shows both arrows), until the unit is passed; a unit of the basics with its line and checkpoint. Then the phone at 390px in the dark, the deep links, the merge of
 two copies of the record, and no notation anywhere the player reads."""
 import re, sys
 from pathlib import Path
@@ -64,12 +65,46 @@ try:
         # ---- the tab: the house player's, with the kinds to pick from
         pg.goto(APP + '#endings'); pg.wait_for_timeout(1200)
         assert pg.evaluate('S.view') == 'endings' and pg.locator('.tabs [data-view="endings"]').is_visible()
-        assert pg.locator('[data-egk="all"][aria-pressed="true"]').count() == 1 and pg.locator('[data-egk]').count() >= 15
+        assert pg.locator('[data-egk="all"][aria-pressed="true"]').count() == 1 and pg.locator('[data-egk]').count() >= 45
+        # the kinds fold by group: only the group names show until one is opened
+        assert pg.locator('details.egg').count() == 7 and pg.locator('details.egg[open]').count() == 0 and not pg.locator('[data-egk="r"]').is_visible()
         pg.screenshot(path=out + 'eg_home.png'); clean(pg, 'home')
+        pg.click('details.egg[data-eggrp="Mates"] summary'); pg.wait_for_timeout(150)
         pg.click('[data-egk="r"]'); pg.wait_for_timeout(200)
         assert pg.evaluate('EG.pick') == ['r'] and pg.evaluate('EG.peek.k') == 'r'
+        assert pg.locator('details.egg[open]').count() == 1, 'a group stays open after a pick'
+        assert '1 of 5' in pg.inner_text('details.egg[data-eggrp="Mates"] summary')
         pg.click('[data-egk="all"]'); pg.wait_for_timeout(200)
         assert pg.evaluate('EG.pick') is None
+
+        # ---- the card above the kinds: the next ending's kind and goal, and its idea picture by picture
+        pg.click('details.egg[data-eggrp="Mating patterns"] summary'); pg.wait_for_timeout(150)
+        pg.click('[data-egk="bod"]'); pg.wait_for_timeout(300)
+        top = pg.inner_text('.egtop'); print('next ending:', ' '.join(top.split()))
+        assert pg.evaluate('EG.peek.k') == 'bod' and "boden's mate" in top.lower() and re.search(r'Mate in \d', top)
+        n_idea = pg.evaluate("EG.kind('bod').idea.length")
+        pg.click('#egIdea'); pg.wait_for_timeout(200)
+        assert 'the idea' in pg.inner_text('.egtop').lower() and pg.locator('#db svg g.arr.g').count() >= 1, 'the idea on the board, with its green arrow'
+        assert pg.evaluate("S.egIdea.i") == 0 and pg.locator('#eiNext').count() == (1 if n_idea > 1 else 0)
+        pg.screenshot(path=out + 'eg_idea.png'); clean(pg, 'idea')
+        if n_idea > 1:
+            pg.click('#eiNext'); pg.wait_for_timeout(150); assert pg.evaluate("S.egIdea.i") == 1
+        pg.click('#eiBack'); pg.wait_for_timeout(150)
+        assert pg.evaluate('S.egIdea') is None and pg.locator('#egIdea').count() == 1
+
+        # ---- a named mate: a move that lets the mate go is taken back with their answer; then the mate wins it
+        pid = pg.evaluate('EG.peek.id'); par = pg.evaluate('EG.peek.par')
+        pg.click('#egStart'); pg.wait_for_timeout(500)
+        assert pg.evaluate('S.drill.id') == pid and pg.evaluate('S.drill.k.how') == 'mate' and f'Mate in {par}' in pg.inner_text('#dpanel')
+        best = pg.evaluate(ENGINE_BEST)
+        wrong = pg.evaluate(f"""(() => {{ const f = EG.fen(S.drill); return new Chess(f).moves({{verbose: true}}).map(m => m.from + m.to).filter(u => u !== '{best}' && !new Chess(f).move(uciObj(u)).san.includes('#')).pop(); }})()""")
+        pg.evaluate(f"tryMove('{wrong[:2]}', '{wrong[2:4]}')"); pg.wait_for_timeout(300); idle(pg)
+        msg = pg.evaluate('S.drill.msg'); print('a named mate let go:', msg)
+        assert pg.evaluate('S.drill.slips') == 1 and pg.evaluate('S.drill.moves.length') == 0 and 'mate' in msg.lower() and not notation(msg)
+        st = play(pg, ENGINE_BEST, 10); print("Boden's mate:", st)
+        assert st[1] == 'won' and st[2] == par and st[4] == 2, st
+        pg.screenshot(path=out + 'eg_pattern.png'); clean(pg, 'pattern')
+        pg.evaluate("S.drill = S.egState = null; EG.pick = null; EG.peek = null; EG.render()"); pg.wait_for_timeout(200)
 
         # ---- a rook mate, won with the table's moves: stars, the record, points, and the engine on the board after
         xp0 = pg.evaluate('Level.xp()')
@@ -142,7 +177,9 @@ try:
         pg.evaluate("S.drill = S.egState = null"); pg.click('.tabs [data-view="course"]'); pg.wait_for_timeout(500)
         assert pg.locator('[data-cseg]').count() == 2 and pg.locator('[data-cseg="open"][aria-selected="true"]').count() == 1
         pg.click('[data-cseg="end"]'); pg.wait_for_timeout(500)
-        assert pg.locator('.path .urow').count() == 7 and 'egcourse' in pg.url
+        nlib = pg.evaluate('EG.libU().length')
+        assert pg.locator('.path').first.locator('.urow').count() == 7 and pg.locator('.path .urow').count() == 7 + nlib and 'egcourse' in pg.url
+        assert nlib >= 10 and 'The basics' in pg.inner_text('.eglib')
         pg.screenshot(path=out + 'eg_course.png', full_page=True); clean(pg, 'course')
         pg.click('[data-egunit="eg-r"]'); pg.wait_for_timeout(400)
         assert pg.evaluate('S.view') == 'egunit' and pg.evaluate("EG.steps(EG.unit('eg-r')).map(s => s.done)") == [False, False, False, False]
@@ -179,6 +216,21 @@ try:
         pg.click('[data-egunit="eg-r"]'); pg.wait_for_timeout(400)
         assert 'Passed' in pg.inner_text('.uhead')
 
+        # ---- the basics: a unit for everyone, its pictures from the kinds' ideas, its line and its checkpoint
+        pg.evaluate("EG.openUnit('eg-knm')"); pg.wait_for_timeout(400)
+        assert 'The basics · Unit 1 of' in pg.inner_text('.crumbs') and pg.evaluate("EG.unit('eg-knm').slides.length") >= 5
+        pg.screenshot(path=out + 'eg_lib_unit.png', full_page=True); clean(pg, 'library unit')
+        pg.click('[data-egalong="0"]'); pg.wait_for_timeout(500)
+        st = play(pg, 'S.drill.hint', 10); print('Philidor\'s legacy, played along:', st)
+        assert st[1] == 'along'
+        pg.evaluate("EG.quiz('eg-knm')"); pg.wait_for_timeout(400)
+        n = pg.evaluate('S.drill.items.length'); asks = pg.evaluate('S.drill.items.map(i => i.ask)'); print('checkpoint:', asks)
+        assert all('mate' in a for a in asks)
+        for k in range(n):
+            u = pg.evaluate('S.drill.items[S.drill.k].ok[0]')
+            pg.evaluate(f"tryMove('{u[:2]}', '{u[2:4]}')"); pg.wait_for_timeout(150); pg.click('#egQNext'); pg.wait_for_timeout(150)
+        assert pg.evaluate("EG.rd().u['eg-knm'].q[0]") == n
+
         # ---- the deep links come back to the same place
         for h, view in (('#egcourse', 'course'), ('#egunit.eg-kp', 'egunit'), ('#endings', 'endings')):
             pg.goto(APP + h); pg.reload(); pg.wait_for_timeout(900)
@@ -194,6 +246,8 @@ try:
         ph = b.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True, color_scheme='dark'); q = ph.new_page(); hook(q, 'phone')
         for h, shot in (('#endings', 'eg_phone_home'), ('#egcourse', 'eg_phone_course'), ('#egunit.eg-race', 'eg_phone_unit')):
             q.goto(APP + h); q.reload(); q.wait_for_timeout(900)
+            if h == '#endings':
+                q.click('details.egg[data-eggrp="Mating patterns"] summary'); q.wait_for_timeout(200)
             assert q.evaluate('document.documentElement.scrollWidth') <= 390, h
             q.screenshot(path=out + shot + '.png', full_page=True)
         q.evaluate("EG.start('race-1')"); q.wait_for_timeout(600)
